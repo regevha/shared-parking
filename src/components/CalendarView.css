@@ -167,29 +167,27 @@
     padding: 1px 3px;
   }
 
-  /* Mobile week: only the time-view scrolls, toolbar stays full-width */
-  .calendar-week-view .rbc-calendar {
-    overflow-x: visible;
+  /* Mobile week: shrink all 7 columns to fit viewport width */
+  .calendar-week-view .rbc-time-header-content .rbc-header,
+  .calendar-week-view .rbc-day-slot {
+    min-width: 0;
   }
 
-  .calendar-week-view .rbc-time-view {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .calendar-week-view .rbc-time-gutter {
+    width: 48px;
+    min-width: 48px;
+    max-width: 48px;
   }
 
-  /* 69px time gutter + 7 columns × 72px = 573px */
-  .calendar-week-view .rbc-time-header,
-  .calendar-week-view .rbc-time-content {
-    min-width: 573px;
-  }
-
-  /* Sticky time gutter while scrolling */
-  .calendar-week-view .rbc-time-gutter,
   .calendar-week-view .rbc-time-header-gutter {
-    position: sticky;
-    left: 0;
-    z-index: 10;
-    background: #fff;
+    width: 48px;
+    min-width: 48px;
+    max-width: 48px;
+  }
+
+  .calendar-week-view .rbc-label {
+    font-size: 9px;
+    padding: 0 2px;
   }
 
   /* Compact week column headers */
