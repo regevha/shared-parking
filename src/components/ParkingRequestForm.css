@@ -1,0 +1,37 @@
+.parking-request-form {
+  padding: 24px;
+  background-color: #fafafa;
+  min-height: 100vh;
+}
+
+.parking-request-form h1 {
+  margin-bottom: 24px;
+  color: #1f1f1f;
+}
+
+.parking-request-form h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #1f1f1f;
+}
+
+.parking-request-form ul {
+  margin-bottom: 0;
+  padding-left: 24px;
+}
+
+.parking-request-form ul li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .parking-request-form {
+    padding: 12px;
+  }
+
+  .parking-request-form h1 {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+}

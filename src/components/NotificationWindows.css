@@ -1,0 +1,29 @@
+.notification-windows {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.notification-windows h1 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #1890ff;
+}
+
+.window-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.window-item .ant-tag {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.window-item .ant-btn {
+  padding: 2px 8px;
+}

@@ -1,0 +1,21 @@
+.all-approvals {
+  padding: 24px;
+  background-color: #fafafa;
+  min-height: 100vh;
+}
+
+.all-approvals h1 {
+  margin-bottom: 24px;
+  color: #1f1f1f;
+}
+
+@media (max-width: 768px) {
+  .all-approvals {
+    padding: 12px;
+  }
+
+  .all-approvals h1 {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+}
