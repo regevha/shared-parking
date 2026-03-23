@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Layout, Menu, Dropdown, Button } from 'antd';
+import { Layout, Menu, Dropdown, Button, ConfigProvider, theme } from 'antd';
 import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined } from '@ant-design/icons';
 import { Role } from './types';
 import { RequestsProvider } from './contexts/RequestsContext';
@@ -63,6 +63,7 @@ const App: React.FC = () => {
   };
 
   return (
+    <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
     <RequestsProvider>
       <Router>
         <Layout>
@@ -104,6 +105,7 @@ const App: React.FC = () => {
         </Layout>
       </Router>
     </RequestsProvider>
+    </ConfigProvider>
   );
 };
 

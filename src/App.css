@@ -36,3 +36,147 @@
     transform: rotate(360deg);
   }
 }
+
+@media (max-width: 768px) {
+  .ant-layout-content {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+/* ── Dark mode overrides for react-big-calendar ── */
+body {
+  background-color: #141414;
+}
+
+.rbc-calendar {
+  color: #e6e6e6;
+}
+
+.rbc-off-range-bg {
+  background: #1f1f1f;
+}
+
+.rbc-today {
+  background-color: #1a2942;
+}
+
+.rbc-header,
+.rbc-time-header-content,
+.rbc-time-header-gutter {
+  background-color: #1f1f1f;
+  border-color: #303030;
+  color: #e6e6e6;
+}
+
+.rbc-header + .rbc-header,
+.rbc-time-header.rbc-overflowing {
+  border-color: #303030;
+}
+
+.rbc-time-view,
+.rbc-month-view,
+.rbc-agenda-view {
+  border-color: #303030;
+  background-color: #141414;
+}
+
+.rbc-time-content {
+  border-color: #303030;
+  background-color: #141414;
+}
+
+.rbc-time-gutter .rbc-label,
+.rbc-timeslot-group {
+  color: #888;
+  border-color: #303030;
+}
+
+.rbc-timeslot-group {
+  border-bottom-color: #303030;
+}
+
+.rbc-time-slot {
+  border-top-color: #262626;
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top-color: #262626;
+}
+
+.rbc-day-bg + .rbc-day-bg,
+.rbc-month-row + .rbc-month-row,
+.rbc-month-header {
+  border-color: #303030;
+}
+
+.rbc-day-bg {
+  border-color: #303030;
+}
+
+.rbc-date-cell {
+  color: #bbb;
+}
+
+.rbc-date-cell.rbc-now {
+  color: #4096ff;
+}
+
+.rbc-show-more {
+  color: #4096ff;
+  background: transparent;
+}
+
+.rbc-toolbar button {
+  color: #e6e6e6;
+  border-color: #434343;
+  background: #1f1f1f;
+}
+
+.rbc-toolbar button:hover {
+  background: #2a2a2a;
+}
+
+.rbc-toolbar button.rbc-active {
+  background: #1677ff;
+  border-color: #1677ff;
+  color: #fff;
+}
+
+/* Custom toolbar buttons (desktop + mobile) */
+.desktop-toolbar-nav button,
+.desktop-toolbar-views button,
+.mobile-toolbar-nav button,
+.mobile-toolbar-views button {
+  background: #1f1f1f !important;
+  border-color: #434343 !important;
+  color: #e6e6e6 !important;
+}
+
+.desktop-toolbar-views button.rbc-active,
+.mobile-toolbar-views button.rbc-active {
+  background: #1677ff !important;
+  border-color: #1677ff !important;
+  color: #fff !important;
+}
+
+.desktop-toolbar-label,
+.mobile-toolbar-label {
+  color: #e6e6e6;
+}
+
+.desktop-toolbar,
+.mobile-toolbar {
+  border-top-color: #303030 !important;
+}
+
+/* Sticky gutter background in dark mode */
+.rbc-time-gutter,
+.rbc-time-header-gutter {
+  background-color: #141414 !important;
+}
+
+.calendar-week-view .rbc-time-gutter,
+.calendar-week-view .rbc-time-header-gutter {
+  background-color: #141414 !important;
+}

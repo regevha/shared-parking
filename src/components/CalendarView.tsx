@@ -1,10 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Card, Row, Col, Modal, Descriptions, Tag, Button, notification } from 'antd';
-import { CalendarOutlined } from '@ant-design/icons';
+import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification } from 'antd';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import './CalendarView.css';
@@ -32,11 +31,38 @@ const STATUS_COLORS: Record<string, string> = {
   rejected: '#f5222d',
 };
 
+// Defined outside component for stable reference (no closure needed)
+const CustomEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => (
+  <div className="custom-event">
+    <div className="custom-event-title">{event.title}</div>
+    <div className="custom-event-time">{event.resource.startTime}–{event.resource.endTime}</div>
+  </div>
+);
+
+const CustomMobileHeader: React.FC<{ date: Date }> = ({ date: headerDate }) => (
+  <div className="mobile-week-header">
+    <span className="mobile-week-header-day">{dayjs(headerDate).format('ddd').slice(0, 2)}</span>
+    <span className="mobile-week-header-num">{dayjs(headerDate).format('D')}</span>
+  </div>
+);
+
+
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const { pendingRequests, userRequests, updateUserRequest } = useRequests();
-  const [view, setView] = useState<View>('week');
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
+  const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
+  const minTime = useMemo(() => { const d = new Date(); d.setHours(7, 0, 0, 0); return d; }, []);
+  const maxTime = useMemo(() => { const d = new Date(); d.setHours(20, 0, 0, 0); return d; }, []);
   const [date, setDate] = useState(new Date());
   const [selectedRequest, setSelectedRequest] = useState<ParkingRequest | null>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const myRequestIds = useMemo(() => new Set(userRequests.map((r) => r.id)), [userRequests]);
 
@@ -107,6 +133,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
     });
   };
 
+  const handleViewChange = (newView: View) => {
+    setView(newView);
+  };
+
   const handleEventDrop = ({ event, start, end }: { event: CalendarEvent; start: Date; end: Date }) => {
     if (!event.isMine || event.resource.status !== 'pending') return;
     applyReschedule(event, start, end);
@@ -117,34 +147,150 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
     applyReschedule(event, start, end);
   };
 
+  // Desktop toolbar — matches mobile style, adds DatePicker
+  const CustomDesktopToolbar = useCallback((tb: any) => (
+    <div className="desktop-toolbar">
+      <div className="desktop-toolbar-nav">
+        <button onClick={() => tb.onNavigate('TODAY')}>Today</button>
+        <button onClick={() => tb.onNavigate('PREV')}>‹</button>
+        <button onClick={() => tb.onNavigate('NEXT')}>›</button>
+      </div>
+      <span className="desktop-toolbar-label">{tb.label}</span>
+      <div className="desktop-toolbar-right">
+        <DatePicker
+          size="small"
+          value={dayjs(date)}
+          onChange={(d) => { if (d) setDate(d.toDate()); }}
+          allowClear={false}
+          inputReadOnly
+          style={{ width: 120 }}
+        />
+        <div className="desktop-toolbar-views">
+          {tb.views.map((v: View) => (
+            <button key={v} className={tb.view === v ? 'rbc-active' : ''} onClick={() => tb.onView(v)}>
+              {v.charAt(0).toUpperCase() + v.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  ), [date, setDate]);
+
+  const CustomMobileToolbar = useCallback((tb: any) => (
+    <div className="mobile-toolbar">
+      <div className="mobile-toolbar-nav">
+        <button onClick={() => tb.onNavigate('TODAY')}>Today</button>
+        <button onClick={() => tb.onNavigate('PREV')}>‹</button>
+        <button onClick={() => tb.onNavigate('NEXT')}>›</button>
+      </div>
+      <span className="mobile-toolbar-label">{tb.label}</span>
+      <div className="mobile-toolbar-right">
+        <DatePicker
+          size="small"
+          value={dayjs(date)}
+          onChange={(d) => { if (d) setDate(d.toDate()); }}
+          allowClear={false}
+          inputReadOnly
+          style={{ width: 110 }}
+        />
+        <div className="mobile-toolbar-views">
+          {tb.views.map((v: View) => (
+            <button key={v} className={tb.view === v ? 'rbc-active' : ''} onClick={() => tb.onView(v)}>
+              {v === 'week' ? 'Wk' : v.charAt(0).toUpperCase() + v.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  ), [date, setDate]);
+
+  const desktopComponents = useMemo(() => ({
+    toolbar: CustomDesktopToolbar,
+    event: CustomEvent,
+  }), [CustomDesktopToolbar]);
+
+  const mobileComponents = useMemo(() => ({
+    toolbar: CustomMobileToolbar,
+    event: CustomEvent,
+    header: CustomMobileHeader,
+  }), [CustomMobileToolbar]);
+
+  // Empty state: events visible in current day/week range
+  const hasVisibleEvents = useMemo(() => {
+    if (view === 'month') return true;
+    const rangeStart = (view === 'week' ? dayjs(date).startOf('week') : dayjs(date).startOf('day')).toDate();
+    const rangeEnd = (view === 'week' ? dayjs(date).endOf('week') : dayjs(date).endOf('day')).toDate();
+    return events.some(e => e.start < rangeEnd && e.end > rangeStart);
+  }, [events, date, view]);
+
   // Stats
   const totalRequests = allRequests.length;
   const pendingCount = allRequests.filter((r) => r.status === 'pending' && !r.rejectedByOwner).length;
   const approvedCount = allRequests.filter((r) => r.status === 'approved').length;
   const rejectedCount = allRequests.filter((r) => r.rejectedByOwner).length;
 
+  const mobileCalendarHeight = view === 'month' ? 620 : 500;
+
   return (
     <div className="calendar-view">
       {/* Calendar */}
-      <Card style={{ marginBottom: '24px' }}>
-        <DnDCalendar
-          localizer={localizer}
-          events={events}
-          view={view}
-          onView={setView}
-          date={date}
-          onNavigate={setDate}
-          views={['day', 'week', 'month']}
-          style={{ height: 700 }}
-          eventPropGetter={eventStyleGetter}
-          onSelectEvent={(event: CalendarEvent) => setSelectedRequest(event.resource)}
-          popup
-          draggableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
-          resizableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
-          onEventDrop={handleEventDrop}
-          onEventResize={handleEventResize}
-        />
-      </Card>
+      {isMobile ? (
+        <div className={`calendar-naked-wrapper${view === 'week' ? ' calendar-week-view' : ''}`}>
+          <DnDCalendar
+            localizer={localizer}
+            events={events}
+            view={view}
+            onView={handleViewChange}
+            date={date}
+            onNavigate={setDate}
+            views={['day', 'week', 'month']}
+            style={{ height: mobileCalendarHeight }}
+            eventPropGetter={eventStyleGetter}
+            onSelectEvent={(event: CalendarEvent) => setSelectedRequest(event.resource)}
+            popup
+            draggableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
+            resizableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
+            onEventDrop={handleEventDrop}
+            onEventResize={handleEventResize}
+            scrollToTime={scrollTo8AM}
+            min={minTime}
+            max={maxTime}
+            components={mobileComponents}
+          />
+          {!hasVisibleEvents && (
+            <div className="calendar-empty-state">No requests this period</div>
+          )}
+        </div>
+      ) : (
+        <Card style={{ marginBottom: '24px' }}>
+          <DnDCalendar
+            localizer={localizer}
+            events={events}
+            view={view}
+            onView={handleViewChange}
+            date={date}
+            onNavigate={setDate}
+            views={['day', 'week', 'month']}
+            style={{ height: 700 }}
+            eventPropGetter={eventStyleGetter}
+            onSelectEvent={(event: CalendarEvent) => setSelectedRequest(event.resource)}
+            popup
+            draggableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
+            resizableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
+            onEventDrop={handleEventDrop}
+            onEventResize={handleEventResize}
+            scrollToTime={scrollTo8AM}
+            step={30}
+            timeslots={1}
+            min={minTime}
+            max={maxTime}
+            components={desktopComponents}
+          />
+          {!hasVisibleEvents && (
+            <div className="calendar-empty-state">No requests this period</div>
+          )}
+        </Card>
+      )}
 
       {/* Stats */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
