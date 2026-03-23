@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Card, Tag, Button, Input, Avatar, Divider, Row, Col } from 'antd';
 import { SendOutlined, UserOutlined, CrownOutlined } from '@ant-design/icons';
-import { mockRequestDetail } from '../mock/requestDetailData';
+import { useParams, useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import './RequestDetail.css';
 
 interface Message {
@@ -13,26 +15,31 @@ interface Message {
   isFromMe: boolean;
 }
 
-interface RequestDetailData {
-  id: string;
-  requesterName: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  duration: number;
-  status: 'pending' | 'approved' | 'rejected' | 'expired';
-  submittedAt: string;
-  approvedAt?: string;
-  lotId?: string;
-  floor?: string;
-  lotOwner?: string;
-  messages: Message[];
-}
-
 const RequestDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { pendingRequests, approvedRequests, userRequests } = useRequests();
+
+  const allRequests = [...pendingRequests, ...approvedRequests, ...userRequests];
+  const seen = new Set<string>();
+  const dedupedRequests = allRequests.filter(r => seen.has(r.id) ? false : (seen.add(r.id), true));
+  const request: ParkingRequest | undefined = dedupedRequests.find(r => r.id === id);
+
   const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState<Message[]>(mockRequestDetail.messages);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [sending, setSending] = useState(false);
+
+  if (!request) {
+    return (
+      <div className="request-detail">
+        <h1>Request Details</h1>
+        <Card>
+          <p>Request <strong>{id}</strong> was not found.</p>
+          <Button onClick={() => navigate(-1)}>Go Back</Button>
+        </Card>
+      </div>
+    );
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -105,78 +112,78 @@ const RequestDetail: React.FC = () => {
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
               <div className="label">Request ID</div>
-              <div className="value"><strong>{mockRequestDetail.id}</strong></div>
-            </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="info-item">
-              <div className="label">Requester</div>
-              <div className="value">{mockRequestDetail.requesterName}</div>
-            </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="info-item">
-              <div className="label">Time Slot</div>
-              <div className="value">{mockRequestDetail.startTime} - {mockRequestDetail.endTime}</div>
-            </div>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <div className="info-item">
-              <div className="label">Duration</div>
-              <div className="value">{mockRequestDetail.duration} hours</div>
+              <div className="value"><strong>{request.id}</strong></div>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
               <div className="label">Status</div>
               <div className="value">
-                <Tag color={getStatusColor(mockRequestDetail.status)}>
-                  {getStatusLabel(mockRequestDetail.status)}
+                <Tag color={getStatusColor(request.status)}>
+                  {getStatusLabel(request.status)}
                 </Tag>
               </div>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
-              <div className="label">Submitted</div>
-              <div className="value">{mockRequestDetail.submittedAt}</div>
+              <div className="label">Requester</div>
+              <div className="value">{request.requesterName}</div>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
               <div className="label">Date</div>
-              <div className="value">{mockRequestDetail.date}</div>
+              <div className="value">{dayjs(request.date).format('DD/MM/YYYY')}</div>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="info-item">
+              <div className="label">Time Slot</div>
+              <div className="value">{request.startTime} - {request.endTime}</div>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="info-item">
+              <div className="label">Duration</div>
+              <div className="value">{request.duration} hours</div>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <div className="info-item">
+              <div className="label">Submitted</div>
+              <div className="value">{dayjs(request.submittedAt).format('DD/MM/YYYY HH:mm')}</div>
             </div>
           </Col>
         </Row>
 
         {/* Approved Details */}
-        {mockRequestDetail.status === 'approved' && mockRequestDetail.lotId && (
+        {request.status === 'approved' && request.lotId && (
           <>
             <Divider />
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={6}>
                 <div className="info-item">
                   <div className="label">Assigned Lot</div>
-                  <div className="value"><strong>{mockRequestDetail.lotId}</strong></div>
+                  <div className="value"><strong>{request.lotId}</strong></div>
                 </div>
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <div className="info-item">
                   <div className="label">Floor</div>
-                  <div className="value">{mockRequestDetail.floor}</div>
+                  <div className="value">{request.floor}</div>
                 </div>
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <div className="info-item">
                   <div className="label">Lot Owner</div>
-                  <div className="value">{mockRequestDetail.lotOwner}</div>
+                  <div className="value">{request.lotOwner}</div>
                 </div>
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <div className="info-item">
                   <div className="label">Approved At</div>
-                  <div className="value">{mockRequestDetail.approvedAt}</div>
+                  <div className="value">{request.approvedAt ? dayjs(request.approvedAt).format('DD/MM/YYYY HH:mm') : '—'}</div>
                 </div>
               </Col>
             </Row>

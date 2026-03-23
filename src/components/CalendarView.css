@@ -1,0 +1,21 @@
+.calendar-view {
+  width: 100%;
+}
+
+.rbc-calendar {
+  display: flex;
+  flex-direction: column;
+}
+
+.rbc-toolbar {
+  order: 1;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.calendar-view h1 {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

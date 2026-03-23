@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import dayjs from 'dayjs';
 import { Table, Button, Tag, Space, Row, Col, Card, Segmented, Modal, notification } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -115,12 +116,14 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       dataIndex: 'date',
       key: 'date',
       width: '15%',
+      render: (v: string) => dayjs(v).format('DD/MM/YYYY'),
     },
     {
       title: 'Submitted',
       dataIndex: 'submittedAt',
       key: 'submittedAt',
       width: '15%',
+      render: (v: string) => dayjs(v).format('DD/MM/YYYY HH:mm'),
     },
     {
       title: 'Actions',

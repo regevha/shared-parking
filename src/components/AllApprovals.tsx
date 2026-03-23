@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import dayjs from 'dayjs';
 import { Table, Tag, Space, Card, Row, Col, Button, Modal, notification } from 'antd';
 import { EyeOutlined, MessageOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -22,6 +23,13 @@ const AllApprovals: React.FC = () => {
       dataIndex: 'requesterName',
       key: 'requesterName',
       width: '15%',
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
+      width: '12%',
+      render: (v: string) => dayjs(v).format('DD/MM/YYYY'),
     },
     {
       title: 'Time Slot',
@@ -59,6 +67,7 @@ const AllApprovals: React.FC = () => {
       dataIndex: 'approvedAt',
       key: 'approvedAt',
       width: '15%',
+      render: (v: string) => v ? dayjs(v).format('DD/MM/YYYY HH:mm') : '—',
     },
     {
       title: 'Actions',

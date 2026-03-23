@@ -27,6 +27,7 @@ interface RequestsContextType {
   approveRequest: (requestId: string) => void;
   rejectRequest: (requestId: string) => void;
   cancelUserRequest: (requestId: string) => void;
+  updateUserRequest: (requestId: string, updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>) => void;
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
@@ -234,6 +235,13 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
     setUserRequests(prev => prev.filter(req => req.id !== requestId));
   };
 
+  const updateUserRequest = (requestId: string, updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>) => {
+    const applyUpdate = (req: ParkingRequest) =>
+      req.id === requestId ? { ...req, ...updates } : req;
+    setUserRequests(prev => prev.map(applyUpdate));
+    setPendingRequests(prev => prev.map(applyUpdate));
+  };
+
   return (
     <RequestsContext.Provider
       value={{
@@ -244,6 +252,7 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
         approveRequest,
         rejectRequest,
         cancelUserRequest,
+        updateUserRequest,
       }}
     >
       {children}

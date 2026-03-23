@@ -32,7 +32,7 @@ const MyRequests: React.FC = () => {
   const [editingRequest, setEditingRequest] = useState<ParkingRequest | null>(null);
   const [form] = Form.useForm<EditFormValues>();
   const [loading, setLoading] = useState(false);
-  const { userRequests, cancelUserRequest } = useRequests();
+  const { userRequests, cancelUserRequest, updateUserRequest } = useRequests();
 
   // Filter to show only PENDING and APPROVED requests
   const visibleRequests = userRequests.filter(
@@ -80,20 +80,26 @@ const MyRequests: React.FC = () => {
   const handleSaveEdit = async (values: EditFormValues) => {
     if (!editingRequest) return;
 
-    setLoading(true);
+    const startHour = parseInt(values.startTime.split(':')[0]);
+    const endTime = `${String(startHour + values.duration).padStart(2, '0')}:00`;
 
-    // Simulate API call
+    setLoading(true);
     setTimeout(() => {
+      updateUserRequest(editingRequest.id, {
+        date: values.date?.format('YYYY-MM-DD') || editingRequest.date,
+        startTime: values.startTime,
+        endTime,
+        duration: values.duration,
+      });
       setLoading(false);
       setEditModalVisible(false);
       setEditingRequest(null);
       form.resetFields();
-
       notification.success({
         message: 'Request Updated',
         description: `Request ${editingRequest.id} has been updated successfully.`,
       });
-    }, 1000);
+    }, 500);
   };
 
   const handleCancelRequest = (requestId: string) => {
@@ -143,6 +149,7 @@ const MyRequests: React.FC = () => {
       dataIndex: 'submittedAt',
       key: 'submittedAt',
       width: '20%',
+      render: (v: string) => dayjs(v).format('DD/MM/YYYY HH:mm'),
     },
     {
       title: 'Actions',

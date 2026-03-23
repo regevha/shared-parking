@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npx serve:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(C:/src/nvm/v25.4.0/node.exe C:/src/nvm/v25.4.0/node_modules/npm/bin/npm-cli.js run build)",
+      "Bash(C:/src/nvm/v25.4.0/node.exe -e \"console.log\\(require\\(''./node_modules/@toast-ui/react-calendar/package.json''\\).version\\)\")",
+      "Bash(C:/src/nvm/v25.4.0/node.exe -e \"console.log\\(require\\(''./node_modules/@toast-ui/react-calendar/package.json''\\).peerDependencies\\)\")",
+      "Bash(C:/src/nvm/v25.4.0/node.exe -e \":*)",
+      "Bash(C:/src/nvm/v25.4.0/node.exe C:/src/nvm/v25.4.0/node_modules/npm/bin/npm-cli.js uninstall @toast-ui/react-calendar)",
+      "Bash(C:/src/nvm/v25.4.0/node.exe C:/src/nvm/v25.4.0/node_modules/npm/bin/npm-cli.js install react-big-calendar @types/react-big-calendar)",
+      "Bash(C:/src/nvm/v25.4.0/node.exe -e \"console.log\\(require\\(''./node_modules/react-big-calendar/package.json''\\).version\\)\")",
+      "Bash(find /c/Dev/AI/ClaudeCode/parking-mockup/.claude/worktrees/relaxed-nash/node_modules/antd -name responsiveObserver*)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

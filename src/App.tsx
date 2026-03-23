@@ -12,18 +12,20 @@ import ParkingRequestForm from './components/ParkingRequestForm';
 import RequestDetail from './components/RequestDetail';
 import NotificationWindows from './components/NotificationWindows';
 import AdminPanel from './components/AdminPanel';
+import MyLots from './components/MyLots';
+import CalendarView from './components/CalendarView';
 import './App.css';
 
 const { Header, Content } = Layout;
 
 type AppRole = Role;
-const MyLots: React.FC = () => <div>My Lots</div>;
 
 const App: React.FC = () => {
   const [role, setRole] = useState<AppRole>('User');
 
   const getMenuItems = () => {
     const items = [
+      { key: 'calendar', label: <Link to="/calendar">Calendar View</Link> },
       { key: 'lot-status', label: <Link to="/lot-status">Lot Status Board</Link> },
       { key: 'pending', label: <Link to="/pending">All Pending Requests</Link> },
       { key: 'approvals', label: <Link to="/approvals">All Approvals</Link> },
@@ -87,6 +89,7 @@ const App: React.FC = () => {
               <Routes>
                 <Route path="/lot-status" element={<LotStatusBoard />} />
                 <Route path="/pending" element={<AllPendingRequests role={role} />} />
+                <Route path="/calendar" element={<CalendarView role={role} />} />
                 <Route path="/approvals" element={<AllApprovals />} />
                 <Route path="/submit-request" element={<ParkingRequestForm />} />
                 <Route path="/my-requests" element={<MyRequests />} />
