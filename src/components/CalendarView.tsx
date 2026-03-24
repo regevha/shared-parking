@@ -39,10 +39,22 @@ const CustomEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => (
   </div>
 );
 
-const CustomMobileHeader: React.FC<{ date: Date }> = ({ date: headerDate }) => (
-  <div className="mobile-week-header">
-    <span className="mobile-week-header-day">{dayjs(headerDate).format('ddd').slice(0, 2)}</span>
-    <span className="mobile-week-header-num">{dayjs(headerDate).format('D')}</span>
+const CustomMobileHeader: React.FC<{ date: Date }> = ({ date: headerDate }) => {
+  const isToday = dayjs(headerDate).isSame(dayjs(), 'day');
+  return (
+    <div className="mobile-week-header">
+      <span className="mobile-week-header-day">{dayjs(headerDate).format('ddd').slice(0, 2).toUpperCase()}</span>
+      <span className={`mobile-week-header-num${isToday ? ' mobile-week-header-today' : ''}`}>
+        {dayjs(headerDate).format('D')}
+      </span>
+    </div>
+  );
+};
+
+// Compact event for mobile week view — single line, no time sub-label
+const CustomMobileWeekEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => (
+  <div className="custom-event-week-mobile">
+    <span className="custom-event-week-mobile-title">{event.title}</span>
   </div>
 );
 
@@ -215,6 +227,17 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
     header: CustomMobileHeader,
   }), [CustomMobileToolbar]);
 
+  // Week view on mobile: compact event + short time labels
+  const mobileWeekComponents = useMemo(() => ({
+    toolbar: CustomMobileToolbar,
+    event: CustomMobileWeekEvent,
+    header: CustomMobileHeader,
+  }), [CustomMobileToolbar]);
+
+  const mobileWeekFormats = useMemo(() => ({
+    timeGutterFormat: (date: Date) => dayjs(date).format('ha'),
+  }), []);
+
   // Empty state: events visible in current day/week range
   const hasVisibleEvents = useMemo(() => {
     if (view === 'month') return true;
@@ -255,7 +278,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             scrollToTime={scrollTo8AM}
             min={minTime}
             max={maxTime}
-            components={mobileComponents}
+            components={view === 'week' ? mobileWeekComponents : mobileComponents}
+            formats={view === 'week' ? mobileWeekFormats : undefined}
           />
           {!hasVisibleEvents && (
             <div className="calendar-empty-state">No requests this period</div>

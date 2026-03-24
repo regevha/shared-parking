@@ -173,21 +173,35 @@
     min-width: 0;
   }
 
+  /* Enough height for the 2-row header (day abbr + date circle) */
+  .calendar-week-view .rbc-time-header-content .rbc-header {
+    min-height: 44px;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Narrower gutter frees ~16px for day columns */
   .calendar-week-view .rbc-time-gutter {
-    width: 48px;
-    min-width: 48px;
-    max-width: 48px;
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
   }
 
   .calendar-week-view .rbc-time-header-gutter {
-    width: 48px;
-    min-width: 48px;
-    max-width: 48px;
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
   }
 
   .calendar-week-view .rbc-label {
-    font-size: 9px;
+    font-size: 8px;
     padding: 0 2px;
+    white-space: nowrap;
+  }
+
+  /* Day column separators */
+  .calendar-week-view .rbc-day-slot {
+    border-right: 1px solid var(--day-separator, rgba(0,0,0,0.06));
   }
 
   /* Compact week column headers */
@@ -210,6 +224,37 @@
   .mobile-week-header-num {
     font-size: 13px;
     font-weight: 700;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Today date circle (like Google Calendar) */
+  .mobile-week-header-today {
+    background: #1677ff;
+    color: #fff !important;
+    border-radius: 50%;
+  }
+
+  /* Compact event block for mobile week — single line only */
+  .custom-event-week-mobile {
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    padding: 1px 2px;
+  }
+
+  .custom-event-week-mobile-title {
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
   }
 
   /* Custom mobile toolbar */
