@@ -71,19 +71,27 @@ const App: React.FC = () => {
     onClick: ({ key }: { key: string }) => setRole(key as AppRole),
   };
 
-  const headerBtnStyle = { color: darkMode ? 'white' : undefined };
+  const headerBg   = darkMode ? '#141414' : '#ffffff';
+  const headerBtnStyle = { color: darkMode ? 'white' : 'rgba(0,0,0,0.88)' };
+  const headerStyle = {
+    display: 'flex' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'space-between' as const,
+    background: headerBg,
+    borderBottom: darkMode ? 'none' : '1px solid #f0f0f0',
+  };
 
   return (
     <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
     <RequestsProvider>
       <Router>
         <Layout>
-          <Header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Header style={headerStyle}>
             <Menu
               theme={darkMode ? 'dark' : 'light'}
               mode="horizontal"
               items={getMenuItems()}
-              style={{ flex: 1, minWidth: 0 }}
+              style={{ flex: 1, minWidth: 0, background: 'transparent' }}
             />
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <Button
