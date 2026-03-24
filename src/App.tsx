@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Button, ConfigProvider, theme } from 'antd';
-import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined } from '@ant-design/icons';
+import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
 import { Role } from './types';
 import { RequestsProvider } from './contexts/RequestsContext';
 import LotStatusBoard from './components/LotStatusBoard';
@@ -22,6 +22,15 @@ type AppRole = Role;
 
 const App: React.FC = () => {
   const [role, setRole] = useState<AppRole>('User');
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const stored = localStorage.getItem('darkMode');
+    return stored !== null ? stored === 'true' : true; // default: dark
+  });
+
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    localStorage.setItem('darkMode', String(darkMode));
+  }, [darkMode]);
 
   const getMenuItems = () => {
     const items = [
@@ -62,24 +71,33 @@ const App: React.FC = () => {
     onClick: ({ key }: { key: string }) => setRole(key as AppRole),
   };
 
+  const headerBtnStyle = { color: darkMode ? 'white' : undefined };
+
   return (
-    <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
+    <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
     <RequestsProvider>
       <Router>
         <Layout>
           <Header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Menu
-              theme="dark"
+              theme={darkMode ? 'dark' : 'light'}
               mode="horizontal"
               items={getMenuItems()}
               style={{ flex: 1, minWidth: 0 }}
             />
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Button
+                type="text"
+                icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
+                onClick={() => setDarkMode(d => !d)}
+                style={headerBtnStyle}
+                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              />
               <Dropdown menu={settingsMenu} trigger={['click']}>
-                <Button type="text" icon={<SettingOutlined />} style={{ color: 'white' }} />
+                <Button type="text" icon={<SettingOutlined />} style={headerBtnStyle} />
               </Dropdown>
               <Dropdown menu={roleMenu} trigger={['click']}>
-                <Button type="text" style={{ color: 'white', marginLeft: 16 }}>
+                <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8 }}>
                   {role} <UserOutlined />
                 </Button>
               </Dropdown>

@@ -113,7 +113,7 @@ const ParkingRequestForm: React.FC = () => {
       <h1>Submit Parking Request</h1>
 
       {/* Simulation Toggle */}
-      <Card style={{ marginBottom: '24px', backgroundColor: '#1f1f1f' }}>
+      <Card style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <input
             type="checkbox"
@@ -148,20 +148,20 @@ const ParkingRequestForm: React.FC = () => {
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {mockActiveRequests.map((req) => (
-              <div key={req.id} style={{ padding: '12px', backgroundColor: '#2a2a2a', borderRadius: '4px' }}>
+              <div key={req.id} style={{ padding: '12px', backgroundColor: 'var(--item-bg)', borderRadius: '4px' }}>
                 <Row gutter={16}>
                   <Col xs={24} sm={6}>
-                    <div style={{ fontSize: '12px', color: '#888' }}>Date</div>
+                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Date</div>
                     <div style={{ fontWeight: 'bold' }}>{req.date}</div>
                   </Col>
                   <Col xs={24} sm={9}>
-                    <div style={{ fontSize: '12px', color: '#888' }}>Time Slot</div>
+                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Time Slot</div>
                     <div style={{ fontWeight: 'bold' }}>
                       {req.startTime} - {req.endTime}
                     </div>
                   </Col>
                   <Col xs={24} sm={9}>
-                    <div style={{ fontSize: '12px', color: '#888' }}>Status</div>
+                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Status</div>
                     <Tag color="blue">Active</Tag>
                   </Col>
                 </Row>
@@ -230,9 +230,9 @@ const ParkingRequestForm: React.FC = () => {
               <div
                 style={{
                   padding: '10px 12px',
-                  backgroundColor: '#2a2a2a',
+                  backgroundColor: 'var(--item-bg)',
                   borderRadius: '2px',
-                  border: '1px solid #434343',
+                  border: '1px solid var(--message-bubble-border)',
                   fontWeight: 'bold',
                 }}
               >

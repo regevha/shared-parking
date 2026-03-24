@@ -29,12 +29,8 @@
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
@@ -44,139 +40,163 @@
   }
 }
 
-/* ── Dark mode overrides for react-big-calendar ── */
-body {
+/* ── CSS variables (light mode defaults) ── */
+:root {
+  --info-card-bg: #f0f2f5;
+  --item-bg: #f5f5f5;
+  --message-thread-bg: #f9f9f9;
+  --message-bubble-bg: #ffffff;
+  --message-bubble-border: #e1e1e1;
+  --message-bubble-arrow: #ffffff;
+  --message-input-border: #e1e1e1;
+  --toolbar-border: #f0f0f0;
+  --label-color: #666;
+  --window-item-bg: #f5f5f5;
+}
+
+/* ── CSS variables (dark mode overrides) ── */
+[data-theme="dark"] {
+  --info-card-bg: #1f1f1f;
+  --item-bg: #2a2a2a;
+  --message-thread-bg: #1a1a1a;
+  --message-bubble-bg: #2a2a2a;
+  --message-bubble-border: #303030;
+  --message-bubble-arrow: #2a2a2a;
+  --message-input-border: #303030;
+  --toolbar-border: #303030;
+  --label-color: #888;
+  --window-item-bg: #1f1f1f;
+}
+
+/* ── Dark mode: global background ── */
+[data-theme="dark"] body {
   background-color: #141414;
 }
 
-.rbc-calendar {
+/* ── Dark mode: react-big-calendar overrides ── */
+[data-theme="dark"] .rbc-calendar {
   color: #e6e6e6;
 }
 
-.rbc-off-range-bg {
+[data-theme="dark"] .rbc-off-range-bg {
   background: #1f1f1f;
 }
 
-.rbc-today {
+[data-theme="dark"] .rbc-today {
   background-color: #1a2942;
 }
 
-.rbc-header,
-.rbc-time-header-content,
-.rbc-time-header-gutter {
+[data-theme="dark"] .rbc-header,
+[data-theme="dark"] .rbc-time-header-content,
+[data-theme="dark"] .rbc-time-header-gutter {
   background-color: #1f1f1f;
   border-color: #303030;
   color: #e6e6e6;
 }
 
-.rbc-header + .rbc-header,
-.rbc-time-header.rbc-overflowing {
+[data-theme="dark"] .rbc-header + .rbc-header,
+[data-theme="dark"] .rbc-time-header.rbc-overflowing {
   border-color: #303030;
 }
 
-.rbc-time-view,
-.rbc-month-view,
-.rbc-agenda-view {
-  border-color: #303030;
-  background-color: #141414;
-}
-
-.rbc-time-content {
+[data-theme="dark"] .rbc-time-view,
+[data-theme="dark"] .rbc-month-view,
+[data-theme="dark"] .rbc-agenda-view {
   border-color: #303030;
   background-color: #141414;
 }
 
-.rbc-time-gutter .rbc-label,
-.rbc-timeslot-group {
+[data-theme="dark"] .rbc-time-content {
+  border-color: #303030;
+  background-color: #141414;
+}
+
+[data-theme="dark"] .rbc-time-gutter .rbc-label,
+[data-theme="dark"] .rbc-timeslot-group {
   color: #888;
   border-color: #303030;
 }
 
-.rbc-timeslot-group {
+[data-theme="dark"] .rbc-timeslot-group {
   border-bottom-color: #303030;
 }
 
-.rbc-time-slot {
+[data-theme="dark"] .rbc-time-slot {
   border-top-color: #262626;
 }
 
-.rbc-day-slot .rbc-time-slot {
+[data-theme="dark"] .rbc-day-slot .rbc-time-slot {
   border-top-color: #262626;
 }
 
-.rbc-day-bg + .rbc-day-bg,
-.rbc-month-row + .rbc-month-row,
-.rbc-month-header {
+[data-theme="dark"] .rbc-day-bg + .rbc-day-bg,
+[data-theme="dark"] .rbc-month-row + .rbc-month-row,
+[data-theme="dark"] .rbc-month-header {
   border-color: #303030;
 }
 
-.rbc-day-bg {
+[data-theme="dark"] .rbc-day-bg {
   border-color: #303030;
 }
 
-.rbc-date-cell {
+[data-theme="dark"] .rbc-date-cell {
   color: #bbb;
 }
 
-.rbc-date-cell.rbc-now {
+[data-theme="dark"] .rbc-date-cell.rbc-now {
   color: #4096ff;
 }
 
-.rbc-show-more {
+[data-theme="dark"] .rbc-show-more {
   color: #4096ff;
   background: transparent;
 }
 
-.rbc-toolbar button {
+[data-theme="dark"] .rbc-toolbar button {
   color: #e6e6e6;
   border-color: #434343;
   background: #1f1f1f;
 }
 
-.rbc-toolbar button:hover {
+[data-theme="dark"] .rbc-toolbar button:hover {
   background: #2a2a2a;
 }
 
-.rbc-toolbar button.rbc-active {
+[data-theme="dark"] .rbc-toolbar button.rbc-active {
   background: #1677ff;
   border-color: #1677ff;
   color: #fff;
 }
 
-/* Custom toolbar buttons (desktop + mobile) */
-.desktop-toolbar-nav button,
-.desktop-toolbar-views button,
-.mobile-toolbar-nav button,
-.mobile-toolbar-views button {
-  background: #1f1f1f !important;
-  border-color: #434343 !important;
-  color: #e6e6e6 !important;
-}
-
-.desktop-toolbar-views button.rbc-active,
-.mobile-toolbar-views button.rbc-active {
-  background: #1677ff !important;
-  border-color: #1677ff !important;
-  color: #fff !important;
-}
-
-.desktop-toolbar-label,
-.mobile-toolbar-label {
+/* ── Dark mode: custom toolbar buttons ── */
+[data-theme="dark"] .desktop-toolbar-nav button,
+[data-theme="dark"] .desktop-toolbar-views button,
+[data-theme="dark"] .mobile-toolbar-nav button,
+[data-theme="dark"] .mobile-toolbar-views button {
+  background: #1f1f1f;
+  border-color: #434343;
   color: #e6e6e6;
 }
 
-.desktop-toolbar,
-.mobile-toolbar {
-  border-top-color: #303030 !important;
+[data-theme="dark"] .desktop-toolbar-views button.rbc-active,
+[data-theme="dark"] .mobile-toolbar-views button.rbc-active {
+  background: #1677ff;
+  border-color: #1677ff;
+  color: #fff;
 }
 
-/* Sticky gutter background in dark mode */
-.rbc-time-gutter,
-.rbc-time-header-gutter {
+[data-theme="dark"] .desktop-toolbar-label,
+[data-theme="dark"] .mobile-toolbar-label {
+  color: #e6e6e6;
+}
+
+/* ── Dark mode: sticky time gutter ── */
+[data-theme="dark"] .rbc-time-gutter,
+[data-theme="dark"] .rbc-time-header-gutter {
   background-color: #141414 !important;
 }
 
-.calendar-week-view .rbc-time-gutter,
-.calendar-week-view .rbc-time-header-gutter {
+[data-theme="dark"] .calendar-week-view .rbc-time-gutter,
+[data-theme="dark"] .calendar-week-view .rbc-time-header-gutter {
   background-color: #141414 !important;
 }

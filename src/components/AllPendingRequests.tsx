@@ -234,7 +234,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       )}
 
       {/* Role-specific Info */}
-      <Card style={{ marginBottom: '24px', backgroundColor: '#1f1f1f' }} size="small">
+      <Card style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
         {isOwner ? (
           <div>
             <strong>Owner View:</strong> You can approve or reject pending requests. Requests you've already
