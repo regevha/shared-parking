@@ -1,13 +1,7 @@
 .my-lots h1 {
   margin-bottom: 24px;
-  color: #1890ff;
-}
-
-.my-lots .ant-card {
-  background: #f5f5f5;
 }
 
 .my-lots .ant-table-thead > tr > th {
-  background: #fafafa;
   font-weight: 600;
 }

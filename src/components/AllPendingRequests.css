@@ -1,20 +1,14 @@
 .all-pending-requests {
   padding: 24px;
-  background-color: #fafafa;
   min-height: 100vh;
 }
 
 .all-pending-requests h1 {
   margin-bottom: 24px;
-  color: #1f1f1f;
-}
-
-.all-pending-requests :global(.rejected-row) {
-  background-color: #fafafa !important;
 }
 
 .all-pending-requests :global(.rejected-row td) {
-  color: #999;
+  color: #666;
 }
 
 @media (max-width: 768px) {

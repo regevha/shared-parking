@@ -160,7 +160,7 @@ const AllApprovals: React.FC = () => {
       </Row>
 
       {/* Info */}
-      <Card style={{ marginBottom: '24px', backgroundColor: '#f0f2f5' }} size="small">
+      <Card style={{ marginBottom: '24px', backgroundColor: '#1f1f1f' }} size="small">
         <strong>All Approvals:</strong> View all approved parking requests across the system.
         Click the eye icon to view request details and message threads.
       </Card>

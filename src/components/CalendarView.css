@@ -49,7 +49,7 @@
   gap: 8px;
   padding: 10px 0;
   margin-top: 8px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #303030;
   flex-wrap: wrap;
 }
 
@@ -60,11 +60,11 @@
 .desktop-toolbar-nav button {
   font-size: 13px;
   padding: 4px 12px;
-  border: 1px solid #d9d9d9;
-  background: #fff;
+  border: 1px solid #434343;
+  background: #1f1f1f;
   cursor: pointer;
   border-radius: 0;
-  color: rgba(0,0,0,0.88);
+  color: #e6e6e6;
 }
 
 .desktop-toolbar-nav button:first-child { border-radius: 4px 0 0 4px; }
@@ -90,11 +90,11 @@
 .desktop-toolbar-views button {
   font-size: 13px;
   padding: 4px 12px;
-  border: 1px solid #d9d9d9;
-  background: #fff;
+  border: 1px solid #434343;
+  background: #1f1f1f;
   cursor: pointer;
   border-radius: 0;
-  color: rgba(0,0,0,0.88);
+  color: #e6e6e6;
 }
 
 .desktop-toolbar-views button:first-child { border-radius: 4px 0 0 4px; }
@@ -221,7 +221,7 @@
     gap: 6px;
     padding: 8px 0;
     margin-top: 8px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid #303030;
   }
 
   .mobile-toolbar-nav {
@@ -232,11 +232,11 @@
   .mobile-toolbar-views button {
     font-size: 13px;
     padding: 4px 10px;
-    border: 1px solid #d9d9d9;
-    background: #fff;
+    border: 1px solid #434343;
+    background: #1f1f1f;
     cursor: pointer;
     border-radius: 0;
-    color: rgba(0,0,0,0.88);
+    color: #e6e6e6;
   }
 
   .mobile-toolbar-nav button:first-child { border-radius: 4px 0 0 4px; }

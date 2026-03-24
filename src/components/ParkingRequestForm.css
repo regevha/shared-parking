@@ -1,18 +1,15 @@
 .parking-request-form {
   padding: 24px;
-  background-color: #fafafa;
   min-height: 100vh;
 }
 
 .parking-request-form h1 {
   margin-bottom: 24px;
-  color: #1f1f1f;
 }
 
 .parking-request-form h3 {
   margin-top: 0;
   margin-bottom: 16px;
-  color: #1f1f1f;
 }
 
 .parking-request-form ul {

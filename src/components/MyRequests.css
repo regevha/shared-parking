@@ -1,12 +1,10 @@
 .my-requests {
   padding: 24px;
-  background-color: #fafafa;
   min-height: 100vh;
 }
 
 .my-requests h1 {
   margin-bottom: 24px;
-  color: #1f1f1f;
 }
 
 @media (max-width: 768px) {

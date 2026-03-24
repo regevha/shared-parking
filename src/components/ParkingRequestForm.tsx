@@ -113,7 +113,7 @@ const ParkingRequestForm: React.FC = () => {
       <h1>Submit Parking Request</h1>
 
       {/* Simulation Toggle */}
-      <Card style={{ marginBottom: '24px', backgroundColor: '#fafafa' }}>
+      <Card style={{ marginBottom: '24px', backgroundColor: '#1f1f1f' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <input
             type="checkbox"
@@ -148,20 +148,20 @@ const ParkingRequestForm: React.FC = () => {
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {mockActiveRequests.map((req) => (
-              <div key={req.id} style={{ padding: '12px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+              <div key={req.id} style={{ padding: '12px', backgroundColor: '#2a2a2a', borderRadius: '4px' }}>
                 <Row gutter={16}>
                   <Col xs={24} sm={6}>
-                    <div style={{ fontSize: '12px', color: '#666' }}>Date</div>
+                    <div style={{ fontSize: '12px', color: '#888' }}>Date</div>
                     <div style={{ fontWeight: 'bold' }}>{req.date}</div>
                   </Col>
                   <Col xs={24} sm={9}>
-                    <div style={{ fontSize: '12px', color: '#666' }}>Time Slot</div>
+                    <div style={{ fontSize: '12px', color: '#888' }}>Time Slot</div>
                     <div style={{ fontWeight: 'bold' }}>
                       {req.startTime} - {req.endTime}
                     </div>
                   </Col>
                   <Col xs={24} sm={9}>
-                    <div style={{ fontSize: '12px', color: '#666' }}>Status</div>
+                    <div style={{ fontSize: '12px', color: '#888' }}>Status</div>
                     <Tag color="blue">Active</Tag>
                   </Col>
                 </Row>
@@ -230,9 +230,9 @@ const ParkingRequestForm: React.FC = () => {
               <div
                 style={{
                   padding: '10px 12px',
-                  backgroundColor: '#f5f5f5',
+                  backgroundColor: '#2a2a2a',
                   borderRadius: '2px',
-                  border: '1px solid #d9d9d9',
+                  border: '1px solid #434343',
                   fontWeight: 'bold',
                 }}
               >
