@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, Tag, Space, Modal, Form, DatePicker, Select, notification, Popconfirm } from 'antd';
+import { Table, Button, Tag, Space, Modal, Form, DatePicker, Select, notification, Popconfirm, Card, Row, Col } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -114,58 +114,59 @@ const MyRequests: React.FC = () => {
 
   const columns: ColumnsType<ParkingRequest> = [
     {
-      title: 'Request ID',
+      title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: '15%',
+      width: 60,
       render: (text: string) => <strong>{text}</strong>,
     },
     {
       title: 'Time Slot',
       key: 'timeSlot',
-      width: '20%',
+      width: 130,
       render: (_, record: ParkingRequest) => `${record.startTime} - ${record.endTime}`,
     },
     {
-      title: 'Duration',
+      title: 'Dur.',
       dataIndex: 'duration',
       key: 'duration',
-      width: '12%',
+      width: 55,
+      responsive: ['sm'],
       render: (duration: number) => `${duration}h`,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      width: '15%',
+      width: 90,
       render: (status: string) => (
-        <Tag color={getStatusColor(status)} style={{ color: '#000' }}>
+        <Tag color={getStatusColor(status)}>
           {getStatusLabel(status)}
         </Tag>
       ),
     },
     {
-      title: 'Submitted At',
+      title: 'Submitted',
       dataIndex: 'submittedAt',
       key: 'submittedAt',
-      width: '20%',
+      width: 140,
+      responsive: ['md'],
       render: (v: string) => dayjs(v).format('DD/MM/YYYY HH:mm'),
     },
     {
-      title: 'Actions',
+      title: '',
       key: 'actions',
-      width: '18%',
+      width: 70,
       render: (_, record: ParkingRequest) => (
-        <Space>
+        <Space size={2}>
           {record.status === 'pending' && (
             <Button
               type="link"
               icon={<EditOutlined />}
               onClick={() => handleEdit(record)}
               size="small"
-            >
-              Edit
-            </Button>
+              title="Edit"
+            />
           )}
           <Popconfirm
             title="Cancel Request"
@@ -180,9 +181,8 @@ const MyRequests: React.FC = () => {
               type="link"
               icon={<DeleteOutlined />}
               size="small"
-            >
-              Cancel
-            </Button>
+              title="Cancel"
+            />
           </Popconfirm>
         </Space>
       ),
@@ -200,26 +200,38 @@ const MyRequests: React.FC = () => {
       <h1>My Requests</h1>
 
       {/* Stats */}
-      <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ padding: '16px', backgroundColor: '#f0f2f5', borderRadius: '4px', minWidth: '120px' }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.total}</div>
-          <div style={{ fontSize: '12px', color: '#666' }}>Total Active</div>
-        </div>
-        <div style={{ padding: '16px', backgroundColor: '#e6f7ff', borderRadius: '4px', minWidth: '120px' }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
-          <div style={{ fontSize: '12px', color: '#666' }}>Pending</div>
-        </div>
-        <div style={{ padding: '16px', backgroundColor: '#f6ffed', borderRadius: '4px', minWidth: '120px' }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#52c41a' }}>{stats.approved}</div>
-          <div style={{ fontSize: '12px', color: '#666' }}>Approved</div>
-        </div>
-      </div>
+      <Row gutter={[12, 12]} style={{ marginBottom: '24px' }}>
+        <Col xs={8}>
+          <Card size="small">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '22px', fontWeight: 'bold' }}>{stats.total}</div>
+              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Total Active</div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={8}>
+          <Card size="small">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
+              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Pending</div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={8}>
+          <Card size="small">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#52c41a' }}>{stats.approved}</div>
+              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Approved</div>
+            </div>
+          </Card>
+        </Col>
+      </Row>
 
       {/* Info */}
-      <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#f0f2f5', borderRadius: '4px' }}>
+      <Card size="small" style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }}>
         <strong>My Requests:</strong> View and manage your parking requests. You can edit pending requests or cancel any active request.
         Rejected requests are not shown here.
-      </div>
+      </Card>
 
       {/* Table */}
       <Table
@@ -227,8 +239,8 @@ const MyRequests: React.FC = () => {
         dataSource={visibleRequests}
         rowKey="id"
         pagination={{ pageSize: 10 }}
-        scroll={{ x: 800 }}
-        size="middle"
+        scroll={{ x: 'max-content' }}
+        size="small"
       />
 
       {/* Edit Modal */}
