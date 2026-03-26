@@ -125,12 +125,6 @@ const AllApprovals: React.FC = () => {
     <div className="all-approvals">
       <h1>All Approvals</h1>
 
-      {/* Info */}
-      <Card style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>All Approvals:</strong> View all approved parking requests across the system.
-        Click the eye icon to view request details and message threads.
-      </Card>
-
       {/* Table */}
       <Table
         columns={columns}
@@ -174,6 +168,12 @@ const AllApprovals: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Info */}
+      <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
+        <strong>All Approvals:</strong> View all approved parking requests across the system.
+        Click the eye icon to view request details and message threads.
+      </Card>
     </div>
   );
 };

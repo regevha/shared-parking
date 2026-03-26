@@ -133,14 +133,6 @@ const LotStatusBoard: React.FC = () => {
         </Row>
       </Card>
 
-      <Alert
-        message="Read-Only View"
-        description="You are viewing lot status information. To request or manage lots, use the menu options."
-        type="info"
-        showIcon
-        style={{ marginBottom: '24px' }}
-      />
-
       {/* Floors Collapse */}
       <Collapse items={floorItems} accordion />
 
@@ -187,6 +179,14 @@ const LotStatusBoard: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      <Alert
+        message="Read-Only View"
+        description="You are viewing lot status information. To request or manage lots, use the menu options."
+        type="info"
+        showIcon
+        style={{ marginTop: '24px' }}
+      />
     </div>
   );
 };

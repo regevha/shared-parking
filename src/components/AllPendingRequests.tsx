@@ -203,22 +203,6 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
         </Card>
       )}
 
-      {/* Role-specific Info */}
-      <Card style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        {isOwner ? (
-          <div>
-            <strong>Owner View:</strong> You can approve or reject pending requests. Requests you've already
-            rejected are highlighted in grey with a "Rejected by you" label. You cannot approve or reject your own
-            requests.
-          </div>
-        ) : (
-          <div>
-            <strong>User View:</strong> This is a read-only list of all pending requests. Only owners can approve or
-            reject requests.
-          </div>
-        )}
-      </Card>
-
       {/* Table */}
       <Table
         columns={columns}
@@ -277,6 +261,22 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
           </Col>
         )}
       </Row>
+
+      {/* Role-specific Info */}
+      <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
+        {isOwner ? (
+          <div>
+            <strong>Owner View:</strong> You can approve or reject pending requests. Requests you've already
+            rejected are highlighted in grey with a "Rejected by you" label. You cannot approve or reject your own
+            requests.
+          </div>
+        ) : (
+          <div>
+            <strong>User View:</strong> This is a read-only list of all pending requests. Only owners can approve or
+            reject requests.
+          </div>
+        )}
+      </Card>
     </div>
   );
 };

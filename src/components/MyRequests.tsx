@@ -207,12 +207,6 @@ const MyRequests: React.FC = () => {
     <div className="my-requests">
       <h1>My Requests</h1>
 
-      {/* Info */}
-      <Card size="small" style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>My Requests:</strong> View and manage your parking requests. You can edit pending requests or cancel any active request.
-        Rejected requests are not shown here.
-      </Card>
-
       {/* Table (desktop) / Card list (mobile) */}
       {isMobile ? (
         <div className="requests-card-list">
@@ -293,6 +287,12 @@ const MyRequests: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Info */}
+      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+        <strong>My Requests:</strong> View and manage your parking requests. You can edit pending requests or cancel any active request.
+        Rejected requests are not shown here.
+      </Card>
 
       {/* Edit Modal */}
       <Modal
