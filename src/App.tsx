@@ -35,8 +35,8 @@ const App: React.FC = () => {
 
   const getMenuItems = () => {
     const items = [
-      { key: 'calendar', label: <Link to="/calendar">Calendar View</Link> },
-      { key: 'lot-status', label: <Link to="/lot-status">Lot Status Board</Link> },
+      { key: 'calendar', label: <Link to="/calendar">Requests</Link> },
+      { key: 'lot-status', label: <Link to="/lot-status">Parking Status</Link> },
       { key: 'pending', label: <Link to="/pending">All Pending Requests</Link> },
       { key: 'approvals', label: <Link to="/approvals">All Approvals</Link> },
     ];
