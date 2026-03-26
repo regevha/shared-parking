@@ -1,0 +1,11 @@
+/* Lot selector above the calendar */
+.lot-calendar-view .lot-selector {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .lot-calendar-view .lot-selector {
+    margin-top: -8px;
+    margin-bottom: 12px;
+  }
+}

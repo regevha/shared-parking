@@ -4,12 +4,12 @@ export const mockLotsData: FloorData[] = [
   {
     floor: 'F1 - Ground Floor',
     lots: [
-      { id: 'F1-001', floor: 'F1', owner: 'John Smith', status: 'available' },
+      { id: 'F1-001', floor: 'F1', owner: 'Sarah Johnson', status: 'available' },
       { id: 'F1-002', floor: 'F1', owner: 'Sarah Johnson', status: 'blocked', blockedUntil: '2026-03-25 14:00' },
       { id: 'F1-003', floor: 'F1', owner: null, status: 'unowned' },
       { id: 'F1-004', floor: 'F1', owner: 'Mike Chen', status: 'available' },
       { id: 'F1-005', floor: 'F1', owner: null, status: 'unowned-blocked', blockedUntil: '2026-03-24 10:00' },
-      { id: 'F1-006', floor: 'F1', owner: 'Emma Davis', status: 'available' },
+      { id: 'F1-006', floor: 'F1', owner: 'Sarah Johnson', status: 'available' },
     ],
   },
   {

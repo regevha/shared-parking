@@ -14,6 +14,7 @@ import NotificationWindows from './components/NotificationWindows';
 import AdminPanel from './components/AdminPanel';
 import MyLots from './components/MyLots';
 import CalendarView from './components/CalendarView';
+import LotCalendarView from './components/LotCalendarView';
 import './App.css';
 
 const { Header, Content } = Layout;
@@ -47,6 +48,7 @@ const App: React.FC = () => {
 
     if (role === 'Owner') {
       items.push({ key: 'my-lots', label: <Link to="/my-lots">My Lots</Link> });
+      items.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">Lot Calendar</Link> });
     }
 
     if (role === 'Manager') {
@@ -121,6 +123,7 @@ const App: React.FC = () => {
                 <Route path="/submit-request" element={<ParkingRequestForm />} />
                 <Route path="/my-requests" element={<MyRequests />} />
                 <Route path="/my-lots" element={<MyLots />} />
+                <Route path="/lot-calendar" element={<LotCalendarView />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/notifications" element={<NotificationWindows />} />
                 <Route path="/request/:id" element={<RequestDetail />} />

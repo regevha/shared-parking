@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export const CURRENT_OWNER_ID = 'owner-001';
+export const CURRENT_OWNER_NAME = 'Sarah Johnson';
 
 export interface ParkingRequest {
   id: string;
