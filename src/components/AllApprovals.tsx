@@ -125,8 +125,24 @@ const AllApprovals: React.FC = () => {
     <div className="all-approvals">
       <h1>All Approvals</h1>
 
+      {/* Info */}
+      <Card style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
+        <strong>All Approvals:</strong> View all approved parking requests across the system.
+        Click the eye icon to view request details and message threads.
+      </Card>
+
+      {/* Table */}
+      <Table
+        columns={columns}
+        dataSource={approvedRequests}
+        rowKey="id"
+        pagination={{ pageSize: 10 }}
+        scroll={{ x: 1000 }}
+        size="middle"
+      />
+
       {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
         <Col xs={12} sm={6}>
           <Card>
             <div style={{ textAlign: 'center' }}>
@@ -158,22 +174,6 @@ const AllApprovals: React.FC = () => {
           </Card>
         </Col>
       </Row>
-
-      {/* Info */}
-      <Card style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>All Approvals:</strong> View all approved parking requests across the system.
-        Click the eye icon to view request details and message threads.
-      </Card>
-
-      {/* Table */}
-      <Table
-        columns={columns}
-        dataSource={approvedRequests}
-        rowKey="id"
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: 1000 }}
-        size="middle"
-      />
     </div>
   );
 };

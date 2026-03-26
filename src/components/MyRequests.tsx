@@ -207,34 +207,6 @@ const MyRequests: React.FC = () => {
     <div className="my-requests">
       <h1>My Requests</h1>
 
-      {/* Stats */}
-      <Row gutter={[12, 12]} style={{ marginBottom: '24px' }}>
-        <Col xs={8}>
-          <Card size="small">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 'bold' }}>{stats.total}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Total Active</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={8}>
-          <Card size="small">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Pending</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={8}>
-          <Card size="small">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#52c41a' }}>{stats.approved}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Approved</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-
       {/* Info */}
       <Card size="small" style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }}>
         <strong>My Requests:</strong> View and manage your parking requests. You can edit pending requests or cancel any active request.
@@ -293,6 +265,34 @@ const MyRequests: React.FC = () => {
           size="small"
         />
       )}
+
+      {/* Stats */}
+      <Row gutter={[12, 12]} style={{ marginTop: '24px' }}>
+        <Col xs={8}>
+          <Card size="small">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '22px', fontWeight: 'bold' }}>{stats.total}</div>
+              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Total Active</div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={8}>
+          <Card size="small">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
+              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Pending</div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={8}>
+          <Card size="small">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#52c41a' }}>{stats.approved}</div>
+              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Approved</div>
+            </div>
+          </Card>
+        </Col>
+      </Row>
 
       {/* Edit Modal */}
       <Modal

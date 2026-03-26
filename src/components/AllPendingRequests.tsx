@@ -184,36 +184,6 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
     <div className="all-pending-requests">
       <h1>All Pending Requests</h1>
 
-      {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.total}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Total Requests</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Pending</div>
-            </div>
-          </Card>
-        </Col>
-        {isOwner && (
-          <Col xs={12} sm={6}>
-            <Card>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#999' }}>{stats.rejected}</div>
-                <div style={{ fontSize: '12px', color: '#666' }}>Rejected by You</div>
-              </div>
-            </Card>
-          </Col>
-        )}
-      </Row>
-
       {/* Filter Toggle (Owner only) */}
       {isOwner && (
         <Card style={{ marginBottom: '24px' }}>
@@ -277,6 +247,36 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
           </div>
         </Card>
       )}
+
+      {/* Stats */}
+      <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
+        <Col xs={12} sm={6}>
+          <Card>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.total}</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>Total Requests</div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={12} sm={6}>
+          <Card>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>Pending</div>
+            </div>
+          </Card>
+        </Col>
+        {isOwner && (
+          <Col xs={12} sm={6}>
+            <Card>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#999' }}>{stats.rejected}</div>
+                <div style={{ fontSize: '12px', color: '#666' }}>Rejected by You</div>
+              </div>
+            </Card>
+          </Col>
+        )}
+      </Row>
     </div>
   );
 };
