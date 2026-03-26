@@ -40,7 +40,7 @@ const App: React.FC = () => {
       items.push({ key: 'my-requests', label: <Link to="/my-requests">My Requests</Link> });
     }
 
-    items.push({ key: 'calendar', label: <Link to="/calendar">Requests</Link> });
+    items.push({ key: 'calendar', label: <Link to="/calendar">Requests View</Link> });
     items.push({ key: 'pending', label: <Link to="/pending">All Pending Requests</Link> });
     items.push({ key: 'approvals', label: <Link to="/approvals">All Approvals</Link> });
     items.push({ key: 'lot-status', label: <Link to="/lot-status">Parking Status</Link> });
