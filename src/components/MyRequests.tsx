@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Button, Tag, Space, Modal, Form, DatePicker, Select, notification, Popconfirm, Card, Row, Col } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -32,7 +32,15 @@ const MyRequests: React.FC = () => {
   const [editingRequest, setEditingRequest] = useState<ParkingRequest | null>(null);
   const [form] = Form.useForm<EditFormValues>();
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const { userRequests, cancelUserRequest, updateUserRequest } = useRequests();
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   // Filter to show only PENDING and APPROVED requests
   const visibleRequests = userRequests.filter(
@@ -233,15 +241,58 @@ const MyRequests: React.FC = () => {
         Rejected requests are not shown here.
       </Card>
 
-      {/* Table */}
-      <Table
-        columns={columns}
-        dataSource={visibleRequests}
-        rowKey="id"
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: 'max-content' }}
-        size="small"
-      />
+      {/* Table (desktop) / Card list (mobile) */}
+      {isMobile ? (
+        <div className="requests-card-list">
+          {visibleRequests.length === 0 && (
+            <div className="requests-card-empty">No active requests</div>
+          )}
+          {visibleRequests.map((record: ParkingRequest) => (
+            <Card key={record.id} size="small" className="request-card">
+              <div className="request-card-header">
+                <strong>{record.id}</strong>
+                <Tag color={getStatusColor(record.status)}>{getStatusLabel(record.status)}</Tag>
+              </div>
+              <div className="request-card-row">
+                <span className="request-card-label">Date</span>
+                <span>{dayjs(record.date).format('DD/MM/YYYY')}</span>
+              </div>
+              <div className="request-card-row">
+                <span className="request-card-label">Time</span>
+                <span>{record.startTime} – {record.endTime} ({record.duration}h)</span>
+              </div>
+              <div className="request-card-row">
+                <span className="request-card-label">Submitted</span>
+                <span>{dayjs(record.submittedAt).format('DD/MM/YYYY HH:mm')}</span>
+              </div>
+              <div className="request-card-actions">
+                {record.status === 'pending' && (
+                  <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>Edit</Button>
+                )}
+                <Popconfirm
+                  title="Cancel Request"
+                  description={`Cancel request ${record.id}?`}
+                  onConfirm={() => handleCancelRequest(record.id)}
+                  okText="Yes"
+                  cancelText="No"
+                  okButtonProps={{ danger: true }}
+                >
+                  <Button size="small" danger icon={<DeleteOutlined />}>Cancel</Button>
+                </Popconfirm>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={visibleRequests}
+          rowKey="id"
+          pagination={{ pageSize: 10 }}
+          scroll={{ x: 'max-content' }}
+          size="small"
+        />
+      )}
 
       {/* Edit Modal */}
       <Modal
