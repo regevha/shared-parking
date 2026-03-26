@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Tag, Space, Modal, Form, DatePicker, Select, notification, Popconfirm, Card, Row, Col } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
@@ -33,6 +34,7 @@ const MyRequests: React.FC = () => {
   const [form] = Form.useForm<EditFormValues>();
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const navigate = useNavigate();
   const { userRequests, cancelUserRequest, updateUserRequest } = useRequests();
 
   useEffect(() => {
@@ -205,7 +207,12 @@ const MyRequests: React.FC = () => {
 
   return (
     <div className="my-requests">
-      <h1>My Requests</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <h1 style={{ margin: 0 }}>My Requests</h1>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/submit-request')}>
+          New Request
+        </Button>
+      </div>
 
       {/* Table (desktop) / Card list (mobile) */}
       {isMobile ? (

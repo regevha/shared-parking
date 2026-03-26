@@ -34,21 +34,20 @@ const App: React.FC = () => {
   }, [darkMode]);
 
   const getMenuItems = () => {
-    const items = [
-      { key: 'calendar', label: <Link to="/calendar">Requests</Link> },
-      { key: 'lot-status', label: <Link to="/lot-status">Parking Status</Link> },
-      { key: 'pending', label: <Link to="/pending">All Pending Requests</Link> },
-      { key: 'approvals', label: <Link to="/approvals">All Approvals</Link> },
-    ];
+    const items: { key: string; label: React.ReactNode }[] = [];
 
     if (role === 'User' || role === 'Owner') {
-      items.push({ key: 'submit-request', label: <Link to="/submit-request">Submit Request</Link> });
       items.push({ key: 'my-requests', label: <Link to="/my-requests">My Requests</Link> });
     }
 
+    items.push({ key: 'calendar', label: <Link to="/calendar">Requests</Link> });
+    items.push({ key: 'pending', label: <Link to="/pending">All Pending Requests</Link> });
+    items.push({ key: 'approvals', label: <Link to="/approvals">All Approvals</Link> });
+    items.push({ key: 'lot-status', label: <Link to="/lot-status">Parking Status</Link> });
+
     if (role === 'Owner') {
-      items.push({ key: 'my-lots', label: <Link to="/my-lots">My Lots</Link> });
       items.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">Lot Calendar</Link> });
+      items.push({ key: 'my-lots', label: <Link to="/my-lots">My Lots</Link> });
     }
 
     if (role === 'Manager') {
