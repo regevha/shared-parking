@@ -25,7 +25,7 @@ interface RequestsContextType {
   approvedRequests: ParkingRequest[];
   userRequests: ParkingRequest[];
   addPendingRequest: (request: Omit<ParkingRequest, 'id' | 'submittedAt' | 'status'>) => void;
-  approveRequest: (requestId: string) => void;
+  approveRequest: (requestId: string, lotInfo?: { lotId: string; floor: string; lotOwner: string }) => void;
   rejectRequest: (requestId: string) => void;
   cancelUserRequest: (requestId: string) => void;
   updateUserRequest: (requestId: string, updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>) => void;
@@ -45,133 +45,33 @@ interface RequestsProviderProps {
   children: ReactNode;
 }
 
-// Initial mock data
+// Initial mock data — IDs REQ-001..REQ-009 = approved, REQ-010..REQ-015 = pending, REQ-016..REQ-017 = user history
 const initialPendingRequests: ParkingRequest[] = [
-  {
-    id: '1',
-    requesterId: 'user1',
-    requesterName: 'John Doe',
-    date: '2026-03-25',
-    startTime: '09:00',
-    endTime: '11:00',
-    duration: 2,
-    submittedAt: '2026-03-23T10:30:00Z',
-    status: 'pending',
-  },
-  {
-    id: '2',
-    requesterId: 'user2',
-    requesterName: 'Jane Smith',
-    date: '2026-03-26',
-    startTime: '14:00',
-    endTime: '16:00',
-    duration: 2,
-    submittedAt: '2026-03-23T11:15:00Z',
-    status: 'pending',
-  },
-  {
-    id: '3',
-    requesterId: 'user3',
-    requesterName: 'Bob Johnson',
-    date: '2026-03-27',
-    startTime: '10:00',
-    endTime: '13:00',
-    duration: 3,
-    submittedAt: '2026-03-23T12:00:00Z',
-    status: 'pending',
-  },
-  {
-    id: '4',
-    requesterId: 'user4',
-    requesterName: 'Alice Brown',
-    date: '2026-03-28',
-    startTime: '15:00',
-    endTime: '17:00',
-    duration: 2,
-    submittedAt: '2026-03-23T13:45:00Z',
-    status: 'pending',
-    rejectedByOwner: true,
-  },
-  {
-    id: '5',
-    requesterId: 'owner1',
-    requesterName: 'Owner One',
-    date: '2026-03-29',
-    startTime: '08:00',
-    endTime: '12:00',
-    duration: 4,
-    submittedAt: '2026-03-23T14:20:00Z',
-    status: 'pending',
-  },
+  { id: 'REQ-010', requesterId: 'user-001', requesterName: 'Alice Johnson',  date: '2026-03-28', startTime: '09:00', endTime: '11:00', duration: 2, submittedAt: '2026-03-25T14:30:00Z', status: 'pending' },
+  { id: 'REQ-011', requesterId: 'user-002', requesterName: 'Bob Smith',      date: '2026-03-29', startTime: '13:00', endTime: '15:00', duration: 2, submittedAt: '2026-03-25T15:45:00Z', status: 'pending' },
+  { id: 'REQ-012', requesterId: 'user-003', requesterName: 'Carol Williams', date: '2026-03-29', startTime: '10:00', endTime: '13:00', duration: 3, submittedAt: '2026-03-25T16:00:00Z', status: 'pending', rejectedByOwner: true },
+  { id: 'REQ-013', requesterId: CURRENT_OWNER_ID, requesterName: CURRENT_OWNER_NAME, date: '2026-03-30', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-25T16:30:00Z', status: 'pending' },
+  { id: 'REQ-014', requesterId: 'user-004', requesterName: 'Emma Brown',     date: '2026-03-30', startTime: '08:00', endTime: '12:00', duration: 4, submittedAt: '2026-03-26T09:00:00Z', status: 'pending' },
+  { id: 'REQ-015', requesterId: 'user-005', requesterName: 'Frank Davis',    date: '2026-03-31', startTime: '15:00', endTime: '18:00', duration: 3, submittedAt: '2026-03-26T10:00:00Z', status: 'pending' },
 ];
 
 const initialApprovedRequests: ParkingRequest[] = [
-  {
-    id: '6',
-    requesterId: 'user5',
-    requesterName: 'Charlie Wilson',
-    date: '2026-03-20',
-    startTime: '09:00',
-    endTime: '11:00',
-    duration: 2,
-    submittedAt: '2026-03-18T09:00:00Z',
-    status: 'approved',
-    lotId: 'LOT-001',
-    floor: 'Floor 1',
-    lotOwner: 'Owner One',
-    approvedAt: '2026-03-19T10:00:00Z',
-  },
-  {
-    id: '7',
-    requesterId: 'user6',
-    requesterName: 'Diana Prince',
-    date: '2026-03-21',
-    startTime: '13:00',
-    endTime: '15:00',
-    duration: 2,
-    submittedAt: '2026-03-19T10:30:00Z',
-    status: 'approved',
-    lotId: 'LOT-002',
-    floor: 'Floor 2',
-    lotOwner: 'Owner Two',
-    approvedAt: '2026-03-20T11:00:00Z',
-  },
+  { id: 'REQ-001', requesterId: 'user-001', requesterName: 'Alice Johnson',  date: '2026-03-24', startTime: '09:00', endTime: '11:00', duration: 2, submittedAt: '2026-03-22T14:30:00Z', status: 'approved', lotId: 'F2-003', floor: 'F2 - Level 1',     lotOwner: 'Lisa Anderson',       approvedAt: '2026-03-22T16:45:00Z' },
+  { id: 'REQ-002', requesterId: 'user-002', requesterName: 'Bob Smith',      date: '2026-03-24', startTime: '13:00', endTime: '15:00', duration: 2, submittedAt: '2026-03-22T09:45:00Z', status: 'approved', lotId: 'F1-002', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-22T10:15:00Z' },
+  { id: 'REQ-003', requesterId: 'user-003', requesterName: 'Carol Williams', date: '2026-03-26', startTime: '10:00', endTime: '13:00', duration: 3, submittedAt: '2026-03-23T10:00:00Z', status: 'approved', lotId: 'F3-005', floor: 'F3 - Level 2',     lotOwner: 'Jennifer Lee',        approvedAt: '2026-03-23T11:30:00Z' },
+  { id: 'REQ-004', requesterId: 'user-005', requesterName: 'Frank Davis',    date: '2026-03-27', startTime: '15:00', endTime: '18:00', duration: 3, submittedAt: '2026-03-23T13:15:00Z', status: 'approved', lotId: 'F2-001', floor: 'F2 - Level 1',     lotOwner: 'David Wilson',        approvedAt: '2026-03-23T14:20:00Z' },
+  { id: 'REQ-005', requesterId: 'user-004', requesterName: 'Emma Brown',     date: '2026-03-24', startTime: '08:00', endTime: '12:00', duration: 4, submittedAt: '2026-03-22T15:30:00Z', status: 'approved', lotId: 'F1-004', floor: 'F1 - Ground Floor', lotOwner: 'Mike Chen',           approvedAt: '2026-03-22T16:00:00Z' },
+  { id: 'REQ-006', requesterId: 'user-006', requesterName: 'George Miller',  date: '2026-03-25', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-23T09:00:00Z', status: 'approved', lotId: 'F3-001', floor: 'F3 - Level 2',     lotOwner: 'Patricia Brown',      approvedAt: '2026-03-23T09:45:00Z' },
+  { id: 'REQ-007', requesterId: 'user-007', requesterName: 'Helen Garcia',   date: '2026-03-26', startTime: '11:00', endTime: '13:00', duration: 2, submittedAt: '2026-03-23T11:45:00Z', status: 'approved', lotId: 'F2-004', floor: 'F2 - Level 1',     lotOwner: 'James Taylor',        approvedAt: '2026-03-23T12:30:00Z' },
+  { id: 'REQ-008', requesterId: 'user-008', requesterName: 'Tom Harris',     date: '2026-03-26', startTime: '09:00', endTime: '11:00', duration: 2, submittedAt: '2026-03-24T08:00:00Z', status: 'approved', lotId: 'F1-001', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-24T08:30:00Z' },
+  { id: 'REQ-009', requesterId: 'user-009', requesterName: 'Nina Patel',     date: '2026-03-27', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-24T10:30:00Z', status: 'approved', lotId: 'F1-006', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-24T11:00:00Z' },
 ];
 
+// Current user (Sarah Johnson) own parking requests at other people's lots
 const initialUserRequests: ParkingRequest[] = [
-  {
-    id: '8',
-    requesterId: 'current-user',
-    requesterName: 'Current User',
-    date: '2026-03-25',
-    startTime: '09:00',
-    endTime: '11:00',
-    duration: 2,
-    submittedAt: '2026-03-23T08:00:00Z',
-    status: 'pending',
-  },
-  {
-    id: '9',
-    requesterId: 'current-user',
-    requesterName: 'Current User',
-    date: '2026-03-22',
-    startTime: '14:00',
-    endTime: '16:00',
-    duration: 2,
-    submittedAt: '2026-03-20T15:30:00Z',
-    status: 'approved',
-  },
-  {
-    id: '10',
-    requesterId: 'current-user',
-    requesterName: 'Current User',
-    date: '2026-03-19',
-    startTime: '10:00',
-    endTime: '12:00',
-    duration: 2,
-    submittedAt: '2026-03-17T12:00:00Z',
-    status: 'rejected',
-  },
+  { id: 'REQ-013', requesterId: CURRENT_OWNER_ID, requesterName: CURRENT_OWNER_NAME, date: '2026-03-30', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-25T16:30:00Z', status: 'pending' },
+  { id: 'REQ-016', requesterId: CURRENT_OWNER_ID, requesterName: CURRENT_OWNER_NAME, date: '2026-03-22', startTime: '14:00', endTime: '16:00', duration: 2, submittedAt: '2026-03-21T10:00:00Z', status: 'approved', lotId: 'F3-003', floor: 'F3 - Level 2', lotOwner: 'Robert Garcia', approvedAt: '2026-03-21T11:00:00Z' },
+  { id: 'REQ-017', requesterId: CURRENT_OWNER_ID, requesterName: CURRENT_OWNER_NAME, date: '2026-03-19', startTime: '10:00', endTime: '12:00', duration: 2, submittedAt: '2026-03-17T12:00:00Z', status: 'rejected', lotId: 'F2-001', floor: 'F2 - Level 1', lotOwner: 'David Wilson' },
 ];
 
 export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) => {
@@ -191,24 +91,17 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
     setUserRequests(prev => [...prev, newRequest]);
   };
 
-  const approveRequest = (requestId: string) => {
-    setPendingRequests(prev =>
-      prev.map(req =>
-        req.id === requestId ? { ...req, status: 'approved' } : req
-      )
-    );
-
+  const approveRequest = (requestId: string, lotInfo?: { lotId: string; floor: string; lotOwner: string }) => {
     const approvedRequest = pendingRequests.find(req => req.id === requestId);
     if (approvedRequest) {
       const resolvedApprovedRequest: ParkingRequest = {
         ...approvedRequest,
         status: 'approved' as const,
         approvedAt: new Date().toISOString(),
-        lotId: approvedRequest.lotId || 'LOT-100',
-        floor: approvedRequest.floor || 'Floor 1',
-        lotOwner: approvedRequest.lotOwner || 'System Assigned',
+        lotId: lotInfo?.lotId || approvedRequest.lotId || 'LOT-100',
+        floor: lotInfo?.floor || approvedRequest.floor || 'Floor 1',
+        lotOwner: lotInfo?.lotOwner || approvedRequest.lotOwner || 'System Assigned',
       };
-
       setApprovedRequests(prev => [...prev, resolvedApprovedRequest]);
       setPendingRequests(prev => prev.filter(req => req.id !== requestId));
     }

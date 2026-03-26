@@ -4,7 +4,6 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification } from 'antd';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest, CURRENT_OWNER_NAME } from '../contexts/RequestsContext';
-import { mockApprovalsData, Approval } from '../mock/approvalsData';
 import { mockLotsData } from '../mock/lotsData';
 import { Lot } from '../types';
 import './CalendarView.css';
@@ -20,7 +19,7 @@ interface LotCalendarEvent {
   start: Date;
   end: Date;
   type: EventType;
-  resource: Approval | ParkingRequest | Lot;
+  resource: ParkingRequest | Lot;
 }
 
 const EVENT_COLORS: Record<EventType, string> = {
@@ -55,7 +54,7 @@ const CustomMobileWeekEvent: React.FC<{ event: LotCalendarEvent }> = ({ event })
 );
 
 const LotCalendarView: React.FC = () => {
-  const { pendingRequests, approveRequest, rejectRequest } = useRequests();
+  const { pendingRequests, approvedRequests, approveRequest, rejectRequest } = useRequests();
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
   const [date, setDate] = useState(new Date());
@@ -85,9 +84,9 @@ const LotCalendarView: React.FC = () => {
     ...ownerLots.map(l => ({ value: l.id, label: `${l.id} — ${l.floor}` })),
   ], [ownerLots]);
 
-  // Booked events — current owner's lots only
+  // Booked events — sourced from context so newly approved requests appear immediately
   const bookedEvents = useMemo(() =>
-    mockApprovalsData
+    approvedRequests
       .filter(a => a.lotOwner === CURRENT_OWNER_NAME && (selectedLot === 'all' || a.lotId === selectedLot))
       .map(a => ({
         id: a.id,
@@ -95,15 +94,15 @@ const LotCalendarView: React.FC = () => {
         start: new Date(`${a.date}T${a.startTime}:00`),
         end: new Date(`${a.date}T${a.endTime}:00`),
         type: 'booked' as EventType,
-        resource: a as Approval,
+        resource: a as ParkingRequest,
       })),
-  [selectedLot]);
+  [approvedRequests, selectedLot]);
 
   // Pending events — only shown in "All My Lots" view (not yet assigned to a specific lot)
   const pendingEvents = useMemo(() =>
     selectedLot !== 'all' ? [] :
     pendingRequests
-      .filter(r => !r.rejectedByOwner)
+      .filter(r => !r.rejectedByOwner && r.status !== 'rejected')
       .map(r => ({
         id: `pending-${r.id}`,
         title: `⏳ ${r.requesterName.split(' ')[0]}`,
@@ -150,8 +149,17 @@ const LotCalendarView: React.FC = () => {
     };
   };
 
+  const floorNames: Record<string, string> = { F1: 'F1 - Ground Floor', F2: 'F2 - Level 1', F3: 'F3 - Level 2' };
+
   const handleApprove = (requestId: string) => {
-    approveRequest(requestId);
+    const targetLot = selectedLot !== 'all'
+      ? ownerLots.find(l => l.id === selectedLot)
+      : ownerLots.find(l => l.status === 'available');
+    approveRequest(requestId, targetLot ? {
+      lotId: targetLot.id,
+      floor: floorNames[targetLot.floor] || targetLot.floor,
+      lotOwner: CURRENT_OWNER_NAME,
+    } : undefined);
     setSelectedEvent(null);
     notification.success({ message: 'Request approved successfully' });
   };
@@ -253,7 +261,7 @@ const LotCalendarView: React.FC = () => {
   // Modal title + content based on event type
   const modalTitle = useMemo(() => {
     if (!selectedEvent) return '';
-    if (selectedEvent.type === 'booked')  return `Booked — ${(selectedEvent.resource as Approval).requesterName}`;
+    if (selectedEvent.type === 'booked')  return `Booked — ${(selectedEvent.resource as ParkingRequest).requesterName}`;
     if (selectedEvent.type === 'pending') return `Pending — ${(selectedEvent.resource as ParkingRequest).requesterName}`;
     return `Blocked — ${(selectedEvent.resource as Lot).id}`;
   }, [selectedEvent]);
@@ -262,7 +270,7 @@ const LotCalendarView: React.FC = () => {
     if (!selectedEvent) return null;
 
     if (selectedEvent.type === 'booked') {
-      const a = selectedEvent.resource as Approval;
+      const a = selectedEvent.resource as ParkingRequest;
       return (
         <Descriptions column={1} size="small" bordered>
           <Descriptions.Item label="Requester">{a.requesterName}</Descriptions.Item>
