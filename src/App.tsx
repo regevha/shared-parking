@@ -112,7 +112,7 @@ const App: React.FC = () => {
               </Dropdown>
             </div>
           </Header>
-          <Content style={{ padding: '0 50px', marginTop: 64 }}>
+          <Content style={{ padding: '0 50px' }}>
             <div style={{ padding: 24, minHeight: 380 }}>
               <Routes>
                 <Route path="/lot-status" element={<LotStatusBoard />} />
