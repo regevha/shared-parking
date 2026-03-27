@@ -18,6 +18,11 @@
   display: none;
 }
 
+/* Hide the thin current-time line — we highlight the whole hour block instead */
+.rbc-current-time-indicator {
+  display: none;
+}
+
 /* Custom event component */
 .custom-event {
   display: flex;

@@ -59,6 +59,19 @@ const CustomMobileWeekEvent: React.FC<{ event: CalendarEvent }> = ({ event }) =>
 );
 
 
+const currentHourSlotPropGetter = (date: Date) => {
+  const now = new Date();
+  if (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate() &&
+    date.getHours() === now.getHours()
+  ) {
+    return { style: { backgroundColor: 'rgba(22, 119, 255, 0.18)' } };
+  }
+  return {};
+};
+
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const { pendingRequests, userRequests, updateUserRequest } = useRequests();
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
@@ -276,8 +289,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             onEventDrop={handleEventDrop}
             onEventResize={handleEventResize}
             scrollToTime={scrollTo8AM}
+            step={60}
+            timeslots={1}
             min={minTime}
             max={maxTime}
+            slotPropGetter={currentHourSlotPropGetter}
             components={view === 'week' ? mobileWeekComponents : mobileComponents}
             formats={view === 'week' ? mobileWeekFormats : undefined}
           />
@@ -304,10 +320,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             onEventDrop={handleEventDrop}
             onEventResize={handleEventResize}
             scrollToTime={scrollTo8AM}
-            step={30}
+            step={60}
             timeslots={1}
             min={minTime}
             max={maxTime}
+            slotPropGetter={currentHourSlotPropGetter}
             components={desktopComponents}
           />
           {!hasVisibleEvents && (
@@ -351,6 +368,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           </Card>
         </Col>
       </Row>
+
+      {/* Info */}
+      <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">
+        <strong>Requests View:</strong> A calendar overview of all parking requests — pending, approved, and rejected.
+      </Card>
 
       {/* Legend */}
       <Card>

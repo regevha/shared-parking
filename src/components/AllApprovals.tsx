@@ -4,7 +4,7 @@ import { Table, Tag, Space, Card, Row, Col, Button, Modal, notification } from '
 import { EyeOutlined, MessageOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
-import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
+import { useRequests, ParkingRequest, CURRENT_OWNER_NAME } from '../contexts/RequestsContext';
 import './AllApprovals.css';
 
 const AllApprovals: React.FC = () => {
@@ -123,10 +123,23 @@ const AllApprovals: React.FC = () => {
 
   return (
     <div className="all-approvals">
-      <h1>All Approvals</h1>
+      <h1>Approvals</h1>
+
+      {/* Table */}
+      <Table
+        columns={columns}
+        dataSource={approvedRequests}
+        rowKey="id"
+        pagination={{ pageSize: 10, hideOnSinglePage: true }}
+        scroll={{ x: 1000 }}
+        size="middle"
+        rowClassName={(record: ParkingRequest) =>
+          record.lotOwner === CURRENT_OWNER_NAME ? 'owner-approval-row' : ''
+        }
+      />
 
       {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
         <Col xs={12} sm={6}>
           <Card>
             <div style={{ textAlign: 'center' }}>
@@ -160,20 +173,9 @@ const AllApprovals: React.FC = () => {
       </Row>
 
       {/* Info */}
-      <Card style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>All Approvals:</strong> View all approved parking requests across the system.
-        Click the eye icon to view request details and message threads.
+      <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
+        <strong>Approvals:</strong> A complete history of all approved parking requests across the system.
       </Card>
-
-      {/* Table */}
-      <Table
-        columns={columns}
-        dataSource={approvedRequests}
-        rowKey="id"
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: 1000 }}
-        size="middle"
-      />
     </div>
   );
 };

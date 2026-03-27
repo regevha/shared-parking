@@ -68,7 +68,7 @@ const LotStatusBoard: React.FC = () => {
 
   return (
     <div className="lot-status-board">
-      <h1>Lot Status Board</h1>
+      <h1>Parking Status</h1>
 
       {/* Legend */}
       <Card
@@ -133,8 +133,11 @@ const LotStatusBoard: React.FC = () => {
         </Row>
       </Card>
 
+      {/* Floors Collapse */}
+      <Collapse items={floorItems} accordion />
+
       {/* Summary Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
         <Col xs={12} sm={6}>
           <Card>
             <div style={{ textAlign: 'center' }}>
@@ -178,15 +181,12 @@ const LotStatusBoard: React.FC = () => {
       </Row>
 
       <Alert
-        message="Read-Only View"
-        description="You are viewing lot status information. To request or manage lots, use the menu options."
+        message="Parking Status"
+        description="Displays the current status of all parking lots across all floors."
         type="info"
         showIcon
-        style={{ marginBottom: '24px' }}
+        style={{ marginTop: '24px' }}
       />
-
-      {/* Floors Collapse */}
-      <Collapse items={floorItems} accordion />
     </div>
   );
 };

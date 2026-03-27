@@ -90,7 +90,7 @@
 }
 
 [data-theme="dark"] .rbc-today {
-  background-color: #1a2942;
+  background-color: rgba(22, 119, 255, 0.07);
 }
 
 [data-theme="dark"] .rbc-header,
@@ -134,6 +134,10 @@
 
 [data-theme="dark"] .rbc-day-slot .rbc-time-slot {
   border-top-color: #262626;
+}
+
+.rbc-current-time-indicator {
+  display: none;
 }
 
 [data-theme="dark"] .rbc-day-bg + .rbc-day-bg,

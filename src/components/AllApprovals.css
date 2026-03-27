@@ -7,6 +7,14 @@
   margin-bottom: 24px;
 }
 
+/* Highlight rows where the current owner approved the request */
+.owner-approval-row td {
+  background-color: rgba(22, 119, 255, 0.08) !important;
+}
+.owner-approval-row:hover td {
+  background-color: rgba(22, 119, 255, 0.14) !important;
+}
+
 @media (max-width: 768px) {
   .all-approvals {
     padding: 12px;

@@ -182,10 +182,58 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   return (
     <div className="all-pending-requests">
-      <h1>All Pending Requests</h1>
+      <h1>Pending Requests</h1>
+
+      {/* Filter Toggle (Owner only) */}
+      {isOwner && (
+        <Card style={{ marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>
+              <strong>Show Requests:</strong>
+            </span>
+            <Segmented
+              value={filterMode}
+              onChange={(value) => setFilterMode(value as 'all' | 'active')}
+              options={[
+                { label: 'Show all', value: 'all' },
+                { label: 'Hide already rejected', value: 'active' },
+              ]}
+            />
+          </div>
+        </Card>
+      )}
+
+      {/* Table */}
+      <Table
+        columns={columns}
+        dataSource={filteredRequests}
+        rowKey="id"
+        pagination={{ pageSize: 10, hideOnSinglePage: true }}
+        scroll={{ x: 800 }}
+        rowClassName={getRowClassName}
+        size="middle"
+      />
+
+      {/* Legend for rejected requests (Owner only) */}
+      {isOwner && stats.rejected > 0 && (
+        <Card style={{ marginTop: '24px' }} size="small">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: '#f5f5f5',
+                borderRadius: '2px',
+                border: '1px solid #d9d9d9',
+              }}
+            />
+            <span>= Rejected by you (can reapprove by clicking Approve)</span>
+          </div>
+        </Card>
+      )}
 
       {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
         <Col xs={12} sm={6}>
           <Card>
             <div style={{ textAlign: 'center' }}>
@@ -214,69 +262,18 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
         )}
       </Row>
 
-      {/* Filter Toggle (Owner only) */}
-      {isOwner && (
-        <Card style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>
-              <strong>Show Requests:</strong>
-            </span>
-            <Segmented
-              value={filterMode}
-              onChange={(value) => setFilterMode(value as 'all' | 'active')}
-              options={[
-                { label: 'Show all', value: 'all' },
-                { label: 'Hide already rejected', value: 'active' },
-              ]}
-            />
-          </div>
-        </Card>
-      )}
-
       {/* Role-specific Info */}
-      <Card style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
+      <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
         {isOwner ? (
           <div>
-            <strong>Owner View:</strong> You can approve or reject pending requests. Requests you've already
-            rejected are highlighted in grey with a "Rejected by you" label. You cannot approve or reject your own
-            requests.
+            <strong>Pending Requests:</strong> Lists all parking requests awaiting your approval. Requests you have already rejected are shown in grey.
           </div>
         ) : (
           <div>
-            <strong>User View:</strong> This is a read-only list of all pending requests. Only owners can approve or
-            reject requests.
+            <strong>Pending Requests:</strong> Lists all parking requests currently awaiting owner approval.
           </div>
         )}
       </Card>
-
-      {/* Table */}
-      <Table
-        columns={columns}
-        dataSource={filteredRequests}
-        rowKey="id"
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: 800 }}
-        rowClassName={getRowClassName}
-        size="middle"
-      />
-
-      {/* Legend for rejected requests (Owner only) */}
-      {isOwner && stats.rejected > 0 && (
-        <Card style={{ marginTop: '24px' }} size="small">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '20px',
-                height: '20px',
-                backgroundColor: '#f5f5f5',
-                borderRadius: '2px',
-                border: '1px solid #d9d9d9',
-              }}
-            />
-            <span>= Rejected by you (can reapprove by clicking Approve)</span>
-          </div>
-        </Card>
-      )}
     </div>
   );
 };

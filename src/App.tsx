@@ -14,6 +14,7 @@ import NotificationWindows from './components/NotificationWindows';
 import AdminPanel from './components/AdminPanel';
 import MyLots from './components/MyLots';
 import CalendarView from './components/CalendarView';
+import LotCalendarView from './components/LotCalendarView';
 import './App.css';
 
 const { Header, Content } = Layout;
@@ -33,19 +34,19 @@ const App: React.FC = () => {
   }, [darkMode]);
 
   const getMenuItems = () => {
-    const items = [
-      { key: 'calendar', label: <Link to="/calendar">Calendar View</Link> },
-      { key: 'lot-status', label: <Link to="/lot-status">Lot Status Board</Link> },
-      { key: 'pending', label: <Link to="/pending">All Pending Requests</Link> },
-      { key: 'approvals', label: <Link to="/approvals">All Approvals</Link> },
-    ];
+    const items: { key: string; label: React.ReactNode }[] = [];
 
     if (role === 'User' || role === 'Owner') {
-      items.push({ key: 'submit-request', label: <Link to="/submit-request">Submit Request</Link> });
       items.push({ key: 'my-requests', label: <Link to="/my-requests">My Requests</Link> });
     }
 
+    items.push({ key: 'calendar', label: <Link to="/calendar">Requests View</Link> });
+    items.push({ key: 'pending', label: <Link to="/pending">Pending Requests</Link> });
+    items.push({ key: 'approvals', label: <Link to="/approvals">Approvals</Link> });
+    items.push({ key: 'lot-status', label: <Link to="/lot-status">Parking Status</Link> });
+
     if (role === 'Owner') {
+      items.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">Lot Calendar</Link> });
       items.push({ key: 'my-lots', label: <Link to="/my-lots">My Lots</Link> });
     }
 
@@ -111,7 +112,7 @@ const App: React.FC = () => {
               </Dropdown>
             </div>
           </Header>
-          <Content style={{ padding: '0 50px', marginTop: 64 }}>
+          <Content style={{ padding: '0 50px' }}>
             <div style={{ padding: 24, minHeight: 380 }}>
               <Routes>
                 <Route path="/lot-status" element={<LotStatusBoard />} />
@@ -121,6 +122,7 @@ const App: React.FC = () => {
                 <Route path="/submit-request" element={<ParkingRequestForm />} />
                 <Route path="/my-requests" element={<MyRequests />} />
                 <Route path="/my-lots" element={<MyLots />} />
+                <Route path="/lot-calendar" element={<LotCalendarView />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/notifications" element={<NotificationWindows />} />
                 <Route path="/request/:id" element={<RequestDetail />} />
