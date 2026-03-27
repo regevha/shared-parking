@@ -181,8 +181,8 @@ const LotStatusBoard: React.FC = () => {
       </Row>
 
       <Alert
-        message="Read-Only View"
-        description="You are viewing lot status information. To request or manage lots, use the menu options."
+        message="Parking Status"
+        description="Displays the current status of all parking lots across all floors."
         type="info"
         showIcon
         style={{ marginTop: '24px' }}

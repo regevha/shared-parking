@@ -53,6 +53,8 @@ const initialPendingRequests: ParkingRequest[] = [
   { id: 'REQ-013', requesterId: CURRENT_OWNER_ID, requesterName: CURRENT_OWNER_NAME, date: '2026-03-30', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-25T16:30:00Z', status: 'pending' },
   { id: 'REQ-014', requesterId: 'user-004', requesterName: 'Emma Brown',     date: '2026-03-30', startTime: '08:00', endTime: '12:00', duration: 4, submittedAt: '2026-03-26T09:00:00Z', status: 'pending' },
   { id: 'REQ-015', requesterId: 'user-005', requesterName: 'Frank Davis',    date: '2026-03-31', startTime: '15:00', endTime: '18:00', duration: 3, submittedAt: '2026-03-26T10:00:00Z', status: 'pending' },
+  { id: 'REQ-018', requesterId: 'user-010', requesterName: 'David Lee',      date: '2026-03-26', startTime: '17:00', endTime: '19:00', duration: 2, submittedAt: '2026-03-26T14:00:00Z', status: 'pending' },
+  { id: 'REQ-019', requesterId: 'user-011', requesterName: 'Maria Garcia',   date: '2026-03-26', startTime: '18:00', endTime: '20:00', duration: 2, submittedAt: '2026-03-26T15:00:00Z', status: 'pending' },
 ];
 
 const initialApprovedRequests: ParkingRequest[] = [
@@ -65,6 +67,7 @@ const initialApprovedRequests: ParkingRequest[] = [
   { id: 'REQ-007', requesterId: 'user-007', requesterName: 'Helen Garcia',   date: '2026-03-26', startTime: '11:00', endTime: '13:00', duration: 2, submittedAt: '2026-03-23T11:45:00Z', status: 'approved', lotId: 'F2-004', floor: 'F2 - Level 1',     lotOwner: 'James Taylor',        approvedAt: '2026-03-23T12:30:00Z' },
   { id: 'REQ-008', requesterId: 'user-008', requesterName: 'Tom Harris',     date: '2026-03-26', startTime: '09:00', endTime: '11:00', duration: 2, submittedAt: '2026-03-24T08:00:00Z', status: 'approved', lotId: 'F1-001', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-24T08:30:00Z' },
   { id: 'REQ-009', requesterId: 'user-009', requesterName: 'Nina Patel',     date: '2026-03-27', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-24T10:30:00Z', status: 'approved', lotId: 'F1-006', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-24T11:00:00Z' },
+  { id: 'REQ-020', requesterId: 'user-012', requesterName: 'James Wilson',   date: '2026-03-26', startTime: '16:00', endTime: '18:00', duration: 2, submittedAt: '2026-03-26T12:00:00Z', status: 'approved', lotId: 'F1-001', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-26T13:00:00Z' },
 ];
 
 // Current user (Sarah Johnson) own parking requests at other people's lots

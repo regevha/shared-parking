@@ -41,8 +41,8 @@ const App: React.FC = () => {
     }
 
     items.push({ key: 'calendar', label: <Link to="/calendar">Requests View</Link> });
-    items.push({ key: 'pending', label: <Link to="/pending">All Pending Requests</Link> });
-    items.push({ key: 'approvals', label: <Link to="/approvals">All Approvals</Link> });
+    items.push({ key: 'pending', label: <Link to="/pending">Pending Requests</Link> });
+    items.push({ key: 'approvals', label: <Link to="/approvals">Approvals</Link> });
     items.push({ key: 'lot-status', label: <Link to="/lot-status">Parking Status</Link> });
 
     if (role === 'Owner') {

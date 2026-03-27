@@ -261,7 +261,7 @@ const MyRequests: React.FC = () => {
           columns={columns}
           dataSource={visibleRequests}
           rowKey="id"
-          pagination={{ pageSize: 10 }}
+          pagination={{ pageSize: 10, hideOnSinglePage: true }}
           scroll={{ x: 'max-content' }}
           size="small"
         />
@@ -297,8 +297,7 @@ const MyRequests: React.FC = () => {
 
       {/* Info */}
       <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>My Requests:</strong> View and manage your parking requests. You can edit pending requests or cancel any active request.
-        Rejected requests are not shown here.
+        <strong>My Requests:</strong> Manage your active parking requests. Pending requests can be edited; any active request can be cancelled. Rejected requests are not shown.
       </Card>
 
       {/* Edit Modal */}

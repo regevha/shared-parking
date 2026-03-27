@@ -234,7 +234,7 @@ const AdminPanel: React.FC = () => {
               columns={userColumns}
               dataSource={mockUsers}
               rowKey="id"
-              pagination={{ pageSize: 10 }}
+              pagination={{ pageSize: 10, hideOnSinglePage: true }}
             />
           </div>
         );
@@ -276,7 +276,7 @@ const AdminPanel: React.FC = () => {
               columns={lotColumns}
               dataSource={filteredLots}
               rowKey="id"
-              pagination={{ pageSize: 10 }}
+              pagination={{ pageSize: 10, hideOnSinglePage: true }}
             />
           </div>
         );
@@ -381,7 +381,7 @@ const AdminPanel: React.FC = () => {
                   columns={reportColumns}
                   dataSource={mockReports.filter(r => r.type === 'Request')}
                   rowKey="id"
-                  pagination={{ pageSize: 10 }}
+                  pagination={{ pageSize: 10, hideOnSinglePage: true }}
                 />
               </Tabs.TabPane>
               <Tabs.TabPane tab="Approvals" key="approvals">
@@ -389,7 +389,7 @@ const AdminPanel: React.FC = () => {
                   columns={reportColumns}
                   dataSource={mockReports.filter(r => r.type === 'Approval')}
                   rowKey="id"
-                  pagination={{ pageSize: 10 }}
+                  pagination={{ pageSize: 10, hideOnSinglePage: true }}
                 />
               </Tabs.TabPane>
             </Tabs>

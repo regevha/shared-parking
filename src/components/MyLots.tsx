@@ -90,6 +90,11 @@ const MyLots: React.FC = () => {
           You do not currently own any lots.
         </div>
       )}
+
+      {/* Info */}
+      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+        <strong>My Lots:</strong> Shows all parking lots assigned to you and their current availability status.
+      </Card>
     </div>
   );
 };

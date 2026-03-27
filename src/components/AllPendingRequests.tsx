@@ -208,7 +208,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
         columns={columns}
         dataSource={filteredRequests}
         rowKey="id"
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 10, hideOnSinglePage: true }}
         scroll={{ x: 800 }}
         rowClassName={getRowClassName}
         size="middle"
@@ -266,14 +266,11 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
         {isOwner ? (
           <div>
-            <strong>Owner View:</strong> You can approve or reject pending requests. Requests you've already
-            rejected are highlighted in grey with a "Rejected by you" label. You cannot approve or reject your own
-            requests.
+            <strong>Pending Requests:</strong> Lists all parking requests awaiting your approval. Requests you have already rejected are shown in grey.
           </div>
         ) : (
           <div>
-            <strong>User View:</strong> This is a read-only list of all pending requests. Only owners can approve or
-            reject requests.
+            <strong>Pending Requests:</strong> Lists all parking requests currently awaiting owner approval.
           </div>
         )}
       </Card>

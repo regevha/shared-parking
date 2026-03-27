@@ -53,6 +53,19 @@ const CustomMobileWeekEvent: React.FC<{ event: LotCalendarEvent }> = ({ event })
   </div>
 );
 
+const currentHourSlotPropGetter = (date: Date) => {
+  const now = new Date();
+  if (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate() &&
+    date.getHours() === now.getHours()
+  ) {
+    return { style: { backgroundColor: 'rgba(22, 119, 255, 0.18)' } };
+  }
+  return {};
+};
+
 const LotCalendarView: React.FC = () => {
   const { pendingRequests, approvedRequests, approveRequest, rejectRequest } = useRequests();
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
@@ -350,6 +363,7 @@ const LotCalendarView: React.FC = () => {
             scrollToTime={scrollTo8AM}
             min={minTime}
             max={maxTime}
+            slotPropGetter={currentHourSlotPropGetter}
             components={view === 'week' ? mobileWeekComponents : mobileComponents}
             formats={view === 'week' ? mobileWeekFormats : undefined}
           />
@@ -372,10 +386,11 @@ const LotCalendarView: React.FC = () => {
             onSelectEvent={(event: LotCalendarEvent) => setSelectedEvent(event)}
             popup
             scrollToTime={scrollTo8AM}
-            step={30}
+            step={60}
             timeslots={1}
             min={minTime}
             max={maxTime}
+            slotPropGetter={currentHourSlotPropGetter}
             components={desktopComponents}
           />
           {!hasVisibleEvents && (
@@ -421,6 +436,11 @@ const LotCalendarView: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* Info */}
+      <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">
+        <strong>Lot Calendar:</strong> A calendar view of your lots showing bookings, pending requests, and blocked periods.
+      </Card>
 
       {/* Legend */}
       <Card>

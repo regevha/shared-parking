@@ -4,7 +4,7 @@ import { Table, Tag, Space, Card, Row, Col, Button, Modal, notification } from '
 import { EyeOutlined, MessageOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
-import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
+import { useRequests, ParkingRequest, CURRENT_OWNER_NAME } from '../contexts/RequestsContext';
 import './AllApprovals.css';
 
 const AllApprovals: React.FC = () => {
@@ -130,9 +130,12 @@ const AllApprovals: React.FC = () => {
         columns={columns}
         dataSource={approvedRequests}
         rowKey="id"
-        pagination={{ pageSize: 10 }}
+        pagination={{ pageSize: 10, hideOnSinglePage: true }}
         scroll={{ x: 1000 }}
         size="middle"
+        rowClassName={(record: ParkingRequest) =>
+          record.lotOwner === CURRENT_OWNER_NAME ? 'owner-approval-row' : ''
+        }
       />
 
       {/* Stats */}
@@ -171,8 +174,7 @@ const AllApprovals: React.FC = () => {
 
       {/* Info */}
       <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>All Approvals:</strong> View all approved parking requests across the system.
-        Click the eye icon to view request details and message threads.
+        <strong>Approvals:</strong> A complete history of all approved parking requests across the system.
       </Card>
     </div>
   );
