@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { requestsApi } from '../api/requests';
+import { lotsApi, LotData } from '../api/lots';
 
 export const CURRENT_OWNER_ID = 'owner-001';
 export const CURRENT_OWNER_NAME = 'Sarah Johnson';
@@ -25,6 +26,8 @@ interface RequestsContextType {
   pendingRequests: ParkingRequest[];
   approvedRequests: ParkingRequest[];
   userRequests: ParkingRequest[];
+  allLots: LotData[];
+  ownerLots: LotData[];
   loading: boolean;
   error: string | null;
   addPendingRequest: (request: Omit<ParkingRequest, 'id' | 'submittedAt' | 'status'>) => Promise<void>;
@@ -52,6 +55,8 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
   const [pendingRequests, setPendingRequests] = useState<ParkingRequest[]>([]);
   const [approvedRequests, setApprovedRequests] = useState<ParkingRequest[]>([]);
   const [userRequests, setUserRequests] = useState<ParkingRequest[]>([]);
+  const [allLots, setAllLots] = useState<LotData[]>([]);
+  const [ownerLots, setOwnerLots] = useState<LotData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,14 +66,18 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
       try {
         setLoading(true);
         setError(null);
-        const [pending, approved, user] = await Promise.all([
+        const [pending, approved, user, lots, myLots] = await Promise.all([
           requestsApi.getPending(),
           requestsApi.getApproved(),
           requestsApi.getByUser(CURRENT_OWNER_ID),
+          lotsApi.getAll(),
+          lotsApi.getByOwner(CURRENT_OWNER_NAME),
         ]);
         setPendingRequests(pending);
         setApprovedRequests(approved);
         setUserRequests(user);
+        setAllLots(lots);
+        setOwnerLots(myLots);
       } catch (err: any) {
         setError(err.message || 'Failed to load data from API');
       } finally {
@@ -138,6 +147,8 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
         pendingRequests,
         approvedRequests,
         userRequests,
+        allLots,
+        ownerLots,
         loading,
         error,
         addPendingRequest,

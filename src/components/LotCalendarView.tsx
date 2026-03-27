@@ -4,8 +4,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification } from 'antd';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest, CURRENT_OWNER_NAME } from '../contexts/RequestsContext';
-import { mockLotsData } from '../mock/lotsData';
-import { Lot } from '../types';
+import { LotData } from '../api/lots';
 import './CalendarView.css';
 import './LotCalendarView.css';
 
@@ -19,7 +18,7 @@ interface LotCalendarEvent {
   start: Date;
   end: Date;
   type: EventType;
-  resource: ParkingRequest | Lot;
+  resource: ParkingRequest | LotData;
 }
 
 const EVENT_COLORS: Record<EventType, string> = {
@@ -67,7 +66,7 @@ const currentHourSlotPropGetter = (date: Date) => {
 };
 
 const LotCalendarView: React.FC = () => {
-  const { pendingRequests, approvedRequests, approveRequest, rejectRequest } = useRequests();
+  const { pendingRequests, approvedRequests, approveRequest, rejectRequest, ownerLots } = useRequests();
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
   const [date, setDate] = useState(new Date());
@@ -85,16 +84,10 @@ const LotCalendarView: React.FC = () => {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Only the current owner's lots
-  const ownerLots = useMemo(
-    () => mockLotsData.flatMap(f => f.lots).filter(l => l.owner === CURRENT_OWNER_NAME),
-    []
-  );
-
-  // Lot selector options — current owner's lots only
+  // Lot selector options — current owner's lots only (ownerLots loaded server-side)
   const lotOptions = useMemo(() => [
     { value: 'all', label: 'All My Lots' },
-    ...ownerLots.map(l => ({ value: l.id, label: `${l.id} — ${l.floor}` })),
+    ...ownerLots.map(l => ({ value: l.id, label: `${l.id} — ${l.floorLabel}` })),
   ], [ownerLots]);
 
   // Booked events — sourced from context so newly approved requests appear immediately
@@ -138,7 +131,7 @@ const LotCalendarView: React.FC = () => {
           start: until.startOf('day').toDate(),
           end: until.toDate(),
           type: 'blocked' as EventType,
-          resource: l as Lot,
+          resource: l as LotData,
         };
       }),
   [ownerLots, selectedLot]);
@@ -276,7 +269,7 @@ const LotCalendarView: React.FC = () => {
     if (!selectedEvent) return '';
     if (selectedEvent.type === 'booked')  return `Booked — ${(selectedEvent.resource as ParkingRequest).requesterName}`;
     if (selectedEvent.type === 'pending') return `Pending — ${(selectedEvent.resource as ParkingRequest).requesterName}`;
-    return `Blocked — ${(selectedEvent.resource as Lot).id}`;
+    return `Blocked — ${(selectedEvent.resource as LotData).id}`;
   }, [selectedEvent]);
 
   const renderModalContent = () => {
@@ -319,7 +312,7 @@ const LotCalendarView: React.FC = () => {
     }
 
     // blocked
-    const l = selectedEvent.resource as Lot;
+    const l = selectedEvent.resource as LotData;
     return (
       <Descriptions column={1} size="small" bordered>
         <Descriptions.Item label="Lot ID">{l.id}</Descriptions.Item>
