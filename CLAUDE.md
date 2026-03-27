@@ -41,9 +41,9 @@ Role is derived from the JWT — no manual dropdown.
 | Email | Role |
 |-------|------|
 | `alice@parking.dev` | User |
-| `sarah@parking.dev` | Owner (owns F1-001, F1-002, F1-006) |
+| `sarah@parking.dev` | Owner |
 | `admin@parking.dev` | Manager |
-All 21 users follow `<firstname>@parking.dev` pattern.
+All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the full list.
 
 ## Python Libraries
 
@@ -176,10 +176,6 @@ Both `CalendarView` and `LotCalendarView`:
 
 ### Row Highlighting
 `AllApprovals` highlights rows where `lotOwner === user?.name` (from `useAuth`) using `.owner-approval-row`.
-
-## Lot IDs
-Lots: `F1-001`–`F1-006`, `F2-001`–`F2-005`, `F3-001`–`F3-006` (17 total, one unowned).
-Sarah Johnson (owner-001) owns: **F1-001, F1-002, F1-006**.
 
 ## Git / Branching
 - Main branch: `master`
