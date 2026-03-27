@@ -1,14 +1,46 @@
 """
-Seed the SQLite database with the current mock data.
+Seed the SQLite database with sample users, requests and lots.
 Run once: python seed.py
 Safe to re-run — clears existing data first.
 """
 
+import uuid
 from database import SessionLocal, engine, Base
+from auth import hash_password
 import models
 
 Base.metadata.create_all(bind=engine)
 
+# ── Sample users ──────────────────────────────────────────────────────────────
+# Passwords are all "password123" for development convenience
+USERS = [
+    dict(id="owner-001", name="Sarah Johnson",   email="sarah@parking.dev",    role="owner"),
+    dict(id="owner-002", name="Mike Chen",        email="mike@parking.dev",     role="owner"),
+    dict(id="owner-003", name="David Wilson",     email="david@parking.dev",    role="owner"),
+    dict(id="owner-004", name="Lisa Anderson",    email="lisa@parking.dev",     role="owner"),
+    dict(id="owner-005", name="James Taylor",     email="james@parking.dev",    role="owner"),
+    dict(id="owner-006", name="Patricia Brown",   email="patricia@parking.dev", role="owner"),
+    dict(id="owner-007", name="Robert Garcia",    email="robert@parking.dev",   role="owner"),
+    dict(id="owner-008", name="Jennifer Lee",     email="jennifer@parking.dev", role="owner"),
+    dict(id="user-001",  name="Alice Johnson",    email="alice@parking.dev",    role="user"),
+    dict(id="user-002",  name="Bob Smith",        email="bob@parking.dev",      role="user"),
+    dict(id="user-003",  name="Carol Williams",   email="carol@parking.dev",    role="user"),
+    dict(id="user-004",  name="Emma Brown",       email="emma@parking.dev",     role="user"),
+    dict(id="user-005",  name="Frank Davis",      email="frank@parking.dev",    role="user"),
+    dict(id="user-006",  name="George Miller",    email="george@parking.dev",   role="user"),
+    dict(id="user-007",  name="Helen Garcia",     email="helen@parking.dev",    role="user"),
+    dict(id="user-008",  name="Tom Harris",       email="tom@parking.dev",      role="user"),
+    dict(id="user-009",  name="Nina Patel",       email="nina@parking.dev",     role="user"),
+    dict(id="user-010",  name="David Lee",        email="davidlee@parking.dev", role="user"),
+    dict(id="user-011",  name="Maria Garcia",     email="maria@parking.dev",    role="user"),
+    dict(id="user-012",  name="James Wilson",     email="jameswilson@parking.dev", role="user"),
+    dict(id="manager-001", name="Admin Manager",  email="admin@parking.dev",    role="manager"),
+]
+
+# ── Lot owner lookup by name ───────────────────────────────────────────────────
+OWNER_ID_BY_NAME = {u["name"]: u["id"] for u in USERS if u["role"] == "owner"}
+
+# ── Sample parking requests ───────────────────────────────────────────────────
 PENDING_REQUESTS = [
     dict(id="REQ-010", requester_id="user-001", requester_name="Alice Johnson",  date="2026-03-28", start_time="09:00", end_time="11:00", duration=2, submitted_at="2026-03-25T14:30:00Z", status="pending"),
     dict(id="REQ-011", requester_id="user-002", requester_name="Bob Smith",      date="2026-03-29", start_time="13:00", end_time="15:00", duration=2, submitted_at="2026-03-25T15:45:00Z", status="pending"),
@@ -39,48 +71,56 @@ REJECTED_REQUESTS = [
 ]
 
 LOTS = [
-    # Floor 1 - Ground Floor
-    dict(id="F1-001", floor="F1", floor_label="F1 - Ground Floor", owner="Sarah Johnson",  status="available"),
-    dict(id="F1-002", floor="F1", floor_label="F1 - Ground Floor", owner="Sarah Johnson",  status="blocked",  blocked_until="2026-03-28 14:00"),
-    dict(id="F1-003", floor="F1", floor_label="F1 - Ground Floor", owner="Mike Chen",       status="available"),
-    dict(id="F1-004", floor="F1", floor_label="F1 - Ground Floor", owner="Mike Chen",       status="available"),
-    dict(id="F1-005", floor="F1", floor_label="F1 - Ground Floor", owner="Mike Chen",       status="blocked",  blocked_until="2026-03-29 10:00"),
-    dict(id="F1-006", floor="F1", floor_label="F1 - Ground Floor", owner="Sarah Johnson",  status="available"),
-    # Floor 2 - Level 1
-    dict(id="F2-001", floor="F2", floor_label="F2 - Level 1", owner="David Wilson",   status="available"),
-    dict(id="F2-002", floor="F2", floor_label="F2 - Level 1", owner="David Wilson",   status="available"),
-    dict(id="F2-003", floor="F2", floor_label="F2 - Level 1", owner="Lisa Anderson",  status="blocked",  blocked_until="2026-03-28 09:30"),
-    dict(id="F2-004", floor="F2", floor_label="F2 - Level 1", owner="James Taylor",   status="available"),
-    dict(id="F2-005", floor="F2", floor_label="F2 - Level 1", owner="James Taylor",   status="blocked",  blocked_until="2026-03-30 18:00"),
-    # Floor 3 - Level 2
-    dict(id="F3-001", floor="F3", floor_label="F3 - Level 2", owner="Patricia Brown", status="available"),
-    dict(id="F3-002", floor="F3", floor_label="F3 - Level 2", owner="Robert Garcia",  status="available"),
-    dict(id="F3-003", floor="F3", floor_label="F3 - Level 2", owner="Robert Garcia",  status="available"),
-    dict(id="F3-004", floor="F3", floor_label="F3 - Level 2", owner="Jennifer Lee",   status="blocked",  blocked_until="2026-03-28 16:30"),
-    dict(id="F3-005", floor="F3", floor_label="F3 - Level 2", owner="Jennifer Lee",   status="blocked",  blocked_until="2026-03-29 11:00"),
-    dict(id="F3-006", floor="F3", floor_label="F3 - Level 2", owner=None,             status="unowned"),
+    dict(id="F1-001", floor="F1", floor_label="F1 - Ground Floor", owner="Sarah Johnson",  owner_id="owner-001", status="available"),
+    dict(id="F1-002", floor="F1", floor_label="F1 - Ground Floor", owner="Sarah Johnson",  owner_id="owner-001", status="blocked",  blocked_until="2026-03-28 14:00"),
+    dict(id="F1-003", floor="F1", floor_label="F1 - Ground Floor", owner="Mike Chen",      owner_id="owner-002", status="available"),
+    dict(id="F1-004", floor="F1", floor_label="F1 - Ground Floor", owner="Mike Chen",      owner_id="owner-002", status="available"),
+    dict(id="F1-005", floor="F1", floor_label="F1 - Ground Floor", owner="Mike Chen",      owner_id="owner-002", status="blocked",  blocked_until="2026-03-29 10:00"),
+    dict(id="F1-006", floor="F1", floor_label="F1 - Ground Floor", owner="Sarah Johnson",  owner_id="owner-001", status="available"),
+    dict(id="F2-001", floor="F2", floor_label="F2 - Level 1",      owner="David Wilson",   owner_id="owner-003", status="available"),
+    dict(id="F2-002", floor="F2", floor_label="F2 - Level 1",      owner="David Wilson",   owner_id="owner-003", status="available"),
+    dict(id="F2-003", floor="F2", floor_label="F2 - Level 1",      owner="Lisa Anderson",  owner_id="owner-004", status="blocked",  blocked_until="2026-03-28 09:30"),
+    dict(id="F2-004", floor="F2", floor_label="F2 - Level 1",      owner="James Taylor",   owner_id="owner-005", status="available"),
+    dict(id="F2-005", floor="F2", floor_label="F2 - Level 1",      owner="James Taylor",   owner_id="owner-005", status="blocked",  blocked_until="2026-03-30 18:00"),
+    dict(id="F3-001", floor="F3", floor_label="F3 - Level 2",      owner="Patricia Brown", owner_id="owner-006", status="available"),
+    dict(id="F3-002", floor="F3", floor_label="F3 - Level 2",      owner="Robert Garcia",  owner_id="owner-007", status="available"),
+    dict(id="F3-003", floor="F3", floor_label="F3 - Level 2",      owner="Robert Garcia",  owner_id="owner-007", status="available"),
+    dict(id="F3-004", floor="F3", floor_label="F3 - Level 2",      owner="Jennifer Lee",   owner_id="owner-008", status="blocked",  blocked_until="2026-03-28 16:30"),
+    dict(id="F3-005", floor="F3", floor_label="F3 - Level 2",      owner="Jennifer Lee",   owner_id="owner-008", status="blocked",  blocked_until="2026-03-29 11:00"),
+    dict(id="F3-006", floor="F3", floor_label="F3 - Level 2",      owner=None,             owner_id=None,        status="unowned"),
 ]
 
 
 def seed():
     db = SessionLocal()
     try:
-        # Clear existing data
         db.query(models.ParkingRequest).delete()
         db.query(models.Lot).delete()
+        db.query(models.User).delete()
         db.commit()
 
-        # Insert requests
+        for u in USERS:
+            db.add(models.User(
+                id=u["id"],
+                name=u["name"],
+                email=u["email"],
+                password_hash=hash_password("password123"),
+                role=u["role"],
+            ))
+
         all_requests = PENDING_REQUESTS + APPROVED_REQUESTS + REJECTED_REQUESTS
         for r in all_requests:
             db.add(models.ParkingRequest(**r))
 
-        # Insert lots
         for l in LOTS:
             db.add(models.Lot(**l))
 
         db.commit()
-        print(f"OK: Seeded {len(all_requests)} requests and {len(LOTS)} lots.")
+        print(f"OK: Seeded {len(USERS)} users, {len(all_requests)} requests, {len(LOTS)} lots.")
+        print("Credentials: <email>@parking.dev / password123")
+        print("Example: sarah@parking.dev / password123  (Owner)")
+        print("Example: alice@parking.dev / password123  (User)")
+        print("Example: admin@parking.dev / password123  (Manager)")
     except Exception as e:
         db.rollback()
         print(f"ERROR: Seed failed: {e}")

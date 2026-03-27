@@ -2,28 +2,33 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from typing import List
-import uuid
 
 from database import get_db
 import models
 import schemas
+from auth import get_current_user, require_owner
 
 router = APIRouter(prefix="/api/requests", tags=["requests"])
 
 
 def _generate_id(db: Session) -> str:
-    """Generate next REQ-XXX id."""
     count = db.query(models.ParkingRequest).count()
     return f"REQ-{count + 1:03d}"
 
 
 @router.get("", response_model=List[schemas.ParkingRequestOut])
-def get_all_requests(db: Session = Depends(get_db)):
+def get_all_requests(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
     return db.query(models.ParkingRequest).all()
 
 
 @router.get("/pending", response_model=List[schemas.ParkingRequestOut])
-def get_pending(db: Session = Depends(get_db)):
+def get_pending(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
     return (
         db.query(models.ParkingRequest)
         .filter(models.ParkingRequest.status == "pending")
@@ -32,7 +37,10 @@ def get_pending(db: Session = Depends(get_db)):
 
 
 @router.get("/approved", response_model=List[schemas.ParkingRequestOut])
-def get_approved(db: Session = Depends(get_db)):
+def get_approved(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
     return (
         db.query(models.ParkingRequest)
         .filter(models.ParkingRequest.status == "approved")
@@ -40,21 +48,29 @@ def get_approved(db: Session = Depends(get_db)):
     )
 
 
-@router.get("/user/{user_id}", response_model=List[schemas.ParkingRequestOut])
-def get_user_requests(user_id: str, db: Session = Depends(get_db)):
+@router.get("/me", response_model=List[schemas.ParkingRequestOut])
+def get_my_requests(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Returns requests submitted by the authenticated user."""
     return (
         db.query(models.ParkingRequest)
-        .filter(models.ParkingRequest.requester_id == user_id)
+        .filter(models.ParkingRequest.requester_id == current_user.id)
         .all()
     )
 
 
 @router.post("", response_model=schemas.ParkingRequestOut, status_code=201)
-def create_request(payload: schemas.ParkingRequestCreate, db: Session = Depends(get_db)):
+def create_request(
+    payload: schemas.ParkingRequestCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
     req = models.ParkingRequest(
         id=_generate_id(db),
-        requester_id=payload.requester_id,
-        requester_name=payload.requester_name,
+        requester_id=current_user.id,
+        requester_name=current_user.name,
         date=payload.date,
         start_time=payload.start_time,
         end_time=payload.end_time,
@@ -73,6 +89,7 @@ def approve_request(
     request_id: str,
     payload: schemas.ApprovePayload,
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_owner),
 ):
     req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
     if not req:
@@ -96,7 +113,11 @@ def approve_request(
 
 
 @router.patch("/{request_id}/reject", response_model=schemas.ParkingRequestOut)
-def reject_request(request_id: str, db: Session = Depends(get_db)):
+def reject_request(
+    request_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_owner),
+):
     req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
     if not req:
         raise HTTPException(status_code=404, detail="Request not found")
@@ -113,10 +134,13 @@ def update_request(
     request_id: str,
     payload: schemas.ParkingRequestUpdate,
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
 ):
     req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
     if not req:
         raise HTTPException(status_code=404, detail="Request not found")
+    if req.requester_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only edit your own requests")
     if req.status != "pending":
         raise HTTPException(status_code=400, detail="Only pending requests can be edited")
 
@@ -135,9 +159,15 @@ def update_request(
 
 
 @router.delete("/{request_id}", status_code=204)
-def delete_request(request_id: str, db: Session = Depends(get_db)):
+def delete_request(
+    request_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
     req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
     if not req:
         raise HTTPException(status_code=404, detail="Request not found")
+    if req.requester_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only cancel your own requests")
     db.delete(req)
     db.commit()

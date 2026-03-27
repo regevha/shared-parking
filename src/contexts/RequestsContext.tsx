@@ -1,9 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { requestsApi } from '../api/requests';
 import { lotsApi, LotData } from '../api/lots';
-
-export const CURRENT_OWNER_ID = 'owner-001';
-export const CURRENT_OWNER_NAME = 'Sarah Johnson';
+import { useAuth } from './AuthContext';
 
 export interface ParkingRequest {
   id: string;
@@ -52,6 +50,9 @@ interface RequestsProviderProps {
 }
 
 export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) => {
+  const { user } = useAuth();
+  const isOwner = user?.role === 'owner';
+
   const [pendingRequests, setPendingRequests] = useState<ParkingRequest[]>([]);
   const [approvedRequests, setApprovedRequests] = useState<ParkingRequest[]>([]);
   const [userRequests, setUserRequests] = useState<ParkingRequest[]>([]);
@@ -60,24 +61,40 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load all data from API on mount
+  // Re-load whenever the authenticated user changes
   useEffect(() => {
+    if (!user) return;
+
     const load = async () => {
       try {
         setLoading(true);
         setError(null);
-        const [pending, approved, user, lots, myLots] = await Promise.all([
+
+        const commonLoads = [
           requestsApi.getPending(),
           requestsApi.getApproved(),
-          requestsApi.getByUser(CURRENT_OWNER_ID),
+          requestsApi.getMe(),   // server-scoped to current user
           lotsApi.getAll(),
-          lotsApi.getByOwner(CURRENT_OWNER_NAME),
-        ]);
-        setPendingRequests(pending);
-        setApprovedRequests(approved);
-        setUserRequests(user);
-        setAllLots(lots);
-        setOwnerLots(myLots);
+        ] as const;
+
+        if (isOwner) {
+          const [pending, approved, mine, lots, myLots] = await Promise.all([
+            ...commonLoads,
+            lotsApi.getMine(),   // server-scoped to owner
+          ]);
+          setPendingRequests(pending);
+          setApprovedRequests(approved);
+          setUserRequests(mine);
+          setAllLots(lots);
+          setOwnerLots(myLots);
+        } else {
+          const [pending, approved, mine, lots] = await Promise.all(commonLoads);
+          setPendingRequests(pending);
+          setApprovedRequests(approved);
+          setUserRequests(mine);
+          setAllLots(lots);
+          setOwnerLots([]);
+        }
       } catch (err: any) {
         setError(err.message || 'Failed to load data from API');
       } finally {
@@ -85,7 +102,7 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
       }
     };
     load();
-  }, []);
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addPendingRequest = async (requestData: Omit<ParkingRequest, 'id' | 'submittedAt' | 'status'>) => {
     const created = await requestsApi.create({

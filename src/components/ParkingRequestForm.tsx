@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Form, DatePicker, Select, Button, Card, Alert, notification, Row, Col, Tag } from 'antd';
 import { useRequests } from '../contexts/RequestsContext';
+import { useAuth } from '../contexts/AuthContext';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import './ParkingRequestForm.css';
@@ -39,6 +40,7 @@ const ParkingRequestForm: React.FC = () => {
   const [simulateMaxRequests, setSimulateMaxRequests] = useState(false);
   const [loading, setLoading] = useState(false);
   const { addPendingRequest } = useRequests();
+  const { user } = useAuth();
 
   // Mock active requests
   const mockActiveRequests: ActiveRequest[] = simulateMaxRequests
@@ -91,8 +93,8 @@ const ParkingRequestForm: React.FC = () => {
 
       // Add the request to the shared state
       addPendingRequest({
-        requesterId: 'current-user',
-        requesterName: 'Current User',
+        requesterId:   user?.id   ?? '',
+        requesterName: user?.name ?? '',
         date: values.date?.format('YYYY-MM-DD') || '',
         startTime: values.startTime,
         endTime: endTime || '',

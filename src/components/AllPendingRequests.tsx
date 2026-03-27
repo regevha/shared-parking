@@ -4,7 +4,8 @@ import { Table, Button, Tag, Space, Row, Col, Card, Segmented, Modal, notificati
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { Role } from '../types';
-import { useRequests, CURRENT_OWNER_ID, ParkingRequest } from '../contexts/RequestsContext';
+import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
+import { useAuth } from '../contexts/AuthContext';
 import './AllPendingRequests.css';
 
 interface PendingRequest {
@@ -27,6 +28,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const [filterMode, setFilterMode] = useState<'all' | 'active'>('all');
   const [approvalInProgress, setApprovalInProgress] = useState<string | null>(null);
   const { pendingRequests, approveRequest, rejectRequest } = useRequests();
+  const { user } = useAuth();
 
   const isOwner = role === 'Owner';
 
@@ -89,7 +91,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       key: 'requesterName',
       width: '20%',
       render: (text: string, record: PendingRequest) => {
-        const isOwnRequest = record.requesterId === CURRENT_OWNER_ID;
+        const isOwnRequest = record.requesterId === user?.id;
         return (
           <div>
             <strong>{text}</strong>
@@ -130,7 +132,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       key: 'actions',
       width: '20%',
       render: (_, record: PendingRequest) => {
-        const isOwnRequest = record.requesterId === CURRENT_OWNER_ID;
+        const isOwnRequest = record.requesterId === user?.id;
         const isRejected = record.rejectedByOwner;
 
         if (!isOwner) {
