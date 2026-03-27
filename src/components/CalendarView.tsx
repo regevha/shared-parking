@@ -289,6 +289,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             onEventDrop={handleEventDrop}
             onEventResize={handleEventResize}
             scrollToTime={scrollTo8AM}
+            step={60}
+            timeslots={1}
             min={minTime}
             max={maxTime}
             slotPropGetter={currentHourSlotPropGetter}

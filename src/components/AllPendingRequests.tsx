@@ -182,7 +182,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   return (
     <div className="all-pending-requests">
-      <h1>All Pending Requests</h1>
+      <h1>Pending Requests</h1>
 
       {/* Filter Toggle (Owner only) */}
       {isOwner && (

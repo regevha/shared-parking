@@ -123,7 +123,7 @@ const AllApprovals: React.FC = () => {
 
   return (
     <div className="all-approvals">
-      <h1>All Approvals</h1>
+      <h1>Approvals</h1>
 
       {/* Table */}
       <Table

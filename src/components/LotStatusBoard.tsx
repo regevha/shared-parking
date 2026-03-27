@@ -68,7 +68,7 @@ const LotStatusBoard: React.FC = () => {
 
   return (
     <div className="lot-status-board">
-      <h1>Lot Status Board</h1>
+      <h1>Parking Status</h1>
 
       {/* Legend */}
       <Card

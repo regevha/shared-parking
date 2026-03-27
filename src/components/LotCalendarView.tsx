@@ -361,6 +361,8 @@ const LotCalendarView: React.FC = () => {
             onSelectEvent={(event: LotCalendarEvent) => setSelectedEvent(event)}
             popup
             scrollToTime={scrollTo8AM}
+            step={60}
+            timeslots={1}
             min={minTime}
             max={maxTime}
             slotPropGetter={currentHourSlotPropGetter}
