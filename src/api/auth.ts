@@ -1,10 +1,20 @@
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
+function mapPreferences(raw: any): { darkMode: boolean } {
+  return { darkMode: raw?.dark_mode ?? true };
+}
+
+export interface UserPreferences {
+  darkMode: boolean;
+  // add new preference fields here
+}
+
 export interface AuthUser {
   id: string;
   name: string;
   email: string;
   role: string; // 'user' | 'owner' | 'manager'
+  preferences: UserPreferences;
 }
 
 export interface TokenResponse extends AuthUser {
@@ -27,7 +37,8 @@ export const authApi = {
       const body = await res.json().catch(() => ({}));
       throw new Error(body.detail || 'Login failed');
     }
-    return res.json();
+    const data = await res.json();
+    return { ...data, id: data.user_id, preferences: mapPreferences(data.preferences) };
   },
 
   /** Validate stored token and return current user */
@@ -37,6 +48,7 @@ export const authApi = {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!res.ok) throw new Error('Token invalid');
-    return res.json();
+    const data = await res.json();
+    return { ...data, preferences: mapPreferences(data.preferences) };
   },
 };

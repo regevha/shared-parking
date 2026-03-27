@@ -55,7 +55,7 @@ All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the ful
 | `sqlalchemy` | ORM — maps `User`, `ParkingRequest`, `Lot` to SQLite tables; handles all queries |
 | `pydantic` | Request/response validation — all schemas (`LotCreate`, `ApprovePayload`, etc.) |
 | `python-jose[cryptography]` | JWT creation and verification (`create_access_token`, `get_current_user`) |
-| `passlib[bcrypt]` | Password hashing — `hash_password()` / `verify_password()` in `auth.py` |
+| `bcrypt` | Password hashing — `hash_password()` / `verify_password()` in `auth.py` call bcrypt directly (passlib dropped — incompatible with bcrypt ≥ 4.0) |
 | `python-multipart` | Form-data parsing — **required** for `OAuth2PasswordRequestForm` on `POST /auth/login` |
 
 ### Test packages (`backend/requirements-test.txt`)
@@ -64,7 +64,6 @@ All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the ful
 | `pytest` | Test runner — discovers `test_*.py`, runs fixtures, reports results |
 | `httpx` | Starlette's `TestClient` uses httpx as its transport layer internally |
 | `pytest-cov` | Enables `--cov` flag for line-level coverage reports |
-| `bcrypt<4.0` | `passlib 1.7.4` is incompatible with bcrypt ≥ 4.0 (API breaking change); pin prevents CI breakage |
 
 ## Startup
 ```bash
@@ -88,7 +87,6 @@ pytest tests/ --cov=. --cov-report=term-missing  # with coverage
 ```
 - 82 tests, always green
 - Uses in-memory SQLite (StaticPool) — never touches parking.db
-- `passlib 1.7.4` is incompatible with `bcrypt >= 4.0`; conftest patches `pwd_context` to use `sha256_crypt` for tests; `requirements-test.txt` pins `bcrypt<4.0` for CI
 
 ## Key Files
 
@@ -108,12 +106,12 @@ pytest tests/ --cov=. --cov-report=term-missing  # with coverage
 
 ### Backend
 - `backend/main.py` — FastAPI app, CORS, router registration
-- `backend/models.py` — `User`, `ParkingRequest`, `Lot` SQLAlchemy models
+- `backend/models.py` — `User`, `UserPreferences`, `ParkingRequest`, `Lot` SQLAlchemy models
 - `backend/auth.py` — JWT utilities, `get_current_user`, `require_owner`, `require_manager`
 - `backend/routers/auth.py` — `/auth/login`, `/auth/register`, `/auth/me`
 - `backend/routers/requests.py` — `/api/requests/*`
 - `backend/routers/lots.py` — `/api/lots/*` (CRUD, owner-scoped `/mine`)
-- `backend/routers/users.py` — `/api/users/*` (CRUD, manager/self restrictions)
+- `backend/routers/users.py` — `/api/users/*` (CRUD, manager/self restrictions); `/api/users/{id}/preferences` (GET/PATCH)
 - `backend/seed.py` — seeds 21 users, 20 requests, 17 lots
 - `backend/requirements.txt` — production dependencies
 - `backend/requirements-test.txt` — test dependencies (`pytest`, `httpx`, `pytest-cov`, `bcrypt<4.0`)

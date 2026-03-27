@@ -9,6 +9,7 @@ interface AuthContextType {
   authLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUser: (patch: Partial<AuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,7 +44,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const resp = await authApi.login(email, password);
     localStorage.setItem(TOKEN_KEY, resp.access_token);
     setToken(resp.access_token);
-    setUser({ id: resp.id, name: resp.name, email: resp.email, role: resp.role });
+    setUser({ id: resp.id, name: resp.name, email: resp.email, role: resp.role, preferences: resp.preferences });
   };
 
   const logout = () => {
@@ -52,8 +53,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(null);
   };
 
+  const updateUser = (patch: Partial<AuthUser>) => {
+    setUser(prev => prev ? { ...prev, ...patch } : prev);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, authLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, authLoading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

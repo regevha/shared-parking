@@ -167,3 +167,88 @@ def test_delete_user_requires_manager_role(client, owner_headers, user_headers):
 def test_delete_nonexistent_user_returns_404(client, manager_headers):
     resp = client.delete("/api/users/nonexistent-id", headers=manager_headers)
     assert resp.status_code == 404
+
+
+# ── GET /api/users/{user_id}/preferences ──────────────────────────────────
+
+def test_user_can_get_own_preferences(client, user_headers):
+    uid = get_user_id(client, user_headers)
+    resp = client.get(f"/api/users/{uid}/preferences", headers=user_headers)
+    assert resp.status_code == 200
+    assert "dark_mode" in resp.json()
+
+
+def test_manager_can_get_any_users_preferences(client, user_headers, manager_headers):
+    uid = get_user_id(client, user_headers)
+    resp = client.get(f"/api/users/{uid}/preferences", headers=manager_headers)
+    assert resp.status_code == 200
+
+
+def test_user_cannot_get_other_users_preferences(client, user_headers, owner_headers):
+    owner_id = get_user_id(client, owner_headers)
+    resp = client.get(f"/api/users/{owner_id}/preferences", headers=user_headers)
+    assert resp.status_code == 403
+
+
+def test_get_preferences_requires_auth(client, user_headers):
+    uid = get_user_id(client, user_headers)
+    resp = client.get(f"/api/users/{uid}/preferences")
+    assert resp.status_code == 401
+
+
+# ── PATCH /api/users/{user_id}/preferences ────────────────────────────────
+
+def test_user_can_update_own_dark_mode(client, user_headers):
+    uid = get_user_id(client, user_headers)
+    resp = client.patch(
+        f"/api/users/{uid}/preferences",
+        json={"dark_mode": False},
+        headers=user_headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["dark_mode"] is False
+
+
+def test_manager_can_update_any_users_preferences(client, user_headers, manager_headers):
+    uid = get_user_id(client, user_headers)
+    resp = client.patch(
+        f"/api/users/{uid}/preferences",
+        json={"dark_mode": False},
+        headers=manager_headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json()["dark_mode"] is False
+
+
+def test_user_cannot_update_other_users_preferences(client, user_headers, owner_headers):
+    owner_id = get_user_id(client, owner_headers)
+    resp = client.patch(
+        f"/api/users/{owner_id}/preferences",
+        json={"dark_mode": False},
+        headers=user_headers,
+    )
+    assert resp.status_code == 403
+
+
+def test_update_preferences_requires_auth(client, user_headers):
+    uid = get_user_id(client, user_headers)
+    resp = client.patch(f"/api/users/{uid}/preferences", json={"dark_mode": False})
+    assert resp.status_code == 401
+
+
+def test_preferences_persisted_after_update(client, user_headers):
+    uid = get_user_id(client, user_headers)
+    client.patch(f"/api/users/{uid}/preferences", json={"dark_mode": False}, headers=user_headers)
+    resp = client.get(f"/api/users/{uid}/preferences", headers=user_headers)
+    assert resp.json()["dark_mode"] is False
+
+
+def test_login_response_includes_preferences(client, user_headers):
+    resp = client.post(
+        "/auth/login",
+        data={"username": "alice@test.com", "password": "pass123"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert resp.status_code == 200
+    assert "preferences" in resp.json()
+    assert "dark_mode" in resp.json()["preferences"]
