@@ -107,17 +107,25 @@ const AppShell: React.FC = () => {
                 <Dropdown menu={settingsMenu} trigger={['click']}>
                   <Button type="text" icon={<SettingOutlined />} style={headerBtnStyle} />
                 </Dropdown>
-                {/* User identity badge — read-only, role comes from JWT */}
-                <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8, cursor: 'default' }}>
-                  {roleIcon} {user?.name ?? role}
-                </Button>
-                <Button
-                  type="text"
-                  icon={<LogoutOutlined />}
-                  onClick={logout}
-                  style={headerBtnStyle}
-                  title="Sign out"
-                />
+                {/* User menu — name + logout */}
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 'logout',
+                        label: 'Sign out',
+                        icon: <LogoutOutlined />,
+                        danger: true,
+                        onClick: logout,
+                      },
+                    ],
+                  }}
+                  trigger={['click']}
+                >
+                  <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8 }}>
+                    {roleIcon} {user?.name ?? role}
+                  </Button>
+                </Dropdown>
               </div>
             </Header>
             <Content style={{ padding: '0 50px' }}>
