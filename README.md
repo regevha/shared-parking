@@ -1,46 +1,115 @@
-# Getting Started with Create React App
+# Parking Management Mockup
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React + Python mockup of a parking management system. Users can request parking slots; owners approve or reject requests and manage their lots.
 
-## Available Scripts
+## Tech Stack
 
-In the project directory, you can run:
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 19, TypeScript, Ant Design, react-big-calendar |
+| Backend | Python, FastAPI, SQLAlchemy |
+| Database | SQLite |
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Getting Started
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Prerequisites
+- Node.js 18+
+- Python 3.11+
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 1 — Install dependencies
 
-### `npm run build`
+**Frontend**
+```bash
+npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**Backend**
+```bash
+cd backend
+pip install -r requirements.txt
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 2 — Seed the database (first time only)
 
-### `npm run eject`
+```bash
+cd backend
+python seed.py
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+This creates `backend/parking.db` and populates it with sample data. Only needed once — data persists across server restarts. Re-run only if you want to reset to the original sample data.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### 3 — Start the backend
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+cd backend
+python -m uvicorn main:app --reload
+```
 
-## Learn More
+Runs on **http://localhost:8000**
+API docs (Swagger UI) at **http://localhost:8000/docs**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 4 — Start the frontend (separate terminal)
+
+```bash
+npm start
+```
+
+Runs on **http://localhost:3000**
+
+> Start the backend first so the frontend finds the API on load.
+
+---
+
+## Project Structure
+
+```
+parking-mockup/
+├── backend/
+│   ├── main.py          # FastAPI app + CORS
+│   ├── database.py      # SQLite connection (SQLAlchemy)
+│   ├── models.py        # DB table definitions
+│   ├── schemas.py       # Pydantic request/response schemas
+│   ├── seed.py          # Populate DB with sample data
+│   ├── requirements.txt
+│   └── routers/
+│       ├── requests.py  # /api/requests endpoints
+│       └── lots.py      # /api/lots endpoints
+└── src/
+    ├── api/             # Frontend API client layer
+    │   ├── client.ts    # Base fetch wrapper
+    │   ├── requests.ts  # Parking request API calls
+    │   └── lots.ts      # Lots API calls
+    ├── components/      # Screen components
+    ├── contexts/
+    │   └── RequestsContext.tsx  # Global state, loads from API on mount
+    └── mock/            # (removed — all data served from API)
+```
+
+---
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/requests` | All requests |
+| GET | `/api/requests/pending` | Pending requests |
+| GET | `/api/requests/approved` | Approved requests |
+| GET | `/api/requests/user/{user_id}` | Requests by user |
+| POST | `/api/requests` | Submit new request |
+| PATCH | `/api/requests/{id}/approve` | Approve a request |
+| PATCH | `/api/requests/{id}/reject` | Reject a request |
+| PATCH | `/api/requests/{id}` | Edit a pending request |
+| DELETE | `/api/requests/{id}` | Cancel a request |
+| GET | `/api/lots` | All parking lots |
+| GET | `/api/lots/owner/{owner_name}` | Lots by owner |
+| GET | `/api/lots/{lot_id}` | Single lot |
