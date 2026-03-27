@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { requestsApi } from '../api/requests';
 
 export const CURRENT_OWNER_ID = 'owner-001';
 export const CURRENT_OWNER_NAME = 'Sarah Johnson';
@@ -24,11 +25,13 @@ interface RequestsContextType {
   pendingRequests: ParkingRequest[];
   approvedRequests: ParkingRequest[];
   userRequests: ParkingRequest[];
-  addPendingRequest: (request: Omit<ParkingRequest, 'id' | 'submittedAt' | 'status'>) => void;
-  approveRequest: (requestId: string, lotInfo?: { lotId: string; floor: string; lotOwner: string }) => void;
-  rejectRequest: (requestId: string) => void;
-  cancelUserRequest: (requestId: string) => void;
-  updateUserRequest: (requestId: string, updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>) => void;
+  loading: boolean;
+  error: string | null;
+  addPendingRequest: (request: Omit<ParkingRequest, 'id' | 'submittedAt' | 'status'>) => Promise<void>;
+  approveRequest: (requestId: string, lotInfo?: { lotId: string; floor: string; lotOwner: string }) => Promise<void>;
+  rejectRequest: (requestId: string) => Promise<void>;
+  cancelUserRequest: (requestId: string) => Promise<void>;
+  updateUserRequest: (requestId: string, updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>) => Promise<void>;
 }
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
@@ -45,96 +48,86 @@ interface RequestsProviderProps {
   children: ReactNode;
 }
 
-// Initial mock data — IDs REQ-001..REQ-009 = approved, REQ-010..REQ-015 = pending, REQ-016..REQ-017 = user history
-const initialPendingRequests: ParkingRequest[] = [
-  { id: 'REQ-010', requesterId: 'user-001', requesterName: 'Alice Johnson',  date: '2026-03-28', startTime: '09:00', endTime: '11:00', duration: 2, submittedAt: '2026-03-25T14:30:00Z', status: 'pending' },
-  { id: 'REQ-011', requesterId: 'user-002', requesterName: 'Bob Smith',      date: '2026-03-29', startTime: '13:00', endTime: '15:00', duration: 2, submittedAt: '2026-03-25T15:45:00Z', status: 'pending' },
-  { id: 'REQ-012', requesterId: 'user-003', requesterName: 'Carol Williams', date: '2026-03-29', startTime: '10:00', endTime: '13:00', duration: 3, submittedAt: '2026-03-25T16:00:00Z', status: 'pending', rejectedByOwner: true },
-  { id: 'REQ-013', requesterId: CURRENT_OWNER_ID, requesterName: CURRENT_OWNER_NAME, date: '2026-03-30', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-25T16:30:00Z', status: 'pending' },
-  { id: 'REQ-014', requesterId: 'user-004', requesterName: 'Emma Brown',     date: '2026-03-30', startTime: '08:00', endTime: '12:00', duration: 4, submittedAt: '2026-03-26T09:00:00Z', status: 'pending' },
-  { id: 'REQ-015', requesterId: 'user-005', requesterName: 'Frank Davis',    date: '2026-03-31', startTime: '15:00', endTime: '18:00', duration: 3, submittedAt: '2026-03-26T10:00:00Z', status: 'pending' },
-  { id: 'REQ-018', requesterId: 'user-010', requesterName: 'David Lee',      date: '2026-03-26', startTime: '17:00', endTime: '19:00', duration: 2, submittedAt: '2026-03-26T14:00:00Z', status: 'pending' },
-  { id: 'REQ-019', requesterId: 'user-011', requesterName: 'Maria Garcia',   date: '2026-03-26', startTime: '18:00', endTime: '20:00', duration: 2, submittedAt: '2026-03-26T15:00:00Z', status: 'pending' },
-];
-
-const initialApprovedRequests: ParkingRequest[] = [
-  { id: 'REQ-001', requesterId: 'user-001', requesterName: 'Alice Johnson',  date: '2026-03-24', startTime: '09:00', endTime: '11:00', duration: 2, submittedAt: '2026-03-22T14:30:00Z', status: 'approved', lotId: 'F2-003', floor: 'F2 - Level 1',     lotOwner: 'Lisa Anderson',       approvedAt: '2026-03-22T16:45:00Z' },
-  { id: 'REQ-002', requesterId: 'user-002', requesterName: 'Bob Smith',      date: '2026-03-24', startTime: '13:00', endTime: '15:00', duration: 2, submittedAt: '2026-03-22T09:45:00Z', status: 'approved', lotId: 'F1-002', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-22T10:15:00Z' },
-  { id: 'REQ-003', requesterId: 'user-003', requesterName: 'Carol Williams', date: '2026-03-26', startTime: '10:00', endTime: '13:00', duration: 3, submittedAt: '2026-03-23T10:00:00Z', status: 'approved', lotId: 'F3-005', floor: 'F3 - Level 2',     lotOwner: 'Jennifer Lee',        approvedAt: '2026-03-23T11:30:00Z' },
-  { id: 'REQ-004', requesterId: 'user-005', requesterName: 'Frank Davis',    date: '2026-03-27', startTime: '15:00', endTime: '18:00', duration: 3, submittedAt: '2026-03-23T13:15:00Z', status: 'approved', lotId: 'F2-001', floor: 'F2 - Level 1',     lotOwner: 'David Wilson',        approvedAt: '2026-03-23T14:20:00Z' },
-  { id: 'REQ-005', requesterId: 'user-004', requesterName: 'Emma Brown',     date: '2026-03-24', startTime: '08:00', endTime: '12:00', duration: 4, submittedAt: '2026-03-22T15:30:00Z', status: 'approved', lotId: 'F1-004', floor: 'F1 - Ground Floor', lotOwner: 'Mike Chen',           approvedAt: '2026-03-22T16:00:00Z' },
-  { id: 'REQ-006', requesterId: 'user-006', requesterName: 'George Miller',  date: '2026-03-25', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-23T09:00:00Z', status: 'approved', lotId: 'F3-001', floor: 'F3 - Level 2',     lotOwner: 'Patricia Brown',      approvedAt: '2026-03-23T09:45:00Z' },
-  { id: 'REQ-007', requesterId: 'user-007', requesterName: 'Helen Garcia',   date: '2026-03-26', startTime: '11:00', endTime: '13:00', duration: 2, submittedAt: '2026-03-23T11:45:00Z', status: 'approved', lotId: 'F2-004', floor: 'F2 - Level 1',     lotOwner: 'James Taylor',        approvedAt: '2026-03-23T12:30:00Z' },
-  { id: 'REQ-008', requesterId: 'user-008', requesterName: 'Tom Harris',     date: '2026-03-26', startTime: '09:00', endTime: '11:00', duration: 2, submittedAt: '2026-03-24T08:00:00Z', status: 'approved', lotId: 'F1-001', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-24T08:30:00Z' },
-  { id: 'REQ-009', requesterId: 'user-009', requesterName: 'Nina Patel',     date: '2026-03-27', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-24T10:30:00Z', status: 'approved', lotId: 'F1-006', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-24T11:00:00Z' },
-  { id: 'REQ-020', requesterId: 'user-012', requesterName: 'James Wilson',   date: '2026-03-26', startTime: '16:00', endTime: '18:00', duration: 2, submittedAt: '2026-03-26T12:00:00Z', status: 'approved', lotId: 'F1-001', floor: 'F1 - Ground Floor', lotOwner: 'Sarah Johnson',       approvedAt: '2026-03-26T13:00:00Z' },
-];
-
-// Current user (Sarah Johnson) own parking requests at other people's lots
-const initialUserRequests: ParkingRequest[] = [
-  { id: 'REQ-013', requesterId: CURRENT_OWNER_ID, requesterName: CURRENT_OWNER_NAME, date: '2026-03-30', startTime: '14:00', endTime: '17:00', duration: 3, submittedAt: '2026-03-25T16:30:00Z', status: 'pending' },
-  { id: 'REQ-016', requesterId: CURRENT_OWNER_ID, requesterName: CURRENT_OWNER_NAME, date: '2026-03-22', startTime: '14:00', endTime: '16:00', duration: 2, submittedAt: '2026-03-21T10:00:00Z', status: 'approved', lotId: 'F3-003', floor: 'F3 - Level 2', lotOwner: 'Robert Garcia', approvedAt: '2026-03-21T11:00:00Z' },
-  { id: 'REQ-017', requesterId: CURRENT_OWNER_ID, requesterName: CURRENT_OWNER_NAME, date: '2026-03-19', startTime: '10:00', endTime: '12:00', duration: 2, submittedAt: '2026-03-17T12:00:00Z', status: 'rejected', lotId: 'F2-001', floor: 'F2 - Level 1', lotOwner: 'David Wilson' },
-];
-
 export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) => {
-  const [pendingRequests, setPendingRequests] = useState<ParkingRequest[]>(initialPendingRequests);
-  const [approvedRequests, setApprovedRequests] = useState<ParkingRequest[]>(initialApprovedRequests);
-  const [userRequests, setUserRequests] = useState<ParkingRequest[]>(initialUserRequests);
+  const [pendingRequests, setPendingRequests] = useState<ParkingRequest[]>([]);
+  const [approvedRequests, setApprovedRequests] = useState<ParkingRequest[]>([]);
+  const [userRequests, setUserRequests] = useState<ParkingRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const addPendingRequest = (requestData: Omit<ParkingRequest, 'id' | 'submittedAt' | 'status'>) => {
-    const newRequest: ParkingRequest = {
-      ...requestData,
-      id: Date.now().toString(),
-      submittedAt: new Date().toISOString(),
-      status: 'pending',
+  // Load all data from API on mount
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const [pending, approved, user] = await Promise.all([
+          requestsApi.getPending(),
+          requestsApi.getApproved(),
+          requestsApi.getByUser(CURRENT_OWNER_ID),
+        ]);
+        setPendingRequests(pending);
+        setApprovedRequests(approved);
+        setUserRequests(user);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load data from API');
+      } finally {
+        setLoading(false);
+      }
     };
+    load();
+  }, []);
 
-    setPendingRequests(prev => [...prev, newRequest]);
-    setUserRequests(prev => [...prev, newRequest]);
+  const addPendingRequest = async (requestData: Omit<ParkingRequest, 'id' | 'submittedAt' | 'status'>) => {
+    const created = await requestsApi.create({
+      requester_id:   requestData.requesterId,
+      requester_name: requestData.requesterName,
+      date:           requestData.date,
+      start_time:     requestData.startTime,
+      end_time:       requestData.endTime,
+      duration:       requestData.duration,
+    });
+    setPendingRequests(prev => [...prev, created]);
+    setUserRequests(prev => [...prev, created]);
   };
 
-  const approveRequest = (requestId: string, lotInfo?: { lotId: string; floor: string; lotOwner: string }) => {
-    const approvedRequest = pendingRequests.find(req => req.id === requestId);
-    if (approvedRequest) {
-      const resolvedApprovedRequest: ParkingRequest = {
-        ...approvedRequest,
-        status: 'approved' as const,
-        approvedAt: new Date().toISOString(),
-        lotId: lotInfo?.lotId || approvedRequest.lotId || 'LOT-100',
-        floor: lotInfo?.floor || approvedRequest.floor || 'Floor 1',
-        lotOwner: lotInfo?.lotOwner || approvedRequest.lotOwner || 'System Assigned',
-      };
-      setApprovedRequests(prev => [...prev, resolvedApprovedRequest]);
-      setPendingRequests(prev => prev.filter(req => req.id !== requestId));
-    }
+  const approveRequest = async (requestId: string, lotInfo?: { lotId: string; floor: string; lotOwner: string }) => {
+    const updated = await requestsApi.approve(requestId, lotInfo ? {
+      lot_id:    lotInfo.lotId,
+      floor:     lotInfo.floor,
+      lot_owner: lotInfo.lotOwner,
+    } : undefined);
+    setApprovedRequests(prev => [...prev, updated]);
+    setPendingRequests(prev => prev.filter(r => r.id !== requestId));
   };
 
-  const rejectRequest = (requestId: string) => {
+  const rejectRequest = async (requestId: string) => {
+    const updated = await requestsApi.reject(requestId);
     setPendingRequests(prev =>
-      prev.map(req =>
-        req.id === requestId ? { ...req, status: 'rejected' } : req
-      )
+      prev.map(r => r.id === requestId ? updated : r)
     );
-
-    const rejectedRequest = pendingRequests.find(req => req.id === requestId);
-    if (rejectedRequest) {
-      setUserRequests(prev =>
-        prev.map(req =>
-          req.id === requestId ? { ...req, status: 'rejected' } : req
-        )
-      );
-    }
+    setUserRequests(prev =>
+      prev.map(r => r.id === requestId ? updated : r)
+    );
   };
 
-  const cancelUserRequest = (requestId: string) => {
-    setPendingRequests(prev => prev.filter(req => req.id !== requestId));
-    setUserRequests(prev => prev.filter(req => req.id !== requestId));
+  const cancelUserRequest = async (requestId: string) => {
+    await requestsApi.cancel(requestId);
+    setPendingRequests(prev => prev.filter(r => r.id !== requestId));
+    setUserRequests(prev => prev.filter(r => r.id !== requestId));
   };
 
-  const updateUserRequest = (requestId: string, updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>) => {
-    const applyUpdate = (req: ParkingRequest) =>
-      req.id === requestId ? { ...req, ...updates } : req;
+  const updateUserRequest = async (
+    requestId: string,
+    updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>
+  ) => {
+    const updated = await requestsApi.update(requestId, {
+      date:       updates.date,
+      start_time: updates.startTime,
+      end_time:   updates.endTime,
+      duration:   updates.duration,
+    });
+    const applyUpdate = (r: ParkingRequest) => r.id === requestId ? updated : r;
     setUserRequests(prev => prev.map(applyUpdate));
     setPendingRequests(prev => prev.map(applyUpdate));
   };
@@ -145,6 +138,8 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
         pendingRequests,
         approvedRequests,
         userRequests,
+        loading,
+        error,
         addPendingRequest,
         approveRequest,
         rejectRequest,
