@@ -13,16 +13,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
-from passlib.context import CryptContext
 
 # Make the backend package importable when running pytest from backend/
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-# ── Patch bcrypt → sha256_crypt before importing any app modules ───────────
-# passlib 1.7.4 is incompatible with bcrypt >= 4.0 (API removed).
-# sha256_crypt has no external dependencies and is fast enough for tests.
-import auth as _auth_module
-_auth_module.pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
 
 from database import Base, get_db
 from main import app

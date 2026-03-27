@@ -1,7 +1,4 @@
 -r requirements.txt
-# passlib 1.7.4 is incompatible with bcrypt >= 4.0 (API removed in 4.x).
-# Pin here so tests don't accidentally upgrade and break.
-bcrypt<4.0
 
 # Test runner
 pytest==8.3.3
