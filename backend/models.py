@@ -49,6 +49,18 @@ class ParkingRequest(Base):
     approved_at = Column(String, nullable=True)
 
 
+class RequestMessage(Base):
+    __tablename__ = "request_messages"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    request_id = Column(String, ForeignKey("parking_requests.id", ondelete="SET NULL"), nullable=True, index=True)
+    sender_id = Column(String, nullable=False)      # → users.id
+    sender_name = Column(String, nullable=False)    # denormalised for display
+    sender_role = Column(String, nullable=False)    # user | owner | manager
+    text = Column(String, nullable=False)
+    sent_at = Column(String, nullable=False)        # ISO timestamp
+
+
 class Lot(Base):
     __tablename__ = "lots"
 

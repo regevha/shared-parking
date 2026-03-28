@@ -112,6 +112,35 @@ class ParkingRequestOut(ParkingRequestBase):
         from_attributes = True
 
 
+# ── Request Messages ─────────────────────────────────────────────────────────
+
+class MessageCreate(BaseModel):
+    text: str
+
+    @field_validator('text')
+    @classmethod
+    def validate_text(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError('Message text cannot be empty')
+        if len(v) > 1000:
+            raise ValueError('Message text cannot exceed 1000 characters')
+        return v
+
+
+class MessageOut(BaseModel):
+    id: int
+    request_id: Optional[str]
+    sender_id: str
+    sender_name: str
+    sender_role: str
+    text: str
+    sent_at: str
+
+    class Config:
+        from_attributes = True
+
+
 # ── Lots ─────────────────────────────────────────────────────────────────────
 
 class LotCreate(BaseModel):
