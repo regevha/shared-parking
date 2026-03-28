@@ -87,6 +87,7 @@ pytest tests/ --cov=. --cov-report=term-missing  # with coverage
 ```
 - 82 tests, always green
 - Uses in-memory SQLite (StaticPool) — never touches parking.db
+- Isolation mechanism: `conftest.py` uses FastAPI's `app.dependency_overrides[get_db] = override_get_db` to replace the real `get_db` (which opens `parking.db`) with a version that yields an in-memory session instead. Every endpoint uses `Depends(get_db)`, so the swap is transparent — the app code runs unchanged but all DB operations go to the throwaway in-memory database.
 
 ## Key Files
 
