@@ -51,13 +51,52 @@ class ParkingRequestOut(ParkingRequestBase):
 
 # ── Lots ─────────────────────────────────────────────────────────────────────
 
+class LotCreate(BaseModel):
+    id: str
+    floor: str
+    floor_label: str
+    owner: Optional[str] = None
+    owner_id: Optional[str] = None
+    status: str = "available"
+    blocked_until: Optional[str] = None
+
+
+class LotUpdate(BaseModel):
+    """All fields optional — PATCH semantics."""
+    status: Optional[str] = None          # available | blocked | unowned | unowned-blocked
+    blocked_until: Optional[str] = None   # set to null to clear
+    owner: Optional[str] = None           # display name
+    owner_id: Optional[str] = None        # FK to users.id
+
+
 class LotOut(BaseModel):
     id: str
     floor: str
     floor_label: str
     owner: Optional[str]
+    owner_id: Optional[str] = None
     status: str
     blocked_until: Optional[str]
 
     class Config:
         from_attributes = True
+
+
+# ── Users ─────────────────────────────────────────────────────────────────────
+
+class UserOut(BaseModel):
+    id: str
+    name: str
+    email: str
+    role: str
+
+    class Config:
+        from_attributes = True
+
+
+class UserUpdate(BaseModel):
+    """Manager can update any field; a user can update name/email/password only."""
+    name: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = None      # manager only
+    password: Optional[str] = None  # plain text — will be hashed

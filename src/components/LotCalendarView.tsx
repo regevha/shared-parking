@@ -3,7 +3,8 @@ import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification } from 'antd';
 import dayjs from 'dayjs';
-import { useRequests, ParkingRequest, CURRENT_OWNER_NAME } from '../contexts/RequestsContext';
+import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
+import { useAuth } from '../contexts/AuthContext';
 import { LotData } from '../api/lots';
 import './CalendarView.css';
 import './LotCalendarView.css';
@@ -67,6 +68,7 @@ const currentHourSlotPropGetter = (date: Date) => {
 
 const LotCalendarView: React.FC = () => {
   const { pendingRequests, approvedRequests, approveRequest, rejectRequest, ownerLots } = useRequests();
+  const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
   const [date, setDate] = useState(new Date());
@@ -93,7 +95,7 @@ const LotCalendarView: React.FC = () => {
   // Booked events — sourced from context so newly approved requests appear immediately
   const bookedEvents = useMemo(() =>
     approvedRequests
-      .filter(a => a.lotOwner === CURRENT_OWNER_NAME && (selectedLot === 'all' || a.lotId === selectedLot))
+      .filter(a => a.lotOwner === user?.name && (selectedLot === 'all' || a.lotId === selectedLot))
       .map(a => ({
         id: a.id,
         title: `${a.requesterName.split(' ')[0]} · ${a.lotId}`,
@@ -102,7 +104,7 @@ const LotCalendarView: React.FC = () => {
         type: 'booked' as EventType,
         resource: a as ParkingRequest,
       })),
-  [approvedRequests, selectedLot]);
+  [approvedRequests, selectedLot, user?.name]);
 
   // Pending events — only shown in "All My Lots" view (not yet assigned to a specific lot)
   const pendingEvents = useMemo(() =>
@@ -164,7 +166,7 @@ const LotCalendarView: React.FC = () => {
     approveRequest(requestId, targetLot ? {
       lotId: targetLot.id,
       floor: floorNames[targetLot.floor] || targetLot.floor,
-      lotOwner: CURRENT_OWNER_NAME,
+      lotOwner: user?.name ?? '',
     } : undefined);
     setSelectedEvent(null);
     notification.success({ message: 'Request approved successfully' });

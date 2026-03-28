@@ -47,7 +47,8 @@ export const requestsApi = {
   getAll:     ()              => api.get<any[]>('/api/requests').then(rs => rs.map(mapRequest)),
   getPending: ()              => api.get<any[]>('/api/requests/pending').then(rs => rs.map(mapRequest)),
   getApproved:()              => api.get<any[]>('/api/requests/approved').then(rs => rs.map(mapRequest)),
-  getByUser:  (userId: string)=> api.get<any[]>(`/api/requests/user/${userId}`).then(rs => rs.map(mapRequest)),
+  /** Returns only the authenticated user's requests (server-scoped) */
+  getMe:      ()              => api.get<any[]>('/api/requests/me').then(rs => rs.map(mapRequest)),
 
   create: (payload: CreateRequestPayload) =>
     api.post<any>('/api/requests', payload).then(mapRequest),

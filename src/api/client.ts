@@ -1,4 +1,5 @@
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const TOKEN_KEY = 'parking_token';
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -8,9 +9,17 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = localStorage.getItem(TOKEN_KEY);
+  const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader,
+      // caller-supplied headers take highest precedence
+      ...(options?.headers as Record<string, string> | undefined),
+    },
   });
 
   if (!res.ok) {
@@ -25,8 +34,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  get:    <T>(path: string)                        => request<T>(path),
-  post:   <T>(path: string, body: unknown)         => request<T>(path, { method: 'POST',  body: JSON.stringify(body) }),
-  patch:  <T>(path: string, body?: unknown)        => request<T>(path, { method: 'PATCH', body: body ? JSON.stringify(body) : undefined }),
-  delete: <T>(path: string)                        => request<T>(path, { method: 'DELETE' }),
+  get:    <T>(path: string)                => request<T>(path),
+  post:   <T>(path: string, body: unknown) => request<T>(path, { method: 'POST',  body: JSON.stringify(body) }),
+  patch:  <T>(path: string, body?: unknown)=> request<T>(path, { method: 'PATCH', body: body ? JSON.stringify(body) : undefined }),
+  delete: <T>(path: string)               => request<T>(path, { method: 'DELETE' }),
 };
