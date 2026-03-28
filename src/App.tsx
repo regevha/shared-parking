@@ -1,10 +1,11 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Button, ConfigProvider, theme, Spin } from 'antd';
 import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined, SunOutlined, MoonOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Role } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { RequestsProvider } from './contexts/RequestsContext';
+import { usersApi } from './api/users';
 import LotStatusBoard from './components/LotStatusBoard';
 import AllPendingRequests from './components/AllPendingRequests';
 import AllApprovals from './components/AllApprovals';
@@ -28,19 +29,14 @@ function toAppRole(backendRole: string): Role {
 }
 
 // ── Inner app (rendered after auth) ──────────────────────────────────────────
-const AppShell: React.FC = () => {
+interface AppShellProps {
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode }) => {
   const { user, logout } = useAuth();
   const role: Role = toAppRole(user?.role ?? 'user');
-
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    const stored = localStorage.getItem('darkMode');
-    return stored !== null ? stored === 'true' : true;
-  });
-
-  useLayoutEffect(() => {
-    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    localStorage.setItem('darkMode', String(darkMode));
-  }, [darkMode]);
 
   const getMenuItems = () => {
     const items: { key: string; label: React.ReactNode }[] = [];
@@ -85,9 +81,8 @@ const AppShell: React.FC = () => {
   };
 
   return (
-    <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
-      <RequestsProvider>
-        <Router>
+    <RequestsProvider>
+      <Router>
           <Layout>
             <Header style={headerStyle}>
               <Menu
@@ -100,24 +95,32 @@ const AppShell: React.FC = () => {
                 <Button
                   type="text"
                   icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
-                  onClick={() => setDarkMode(d => !d)}
+                  onClick={toggleDarkMode}
                   style={headerBtnStyle}
                   title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
                 />
                 <Dropdown menu={settingsMenu} trigger={['click']}>
                   <Button type="text" icon={<SettingOutlined />} style={headerBtnStyle} />
                 </Dropdown>
-                {/* User identity badge — read-only, role comes from JWT */}
-                <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8, cursor: 'default' }}>
-                  {roleIcon} {user?.name ?? role}
-                </Button>
-                <Button
-                  type="text"
-                  icon={<LogoutOutlined />}
-                  onClick={logout}
-                  style={headerBtnStyle}
-                  title="Sign out"
-                />
+                {/* User menu — name + logout */}
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 'logout',
+                        label: 'Sign out',
+                        icon: <LogoutOutlined />,
+                        danger: true,
+                        onClick: logout,
+                      },
+                    ],
+                  }}
+                  trigger={['click']}
+                >
+                  <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8 }}>
+                    {roleIcon} {user?.name ?? role}
+                  </Button>
+                </Dropdown>
               </div>
             </Header>
             <Content style={{ padding: '0 50px' }}>
@@ -141,23 +144,49 @@ const AppShell: React.FC = () => {
           </Layout>
         </Router>
       </RequestsProvider>
-    </ConfigProvider>
   );
 };
 
 // ── Root: handles auth gating ─────────────────────────────────────────────────
 const AppRoot: React.FC = () => {
-  const { user, authLoading } = useAuth();
+  const { user, authLoading, updateUser } = useAuth();
+
+  // Default to dark while loading; sync from user.darkMode once authenticated
+  const [darkMode, setDarkMode] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (user) setDarkMode(user.preferences.darkMode);
+  }, [user?.id]); // sync when a different user logs in
+
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
+  const toggleDarkMode = async () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    if (user) {
+      updateUser({ preferences: { ...user.preferences, darkMode: next } });
+      // Fire-and-forget — don't block the UI on the network call
+      usersApi.updatePreferences(user.id, { dark_mode: next }).catch(() => {});
+    }
+  };
 
   if (authLoading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Spin size="large" />
-      </div>
+      <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Spin size="large" />
+        </div>
+      </ConfigProvider>
     );
   }
 
-  return user ? <AppShell /> : <LoginPage />;
+  return (
+    <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
+      {user ? <AppShell darkMode={darkMode} toggleDarkMode={toggleDarkMode} /> : <LoginPage />}
+    </ConfigProvider>
+  );
 };
 
 // ── Top-level export ──────────────────────────────────────────────────────────

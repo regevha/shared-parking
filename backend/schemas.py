@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
 
 
@@ -84,11 +84,32 @@ class LotOut(BaseModel):
 
 # ── Users ─────────────────────────────────────────────────────────────────────
 
+class PreferencesOut(BaseModel):
+    dark_mode: bool = True
+    # ── add new preference fields here ─────────────────────────────────────────
+
+    class Config:
+        from_attributes = True
+
+
+class PreferencesUpdate(BaseModel):
+    dark_mode: Optional[bool] = None
+    # ── add new preference fields here ─────────────────────────────────────────
+
+
 class UserOut(BaseModel):
     id: str
     name: str
     email: str
     role: str
+    preferences: PreferencesOut
+
+    @field_validator('preferences', mode='before')
+    @classmethod
+    def coerce_prefs_list(cls, v):
+        if isinstance(v, list):
+            return v[0] if v else PreferencesOut()
+        return v
 
     class Config:
         from_attributes = True

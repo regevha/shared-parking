@@ -41,9 +41,29 @@ Role is derived from the JWT — no manual dropdown.
 | Email | Role |
 |-------|------|
 | `alice@parking.dev` | User |
-| `sarah@parking.dev` | Owner (owns F1-001, F1-002, F1-006) |
+| `sarah@parking.dev` | Owner |
 | `admin@parking.dev` | Manager |
-All 21 users follow `<firstname>@parking.dev` pattern.
+All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the full list.
+
+## Python Libraries
+
+### Runtime packages (`backend/requirements.txt`)
+| Package | Why it's needed |
+|---------|----------------|
+| `fastapi` | Web framework — routes, dependency injection, automatic Swagger UI |
+| `uvicorn[standard]` | ASGI server that runs FastAPI; `[standard]` adds auto-reload and WebSocket support |
+| `sqlalchemy` | ORM — maps `User`, `ParkingRequest`, `Lot` to SQLite tables; handles all queries |
+| `pydantic` | Request/response validation — all schemas (`LotCreate`, `ApprovePayload`, etc.) |
+| `python-jose[cryptography]` | JWT creation and verification (`create_access_token`, `get_current_user`) |
+| `bcrypt` | Password hashing — `hash_password()` / `verify_password()` in `auth.py` call bcrypt directly (passlib dropped — incompatible with bcrypt ≥ 4.0) |
+| `python-multipart` | Form-data parsing — **required** for `OAuth2PasswordRequestForm` on `POST /auth/login` |
+
+### Test packages (`backend/requirements-test.txt`)
+| Package | Why it's needed |
+|---------|----------------|
+| `pytest` | Test runner — discovers `test_*.py`, runs fixtures, reports results |
+| `httpx` | Starlette's `TestClient` uses httpx as its transport layer internally |
+| `pytest-cov` | Enables `--cov` flag for line-level coverage reports |
 
 ## Startup
 ```bash
@@ -57,6 +77,17 @@ uvicorn main:app --reload
 npm install
 npm start
 ```
+
+## Running Tests
+```bash
+cd backend
+pip install -r requirements-test.txt   # first time only
+pytest tests/ -v
+pytest tests/ --cov=. --cov-report=term-missing  # with coverage
+```
+- 82 tests, always green
+- Uses in-memory SQLite (StaticPool) — never touches parking.db
+- Isolation mechanism: `conftest.py` uses FastAPI's `app.dependency_overrides[get_db] = override_get_db` to replace the real `get_db` (which opens `parking.db`) with a version that yields an in-memory session instead. Every endpoint uses `Depends(get_db)`, so the swap is transparent — the app code runs unchanged but all DB operations go to the throwaway in-memory database.
 
 ## Key Files
 
@@ -76,12 +107,22 @@ npm start
 
 ### Backend
 - `backend/main.py` — FastAPI app, CORS, router registration
-- `backend/models.py` — `User`, `ParkingRequest`, `Lot` SQLAlchemy models
+- `backend/models.py` — `User`, `UserPreferences`, `ParkingRequest`, `Lot` SQLAlchemy models
 - `backend/auth.py` — JWT utilities, `get_current_user`, `require_owner`, `require_manager`
 - `backend/routers/auth.py` — `/auth/login`, `/auth/register`, `/auth/me`
 - `backend/routers/requests.py` — `/api/requests/*`
-- `backend/routers/lots.py` — `/api/lots/*`
+- `backend/routers/lots.py` — `/api/lots/*` (CRUD, owner-scoped `/mine`)
+- `backend/routers/users.py` — `/api/users/*` (CRUD, manager/self restrictions); `/api/users/{id}/preferences` (GET/PATCH)
 - `backend/seed.py` — seeds 21 users, 20 requests, 17 lots
+- `backend/requirements.txt` — production dependencies
+- `backend/requirements-test.txt` — test dependencies (`pytest`, `httpx`, `pytest-cov`, `bcrypt<4.0`)
+
+### Tests
+- `backend/tests/conftest.py` — fixtures: in-memory SQLite (StaticPool), TestClient with `get_db` override, `user_headers` / `owner_headers` / `manager_headers`, `created_request_id`, `created_lot_id`, `owner_lot_id`; patches `pwd_context` to `sha256_crypt`
+- `backend/tests/test_auth.py` — 9 tests: register, login, `/auth/me`
+- `backend/tests/test_requests.py` — 29 tests: full CRUD, approve/reject, RBAC, status guards
+- `backend/tests/test_lots.py` — 24 tests: full CRUD, `/mine`, `/owner/{name}`, dual-role PATCH
+- `backend/tests/test_users.py` — 20 tests: list, get, update, delete, role restrictions, password change, self-delete prevention
 
 ### Screens
 | File | Route | Menu Label |
@@ -134,10 +175,6 @@ Both `CalendarView` and `LotCalendarView`:
 
 ### Row Highlighting
 `AllApprovals` highlights rows where `lotOwner === user?.name` (from `useAuth`) using `.owner-approval-row`.
-
-## Lot IDs
-Lots: `F1-001`–`F1-006`, `F2-001`–`F2-005`, `F3-001`–`F3-006` (17 total, one unowned).
-Sarah Johnson (owner-001) owns: **F1-001, F1-002, F1-006**.
 
 ## Git / Branching
 - Main branch: `master`
