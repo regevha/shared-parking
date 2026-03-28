@@ -68,10 +68,13 @@ const MyRequests: React.FC = () => {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Filter to show only PENDING and APPROVED requests
-  const visibleRequests = userRequests.filter(
-    (req: ParkingRequest) => req.status === 'pending' || req.status === 'approved'
-  );
+  // Filter to show only PENDING and APPROVED requests, newest date+time first
+  const visibleRequests = userRequests
+    .filter((req: ParkingRequest) => req.status === 'pending' || req.status === 'approved')
+    .sort((a, b) => {
+      const d = b.date.localeCompare(a.date);
+      return d !== 0 ? d : b.startTime.localeCompare(a.startTime);
+    });
 
 
   const handleEdit = (request: ParkingRequest) => {

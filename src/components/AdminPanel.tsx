@@ -16,10 +16,12 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadProps } from 'antd';
 import dayjs from 'dayjs';
+import * as XLSX from 'xlsx';
 import { usersApi, UserData } from '../api/users';
 import { lotsApi, LotData } from '../api/lots';
 import { requestsApi } from '../api/requests';
 import type { ParkingRequest } from '../contexts/RequestsContext';
+import { useAuth } from '../contexts/AuthContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import './AdminPanel.css';
 
@@ -36,6 +38,10 @@ const LOT_STATUS_COLOR: Record<string, string> = {
 };
 
 const AdminPanel: React.FC = () => {
+  // ── Theme ───────────────────────────────────────────────────────────────────
+  const { user } = useAuth();
+  const isDark = user?.preferences?.darkMode ?? true;
+
   // ── Navigation ─────────────────────────────────────────────────────────────
   const [selectedMenu, setSelectedMenu] = useState('users');
 
@@ -211,7 +217,7 @@ const AdminPanel: React.FC = () => {
       title: 'Owner',
       key: 'owner',
       render: (_: any, record: LotData) =>
-        record.owner ?? <em style={{ color: '#aaa' }}>Unowned</em>,
+        record.owner ?? <em style={{ color: 'var(--label-color)' }}>Unowned</em>,
     },
     {
       title: 'Actions',
@@ -261,14 +267,37 @@ const AdminPanel: React.FC = () => {
   ];
 
   // ── Reports helpers ─────────────────────────────────────────────────────────
-  const filteredRequests = requests.filter(r => {
-    if (!reportDateRange) return true;
-    const d = dayjs(r.date);
-    return (
-      !d.isBefore(reportDateRange[0].startOf('day')) &&
-      !d.isAfter(reportDateRange[1].endOf('day'))
-    );
-  });
+  const filteredRequests = requests
+    .filter(r => {
+      if (!reportDateRange) return true;
+      const d = dayjs(r.date);
+      return (
+        !d.isBefore(reportDateRange[0].startOf('day')) &&
+        !d.isAfter(reportDateRange[1].endOf('day'))
+      );
+    })
+    .sort((a, b) => {
+      const d = b.date.localeCompare(a.date);
+      return d !== 0 ? d : b.startTime.localeCompare(a.startTime);
+    });
+
+  const handleExport = () => {
+    const activeTab = document.querySelector('.ant-tabs-tab-active')?.textContent ?? 'All';
+    const rows = filteredRequests.map(r => ({
+      ID:          r.id,
+      Date:        dayjs(r.date).format('DD/MM/YYYY'),
+      Requester:   r.requesterName,
+      'Time Slot': `${r.startTime} – ${r.endTime}`,
+      'Duration':  `${r.duration}h`,
+      Status:      getRequestStatusLabel(r.status),
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Requests');
+    const filename = `parking-requests-${dayjs().format('YYYY-MM-DD')}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    notification.success({ message: `Exported ${rows.length} rows to ${filename}` });
+  };
 
   const reportColumns: ColumnsType<ParkingRequest> = [
     { title: 'ID',        dataIndex: 'id',            key: 'id',            width: 100 },
@@ -462,7 +491,7 @@ const AdminPanel: React.FC = () => {
                       Upload Excel File
                     </Button>
                   </Upload>
-                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                  <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--label-color)' }}>
                     Drag and drop or click to upload Excel files
                   </div>
                 </Card>
@@ -551,10 +580,8 @@ const AdminPanel: React.FC = () => {
                 <Button
                   type="primary"
                   icon={<DownloadOutlined />}
-                  onClick={() => notification.info({
-                    message: 'Export not yet implemented',
-                    description: 'Excel export requires additional backend support.',
-                  })}
+                  disabled={filteredRequests.length === 0}
+                  onClick={handleExport}
                 >
                   Export to Excel
                 </Button>
@@ -696,7 +723,7 @@ const AdminPanel: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider width={250} theme="light">
+      <Sider width={250} theme={isDark ? 'dark' : 'light'}>
         <div style={{ padding: '16px', fontSize: '18px', fontWeight: 'bold', textAlign: 'center' }}>
           Admin Panel
         </div>
@@ -708,7 +735,7 @@ const AdminPanel: React.FC = () => {
         />
       </Sider>
       <Layout>
-        <Content style={{ padding: '24px', background: '#fff' }}>
+        <Content style={{ padding: '24px' }}>
           <Spin spinning={loading} tip="Loading admin data...">
             {renderContent()}
           </Spin>

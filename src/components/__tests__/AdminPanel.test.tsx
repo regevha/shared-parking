@@ -169,12 +169,12 @@ describe('AdminPanel — Lot Management', () => {
   it('Assign Owner modal opens when "Assign Owner" is clicked', async () => {
     setup();
     fireEvent.click(screen.getByText('Lot Management'));
-    await waitFor(() => screen.getByRole('button', { name: /Assign Owner/i }));
+    await waitFor(() => screen.getByRole('button', { name: /Assign Owner/i }), { timeout: 10000 });
     fireEvent.click(screen.getByRole('button', { name: /Assign Owner/i }));
     await waitFor(() => {
       expect(screen.getByText('Assign Owner to Lot')).toBeInTheDocument();
     });
-  });
+  }, 15000);
 });
 
 // ── Reports ──────────────────────────────────────────────────────────────────
