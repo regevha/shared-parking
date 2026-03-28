@@ -205,7 +205,9 @@ def delete_request(
         raise HTTPException(status_code=404, detail="Request not found")
     if req.requester_id != current_user.id:
         raise HTTPException(status_code=403, detail="You can only cancel your own requests")
-    # Preserve messages for audit (7-day retention) — null out the FK before deleting
+    # Audit retention: null out request_id on related messages so they survive the
+    # delete.  Done explicitly here because SQLite ignores FK ON DELETE actions
+    # unless PRAGMA foreign_keys=ON is set for every connection.
     db.query(models.RequestMessage)\
         .filter(models.RequestMessage.request_id == request_id)\
         .update({"request_id": None})

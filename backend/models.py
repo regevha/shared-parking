@@ -23,6 +23,7 @@ class UserPreferences(Base):
     __tablename__ = "user_preferences"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    # CASCADE: preferences have no meaning without their owner — delete with the user
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     dark_mode = Column(Boolean, nullable=False, default=True)
     # ── add new preference columns here ────────────────────────────────────────
@@ -53,6 +54,9 @@ class RequestMessage(Base):
     __tablename__ = "request_messages"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    # SET NULL (not CASCADE): messages are preserved for 7-day audit retention after a
+    # request is deleted.  The FK is nulled explicitly in delete_request() before the
+    # parent row is removed (SQLite does not enforce FK actions without PRAGMA foreign_keys=ON).
     request_id = Column(String, ForeignKey("parking_requests.id", ondelete="SET NULL"), nullable=True, index=True)
     sender_id = Column(String, nullable=False)      # → users.id
     sender_name = Column(String, nullable=False)    # denormalised for display
