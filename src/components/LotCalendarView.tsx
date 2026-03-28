@@ -158,15 +158,13 @@ const LotCalendarView: React.FC = () => {
     };
   };
 
-  const floorNames: Record<string, string> = { F1: 'F1 - Ground Floor', F2: 'F2 - Level 1', F3: 'F3 - Level 2' };
-
   const handleApprove = (requestId: string) => {
     const targetLot = selectedLot !== 'all'
       ? ownerLots.find(l => l.id === selectedLot)
       : ownerLots.find(l => l.status === 'available');
     approveRequest(requestId, targetLot ? {
       lotId: targetLot.id,
-      floor: floorNames[targetLot.floor] || targetLot.floor,
+      floor: targetLot.floorLabel,
       lotOwner: user?.name ?? '',
     } : undefined);
     setSelectedEvent(null);
