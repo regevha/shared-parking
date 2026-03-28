@@ -94,14 +94,13 @@ const MyRequests: React.FC = () => {
     const endTime = `${String(startHour + values.duration).padStart(2, '0')}:00`;
 
     setLoading(true);
-    setTimeout(() => {
-      updateUserRequest(editingRequest.id, {
+    try {
+      await updateUserRequest(editingRequest.id, {
         date: values.date?.format('YYYY-MM-DD') || editingRequest.date,
         startTime: values.startTime,
         endTime,
         duration: values.duration,
       });
-      setLoading(false);
       setEditModalVisible(false);
       setEditingRequest(null);
       form.resetFields();
@@ -109,17 +108,29 @@ const MyRequests: React.FC = () => {
         message: 'Request Updated',
         description: `Request ${editingRequest.id} has been updated successfully.`,
       });
-    }, 500);
+    } catch (err: any) {
+      notification.error({
+        message: 'Update Failed',
+        description: err.message || 'Failed to update the request. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCancelRequest = (requestId: string) => {
-    // Remove the request from the list
-    cancelUserRequest(requestId);
-
-    notification.success({
-      message: 'Request Cancelled',
-      description: `Request ${requestId} has been cancelled.`,
-    });
+  const handleCancelRequest = async (requestId: string) => {
+    try {
+      await cancelUserRequest(requestId);
+      notification.success({
+        message: 'Request Cancelled',
+        description: `Request ${requestId} has been cancelled.`,
+      });
+    } catch (err: any) {
+      notification.error({
+        message: 'Cancellation Failed',
+        description: err.message || 'Failed to cancel the request. Please try again.',
+      });
+    }
   };
 
   const columns: ColumnsType<ParkingRequest> = [

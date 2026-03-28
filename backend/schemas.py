@@ -1,5 +1,10 @@
-from pydantic import BaseModel, field_validator
+import re
+from datetime import date as DateType
+from pydantic import BaseModel, field_validator, model_validator
 from typing import Optional
+
+_TIME_RE = re.compile(r'^([01]\d|2[0-3]):[0-5]\d$')
+_DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 
 
 # ── Parking Requests ────────────────────────────────────────────────────────
@@ -28,12 +33,70 @@ class ParkingRequestCreate(BaseModel):
     end_time: str
     duration: int
 
+    @field_validator('date')
+    @classmethod
+    def validate_date(cls, v: str) -> str:
+        if not _DATE_RE.match(v):
+            raise ValueError('date must be in YYYY-MM-DD format')
+        try:
+            d = DateType.fromisoformat(v)
+        except ValueError:
+            raise ValueError('date is not a valid calendar date')
+        if d < DateType.today():
+            raise ValueError('date cannot be in the past')
+        return v
+
+    @field_validator('start_time', 'end_time')
+    @classmethod
+    def validate_time_format(cls, v: str) -> str:
+        if not _TIME_RE.match(v):
+            raise ValueError('time must be in HH:MM format')
+        return v
+
+    @model_validator(mode='after')
+    def validate_time_range(self) -> 'ParkingRequestCreate':
+        s, e = self.start_time, self.end_time
+        if s >= e:
+            raise ValueError('start_time must be before end_time')
+        if s < '07:00':
+            raise ValueError('start_time must be 07:00 or later')
+        if e > '20:00':
+            raise ValueError('end_time cannot be later than 20:00')
+        expected = int(e.split(':')[0]) - int(s.split(':')[0])
+        if self.duration != expected:
+            raise ValueError(f'duration must be {expected} hour(s) to match start and end times')
+        return self
+
 
 class ParkingRequestUpdate(BaseModel):
     date: Optional[str] = None
     start_time: Optional[str] = None
     end_time: Optional[str] = None
     duration: Optional[int] = None
+
+    @field_validator('date')
+    @classmethod
+    def validate_date(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        if not _DATE_RE.match(v):
+            raise ValueError('date must be in YYYY-MM-DD format')
+        try:
+            d = DateType.fromisoformat(v)
+        except ValueError:
+            raise ValueError('date is not a valid calendar date')
+        if d < DateType.today():
+            raise ValueError('date cannot be in the past')
+        return v
+
+    @field_validator('start_time', 'end_time')
+    @classmethod
+    def validate_time_format(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        if not _TIME_RE.match(v):
+            raise ValueError('time must be in HH:MM format')
+        return v
 
 
 class ApprovePayload(BaseModel):

@@ -86,13 +86,8 @@ const ParkingRequestForm: React.FC = () => {
     }
 
     setLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-
-      // Add the request to the shared state
-      addPendingRequest({
+    try {
+      await addPendingRequest({
         requesterId:   user?.id   ?? '',
         requesterName: user?.name ?? '',
         date: values.date?.format('YYYY-MM-DD') || '',
@@ -100,14 +95,20 @@ const ParkingRequestForm: React.FC = () => {
         endTime: endTime || '',
         duration: values.duration,
       });
-
       notification.success({
         message: 'Request Submitted',
         description: `Parking request submitted for ${values.date?.format('YYYY-MM-DD')} from ${values.startTime} to ${endTime}`,
         duration: 3,
       });
       form.resetFields();
-    }, 1000);
+    } catch (err: any) {
+      notification.error({
+        message: 'Submission Failed',
+        description: err.message || 'Failed to submit the request. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

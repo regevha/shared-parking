@@ -212,7 +212,7 @@ def test_update_approved_request_returns_400(client, user_headers, owner_headers
 def test_update_nonexistent_returns_404(client, user_headers):
     resp = client.patch(
         "/api/requests/REQ-999",
-        json={"date": "2026-01-01"},
+        json={"date": "2026-09-01"},
         headers=user_headers,
     )
     assert resp.status_code == 404
@@ -242,3 +242,120 @@ def test_delete_nonexistent_returns_404(client, user_headers):
 def test_delete_requires_auth(client, created_request_id):
     resp = client.delete(f"/api/requests/{created_request_id}")
     assert resp.status_code == 401
+
+
+# ── Input validation (POST /api/requests) ────────────────────────────────
+
+def test_create_request_rejects_past_date(client, user_headers):
+    bad = {**REQUEST_PAYLOAD, "date": "2025-01-01"}
+    resp = client.post("/api/requests", json=bad, headers=user_headers)
+    assert resp.status_code == 422
+    assert "past" in resp.text.lower()
+
+
+def test_create_request_rejects_invalid_date_format(client, user_headers):
+    bad = {**REQUEST_PAYLOAD, "date": "01-04-2026"}
+    resp = client.post("/api/requests", json=bad, headers=user_headers)
+    assert resp.status_code == 422
+
+
+def test_create_request_rejects_invalid_time_format(client, user_headers):
+    bad = {**REQUEST_PAYLOAD, "start_time": "9:00"}
+    resp = client.post("/api/requests", json=bad, headers=user_headers)
+    assert resp.status_code == 422
+
+
+def test_create_request_rejects_start_after_end(client, user_headers):
+    bad = {**REQUEST_PAYLOAD, "start_time": "14:00", "end_time": "10:00", "duration": 2}
+    resp = client.post("/api/requests", json=bad, headers=user_headers)
+    assert resp.status_code == 422
+    assert "before" in resp.text.lower()
+
+
+def test_create_request_rejects_start_equals_end(client, user_headers):
+    bad = {**REQUEST_PAYLOAD, "start_time": "10:00", "end_time": "10:00", "duration": 0}
+    resp = client.post("/api/requests", json=bad, headers=user_headers)
+    assert resp.status_code == 422
+
+
+def test_create_request_rejects_end_time_after_20(client, user_headers):
+    bad = {**REQUEST_PAYLOAD, "start_time": "19:00", "end_time": "21:00", "duration": 2}
+    resp = client.post("/api/requests", json=bad, headers=user_headers)
+    assert resp.status_code == 422
+    assert "20:00" in resp.text
+
+
+def test_create_request_rejects_start_before_07(client, user_headers):
+    bad = {**REQUEST_PAYLOAD, "start_time": "06:00", "end_time": "08:00", "duration": 2}
+    resp = client.post("/api/requests", json=bad, headers=user_headers)
+    assert resp.status_code == 422
+    assert "07:00" in resp.text
+
+
+def test_create_request_rejects_wrong_duration(client, user_headers):
+    bad = {**REQUEST_PAYLOAD, "start_time": "09:00", "end_time": "11:00", "duration": 5}
+    resp = client.post("/api/requests", json=bad, headers=user_headers)
+    assert resp.status_code == 422
+    assert "duration" in resp.text.lower()
+
+
+# ── Time conflict detection (PATCH /api/requests/{id}/approve) ────────────
+
+def test_approve_detects_time_slot_conflict(client, user_headers, owner_headers):
+    """Approving two requests for the same lot/date with overlapping times → 409."""
+    # Create two requests for the same date and overlapping slot
+    r1 = client.post("/api/requests", json={
+        **REQUEST_PAYLOAD, "start_time": "09:00", "end_time": "11:00", "duration": 2,
+    }, headers=user_headers)
+    r2 = client.post("/api/requests", json={
+        **REQUEST_PAYLOAD, "start_time": "10:00", "end_time": "12:00", "duration": 2,
+    }, headers=user_headers)
+    assert r1.status_code == 201
+    assert r2.status_code == 201
+    id1, id2 = r1.json()["id"], r2.json()["id"]
+
+    lot_info = {"lot_id": "F1-001", "floor": "F1", "lot_owner": "Bob"}
+
+    # Approve first request — should succeed
+    resp1 = client.patch(f"/api/requests/{id1}/approve", json=lot_info, headers=owner_headers)
+    assert resp1.status_code == 200
+
+    # Approve second request for same lot and overlapping time — should conflict
+    resp2 = client.patch(f"/api/requests/{id2}/approve", json=lot_info, headers=owner_headers)
+    assert resp2.status_code == 409
+    assert "conflict" in resp2.json()["detail"].lower()
+
+
+def test_approve_no_conflict_different_lot(client, user_headers, owner_headers):
+    """Same time slot on different lots is allowed."""
+    r1 = client.post("/api/requests", json={
+        **REQUEST_PAYLOAD, "start_time": "09:00", "end_time": "11:00", "duration": 2,
+    }, headers=user_headers)
+    r2 = client.post("/api/requests", json={
+        **REQUEST_PAYLOAD, "start_time": "09:00", "end_time": "11:00", "duration": 2,
+    }, headers=user_headers)
+    id1, id2 = r1.json()["id"], r2.json()["id"]
+
+    client.patch(f"/api/requests/{id1}/approve",
+                 json={"lot_id": "F1-001", "floor": "F1", "lot_owner": "Bob"},
+                 headers=owner_headers)
+    resp2 = client.patch(f"/api/requests/{id2}/approve",
+                         json={"lot_id": "F1-002", "floor": "F1", "lot_owner": "Bob"},
+                         headers=owner_headers)
+    assert resp2.status_code == 200
+
+
+def test_approve_no_conflict_adjacent_slots(client, user_headers, owner_headers):
+    """Adjacent (non-overlapping) slots on the same lot are allowed."""
+    r1 = client.post("/api/requests", json={
+        **REQUEST_PAYLOAD, "start_time": "09:00", "end_time": "11:00", "duration": 2,
+    }, headers=user_headers)
+    r2 = client.post("/api/requests", json={
+        **REQUEST_PAYLOAD, "start_time": "11:00", "end_time": "13:00", "duration": 2,
+    }, headers=user_headers)
+    id1, id2 = r1.json()["id"], r2.json()["id"]
+
+    lot_info = {"lot_id": "F1-001", "floor": "F1", "lot_owner": "Bob"}
+    client.patch(f"/api/requests/{id1}/approve", json=lot_info, headers=owner_headers)
+    resp2 = client.patch(f"/api/requests/{id2}/approve", json=lot_info, headers=owner_headers)
+    assert resp2.status_code == 200

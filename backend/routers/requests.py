@@ -97,6 +97,28 @@ def approve_request(
     if req.status != "pending":
         raise HTTPException(status_code=400, detail="Only pending requests can be approved")
 
+    if payload.lot_id:
+        conflict = (
+            db.query(models.ParkingRequest)
+            .filter(
+                models.ParkingRequest.lot_id == payload.lot_id,
+                models.ParkingRequest.date == req.date,
+                models.ParkingRequest.status == "approved",
+                models.ParkingRequest.id != request_id,
+                models.ParkingRequest.start_time < req.end_time,
+                models.ParkingRequest.end_time > req.start_time,
+            )
+            .first()
+        )
+        if conflict:
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    f"Time slot conflict: lot {payload.lot_id} is already approved "
+                    f"for {conflict.start_time}–{conflict.end_time} on {req.date}"
+                ),
+            )
+
     req.status = "approved"
     req.approved_at = datetime.now(timezone.utc).isoformat()
     req.rejected_by_owner = False
@@ -143,6 +165,20 @@ def update_request(
         raise HTTPException(status_code=403, detail="You can only edit your own requests")
     if req.status != "pending":
         raise HTTPException(status_code=400, detail="Only pending requests can be edited")
+
+    effective_start = payload.start_time if payload.start_time is not None else req.start_time
+    effective_end   = payload.end_time   if payload.end_time   is not None else req.end_time
+    effective_dur   = payload.duration   if payload.duration   is not None else req.duration
+
+    if effective_start >= effective_end:
+        raise HTTPException(status_code=400, detail="start_time must be before end_time")
+    if effective_start < '07:00':
+        raise HTTPException(status_code=400, detail="start_time must be 07:00 or later")
+    if effective_end > '20:00':
+        raise HTTPException(status_code=400, detail="end_time cannot be later than 20:00")
+    expected_dur = int(effective_end.split(':')[0]) - int(effective_start.split(':')[0])
+    if effective_dur != expected_dur:
+        raise HTTPException(status_code=400, detail=f"duration must be {expected_dur} hour(s) to match start and end times")
 
     if payload.date is not None:
         req.date = payload.date
