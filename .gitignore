@@ -21,3 +21,21 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# IDE / editor
+.vscode/
+
+# Claude Code
+.claude/settings.local.json
+.claude/worktrees/
+
+# Backend
+backend/.coverage
+backend/__pycache__/
+backend/*.pyc
+parking.db
+
+# Docs sub-project
+docs/node_modules/
+docs/package.json
+docs/package-lock.json

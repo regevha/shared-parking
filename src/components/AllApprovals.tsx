@@ -130,7 +130,10 @@ const AllApprovals: React.FC = () => {
       {/* Table */}
       <Table
         columns={columns}
-        dataSource={approvedRequests}
+        dataSource={[...approvedRequests].sort((a, b) => {
+          const d = b.date.localeCompare(a.date);
+          return d !== 0 ? d : b.startTime.localeCompare(a.startTime);
+        })}
         rowKey="id"
         loading={loading}
         pagination={{ pageSize: 10, hideOnSinglePage: true }}
