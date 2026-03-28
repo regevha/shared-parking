@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Form, DatePicker, Select, Button, Card, Alert, notification, Row, Col, Tag } from 'antd';
 import { useRequests } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
+import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import './ParkingRequestForm.css';
@@ -12,19 +13,16 @@ interface FormValues {
   duration: number;
 }
 
-interface ActiveRequest {
-  id: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-}
+const MAX_END_HOUR = 20;
+const MAX_ACTIVE_REQUESTS = 3;
 
+// 20:00 is excluded: no valid duration fits (min 1h would exceed 20:00)
 const HOUR_OPTIONS = [
   '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
-  '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00',
+  '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ];
 
-const DURATION_OPTIONS = [
+const ALL_DURATION_OPTIONS = [
   { label: '1 hour', value: 1 },
   { label: '2 hours', value: 2 },
   { label: '3 hours', value: 3 },
@@ -33,46 +31,48 @@ const DURATION_OPTIONS = [
   { label: '6 hours', value: 6 },
 ];
 
-const MAX_ACTIVE_REQUESTS = 3;
-
 const ParkingRequestForm: React.FC = () => {
   const [form] = Form.useForm<FormValues>();
-  const [simulateMaxRequests, setSimulateMaxRequests] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { addPendingRequest } = useRequests();
+  const { addPendingRequest, userRequests } = useRequests();
   const { user } = useAuth();
 
-  // Mock active requests
-  const mockActiveRequests: ActiveRequest[] = simulateMaxRequests
-    ? [
-        { id: '1', date: '2026-03-25', startTime: '09:00', endTime: '11:00' },
-        { id: '2', date: '2026-03-26', startTime: '14:00', endTime: '16:00' },
-        { id: '3', date: '2026-03-27', startTime: '10:00', endTime: '13:00' },
-      ]
-    : [];
+  const activeRequests = userRequests.filter(
+    r => r.status === 'pending' || r.status === 'approved'
+  );
+  const hasMaxRequests = activeRequests.length >= MAX_ACTIVE_REQUESTS;
 
-  const hasMaxRequests = mockActiveRequests.length >= MAX_ACTIVE_REQUESTS;
-
-  // Watch form values for end time calculation
+  // Watch form values for end time calculation and duration filtering
   const startTime = Form.useWatch('startTime', form);
   const duration = Form.useWatch('duration', form);
+
+  // Filter durations so end time never exceeds MAX_END_HOUR
+  const availableDurations = useMemo(() => {
+    if (!startTime) return ALL_DURATION_OPTIONS;
+    const startHour = parseInt(startTime.split(':')[0]);
+    const maxDuration = MAX_END_HOUR - startHour;
+    return ALL_DURATION_OPTIONS.filter(opt => opt.value <= maxDuration);
+  }, [startTime]);
+
+  // Clear duration when start time changes and the current value is no longer valid
+  useEffect(() => {
+    if (!startTime || !duration) return;
+    const startHour = parseInt(startTime.split(':')[0]);
+    if (startHour + duration > MAX_END_HOUR) {
+      form.setFieldValue('duration', undefined);
+    }
+  }, [startTime]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-calculate end time
   const endTime = useMemo(() => {
     if (!startTime || !duration) return null;
-
-    const [hours, minutes] = startTime.split(':').map(Number);
-    const endHours = hours + duration;
-
-    if (endHours > 23) {
-      return null; // Invalid: goes past midnight
-    }
-
-    return `${String(endHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    const startHour = parseInt(startTime.split(':')[0]);
+    const endHour = startHour + duration;
+    if (endHour > MAX_END_HOUR) return null;
+    return `${String(endHour).padStart(2, '0')}:00`;
   }, [startTime, duration]);
 
   const handleFormChange = () => {
-    // Trigger re-render to update end time
     form.validateFields();
   };
 
@@ -86,13 +86,8 @@ const ParkingRequestForm: React.FC = () => {
     }
 
     setLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-
-      // Add the request to the shared state
-      addPendingRequest({
+    try {
+      await addPendingRequest({
         requesterId:   user?.id   ?? '',
         requesterName: user?.name ?? '',
         date: values.date?.format('YYYY-MM-DD') || '',
@@ -100,71 +95,61 @@ const ParkingRequestForm: React.FC = () => {
         endTime: endTime || '',
         duration: values.duration,
       });
-
       notification.success({
         message: 'Request Submitted',
         description: `Parking request submitted for ${values.date?.format('YYYY-MM-DD')} from ${values.startTime} to ${endTime}`,
         duration: 3,
       });
       form.resetFields();
-    }, 1000);
+    } catch (err: any) {
+      notification.error({
+        message: 'Submission Failed',
+        description: err.message || 'Failed to submit the request. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="parking-request-form">
       <h1>Submit Parking Request</h1>
 
-      {/* Simulation Toggle */}
-      <Card style={{ marginBottom: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <input
-            type="checkbox"
-            id="simulate-max"
-            checked={simulateMaxRequests}
-            onChange={(e) => setSimulateMaxRequests(e.target.checked)}
-          />
-          <label htmlFor="simulate-max" style={{ margin: 0, cursor: 'pointer' }}>
-            <strong>Simulate: Already has 3 active requests</strong>
-          </label>
-        </div>
-      </Card>
-
       {/* Warning Banner */}
       {hasMaxRequests && (
         <Alert
           message="Request Limit Reached"
-          description="You currently have the maximum number of active parking requests (3). You cannot submit new requests until one of your existing requests expires."
+          description="You currently have the maximum number of active parking requests (3). You cannot submit new requests until one of your existing requests is approved or cancelled."
           type="warning"
           showIcon
-          closable
           style={{ marginBottom: '24px' }}
         />
       )}
 
       {/* Active Requests List */}
-      {mockActiveRequests.length > 0 && (
+      {activeRequests.length > 0 && (
         <Card
-          title="Your Active Requests"
+          title={`Your Active Requests (${activeRequests.length} / ${MAX_ACTIVE_REQUESTS})`}
           style={{ marginBottom: '24px' }}
           size="small"
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {mockActiveRequests.map((req) => (
+            {activeRequests.map((req) => (
               <div key={req.id} style={{ padding: '12px', backgroundColor: 'var(--item-bg)', borderRadius: '4px' }}>
                 <Row gutter={16}>
                   <Col xs={24} sm={6}>
                     <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Date</div>
-                    <div style={{ fontWeight: 'bold' }}>{req.date}</div>
+                    <div style={{ fontWeight: 'bold' }}>{dayjs(req.date).format('DD/MM/YYYY')}</div>
                   </Col>
                   <Col xs={24} sm={9}>
                     <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Time Slot</div>
-                    <div style={{ fontWeight: 'bold' }}>
-                      {req.startTime} - {req.endTime}
-                    </div>
+                    <div style={{ fontWeight: 'bold' }}>{req.startTime} – {req.endTime}</div>
                   </Col>
                   <Col xs={24} sm={9}>
                     <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Status</div>
-                    <Tag color="blue">Active</Tag>
+                    <Tag color={getRequestStatusColor(req.status)}>
+                      {getRequestStatusLabel(req.status)}
+                    </Tag>
                   </Col>
                 </Row>
               </div>
@@ -220,7 +205,7 @@ const ParkingRequestForm: React.FC = () => {
               >
                 <Select
                   placeholder="Select duration"
-                  options={DURATION_OPTIONS}
+                  options={availableDurations}
                 />
               </Form.Item>
             </Col>
@@ -245,7 +230,7 @@ const ParkingRequestForm: React.FC = () => {
             form.getFieldValue('startTime') && form.getFieldValue('duration') && (
               <Form.Item label="End Time">
                 <div style={{ color: '#ff4d4f', fontWeight: 'bold' }}>
-                  ⚠️ Invalid: Duration would exceed 23:00
+                  ⚠️ Invalid: End time would exceed 20:00
                 </div>
               </Form.Item>
             )
@@ -272,10 +257,14 @@ const ParkingRequestForm: React.FC = () => {
         <ul>
           <li>You can have a maximum of <strong>3 concurrent active requests</strong></li>
           <li>Select any date from today onwards</li>
-          <li>Start time must be on hourly boundaries (08:00 - 20:00)</li>
-          <li>Duration can be 1 to 6 hours in 1-hour increments</li>
-          <li>End time is auto-calculated and cannot exceed 23:00</li>
+          <li>Start time must be on hourly boundaries (08:00 – 19:00)</li>
+          <li>Duration is 1–6 hours, automatically limited so end time never exceeds 20:00</li>
+          <li>End time is auto-calculated and cannot exceed 20:00</li>
         </ul>
+      </Card>
+
+      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+        <strong>New Request:</strong> Submit a parking request for a specific date and time slot; an owner will review and approve or reject it.
       </Card>
     </div>
   );

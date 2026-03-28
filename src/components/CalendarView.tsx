@@ -6,6 +6,7 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification } from 'antd';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
+import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import './CalendarView.css';
 
 const DnDCalendar = withDragAndDrop(Calendar as any) as any;
@@ -108,14 +109,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
 
   const getStatusLabel = (req: ParkingRequest) => {
     if (req.rejectedByOwner) return 'Rejected';
-    if (req.status === 'approved') return 'Approved';
-    return 'Pending';
+    return getRequestStatusLabel(req.status);
   };
 
   const getStatusTagColor = (req: ParkingRequest) => {
     if (req.rejectedByOwner) return 'red';
-    if (req.status === 'approved') return 'green';
-    return 'blue';
+    return getRequestStatusColor(req.status);
   };
 
   const events: CalendarEvent[] = useMemo(() =>

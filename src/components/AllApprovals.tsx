@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
-import { Table, Tag, Space, Card, Row, Col, Button, Modal, notification } from 'antd';
+import { Table, Space, Card, Row, Col, Button, Modal } from 'antd';
 import { EyeOutlined, MessageOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import './AllApprovals.css';
 
 const AllApprovals: React.FC = () => {
-  const { approvedRequests } = useRequests();
+  const { approvedRequests, loading } = useRequests();
   const { user } = useAuth();
 
   const columns: ColumnsType<ParkingRequest> = [
@@ -132,6 +132,7 @@ const AllApprovals: React.FC = () => {
         columns={columns}
         dataSource={approvedRequests}
         rowKey="id"
+        loading={loading}
         pagination={{ pageSize: 10, hideOnSinglePage: true }}
         scroll={{ x: 1000 }}
         size="middle"

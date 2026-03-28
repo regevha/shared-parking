@@ -156,7 +156,7 @@ const AppRoot: React.FC = () => {
 
   useEffect(() => {
     if (user) setDarkMode(user.preferences.darkMode);
-  }, [user?.id]); // sync when a different user logs in
+  }, [user]); // sync whenever the user object changes (login / preference update)
 
   useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');

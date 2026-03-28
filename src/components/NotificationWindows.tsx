@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Button, TimePicker, Alert, Space, Row, Col, Tag, Modal, Form, message } from 'antd';
 import { PlusOutlined, DeleteOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
 import './NotificationWindows.css';
 
 interface NotificationWindow {

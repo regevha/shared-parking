@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Upload, Alert, Form, Input, DatePicker, Tabs, Select, message, Switch, Divider } from 'antd';
+import { Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Upload, Alert, Input, DatePicker, Tabs, Select, message, Switch } from 'antd';
 import {
   UserOutlined,
   CarOutlined,
@@ -8,13 +8,10 @@ import {
   SettingOutlined,
   BarChartOutlined,
   SendOutlined,
-  DeleteOutlined,
   UserAddOutlined,
-  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadProps } from 'antd';
-import type { RangePickerProps } from 'antd/es/date-picker';
 import dayjs from 'dayjs';
 import './AdminPanel.css';
 
@@ -236,6 +233,9 @@ const AdminPanel: React.FC = () => {
               rowKey="id"
               pagination={{ pageSize: 10, hideOnSinglePage: true }}
             />
+            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+              <strong>User Management:</strong> View and manage all registered users, their roles, and account status.
+            </Card>
           </div>
         );
 
@@ -278,6 +278,9 @@ const AdminPanel: React.FC = () => {
               rowKey="id"
               pagination={{ pageSize: 10, hideOnSinglePage: true }}
             />
+            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+              <strong>Lot Management:</strong> View all parking lots, filter by status, and assign or reassign ownership.
+            </Card>
           </div>
         );
 
@@ -317,6 +320,9 @@ const AdminPanel: React.FC = () => {
                 </Card>
               </Col>
             </Row>
+            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+              <strong>Import / Export:</strong> Upload an Excel file to bulk-import parking data, or download the current master file for offline use.
+            </Card>
           </div>
         );
 
@@ -355,6 +361,9 @@ const AdminPanel: React.FC = () => {
                 </Card>
               </Col>
             </Row>
+            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+              <strong>System Configuration:</strong> Manage global system settings including timezone, blackout periods, and default notification windows.
+            </Card>
           </div>
         );
 
@@ -393,6 +402,9 @@ const AdminPanel: React.FC = () => {
                 />
               </Tabs.TabPane>
             </Tabs>
+            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+              <strong>Reports:</strong> View and export a history of all parking requests and approvals filtered by date range.
+            </Card>
           </div>
         );
 
@@ -459,6 +471,9 @@ const AdminPanel: React.FC = () => {
                   Send Broadcast
                 </Button>
               </Space>
+            </Card>
+            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+              <strong>Broadcast Messages:</strong> Send a system-wide message to all owners, all users, or both audiences at once.
             </Card>
           </div>
         );

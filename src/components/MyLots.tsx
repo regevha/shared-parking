@@ -5,6 +5,8 @@ import type { ColumnsType } from 'antd/es/table';
 import { useRequests } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { LotData } from '../api/lots';
+import { getLotStatusTagColor } from '../utils/statusUtils';
+import { LotStatus } from '../types';
 import './MyLots.css';
 
 const columns: ColumnsType<LotData> = [
@@ -15,14 +17,8 @@ const columns: ColumnsType<LotData> = [
     dataIndex: 'status',
     key: 'status',
     width: '20%',
-    render: (status: LotData['status']) => {
-      const colors: Record<string, string> = {
-        available: 'green',
-        blocked:   'red',
-        unowned:   'default',
-        'unowned-blocked': 'orange',
-      };
-      return <Tag color={colors[status] ?? 'default'}>{status}</Tag>;
+    render: (status: LotStatus) => {
+      return <Tag color={getLotStatusTagColor(status)}>{status}</Tag>;
     },
   },
   {
@@ -45,7 +41,7 @@ const columns: ColumnsType<LotData> = [
 ];
 
 const MyLots: React.FC = () => {
-  const { ownerLots } = useRequests();
+  const { ownerLots, loading } = useRequests();
   const { user } = useAuth();
 
   return (
@@ -71,7 +67,8 @@ const MyLots: React.FC = () => {
         columns={columns}
         dataSource={ownerLots}
         rowKey="id"
-        pagination={false}
+        loading={loading}
+        pagination={{ pageSize: 10, hideOnSinglePage: true }}
         bordered
       />
       {ownerLots.length === 0 && (

@@ -49,16 +49,22 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       content: `Approve parking request from ${requesterName}?`,
       okText: 'Approve',
       cancelText: 'Cancel',
-      onOk: () => {
+      onOk: async () => {
         setApprovalInProgress(requestId);
-        setTimeout(() => {
-          setApprovalInProgress(null);
-          approveRequest(requestId);
+        try {
+          await approveRequest(requestId);
           notification.success({
             message: 'Request Approved',
             description: `Parking request from ${requesterName} has been approved.`,
           });
-        }, 1000);
+        } catch (err: any) {
+          notification.error({
+            message: 'Approval Failed',
+            description: err.message || 'Failed to approve the request. Please try again.',
+          });
+        } finally {
+          setApprovalInProgress(null);
+        }
       },
     });
   };
@@ -70,16 +76,22 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       okText: 'Reject',
       okButtonProps: { danger: true },
       cancelText: 'Cancel',
-      onOk: () => {
+      onOk: async () => {
         setApprovalInProgress(requestId);
-        setTimeout(() => {
-          setApprovalInProgress(null);
-          rejectRequest(requestId);
+        try {
+          await rejectRequest(requestId);
           notification.success({
             message: 'Request Rejected',
             description: `Parking request from ${requesterName} has been rejected.`,
           });
-        }, 1000);
+        } catch (err: any) {
+          notification.error({
+            message: 'Rejection Failed',
+            description: err.message || 'Failed to reject the request. Please try again.',
+          });
+        } finally {
+          setApprovalInProgress(null);
+        }
       },
     });
   };
@@ -133,7 +145,6 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       width: '20%',
       render: (_, record: PendingRequest) => {
         const isOwnRequest = record.requesterId === user?.id;
-        const isRejected = record.rejectedByOwner;
 
         if (!isOwner) {
           return <span style={{ color: '#999' }}>No actions</span>;

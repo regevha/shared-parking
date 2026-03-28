@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Table, Button, Tag, Space, Modal, Form, DatePicker, Select, notification, Popconfirm, Card, Row, Col } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
+import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import './MyRequests.css';
 
 interface EditFormValues {
@@ -14,12 +15,15 @@ interface EditFormValues {
   duration: number;
 }
 
+const MAX_END_HOUR = 20;
+
+// 20:00 excluded: no valid duration fits (min 1h would exceed 20:00)
 const HOUR_OPTIONS = [
   '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
-  '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00',
+  '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ];
 
-const DURATION_OPTIONS = [
+const ALL_DURATION_OPTIONS = [
   { label: '1 hour', value: 1 },
   { label: '2 hours', value: 2 },
   { label: '3 hours', value: 3 },
@@ -37,6 +41,26 @@ const MyRequests: React.FC = () => {
   const navigate = useNavigate();
   const { userRequests, cancelUserRequest, updateUserRequest } = useRequests();
 
+  const editStartTime = Form.useWatch('startTime', form);
+
+  const availableDurations = useMemo(() => {
+    if (!editStartTime) return ALL_DURATION_OPTIONS;
+    const startHour = parseInt(editStartTime.split(':')[0]);
+    return ALL_DURATION_OPTIONS.filter(opt => opt.value <= MAX_END_HOUR - startHour);
+  }, [editStartTime]);
+
+  // Clear duration when start time changes and current value is no longer valid
+  useEffect(() => {
+    if (!editStartTime) return;
+    const currentDuration = form.getFieldValue('duration');
+    if (currentDuration) {
+      const startHour = parseInt(editStartTime.split(':')[0]);
+      if (startHour + currentDuration > MAX_END_HOUR) {
+        form.setFieldValue('duration', undefined);
+      }
+    }
+  }, [editStartTime]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
@@ -49,27 +73,6 @@ const MyRequests: React.FC = () => {
     (req: ParkingRequest) => req.status === 'pending' || req.status === 'approved'
   );
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return 'green';
-      case 'pending':
-        return 'blue';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return 'Approved';
-      case 'pending':
-        return 'Pending';
-      default:
-        return status;
-    }
-  };
 
   const handleEdit = (request: ParkingRequest) => {
     setEditingRequest(request);
@@ -91,17 +94,26 @@ const MyRequests: React.FC = () => {
     if (!editingRequest) return;
 
     const startHour = parseInt(values.startTime.split(':')[0]);
-    const endTime = `${String(startHour + values.duration).padStart(2, '0')}:00`;
+    const endHour = startHour + values.duration;
+
+    if (endHour > MAX_END_HOUR) {
+      notification.error({
+        message: 'Invalid Time',
+        description: `End time ${endHour}:00 exceeds the maximum allowed time of 20:00.`,
+      });
+      return;
+    }
+
+    const endTime = `${String(endHour).padStart(2, '0')}:00`;
 
     setLoading(true);
-    setTimeout(() => {
-      updateUserRequest(editingRequest.id, {
+    try {
+      await updateUserRequest(editingRequest.id, {
         date: values.date?.format('YYYY-MM-DD') || editingRequest.date,
         startTime: values.startTime,
         endTime,
         duration: values.duration,
       });
-      setLoading(false);
       setEditModalVisible(false);
       setEditingRequest(null);
       form.resetFields();
@@ -109,17 +121,29 @@ const MyRequests: React.FC = () => {
         message: 'Request Updated',
         description: `Request ${editingRequest.id} has been updated successfully.`,
       });
-    }, 500);
+    } catch (err: any) {
+      notification.error({
+        message: 'Update Failed',
+        description: err.message || 'Failed to update the request. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCancelRequest = (requestId: string) => {
-    // Remove the request from the list
-    cancelUserRequest(requestId);
-
-    notification.success({
-      message: 'Request Cancelled',
-      description: `Request ${requestId} has been cancelled.`,
-    });
+  const handleCancelRequest = async (requestId: string) => {
+    try {
+      await cancelUserRequest(requestId);
+      notification.success({
+        message: 'Request Cancelled',
+        description: `Request ${requestId} has been cancelled.`,
+      });
+    } catch (err: any) {
+      notification.error({
+        message: 'Cancellation Failed',
+        description: err.message || 'Failed to cancel the request. Please try again.',
+      });
+    }
   };
 
   const columns: ColumnsType<ParkingRequest> = [
@@ -150,8 +174,8 @@ const MyRequests: React.FC = () => {
       key: 'status',
       width: 90,
       render: (status: string) => (
-        <Tag color={getStatusColor(status)}>
-          {getStatusLabel(status)}
+        <Tag color={getRequestStatusColor(status)}>
+          {getRequestStatusLabel(status)}
         </Tag>
       ),
     },
@@ -224,7 +248,7 @@ const MyRequests: React.FC = () => {
             <Card key={record.id} size="small" className="request-card">
               <div className="request-card-header">
                 <strong>{record.id}</strong>
-                <Tag color={getStatusColor(record.status)}>{getStatusLabel(record.status)}</Tag>
+                <Tag color={getRequestStatusColor(record.status)}>{getRequestStatusLabel(record.status)}</Tag>
               </div>
               <div className="request-card-row">
                 <span className="request-card-label">Date</span>
@@ -362,7 +386,7 @@ const MyRequests: React.FC = () => {
             >
               <Select
                 placeholder="Select duration"
-                options={DURATION_OPTIONS}
+                options={availableDurations}
               />
             </Form.Item>
           </div>
