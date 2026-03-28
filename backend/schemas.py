@@ -178,6 +178,8 @@ class LotOut(BaseModel):
 
 class PreferencesOut(BaseModel):
     dark_mode: bool = True
+    # JSON-encoded notification windows, e.g. '{"Monday":[{"id":"1","startTime":"09:00","endTime":"12:00"}]}'
+    notification_windows: Optional[str] = '{}'
     # ── add new preference fields here ─────────────────────────────────────────
 
     class Config:
@@ -186,6 +188,7 @@ class PreferencesOut(BaseModel):
 
 class PreferencesUpdate(BaseModel):
     dark_mode: Optional[bool] = None
+    notification_windows: Optional[str] = None  # JSON-encoded
     # ── add new preference fields here ─────────────────────────────────────────
 
 

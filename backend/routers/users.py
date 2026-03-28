@@ -121,6 +121,8 @@ def update_preferences(
         raise HTTPException(status_code=404, detail="Preferences not found")
     if payload.dark_mode is not None:
         prefs.dark_mode = payload.dark_mode
+    if payload.notification_windows is not None:
+        prefs.notification_windows = payload.notification_windows
     db.commit()
     db.refresh(prefs)
     return prefs

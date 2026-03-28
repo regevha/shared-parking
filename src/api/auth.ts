@@ -1,12 +1,23 @@
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-function mapPreferences(raw: any): { darkMode: boolean } {
-  return { darkMode: raw?.dark_mode ?? true };
+export interface NotificationWindow {
+  id: string;
+  startTime: string;
+  endTime: string;
 }
 
 export interface UserPreferences {
   darkMode: boolean;
+  notificationWindows: Record<string, NotificationWindow[]>;
   // add new preference fields here
+}
+
+function mapPreferences(raw: any): UserPreferences {
+  let notificationWindows: Record<string, NotificationWindow[]> = {};
+  if (raw?.notification_windows) {
+    try { notificationWindows = JSON.parse(raw.notification_windows); } catch { /* ignore */ }
+  }
+  return { darkMode: raw?.dark_mode ?? true, notificationWindows };
 }
 
 export interface AuthUser {
