@@ -145,7 +145,6 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       width: '20%',
       render: (_, record: PendingRequest) => {
         const isOwnRequest = record.requesterId === user?.id;
-        const isRejected = record.rejectedByOwner;
 
         if (!isOwner) {
           return <span style={{ color: '#999' }}>No actions</span>;

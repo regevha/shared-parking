@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Upload, Alert, Form, Input, DatePicker, Tabs, Select, message, Switch, Divider } from 'antd';
+import { Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Upload, Alert, Input, DatePicker, Tabs, Select, message, Switch } from 'antd';
 import {
   UserOutlined,
   CarOutlined,
@@ -8,13 +8,10 @@ import {
   SettingOutlined,
   BarChartOutlined,
   SendOutlined,
-  DeleteOutlined,
   UserAddOutlined,
-  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadProps } from 'antd';
-import type { RangePickerProps } from 'antd/es/date-picker';
 import dayjs from 'dayjs';
 import './AdminPanel.css';
 
