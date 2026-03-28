@@ -16,7 +16,7 @@ A React + FastAPI parking management system. Users request parking slots; owners
 - **SQLAlchemy** + **SQLite** — ORM + database (`parking.db`)
 - **pydantic v2** — request/response schemas
 - **python-jose[cryptography]** — JWT signing (HS256)
-- **passlib[bcrypt]** — password hashing
+- **bcrypt** — password hashing (called directly; passlib dropped — incompatible with bcrypt ≥ 4.0)
 - **python-multipart** — form-data parsing for OAuth2 login
 
 ## Authentication
@@ -85,7 +85,7 @@ pip install -r requirements-test.txt   # first time only
 pytest tests/ -v
 pytest tests/ --cov=. --cov-report=term-missing  # with coverage
 ```
-- 82 tests, always green
+- 119 tests, always green
 - Uses in-memory SQLite (StaticPool) — never touches parking.db
 - Isolation mechanism: `conftest.py` uses FastAPI's `app.dependency_overrides[get_db] = override_get_db` to replace the real `get_db` (which opens `parking.db`) with a version that yields an in-memory session instead. Every endpoint uses `Depends(get_db)`, so the swap is transparent — the app code runs unchanged but all DB operations go to the throwaway in-memory database.
 
@@ -104,25 +104,31 @@ pytest tests/ --cov=. --cov-report=term-missing  # with coverage
   - `approveRequest(id, lotInfo?)`, `rejectRequest(id)`, `cancelUserRequest(id)`, `updateUserRequest(id, updates)`
 - `src/api/requests.ts` — `requestsApi.*` — maps snake_case ↔ camelCase
 - `src/api/lots.ts` — `lotsApi.*`
+- `src/api/messages.ts` — `messagesApi.getForRequest(id)` + `messagesApi.send(id, text)`; maps snake_case ↔ camelCase
+- `src/utils/statusUtils.ts` — centralised colour/label helpers: `getStatusColor`, `getStatusLabel`, `getLotStatusTagColor`, `getRequestStatusColor`, `getRequestStatusLabel`
 
 ### Backend
 - `backend/main.py` — FastAPI app, CORS, router registration
-- `backend/models.py` — `User`, `UserPreferences`, `ParkingRequest`, `Lot` SQLAlchemy models
+- `backend/models.py` — `User`, `UserPreferences`, `ParkingRequest`, `Lot`, `RequestMessage` SQLAlchemy models
+  - `UserPreferences`: `ondelete="CASCADE"` (preferences have no meaning without the owner)
+  - `RequestMessage.request_id`: nullable, `ondelete="SET NULL"` — messages are preserved for 7-day audit retention after a request is deleted; FK is nulled explicitly in `delete_request()` because SQLite does not enforce FK actions without `PRAGMA foreign_keys=ON`
 - `backend/auth.py` — JWT utilities, `get_current_user`, `require_owner`, `require_manager`
 - `backend/routers/auth.py` — `/auth/login`, `/auth/register`, `/auth/me`
 - `backend/routers/requests.py` — `/api/requests/*`
 - `backend/routers/lots.py` — `/api/lots/*` (CRUD, owner-scoped `/mine`)
+- `backend/routers/messages.py` — `/api/requests/{id}/messages` (GET + POST); access: requester or any owner/manager
 - `backend/routers/users.py` — `/api/users/*` (CRUD, manager/self restrictions); `/api/users/{id}/preferences` (GET/PATCH)
 - `backend/seed.py` — seeds 21 users, 20 requests, 17 lots
 - `backend/requirements.txt` — production dependencies
-- `backend/requirements-test.txt` — test dependencies (`pytest`, `httpx`, `pytest-cov`, `bcrypt<4.0`)
+- `backend/requirements-test.txt` — test dependencies (`pytest`, `httpx`, `pytest-cov`)
 
 ### Tests
 - `backend/tests/conftest.py` — fixtures: in-memory SQLite (StaticPool), TestClient with `get_db` override, `user_headers` / `owner_headers` / `manager_headers`, `created_request_id`, `created_lot_id`, `owner_lot_id`; patches `pwd_context` to `sha256_crypt`
 - `backend/tests/test_auth.py` — 9 tests: register, login, `/auth/me`
-- `backend/tests/test_requests.py` — 29 tests: full CRUD, approve/reject, RBAC, status guards
-- `backend/tests/test_lots.py` — 24 tests: full CRUD, `/mine`, `/owner/{name}`, dual-role PATCH
-- `backend/tests/test_users.py` — 20 tests: list, get, update, delete, role restrictions, password change, self-delete prevention
+- `backend/tests/test_requests.py` — 41 tests: full CRUD, approve/reject, RBAC, status guards
+- `backend/tests/test_lots.py` — 23 tests: full CRUD, `/mine`, `/owner/{name}`, dual-role PATCH
+- `backend/tests/test_users.py` — 30 tests: list, get, update, delete, role restrictions, password change, self-delete prevention
+- `backend/tests/test_messages.py` — 16 tests: send/read messages, RBAC, audit retention (messages preserved with `request_id=NULL` after request deletion)
 
 ### Screens
 | File | Route | Menu Label |
@@ -135,7 +141,9 @@ pytest tests/ --cov=. --cov-report=term-missing  # with coverage
 | `LotCalendarView.tsx` | `/lot-calendar` | Lot Calendar (Owner only) |
 | `MyLots.tsx` | `/my-lots` | My Lots (Owner only) |
 | `AdminPanel.tsx` | `/admin` | Admin Panel (Manager only) |
+| `NotificationWindows.tsx` | `/notifications` | Notification Windows |
 | `ParkingRequestForm.tsx` | `/submit-request` | (via "+ New Request" button) |
+| `RequestDetail.tsx` | `/request/:id` | (navigated to from request rows) |
 
 ### Styles
 - `src/components/CalendarView.css` — shared by CalendarView and LotCalendarView
@@ -178,9 +186,12 @@ Both `CalendarView` and `LotCalendarView`:
 
 ## Git / Branching
 - Main branch: `master`
-- Current branch: `feature/auth`
+- **Never commit directly to `master`.** Always create a feature branch for any change, no matter how small, and open a PR to merge it.
+- Branch naming convention: `feature/<short-description>` (e.g. `feature/messages-api`, `feature/error-handling`)
+- Current branch: `master`
 
 ## Pending TODOs
 1. Improve overlapping events display — hover tooltip for narrow calendar events
-2. Add info banner to AdminPanel screen
-3. Review ParkingRequestForm — info banner, layout, field consistency
+2. Wire AdminPanel to real API (currently mock/static data)
+3. Empty state UI for all tables (currently shows empty table when no data)
+4. Audit trail — `created_at` / `updated_at` timestamps on records

@@ -117,14 +117,15 @@ With coverage report:
 pytest tests/ --cov=. --cov-report=term-missing
 ```
 
-The suite runs **82 tests** against a fresh in-memory SQLite database — it never touches `parking.db`.
+The suite runs **119 tests** against a fresh in-memory SQLite database — it never touches `parking.db`.
 
 | File | Tests | Covers |
 |------|-------|--------|
 | `tests/test_auth.py` | 9 | Register, login, `/auth/me` |
-| `tests/test_requests.py` | 29 | Full CRUD, approve/reject, RBAC |
-| `tests/test_lots.py` | 24 | Full CRUD, `/mine`, `/owner/{name}`, RBAC |
-| `tests/test_users.py` | 20 | List, get, update, delete, RBAC |
+| `tests/test_requests.py` | 41 | Full CRUD, approve/reject, RBAC, status guards |
+| `tests/test_lots.py` | 23 | Full CRUD, `/mine`, `/owner/{name}`, RBAC |
+| `tests/test_users.py` | 30 | List, get, update, delete, RBAC, password change, preferences |
+| `tests/test_messages.py` | 16 | Send/read messages, RBAC, audit retention after request deletion |
 
 Every endpoint is tested for: success cases · 401 (no/bad token) · 403 (wrong role) · 404 (not found) · 400 (business rule violations) · 422 (validation errors).
 
@@ -148,24 +149,29 @@ parking-mockup/
 │   │   ├── auth.py           # POST /auth/login, /register  GET /auth/me
 │   │   ├── requests.py       # /api/requests endpoints
 │   │   ├── lots.py           # /api/lots endpoints
+│   │   ├── messages.py       # /api/requests/{id}/messages endpoints
 │   │   └── users.py          # /api/users endpoints
 │   └── tests/
 │       ├── conftest.py       # Fixtures: in-memory DB, TestClient, auth helpers
 │       ├── test_auth.py
 │       ├── test_requests.py
 │       ├── test_lots.py
-│       └── test_users.py
+│       ├── test_users.py
+│       └── test_messages.py
 └── src/
     ├── api/
     │   ├── client.ts         # Base fetch wrapper (auto-attaches Bearer token)
     │   ├── auth.ts           # Login / me API calls
     │   ├── requests.ts       # Parking request API calls
     │   ├── lots.ts           # Lots API calls
+    │   ├── messages.ts       # Request message API calls
     │   └── users.ts          # Users API calls
     ├── components/           # Screen components
     ├── contexts/
     │   ├── AuthContext.tsx   # Token storage, login/logout, useAuth() hook
     │   └── RequestsContext.tsx  # Global request + lot state, loaded from API
+    ├── utils/
+    │   └── statusUtils.ts    # Centralised status colour/label helpers
     └── types/
         └── index.ts          # Shared TypeScript types
 ```
@@ -212,6 +218,15 @@ Authorization: Bearer <token>
 | POST | `/api/lots` | Manager | Create lot |
 | PATCH | `/api/lots/{id}` | Owner / Manager | Update status/owner |
 | DELETE | `/api/lots/{id}` | Manager | Delete lot |
+
+### Messages
+
+| Method | Path | Role | Description |
+|--------|------|------|-------------|
+| GET | `/api/requests/{id}/messages` | Requester / Owner / Manager | List messages for a request |
+| POST | `/api/requests/{id}/messages` | Requester / Owner / Manager | Send a message on a request |
+
+Messages survive request deletion for auditing — `request_id` is set to `NULL` rather than cascading.
 
 ### Users
 

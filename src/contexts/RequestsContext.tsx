@@ -35,7 +35,7 @@ interface RequestsContextType {
   updateUserRequest: (requestId: string, updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>) => Promise<void>;
 }
 
-const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
+export const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
 
 export const useRequests = () => {
   const context = useContext(RequestsContext);
