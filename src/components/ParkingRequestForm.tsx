@@ -262,6 +262,10 @@ const ParkingRequestForm: React.FC = () => {
           <li>End time is auto-calculated and cannot exceed 20:00</li>
         </ul>
       </Card>
+
+      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+        <strong>New Request:</strong> Submit a parking request for a specific date and time slot; an owner will review and approve or reject it.
+      </Card>
     </div>
   );
 };

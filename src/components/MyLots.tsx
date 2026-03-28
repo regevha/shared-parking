@@ -67,7 +67,7 @@ const MyLots: React.FC = () => {
         columns={columns}
         dataSource={ownerLots}
         rowKey="id"
-        pagination={false}
+        pagination={{ pageSize: 10, hideOnSinglePage: true }}
         bordered
       />
       {ownerLots.length === 0 && (
