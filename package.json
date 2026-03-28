@@ -35,6 +35,15 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "moduleNameMapper": {
+      "^@rc-component/.+/locale/.+$": "<rootDir>/src/__mocks__/emptyLocale.js",
+      "^@rc-component/picker/generate/dayjs$": "<rootDir>/node_modules/@rc-component/picker/lib/generate/dayjs.js",
+      "^@rc-component/picker/generate/(.+)$": "<rootDir>/node_modules/@rc-component/picker/lib/generate/$1.js",
+      "^react-router-dom$": "<rootDir>/node_modules/react-router-dom/dist/index.js",
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js"
+    }
+  },
   "browserslist": {
     "production": [
       ">0.2%",

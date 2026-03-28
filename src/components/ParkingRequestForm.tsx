@@ -118,7 +118,7 @@ const ParkingRequestForm: React.FC = () => {
       {/* Warning Banner */}
       {hasMaxRequests && (
         <Alert
-          message="Request Limit Reached"
+          title="Request Limit Reached"
           description="You currently have the maximum number of active parking requests (3). You cannot submit new requests until one of your existing requests is approved or cancelled."
           type="warning"
           showIcon
