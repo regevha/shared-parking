@@ -9,7 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import './AllApprovals.css';
 
 const AllApprovals: React.FC = () => {
-  const { approvedRequests } = useRequests();
+  const { approvedRequests, loading } = useRequests();
   const { user } = useAuth();
 
   const columns: ColumnsType<ParkingRequest> = [
@@ -132,6 +132,7 @@ const AllApprovals: React.FC = () => {
         columns={columns}
         dataSource={approvedRequests}
         rowKey="id"
+        loading={loading}
         pagination={{ pageSize: 10, hideOnSinglePage: true }}
         scroll={{ x: 1000 }}
         size="middle"

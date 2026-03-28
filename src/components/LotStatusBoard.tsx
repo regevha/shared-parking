@@ -122,7 +122,9 @@ const LotStatusBoard: React.FC = () => {
       </Card>
 
       {/* Floors Collapse */}
-      {loading ? <Spin /> : <Collapse items={floorItems} accordion />}
+      <Spin spinning={loading}>
+        <Collapse items={floorItems} accordion />
+      </Spin>
 
       {/* Summary Stats */}
       <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>

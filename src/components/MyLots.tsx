@@ -41,7 +41,7 @@ const columns: ColumnsType<LotData> = [
 ];
 
 const MyLots: React.FC = () => {
-  const { ownerLots } = useRequests();
+  const { ownerLots, loading } = useRequests();
   const { user } = useAuth();
 
   return (
@@ -67,6 +67,7 @@ const MyLots: React.FC = () => {
         columns={columns}
         dataSource={ownerLots}
         rowKey="id"
+        loading={loading}
         pagination={{ pageSize: 10, hideOnSinglePage: true }}
         bordered
       />
