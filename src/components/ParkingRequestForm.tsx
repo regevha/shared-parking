@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Form, DatePicker, Select, Button, Card, Alert, notification, Row, Col, Tag } from 'antd';
 import { useRequests } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
+import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import './ParkingRequestForm.css';
@@ -146,8 +147,8 @@ const ParkingRequestForm: React.FC = () => {
                   </Col>
                   <Col xs={24} sm={9}>
                     <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Status</div>
-                    <Tag color={req.status === 'approved' ? 'green' : 'blue'}>
-                      {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                    <Tag color={getRequestStatusColor(req.status)}>
+                      {getRequestStatusLabel(req.status)}
                     </Tag>
                   </Col>
                 </Row>

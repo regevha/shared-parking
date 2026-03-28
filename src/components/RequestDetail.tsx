@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { messagesApi, Message } from '../api/messages';
+import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import './RequestDetail.css';
 
 const RequestDetail: React.FC = () => {
@@ -47,25 +48,6 @@ const RequestDetail: React.FC = () => {
     );
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'approved': return 'green';
-      case 'pending':  return 'blue';
-      case 'rejected': return 'red';
-      case 'expired':  return 'orange';
-      default:         return 'default';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'approved': return 'Approved';
-      case 'pending':  return 'Pending';
-      case 'rejected': return 'Rejected';
-      case 'expired':  return 'Expired';
-      default:         return status;
-    }
-  };
 
   const handleSendMessage = async () => {
     const text = newMessage.trim();
@@ -111,8 +93,8 @@ const RequestDetail: React.FC = () => {
             <div className="info-item">
               <div className="label">Status</div>
               <div className="value">
-                <Tag color={getStatusColor(request.status)}>
-                  {getStatusLabel(request.status)}
+                <Tag color={getRequestStatusColor(request.status)}>
+                  {getRequestStatusLabel(request.status)}
                 </Tag>
               </div>
             </div>

@@ -6,6 +6,7 @@ import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
+import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import './MyRequests.css';
 
 interface EditFormValues {
@@ -72,27 +73,6 @@ const MyRequests: React.FC = () => {
     (req: ParkingRequest) => req.status === 'pending' || req.status === 'approved'
   );
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return 'green';
-      case 'pending':
-        return 'blue';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return 'Approved';
-      case 'pending':
-        return 'Pending';
-      default:
-        return status;
-    }
-  };
 
   const handleEdit = (request: ParkingRequest) => {
     setEditingRequest(request);
@@ -194,8 +174,8 @@ const MyRequests: React.FC = () => {
       key: 'status',
       width: 90,
       render: (status: string) => (
-        <Tag color={getStatusColor(status)}>
-          {getStatusLabel(status)}
+        <Tag color={getRequestStatusColor(status)}>
+          {getRequestStatusLabel(status)}
         </Tag>
       ),
     },
@@ -268,7 +248,7 @@ const MyRequests: React.FC = () => {
             <Card key={record.id} size="small" className="request-card">
               <div className="request-card-header">
                 <strong>{record.id}</strong>
-                <Tag color={getStatusColor(record.status)}>{getStatusLabel(record.status)}</Tag>
+                <Tag color={getRequestStatusColor(record.status)}>{getRequestStatusLabel(record.status)}</Tag>
               </div>
               <div className="request-card-row">
                 <span className="request-card-label">Date</span>

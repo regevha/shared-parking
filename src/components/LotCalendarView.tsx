@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { LotData } from '../api/lots';
+import { getRequestStatusColor, getRequestStatusLabel, getLotStatusTagColor } from '../utils/statusUtils';
 import './CalendarView.css';
 import './LotCalendarView.css';
 
@@ -287,7 +288,7 @@ const LotCalendarView: React.FC = () => {
           <Descriptions.Item label="Duration">{a.duration}h</Descriptions.Item>
           <Descriptions.Item label="Lot">{a.lotId}</Descriptions.Item>
           <Descriptions.Item label="Floor">{a.floor}</Descriptions.Item>
-          <Descriptions.Item label="Status"><Tag color="green">Approved</Tag></Descriptions.Item>
+          <Descriptions.Item label="Status"><Tag color={getRequestStatusColor('approved')}>{getRequestStatusLabel('approved')}</Tag></Descriptions.Item>
           <Descriptions.Item label="Approved At">{dayjs(a.approvedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
         </Descriptions>
       );
@@ -302,7 +303,7 @@ const LotCalendarView: React.FC = () => {
             <Descriptions.Item label="Date">{dayjs(r.date).format('DD/MM/YYYY')}</Descriptions.Item>
             <Descriptions.Item label="Time">{r.startTime} – {r.endTime}</Descriptions.Item>
             <Descriptions.Item label="Duration">{r.duration}h</Descriptions.Item>
-            <Descriptions.Item label="Status"><Tag color="orange">Pending</Tag></Descriptions.Item>
+            <Descriptions.Item label="Status"><Tag color={getRequestStatusColor('pending')}>{getRequestStatusLabel('pending')}</Tag></Descriptions.Item>
             <Descriptions.Item label="Submitted">{dayjs(r.submittedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
           </Descriptions>
           <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
@@ -320,7 +321,7 @@ const LotCalendarView: React.FC = () => {
         <Descriptions.Item label="Lot ID">{l.id}</Descriptions.Item>
         <Descriptions.Item label="Floor">{l.floor}</Descriptions.Item>
         <Descriptions.Item label="Owner">{l.owner ?? 'Unowned'}</Descriptions.Item>
-        <Descriptions.Item label="Status"><Tag color="red">Blocked</Tag></Descriptions.Item>
+        <Descriptions.Item label="Status"><Tag color={getLotStatusTagColor('blocked')}>Blocked</Tag></Descriptions.Item>
         <Descriptions.Item label="Blocked Until">{dayjs(l.blockedUntil).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
       </Descriptions>
     );
