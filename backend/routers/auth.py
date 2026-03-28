@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 import uuid
 
 from database import get_db
@@ -18,6 +18,10 @@ class RegisterRequest(BaseModel):
     role: str = "user"  # user | owner | manager
 
 
+class PreferencesOut(BaseModel):
+    dark_mode: bool = True
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -25,6 +29,7 @@ class TokenResponse(BaseModel):
     name: str
     email: str
     role: str
+    preferences: PreferencesOut
 
 
 class UserOut(BaseModel):
@@ -32,6 +37,14 @@ class UserOut(BaseModel):
     name: str
     email: str
     role: str
+    preferences: PreferencesOut
+
+    @field_validator('preferences', mode='before')
+    @classmethod
+    def coerce_prefs_list(cls, v):
+        if isinstance(v, list):
+            return v[0] if v else PreferencesOut()
+        return v
 
     class Config:
         from_attributes = True
@@ -50,6 +63,9 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
         role=payload.role,
     )
     db.add(user)
+    db.flush()  # get user.id before creating preferences
+
+    db.add(models.UserPreferences(user_id=user.id))
     db.commit()
     db.refresh(user)
     return user
@@ -69,15 +85,24 @@ def login(
         )
 
     token = auth_utils.create_access_token({"sub": user.id, "role": user.role})
+    prefs = user.preferences[0] if user.preferences else models.UserPreferences(user_id=user.id)
     return TokenResponse(
         access_token=token,
         user_id=user.id,
         name=user.name,
         email=user.email,
         role=user.role,
+        preferences=PreferencesOut(dark_mode=prefs.dark_mode),
     )
 
 
 @router.get("/me", response_model=UserOut)
 def me(current_user: models.User = Depends(auth_utils.get_current_user)):
-    return current_user
+    prefs = current_user.preferences[0] if current_user.preferences else models.UserPreferences(user_id=current_user.id)
+    return UserOut(
+        id=current_user.id,
+        name=current_user.name,
+        email=current_user.email,
+        role=current_user.role,
+        preferences=PreferencesOut(dark_mode=prefs.dark_mode),
+    )

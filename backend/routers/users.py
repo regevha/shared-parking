@@ -91,6 +91,41 @@ def update_user(
     return user
 
 
+@router.get("/{user_id}/preferences", response_model=schemas.PreferencesOut)
+def get_preferences(
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Return a user's preferences. Manager sees any user; others can only see themselves."""
+    if current_user.role != "manager" and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorised to view these preferences")
+    prefs = db.query(models.UserPreferences).filter(models.UserPreferences.user_id == user_id).first()
+    if not prefs:
+        raise HTTPException(status_code=404, detail="Preferences not found")
+    return prefs
+
+
+@router.patch("/{user_id}/preferences", response_model=schemas.PreferencesOut)
+def update_preferences(
+    user_id: str,
+    payload: schemas.PreferencesUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Update a user's preferences. Manager can update any user; others can only update themselves."""
+    if current_user.role != "manager" and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorised to update these preferences")
+    prefs = db.query(models.UserPreferences).filter(models.UserPreferences.user_id == user_id).first()
+    if not prefs:
+        raise HTTPException(status_code=404, detail="Preferences not found")
+    if payload.dark_mode is not None:
+        prefs.dark_mode = payload.dark_mode
+    db.commit()
+    db.refresh(prefs)
+    return prefs
+
+
 @router.delete("/{user_id}", status_code=204)
 def delete_user(
     user_id: str,

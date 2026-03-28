@@ -91,7 +91,7 @@ Runs on **http://localhost:3000** — start the backend first so the API is reac
 | `sqlalchemy` | ORM — maps `User`, `ParkingRequest`, `Lot` Python classes to SQLite tables |
 | `pydantic` | Data validation — powers all request schemas (`LotCreate`, `UserUpdate`, etc.) and response models |
 | `python-jose[cryptography]` | Creates and verifies JWT tokens issued at login. `[cryptography]` provides the HS256 signing backend |
-| `passlib[bcrypt]` | Password hashing — `hash_password()` and `verify_password()` in `auth.py` store only bcrypt hashes, never plaintext |
+| `bcrypt` | Password hashing — `hash_password()` and `verify_password()` in `auth.py` call bcrypt directly (passlib dropped — incompatible with bcrypt ≥ 4.0) |
 | `python-multipart` | Form-data parser — **required** by FastAPI's `OAuth2PasswordRequestForm`; the `/auth/login` endpoint receives `username`/`password` as form fields, not JSON |
 
 ### Test packages (`requirements-test.txt`)
@@ -101,7 +101,6 @@ Runs on **http://localhost:3000** — start the backend first so the API is reac
 | `pytest` | Test runner — discovers and executes all `test_*.py` files |
 | `httpx` | HTTP client — required by Starlette's `TestClient` transport layer (must be installed even though you never call it directly) |
 | `pytest-cov` | Coverage plugin — enables `pytest --cov=. --cov-report=term-missing` |
-| `bcrypt<4.0` | Version pin — `passlib 1.7.4` uses a bcrypt API that was removed in `bcrypt 4.0`. Tests patch `pwd_context` to `sha256_crypt` at runtime; this pin prevents accidental upgrades in CI |
 
 ---
 
@@ -129,7 +128,6 @@ The suite runs **82 tests** against a fresh in-memory SQLite database — it nev
 
 Every endpoint is tested for: success cases · 401 (no/bad token) · 403 (wrong role) · 404 (not found) · 400 (business rule violations) · 422 (validation errors).
 
-> **Note:** `passlib 1.7.4` is incompatible with `bcrypt >= 4.0`. The test suite patches password hashing to use `sha256_crypt` automatically, and `requirements-test.txt` pins `bcrypt<4.0` for CI safety.
 
 ---
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Typography, Card, Alert, Divider, Tag, Space } from 'antd';
+import { Form, Input, Button, Typography, Card, Alert, Divider, Tag, Space, theme } from 'antd';
 import { UserOutlined, LockOutlined, CrownOutlined, TeamOutlined } from '@ant-design/icons';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -17,6 +17,7 @@ const DEMO_ACCOUNTS = [
 ];
 
 const LoginPage: React.FC = () => {
+  const { token: { colorBgLayout } } = theme.useToken();
   const { login } = useAuth();
   const [form] = Form.useForm<LoginForm>();
   const [loading, setLoading] = useState(false);
@@ -45,7 +46,7 @@ const LoginPage: React.FC = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'var(--bg-color, #0a0a0a)',
+      background: colorBgLayout,
       padding: 24,
     }}>
       <Card style={{ width: '100%', maxWidth: 420 }}>

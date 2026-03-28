@@ -94,6 +94,7 @@ LOTS = [
 def seed():
     db = SessionLocal()
     try:
+        db.query(models.UserPreferences).delete()
         db.query(models.ParkingRequest).delete()
         db.query(models.Lot).delete()
         db.query(models.User).delete()
@@ -107,6 +108,7 @@ def seed():
                 password_hash=hash_password("password123"),
                 role=u["role"],
             ))
+            db.add(models.UserPreferences(user_id=u["id"]))
 
         all_requests = PENDING_REQUESTS + APPROVED_REQUESTS + REJECTED_REQUESTS
         for r in all_requests:
