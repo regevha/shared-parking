@@ -26,6 +26,8 @@ class UserPreferences(Base):
     # CASCADE: preferences have no meaning without their owner — delete with the user
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     dark_mode = Column(Boolean, nullable=False, default=True)
+    # JSON-encoded dict: { "Monday": [{"id":"..","startTime":"..","endTime":".."}], … }
+    notification_windows = Column(String, nullable=True, default='{}')
     # ── add new preference columns here ────────────────────────────────────────
 
     user = relationship("User", back_populates="preferences")

@@ -1,11 +1,28 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from database import engine, Base
-from routers import requests, lots, auth, users, messages
+from routers import requests, lots, auth, users, messages, config
 
 # Create all tables on startup
 Base.metadata.create_all(bind=engine)
+
+# ── Lightweight startup migrations (idempotent ALTER TABLE statements) ────────
+def _run_migrations() -> None:
+    """Add new columns to existing tables without requiring a full reseed."""
+    with engine.connect() as conn:
+        migrations = [
+            "ALTER TABLE user_preferences ADD COLUMN notification_windows TEXT DEFAULT '{}'",
+        ]
+        for sql in migrations:
+            try:
+                conn.execute(text(sql))
+                conn.commit()
+            except Exception:
+                pass  # Column already exists — safe to ignore
+
+_run_migrations()
 
 app = FastAPI(
     title="Parking Management API",
@@ -27,6 +44,7 @@ app.include_router(requests.router)
 app.include_router(messages.router)
 app.include_router(lots.router)
 app.include_router(users.router)
+app.include_router(config.router)
 
 
 @app.get("/")

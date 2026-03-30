@@ -23,6 +23,7 @@ import { requestsApi } from '../api/requests';
 import type { ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
+import { configApi, SystemConfig } from '../api/config';
 import './AdminPanel.css';
 
 const { Sider, Content } = Layout;
@@ -66,6 +67,18 @@ const AdminPanel: React.FC = () => {
   const [broadcastAudience,   setBroadcastAudience]   = useState<'owners' | 'users' | 'both'>('both');
   const [isBlackoutSimulated, setIsBlackoutSimulated] = useState(false);
   const [hasImportedData,     setHasImportedData]     = useState(false);
+
+  // ── System config ───────────────────────────────────────────────────────────
+  const [systemConfig,  setSystemConfig]  = useState<SystemConfig | null>(null);
+  const [configLoading, setConfigLoading] = useState(false);
+
+  useEffect(() => {
+    setConfigLoading(true);
+    configApi.get()
+      .then(setSystemConfig)
+      .catch(() => {/* non-critical — fallback text shown */})
+      .finally(() => setConfigLoading(false));
+  }, []);
 
   // ── Initial data load ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -526,40 +539,32 @@ const AdminPanel: React.FC = () => {
         return (
           <div>
             <h2>System Configuration</h2>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Card title="System Settings">
-                  <Space direction="vertical" style={{ width: '100%' }}>
-                    <div><strong>Timezone:</strong> UTC+0 (Server time)</div>
-                    <div><strong>Blackout Period:</strong> 22:00 – 06:00</div>
-                    <div><strong>Max Active Requests per User:</strong> 3</div>
-                    <div><strong>Booking Window:</strong> 08:00 – 20:00</div>
-                  </Space>
-                </Card>
-              </Col>
-              <Col span={12}>
-                <Card title="Default Notification Windows">
-                  <Space direction="vertical" style={{ width: '100%' }}>
-                    <Tag color="blue">09:00 – 12:00</Tag>
-                    <Tag color="blue">14:00 – 17:00</Tag>
-                  </Space>
-                  <Button
-                    type="primary"
-                    size="small"
-                    style={{ marginTop: '16px' }}
-                    onClick={() => notification.info({
-                      message: 'Not yet implemented',
-                      description: 'Editing default notification windows requires backend support.',
-                    })}
-                  >
-                    Edit Default Windows
-                  </Button>
-                </Card>
-              </Col>
-            </Row>
+            <Spin spinning={configLoading}>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Card title="System Settings">
+                    <Space direction="vertical" style={{ width: '100%' }}>
+                      <div><strong>Timezone:</strong> {systemConfig?.timezone ?? '—'}</div>
+                      <div>
+                        <strong>Blackout Period:</strong>{' '}
+                        {systemConfig ? `${systemConfig.blackoutStart} – ${systemConfig.blackoutEnd}` : '—'}
+                      </div>
+                      <div>
+                        <strong>Max Active Requests per User:</strong>{' '}
+                        {systemConfig?.maxActiveRequestsPerUser ?? '—'}
+                      </div>
+                      <div>
+                        <strong>Booking Window:</strong>{' '}
+                        {systemConfig ? `${systemConfig.bookingWindowStart} – ${systemConfig.bookingWindowEnd}` : '—'}
+                      </div>
+                    </Space>
+                  </Card>
+                </Col>
+              </Row>
+            </Spin>
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>System Configuration:</strong> View global system settings. Editable
-              configuration requires additional backend support.
+              <strong>System Configuration:</strong> Read-only view of global system constants
+              enforced by the backend.
             </Card>
           </div>
         );

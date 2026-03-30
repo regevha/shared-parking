@@ -1,4 +1,5 @@
 import { api } from './client';
+import type { NotificationWindow } from './auth';
 
 export interface UserData {
   id: string;
@@ -16,16 +17,22 @@ export interface UserUpdatePayload {
 
 export interface PreferencesData {
   darkMode: boolean;
+  notificationWindows: Record<string, NotificationWindow[]>;
   // add new preference fields here
 }
 
 export interface PreferencesUpdatePayload {
   dark_mode?: boolean;
+  notification_windows?: string; // JSON-serialized Record<string, NotificationWindow[]>
   // add new preference fields here (snake_case — matches backend)
 }
 
 function mapPreferences(raw: any): PreferencesData {
-  return { darkMode: raw.dark_mode ?? true };
+  let notificationWindows: Record<string, NotificationWindow[]> = {};
+  if (raw?.notification_windows) {
+    try { notificationWindows = JSON.parse(raw.notification_windows); } catch { /* ignore */ }
+  }
+  return { darkMode: raw.dark_mode ?? true, notificationWindows };
 }
 
 export const usersApi = {

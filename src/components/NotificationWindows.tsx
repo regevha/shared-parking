@@ -1,126 +1,116 @@
-import React, { useState } from 'react';
-import { Card, Button, TimePicker, Alert, Space, Row, Col, Tag, Modal, Form, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, TimePicker, Alert, Space, Row, Col, Tag, Modal, Form, notification, Spin } from 'antd';
 import { PlusOutlined, DeleteOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { useAuth } from '../contexts/AuthContext';
+import { usersApi } from '../api/users';
+import type { NotificationWindow } from '../api/auth';
 import './NotificationWindows.css';
-
-interface NotificationWindow {
-  id: string;
-  startTime: string;
-  endTime: string;
-}
 
 interface DayWindows {
   [key: string]: NotificationWindow[];
 }
 
 const DAYS_OF_WEEK = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday'
+  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
 ];
 
-// Mock data - hardcoded notification windows
-const initialWindows: DayWindows = {
-  'Monday': [
-    { id: '1', startTime: '09:00', endTime: '12:00' },
-    { id: '2', startTime: '14:00', endTime: '17:00' }
-  ],
-  'Tuesday': [
-    { id: '3', startTime: '10:00', endTime: '15:00' }
-  ],
-  'Wednesday': [],
-  'Thursday': [
-    { id: '4', startTime: '08:00', endTime: '11:00' }
-  ],
-  'Friday': [],
-  'Saturday': [],
-  'Sunday': []
-};
+const BLACKOUT_START = '22:00';
+const BLACKOUT_END = '06:00';
+const MAX_WINDOWS_PER_DAY = 2;
+
+// Ensure every day of the week has an entry (even if empty)
+function normalise(raw: Record<string, NotificationWindow[]>): DayWindows {
+  const out: DayWindows = {};
+  DAYS_OF_WEEK.forEach(day => { out[day] = raw[day] ?? []; });
+  return out;
+}
+
+// Convert HH:MM to minutes since midnight
+function timeToMinutes(time: string): number {
+  const [h, m] = time.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function timeRangesOverlap(s1: string, e1: string, s2: string, e2: string): boolean {
+  return timeToMinutes(s1) < timeToMinutes(e2) && timeToMinutes(e1) > timeToMinutes(s2);
+}
+
+// Check if a window overlaps the overnight blackout period (22:00–06:00)
+function overlapsWithBlackout(startTime: string, endTime: string): boolean {
+  const bs = timeToMinutes(BLACKOUT_START); // 1320
+  const be = timeToMinutes(BLACKOUT_END);   // 360
+  const ws = timeToMinutes(startTime);
+  const we = timeToMinutes(endTime);
+  // Blackout spans midnight: any window that starts at/after 22:00 or ends at/before 06:00
+  return ws >= bs || we <= be;
+}
 
 const NotificationWindows: React.FC = () => {
-  const [windows, setWindows] = useState<DayWindows>(initialWindows);
+  const { user, updateUser } = useAuth();
+  const [windows, setWindows] = useState<DayWindows>(normalise({}));
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [form] = Form.useForm();
 
-  const BLACKOUT_START = '22:00';
-  const BLACKOUT_END = '06:00';
-  const MAX_WINDOWS_PER_DAY = 2;
+  // ── Load preferences on mount ─────────────────────────────────────────────
+  useEffect(() => {
+    if (!user) return;
+    usersApi.getPreferences(user.id)
+      .then(prefs => setWindows(normalise(prefs.notificationWindows)))
+      .catch(() => notification.error({ message: 'Failed to load notification preferences' }))
+      .finally(() => setLoading(false));
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Check if two time ranges overlap
-  const timeRangesOverlap = (start1: string, end1: string, start2: string, end2: string): boolean => {
-    const start1Minutes = timeToMinutes(start1);
-    const end1Minutes = timeToMinutes(end1);
-    const start2Minutes = timeToMinutes(start2);
-    const end2Minutes = timeToMinutes(end2);
-
-    return start1Minutes < end2Minutes && end1Minutes > start2Minutes;
-  };
-
-  // Convert HH:MM to minutes since midnight
-  const timeToMinutes = (time: string): number => {
-    const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
-  };
-
-  // Check if a time range overlaps with blackout period (22:00-06:00)
-  const overlapsWithBlackout = (startTime: string, endTime: string): boolean => {
-    const blackoutStart = timeToMinutes(BLACKOUT_START);
-    const blackoutEnd = timeToMinutes(BLACKOUT_END);
-    const windowStart = timeToMinutes(startTime);
-    const windowEnd = timeToMinutes(endTime);
-
-    // Handle overnight blackout period (22:00 to 06:00 next day)
-    if (blackoutStart > blackoutEnd) {
-      // Blackout spans midnight
-      return (windowStart < blackoutEnd || windowStart >= blackoutStart) ||
-             (windowEnd <= blackoutEnd && windowEnd > blackoutStart) ||
-             (windowStart <= blackoutEnd && windowEnd >= blackoutStart);
-    } else {
-      // Normal case
-      return windowStart < blackoutEnd && windowEnd > blackoutStart;
+  // ── Persist windows to backend ────────────────────────────────────────────
+  const persist = async (next: DayWindows) => {
+    if (!user) return;
+    setSaving(true);
+    try {
+      const updated = await usersApi.updatePreferences(user.id, {
+        notification_windows: JSON.stringify(next),
+      });
+      // Keep AuthContext in sync so other components see the latest preferences
+      updateUser({ preferences: { ...user.preferences, notificationWindows: updated.notificationWindows } });
+    } catch {
+      notification.error({ message: 'Failed to save notification preferences' });
+    } finally {
+      setSaving(false);
     }
   };
 
+  // ── Handlers ──────────────────────────────────────────────────────────────
   const handleAddWindow = (day: string) => {
     setSelectedDay(day);
     setAddModalVisible(true);
     form.resetFields();
   };
 
-  const handleDeleteWindow = (day: string, windowId: string) => {
-    setWindows(prev => ({
-      ...prev,
-      [day]: prev[day].filter(w => w.id !== windowId)
-    }));
-    message.success('Notification window deleted');
+  const handleDeleteWindow = async (day: string, windowId: string) => {
+    const next = { ...windows, [day]: windows[day].filter(w => w.id !== windowId) };
+    setWindows(next);
+    await persist(next);
+    notification.success({ message: 'Notification window removed' });
   };
 
   const handleModalOk = () => {
-    form.validateFields().then((values) => {
+    form.validateFields().then(values => {
       const startTime = values.timeRange[0].format('HH:mm');
-      const endTime = values.timeRange[1].format('HH:mm');
+      const endTime   = values.timeRange[1].format('HH:mm');
 
-      // Check for overlaps with existing windows
-      const existingWindows = windows[selectedDay] || [];
-      const hasOverlap = existingWindows.some(window =>
-        timeRangesOverlap(startTime, endTime, window.startTime, window.endTime)
+      const hasOverlap = (windows[selectedDay] || []).some(w =>
+        timeRangesOverlap(startTime, endTime, w.startTime, w.endTime)
       );
-
       if (hasOverlap) {
-        message.error('This time range overlaps with an existing notification window');
+        notification.error({ message: 'This time range overlaps with an existing notification window' });
         return;
       }
 
-      // Check blackout overlap and show warning
       if (overlapsWithBlackout(startTime, endTime)) {
         Modal.confirm({
           title: 'Blackout Period Warning',
-          content: 'This notification window overlaps with the blackout period (22:00-06:00). Notifications will not be delivered during this time.',
+          content: 'This notification window overlaps with the blackout period (22:00–06:00). Notifications will not be delivered during this time.',
           okText: 'Save Anyway',
           cancelText: 'Cancel',
           onOk: () => saveWindow(startTime, endTime),
@@ -131,31 +121,29 @@ const NotificationWindows: React.FC = () => {
     });
   };
 
-  const saveWindow = (startTime: string, endTime: string) => {
-    const newWindow: NotificationWindow = {
-      id: Date.now().toString(),
-      startTime,
-      endTime
-    };
-
-    setWindows(prev => ({
-      ...prev,
-      [selectedDay]: [...(prev[selectedDay] || []), newWindow]
-    }));
-
+  const saveWindow = async (startTime: string, endTime: string) => {
+    const newWindow: NotificationWindow = { id: Date.now().toString(), startTime, endTime };
+    const next = { ...windows, [selectedDay]: [...(windows[selectedDay] || []), newWindow] };
+    setWindows(next);
     setAddModalVisible(false);
-    message.success('Notification window added');
+    await persist(next);
+    notification.success({ message: 'Notification window added' });
   };
 
-  const canAddWindow = (day: string): boolean => {
-    return (windows[day] || []).length < MAX_WINDOWS_PER_DAY;
-  };
+  const canAddWindow = (day: string) => (windows[day] || []).length < MAX_WINDOWS_PER_DAY;
+
+  if (loading) {
+    return (
+      <div className="notification-windows" style={{ textAlign: 'center', paddingTop: '80px' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="notification-windows">
       <h1>Notification Window Preferences</h1>
 
-      {/* Permanent blackout notice */}
       <Alert
         message="No notifications are delivered between 22:00 and 06:00"
         description="This blackout period applies system-wide to prevent disturbances during nighttime hours."
@@ -164,67 +152,62 @@ const NotificationWindows: React.FC = () => {
         style={{ marginBottom: '24px' }}
       />
 
-      <Row gutter={[16, 16]}>
-        {DAYS_OF_WEEK.map(day => (
-          <Col xs={24} sm={12} lg={8} key={day}>
-            <Card
-              title={
-                <Space>
-                  <ClockCircleOutlined />
-                  {day}
-                </Space>
-              }
-              size="small"
-            >
-              <div style={{ minHeight: '120px' }}>
-                {windows[day] && windows[day].length > 0 ? (
-                  <Space direction="vertical" style={{ width: '100%' }}>
-                    {windows[day].map(window => (
-                      <div key={window.id} className="window-item">
-                        <Tag color="blue">
-                          {window.startTime} - {window.endTime}
-                        </Tag>
-                        <Button
-                          type="text"
-                          size="small"
-                          danger
-                          icon={<DeleteOutlined />}
-                          onClick={() => handleDeleteWindow(day, window.id)}
-                        />
-                      </div>
-                    ))}
-                  </Space>
-                ) : (
-                  <div style={{ color: '#999', fontStyle: 'italic', padding: '20px 0' }}>
-                    System default applies
-                  </div>
-                )}
-              </div>
+      <Spin spinning={saving} tip="Saving…">
+        <Row gutter={[16, 16]}>
+          {DAYS_OF_WEEK.map(day => (
+            <Col xs={24} sm={12} lg={8} key={day}>
+              <Card
+                title={<Space><ClockCircleOutlined />{day}</Space>}
+                size="small"
+              >
+                <div style={{ minHeight: '120px' }}>
+                  {windows[day] && windows[day].length > 0 ? (
+                    <Space direction="vertical" style={{ width: '100%' }}>
+                      {windows[day].map(w => (
+                        <div key={w.id} className="window-item">
+                          <Tag color="blue">{w.startTime} – {w.endTime}</Tag>
+                          <Button
+                            type="text"
+                            size="small"
+                            danger
+                            icon={<DeleteOutlined />}
+                            onClick={() => handleDeleteWindow(day, w.id)}
+                          />
+                        </div>
+                      ))}
+                    </Space>
+                  ) : (
+                    <div style={{ color: '#999', fontStyle: 'italic', padding: '20px 0' }}>
+                      No windows set — system default applies
+                    </div>
+                  )}
+                </div>
 
-              <div style={{ marginTop: '16px', textAlign: 'center' }}>
-                <Button
-                  type="dashed"
-                  icon={<PlusOutlined />}
-                  disabled={!canAddWindow(day)}
-                  onClick={() => handleAddWindow(day)}
-                  size="small"
-                >
-                  Add Window
-                </Button>
-                {!canAddWindow(day) && (
-                  <div style={{ fontSize: '12px', color: '#ff4d4f', marginTop: '4px' }}>
-                    Maximum {MAX_WINDOWS_PER_DAY} windows per day
-                  </div>
-                )}
-              </div>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+                <div style={{ marginTop: '16px', textAlign: 'center' }}>
+                  <Button
+                    type="dashed"
+                    icon={<PlusOutlined />}
+                    disabled={!canAddWindow(day)}
+                    onClick={() => handleAddWindow(day)}
+                    size="small"
+                  >
+                    Add Window
+                  </Button>
+                  {!canAddWindow(day) && (
+                    <div style={{ fontSize: '12px', color: '#ff4d4f', marginTop: '4px' }}>
+                      Maximum {MAX_WINDOWS_PER_DAY} windows per day
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Spin>
 
       {/* Add Window Modal */}
       <Modal
-        title={`Add Notification Window - ${selectedDay}`}
+        title={`Add Notification Window — ${selectedDay}`}
         open={addModalVisible}
         onOk={handleModalOk}
         onCancel={() => setAddModalVisible(false)}
@@ -239,14 +222,11 @@ const NotificationWindows: React.FC = () => {
               {
                 validator: (_, value) => {
                   if (!value) return Promise.resolve();
-                  const start = value[0];
-                  const end = value[1];
-                  if (start.isSameOrAfter(end)) {
+                  if (value[0].isSameOrAfter(value[1]))
                     return Promise.reject('End time must be after start time');
-                  }
                   return Promise.resolve();
-                }
-              }
+                },
+              },
             ]}
           >
             <TimePicker.RangePicker
@@ -258,6 +238,11 @@ const NotificationWindows: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+        <strong>Notification Windows:</strong> Set the time slots when you are willing to receive
+        parking notifications. Up to {MAX_WINDOWS_PER_DAY} windows per day. Changes are saved immediately.
+      </Card>
     </div>
   );
 };
