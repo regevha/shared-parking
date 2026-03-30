@@ -2,10 +2,14 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Button, ConfigProvider, theme, Spin } from 'antd';
 import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined, SunOutlined, MoonOutlined, LogoutOutlined } from '@ant-design/icons';
+import enUS from 'antd/locale/en_US';
+import frFR from 'antd/locale/fr_FR';
+import { useTranslation } from 'react-i18next';
 import { Role } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { RequestsProvider } from './contexts/RequestsContext';
 import { usersApi } from './api/users';
+import { type SupportedLanguage, getStoredLanguage, storeLanguage } from './i18n';
 import LotStatusBoard from './components/LotStatusBoard';
 import AllPendingRequests from './components/AllPendingRequests';
 import AllApprovals from './components/AllApprovals';
@@ -32,10 +36,13 @@ function toAppRole(backendRole: string): Role {
 interface AppShellProps {
   darkMode: boolean;
   toggleDarkMode: () => void;
+  language: SupportedLanguage;
+  toggleLanguage: () => void;
 }
 
-const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode }) => {
+const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language, toggleLanguage }) => {
   const { user, logout } = useAuth();
+  const { i18n } = useTranslation();
   const role: Role = toAppRole(user?.role ?? 'user');
 
   const getMenuItems = () => {
@@ -94,6 +101,14 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode }) => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <Button
                   type="text"
+                  onClick={toggleLanguage}
+                  style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13, minWidth: 44 }}
+                  title={language === 'en' ? 'Passer en français' : 'Switch to English'}
+                >
+                  {language === 'en' ? '🇫🇷 FR' : '🇬🇧 EN'}
+                </Button>
+                <Button
+                  type="text"
                   icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
                   onClick={toggleDarkMode}
                   style={headerBtnStyle}
@@ -150,9 +165,11 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode }) => {
 // ── Root: handles auth gating ─────────────────────────────────────────────────
 const AppRoot: React.FC = () => {
   const { user, authLoading, updateUser } = useAuth();
+  const { i18n } = useTranslation();
 
   // Default to dark while loading; sync from user.darkMode once authenticated
   const [darkMode, setDarkMode] = useState<boolean>(true);
+  const [language, setLanguage] = useState<SupportedLanguage>(getStoredLanguage);
 
   useEffect(() => {
     if (user) setDarkMode(user.preferences.darkMode);
@@ -172,9 +189,18 @@ const AppRoot: React.FC = () => {
     }
   };
 
+  const toggleLanguage = () => {
+    const next: SupportedLanguage = language === 'en' ? 'fr' : 'en';
+    setLanguage(next);
+    storeLanguage(next);
+    i18n.changeLanguage(next);
+  };
+
+  const antdLocale = language === 'fr' ? frFR : enUS;
+
   if (authLoading) {
     return (
-      <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
+      <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }} locale={antdLocale}>
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Spin size="large" />
         </div>
@@ -183,8 +209,10 @@ const AppRoot: React.FC = () => {
   }
 
   return (
-    <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
-      {user ? <AppShell darkMode={darkMode} toggleDarkMode={toggleDarkMode} /> : <LoginPage />}
+    <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }} locale={antdLocale}>
+      {user
+        ? <AppShell darkMode={darkMode} toggleDarkMode={toggleDarkMode} language={language} toggleLanguage={toggleLanguage} />
+        : <LoginPage />}
     </ConfigProvider>
   );
 };
