@@ -40,6 +40,7 @@ function mapRequest(r: any): ParkingRequest {
     floor: r.floor ?? undefined,
     lotOwner: r.lot_owner ?? undefined,
     approvedAt: r.approved_at ?? undefined,
+    updatedAt: r.updated_at ?? undefined,
   };
 }
 

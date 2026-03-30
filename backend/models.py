@@ -11,6 +11,7 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
     role = Column(String, nullable=False, default="user")  # user | owner | manager
+    created_at = Column(String, nullable=True)             # ISO string — set on registration
 
     preferences = relationship(
         "UserPreferences",
@@ -50,6 +51,7 @@ class ParkingRequest(Base):
     floor = Column(String, nullable=True)
     lot_owner = Column(String, nullable=True)
     approved_at = Column(String, nullable=True)
+    updated_at = Column(String, nullable=True)             # ISO string — set on every status/field change
 
 
 class RequestMessage(Base):
@@ -77,3 +79,5 @@ class Lot(Base):
     owner_id = Column(String, nullable=True)               # → users.id
     status = Column(String, nullable=False)                # available | blocked | unowned | unowned-blocked
     blocked_until = Column(String, nullable=True)
+    created_at = Column(String, nullable=True)             # ISO string — set on creation
+    updated_at = Column(String, nullable=True)             # ISO string — set on every update

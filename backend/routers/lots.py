@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime, timezone
 from typing import List
 
 from database import get_db
@@ -53,7 +54,8 @@ def create_lot(
     """Create a new lot. Manager only."""
     if db.query(models.Lot).filter(models.Lot.id == payload.id).first():
         raise HTTPException(status_code=400, detail="Lot ID already exists")
-    lot = models.Lot(**payload.model_dump())
+    now = datetime.now(timezone.utc).isoformat()
+    lot = models.Lot(**payload.model_dump(), created_at=now, updated_at=now)
     db.add(lot)
     db.commit()
     db.refresh(lot)
@@ -95,6 +97,7 @@ def update_lot(
             lot.owner = payload.owner
         if payload.owner_id is not None:
             lot.owner_id = payload.owner_id
+    lot.updated_at = datetime.now(timezone.utc).isoformat()
 
     db.commit()
     db.refresh(lot)
