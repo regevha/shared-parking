@@ -8,6 +8,8 @@ export interface LotData {
   ownerId: string | null;
   status: 'available' | 'blocked' | 'unowned' | 'unowned-blocked';
   blockedUntil?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LotCreatePayload {
@@ -36,6 +38,8 @@ function mapLot(l: any): LotData {
     ownerId: l.owner_id ?? null,
     status: l.status,
     blockedUntil: l.blocked_until ?? undefined,
+    createdAt: l.created_at ?? undefined,
+    updatedAt: l.updated_at ?? undefined,
   };
 }
 

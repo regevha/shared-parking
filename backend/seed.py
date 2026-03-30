@@ -5,6 +5,7 @@ Safe to re-run — clears existing data first.
 """
 
 import uuid
+from datetime import datetime, timezone
 from database import SessionLocal, engine, Base
 from auth import hash_password
 import models
@@ -100,6 +101,8 @@ def seed():
         db.query(models.User).delete()
         db.commit()
 
+        now = datetime.now(timezone.utc).isoformat()
+
         for u in USERS:
             db.add(models.User(
                 id=u["id"],
@@ -107,15 +110,18 @@ def seed():
                 email=u["email"],
                 password_hash=hash_password("password123"),
                 role=u["role"],
+                created_at=now,
             ))
             db.add(models.UserPreferences(user_id=u["id"]))
 
         all_requests = PENDING_REQUESTS + APPROVED_REQUESTS + REJECTED_REQUESTS
         for r in all_requests:
-            db.add(models.ParkingRequest(**r))
+            # Set updated_at to approved_at for approved/rejected, submitted_at for pending
+            updated_at = r.get("approved_at") or r["submitted_at"]
+            db.add(models.ParkingRequest(**r, updated_at=updated_at))
 
         for l in LOTS:
-            db.add(models.Lot(**l))
+            db.add(models.Lot(**l, created_at=now, updated_at=now))
 
         db.commit()
         print(f"OK: Seeded {len(USERS)} users, {len(all_requests)} requests, {len(LOTS)} lots.")

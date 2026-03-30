@@ -165,6 +165,13 @@ const AdminPanel: React.FC = () => {
       ),
     },
     {
+      title: 'Joined',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: 110,
+      render: (v?: string) => v ? dayjs(v).format('DD/MM/YYYY') : <em style={{ color: 'var(--label-color)' }}>—</em>,
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_: any, record: UserData) => (
@@ -231,6 +238,13 @@ const AdminPanel: React.FC = () => {
       key: 'owner',
       render: (_: any, record: LotData) =>
         record.owner ?? <em style={{ color: 'var(--label-color)' }}>Unowned</em>,
+    },
+    {
+      title: 'Last Modified',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      width: 130,
+      render: (v?: string) => v ? dayjs(v).format('DD/MM/YYYY HH:mm') : <em style={{ color: 'var(--label-color)' }}>—</em>,
     },
     {
       title: 'Actions',

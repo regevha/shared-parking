@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from datetime import datetime, timezone
 from pydantic import BaseModel, EmailStr, field_validator
 import uuid
 
@@ -61,6 +62,7 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
         email=payload.email,
         password_hash=auth_utils.hash_password(payload.password),
         role=payload.role,
+        created_at=datetime.now(timezone.utc).isoformat(),
     )
     db.add(user)
     db.flush()  # get user.id before creating preferences

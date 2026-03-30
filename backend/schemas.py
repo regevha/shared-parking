@@ -23,6 +23,7 @@ class ParkingRequestBase(BaseModel):
     floor: Optional[str] = None
     lot_owner: Optional[str] = None
     approved_at: Optional[str] = None
+    updated_at: Optional[str] = None
 
 
 class ParkingRequestCreate(BaseModel):
@@ -169,6 +170,8 @@ class LotOut(BaseModel):
     owner_id: Optional[str] = None
     status: str
     blocked_until: Optional[str]
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -197,6 +200,7 @@ class UserOut(BaseModel):
     name: str
     email: str
     role: str
+    created_at: Optional[str] = None
     preferences: PreferencesOut
 
     @field_validator('preferences', mode='before')

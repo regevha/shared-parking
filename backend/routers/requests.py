@@ -119,8 +119,10 @@ def approve_request(
                 ),
             )
 
+    now = datetime.now(timezone.utc).isoformat()
     req.status = "approved"
-    req.approved_at = datetime.now(timezone.utc).isoformat()
+    req.approved_at = now
+    req.updated_at = now
     req.rejected_by_owner = False
     if payload.lot_id:
         req.lot_id = payload.lot_id
@@ -146,6 +148,7 @@ def reject_request(
 
     req.status = "rejected"
     req.rejected_by_owner = True
+    req.updated_at = datetime.now(timezone.utc).isoformat()
     db.commit()
     db.refresh(req)
     return req
@@ -188,6 +191,7 @@ def update_request(
         req.end_time = payload.end_time
     if payload.duration is not None:
         req.duration = payload.duration
+    req.updated_at = datetime.now(timezone.utc).isoformat()
 
     db.commit()
     db.refresh(req)

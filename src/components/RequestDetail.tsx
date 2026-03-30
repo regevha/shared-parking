@@ -129,6 +129,14 @@ const RequestDetail: React.FC = () => {
               <div className="value">{dayjs(request.submittedAt).format('DD/MM/YYYY HH:mm')}</div>
             </div>
           </Col>
+          {request.updatedAt && (
+            <Col xs={24} sm={12} md={6}>
+              <div className="info-item">
+                <div className="label">Last Updated</div>
+                <div className="value">{dayjs(request.updatedAt).format('DD/MM/YYYY HH:mm')}</div>
+              </div>
+            </Col>
+          )}
         </Row>
 
         {/* Approved Details */}

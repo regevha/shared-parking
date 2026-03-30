@@ -6,6 +6,11 @@ export interface UserData {
   name: string;
   email: string;
   role: string; // 'user' | 'owner' | 'manager'
+  createdAt?: string; // ISO string
+}
+
+function mapUser(u: any): UserData {
+  return { id: u.id, name: u.name, email: u.email, role: u.role, createdAt: u.created_at ?? undefined };
 }
 
 export interface UserUpdatePayload {
@@ -36,12 +41,12 @@ function mapPreferences(raw: any): PreferencesData {
 }
 
 export const usersApi = {
-  getAll: ()            => api.get<UserData[]>('/api/users'),
-  getById: (id: string) => api.get<UserData>(`/api/users/${id}`),
-  getMe: ()             => api.get<UserData>('/api/users/me'),
+  getAll: ()            => api.get<any[]>('/api/users').then(us => us.map(mapUser)),
+  getById: (id: string) => api.get<any>(`/api/users/${id}`).then(mapUser),
+  getMe: ()             => api.get<any>('/api/users/me').then(mapUser),
 
   update: (id: string, payload: UserUpdatePayload) =>
-    api.patch<UserData>(`/api/users/${id}`, payload),
+    api.patch<any>(`/api/users/${id}`, payload).then(mapUser),
 
   delete: (id: string) =>
     api.delete<void>(`/api/users/${id}`),
