@@ -192,6 +192,5 @@ Both `CalendarView` and `LotCalendarView`:
 
 ## Pending TODOs
 1. Improve overlapping events display — hover tooltip for narrow calendar events
-2. Wire AdminPanel to real API (currently mock/static data)
-3. Empty state UI for all tables (currently shows empty table when no data)
-4. Audit trail — `created_at` / `updated_at` timestamps on records
+2. Empty state UI for all tables (currently shows empty table when no data)
+3. Audit trail — `created_at` / `updated_at` timestamps on records
