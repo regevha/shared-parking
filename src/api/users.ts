@@ -23,12 +23,14 @@ export interface UserUpdatePayload {
 export interface PreferencesData {
   darkMode: boolean;
   notificationWindows: Record<string, NotificationWindow[]>;
+  language: string;
   // add new preference fields here
 }
 
 export interface PreferencesUpdatePayload {
   dark_mode?: boolean;
   notification_windows?: string; // JSON-serialized Record<string, NotificationWindow[]>
+  language?: string;             // 'en' | 'fr'
   // add new preference fields here (snake_case — matches backend)
 }
 
@@ -37,7 +39,7 @@ function mapPreferences(raw: any): PreferencesData {
   if (raw?.notification_windows) {
     try { notificationWindows = JSON.parse(raw.notification_windows); } catch { /* ignore */ }
   }
-  return { darkMode: raw.dark_mode ?? true, notificationWindows };
+  return { darkMode: raw.dark_mode ?? true, notificationWindows, language: raw?.language ?? 'en' };
 }
 
 export const usersApi = {
