@@ -1,2 +1,165 @@
 {
+  "login": {
+    "title": "Gestion du stationnement",
+    "subtitle": "Connectez-vous à votre compte",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "vous@parking.dev",
+    "emailRequired": "Veuillez saisir votre e-mail",
+    "emailInvalid": "Saisissez un e-mail valide",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Mot de passe",
+    "passwordRequired": "Veuillez saisir votre mot de passe",
+    "signIn": "Se connecter",
+    "loginFailed": "Échec de la connexion",
+    "demoAccounts": "Comptes de démonstration — mot de passe : password123",
+    "demoRoles": {
+      "user": "Utilisateur",
+      "owner": "Propriétaire",
+      "manager": "Gestionnaire"
+    }
+  },
+  "myRequests": {
+    "title": "Mes demandes",
+    "newRequest": "Nouvelle demande",
+    "noActiveRequests": "Aucune demande active",
+    "columns": {
+      "id": "ID",
+      "timeSlot": "Créneau",
+      "duration": "Dur.",
+      "status": "Statut",
+      "submitted": "Soumis le"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "cancel": "Annuler"
+    },
+    "mobile": {
+      "date": "Date",
+      "time": "Heure",
+      "submitted": "Soumis le"
+    },
+    "stats": {
+      "totalActive": "Total actif",
+      "pending": "En attente",
+      "approved": "Approuvé"
+    },
+    "info": "Gérez vos demandes de stationnement actives. Les demandes en attente peuvent être modifiées ; toute demande active peut être annulée. Les demandes rejetées ne sont pas affichées.",
+    "cancelConfirm": {
+      "title": "Annuler la demande",
+      "description": "Êtes-vous sûr de vouloir annuler la demande {{id}} ?",
+      "descriptionMobile": "Annuler la demande {{id}} ?",
+      "ok": "Oui, annuler",
+      "okMobile": "Oui",
+      "no": "Non"
+    },
+    "editModal": {
+      "title": "Modifier la demande {{id}}",
+      "parkingDate": "Date de stationnement",
+      "startTime": "Heure de début",
+      "duration": "Durée",
+      "selectDate": "Sélectionner une date",
+      "selectStartTime": "Sélectionner l'heure de début (intervalles horaires)",
+      "selectDuration": "Sélectionner la durée",
+      "dateRequired": "Veuillez sélectionner une date",
+      "startTimeRequired": "Veuillez sélectionner l'heure de début",
+      "durationRequired": "Veuillez sélectionner la durée",
+      "cancel": "Annuler",
+      "saveChanges": "Enregistrer les modifications"
+    },
+    "notifications": {
+      "invalidTime": "Heure invalide",
+      "invalidTimeDesc": "L'heure de fin {{endHour}}:00 dépasse l'heure maximale autorisée de 20:00.",
+      "updated": "Demande mise à jour",
+      "updatedDesc": "La demande {{id}} a été mise à jour avec succès.",
+      "updateFailed": "Échec de la mise à jour",
+      "updateFailedDesc": "Impossible de mettre à jour la demande. Veuillez réessayer.",
+      "cancelled": "Demande annulée",
+      "cancelledDesc": "La demande {{id}} a été annulée.",
+      "cancelFailed": "Échec de l'annulation",
+      "cancelFailedDesc": "Impossible d'annuler la demande. Veuillez réessayer."
+    },
+    "durationOption_one": "{{count}} heure",
+    "durationOption_other": "{{count}} heures"
+  },
+  "pendingRequests": {
+    "title": "Demandes en attente",
+    "filterLabel": "Afficher les demandes :",
+    "filterAll": "Tout afficher",
+    "filterHideRejected": "Masquer les déjà rejetées",
+    "columns": {
+      "requesterName": "Nom du demandeur",
+      "timeSlot": "Créneau",
+      "duration": "Durée",
+      "date": "Date",
+      "submitted": "Soumis le",
+      "actions": "Actions"
+    },
+    "youTag": "Vous",
+    "noActions": "Aucune action",
+    "cannotApproveOwn": "Impossible d'approuver sa propre demande",
+    "actions": {
+      "approve": "Approuver",
+      "reject": "Rejeter"
+    },
+    "approveModal": {
+      "title": "Approuver la demande",
+      "content": "Approuver la demande de stationnement de {{name}} ?",
+      "ok": "Approuver",
+      "cancel": "Annuler"
+    },
+    "rejectModal": {
+      "title": "Rejeter la demande",
+      "content": "Rejeter la demande de stationnement de {{name}} ?",
+      "ok": "Rejeter",
+      "cancel": "Annuler"
+    },
+    "notifications": {
+      "approved": "Demande approuvée",
+      "approvedDesc": "La demande de stationnement de {{name}} a été approuvée.",
+      "approvalFailed": "Échec de l'approbation",
+      "approvalFailedDesc": "Impossible d'approuver la demande. Veuillez réessayer.",
+      "rejected": "Demande rejetée",
+      "rejectedDesc": "La demande de stationnement de {{name}} a été rejetée.",
+      "rejectionFailed": "Échec du rejet",
+      "rejectionFailedDesc": "Impossible de rejeter la demande. Veuillez réessayer."
+    },
+    "rejectedLegend": "= Rejeté par vous (vous pouvez réapprouver en cliquant sur Approuver)",
+    "stats": {
+      "total": "Total des demandes",
+      "pending": "En attente",
+      "rejectedByYou": "Rejeté par vous"
+    },
+    "infoOwner": "Liste toutes les demandes de stationnement en attente de votre approbation. Les demandes que vous avez déjà rejetées apparaissent en gris.",
+    "infoManager": "Liste toutes les demandes de stationnement en attente d'approbation par un propriétaire."
+  },
+  "approvals": {
+    "title": "Approbations",
+    "columns": {
+      "requestId": "ID de la demande",
+      "requester": "Demandeur",
+      "date": "Date",
+      "timeSlot": "Créneau",
+      "duration": "Durée",
+      "assignedLot": "Place attribuée",
+      "lotOwner": "Propriétaire",
+      "approvedAt": "Approuvé le",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "Voir les détails",
+      "viewMessages": "Voir les messages"
+    },
+    "messagesModal": {
+      "title": "Messages pour {{id}}",
+      "requester": "Demandeur :",
+      "lotOwner": "Propriétaire :",
+      "hint": "Cliquez sur « Voir les détails » pour voir le fil de messages complet."
+    },
+    "stats": {
+      "total": "Total des approbations",
+      "today": "Approuvé aujourd'hui",
+      "thisWeek": "Cette semaine"
+    },
+    "info": "Historique complet de toutes les demandes de stationnement approuvées dans le système."
+  }
 }
