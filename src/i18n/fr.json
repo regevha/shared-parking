@@ -212,6 +212,48 @@
     "durationOption_one": "{{count}} heure",
     "durationOption_other": "{{count}} heures"
   },
+  "lotStatusBoard": {
+    "title": "État du stationnement",
+    "legendTitle": "Légende des statuts",
+    "legend": {
+      "available": "Disponible - Propriétaire, sans blocage",
+      "blocked": "Bloqué - Blocage actif",
+      "unowned": "Sans propriétaire - Aucun propriétaire",
+      "unownedBlocked": "Sans propriétaire bloqué - Blocage hérité"
+    },
+    "lotsCount_one": "{{count}} place",
+    "lotsCount_other": "{{count}} places",
+    "columns": {
+      "lotId": "ID place",
+      "owner": "Propriétaire",
+      "status": "Statut",
+      "blockedUntil": "Bloqué jusqu'au"
+    },
+    "unassigned": "Non attribué",
+    "stats": {
+      "available": "Disponible",
+      "blocked": "Bloqué",
+      "unowned": "Sans propriétaire",
+      "unownedBlocked": "Sans prop. bloqué"
+    },
+    "infoTitle": "État du stationnement",
+    "infoDesc": "Affiche l'état actuel de toutes les places de stationnement sur tous les étages."
+  },
+  "myLots": {
+    "title": "Mes places",
+    "ownerLabel": "Propriétaire :",
+    "totalLotsLabel": "Total des places :",
+    "columns": {
+      "lotId": "ID place",
+      "floor": "Étage",
+      "status": "Statut",
+      "blockedUntil": "Bloqué jusqu'au",
+      "actions": "Actions"
+    },
+    "viewUsage": "Voir l'utilisation",
+    "noLots": "Vous ne possédez actuellement aucune place.",
+    "info": "Affiche toutes les places de stationnement qui vous sont attribuées et leur statut de disponibilité actuel."
+  },
   "requestDetail": {
     "title": "Détails de la demande",
     "notFoundPrefix": "La demande ",

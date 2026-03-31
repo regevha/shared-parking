@@ -212,6 +212,48 @@
     "durationOption_one": "{{count}} hour",
     "durationOption_other": "{{count}} hours"
   },
+  "lotStatusBoard": {
+    "title": "Parking Status",
+    "legendTitle": "Status Legend",
+    "legend": {
+      "available": "Available - Owner, No Block",
+      "blocked": "Blocked - Active Block",
+      "unowned": "Unowned - No Owner",
+      "unownedBlocked": "Unowned-Blocked - Legacy Block"
+    },
+    "lotsCount_one": "{{count}} lot",
+    "lotsCount_other": "{{count}} lots",
+    "columns": {
+      "lotId": "Lot ID",
+      "owner": "Owner",
+      "status": "Status",
+      "blockedUntil": "Blocked Until"
+    },
+    "unassigned": "Unassigned",
+    "stats": {
+      "available": "Available",
+      "blocked": "Blocked",
+      "unowned": "Unowned",
+      "unownedBlocked": "Unowned-Blocked"
+    },
+    "infoTitle": "Parking Status",
+    "infoDesc": "Displays the current status of all parking lots across all floors."
+  },
+  "myLots": {
+    "title": "My Lots",
+    "ownerLabel": "Owner:",
+    "totalLotsLabel": "Total Lots:",
+    "columns": {
+      "lotId": "Lot ID",
+      "floor": "Floor",
+      "status": "Status",
+      "blockedUntil": "Blocked Until",
+      "actions": "Actions"
+    },
+    "viewUsage": "View Usage",
+    "noLots": "You do not currently own any lots.",
+    "info": "Shows all parking lots assigned to you and their current availability status."
+  },
   "requestDetail": {
     "title": "Request Details",
     "notFoundPrefix": "Request ",
