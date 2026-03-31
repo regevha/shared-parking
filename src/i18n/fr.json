@@ -161,5 +161,87 @@
       "thisWeek": "Cette semaine"
     },
     "info": "Historique complet de toutes les demandes de stationnement approuvées dans le système."
+  },
+  "requestForm": {
+    "title": "Soumettre une demande de stationnement",
+    "limitAlert": {
+      "title": "Limite de demandes atteinte",
+      "description": "Vous avez déjà le nombre maximum de demandes actives (3). Vous ne pouvez pas soumettre de nouvelles demandes tant qu'une demande existante n'est pas approuvée ou annulée."
+    },
+    "activeRequestsCard": "Vos demandes actives ({{count}} / {{max}})",
+    "labels": {
+      "date": "Date",
+      "timeSlot": "Créneau",
+      "status": "Statut",
+      "parkingDate": "Date de stationnement",
+      "startTime": "Heure de début",
+      "duration": "Durée",
+      "endTime": "Heure de fin"
+    },
+    "placeholders": {
+      "selectDate": "Sélectionner une date",
+      "selectStartTime": "Sélectionner l'heure de début (intervalles horaires)",
+      "selectDuration": "Sélectionner la durée"
+    },
+    "validation": {
+      "dateRequired": "Veuillez sélectionner une date",
+      "startTimeRequired": "Veuillez sélectionner l'heure de début",
+      "durationRequired": "Veuillez sélectionner la durée"
+    },
+    "endTimeInvalid": "⚠️ Invalide : l'heure de fin dépasserait 20:00",
+    "submitButton": "Soumettre la demande",
+    "submitButtonDisabled": "Impossible de soumettre (limite atteinte)",
+    "businessRules": {
+      "title": "Règles métier",
+      "rule1start": "Vous pouvez avoir au maximum ",
+      "rule1bold": "3 demandes actives simultanées",
+      "rule2": "Sélectionnez n'importe quelle date à partir d'aujourd'hui",
+      "rule3": "L'heure de début doit être sur des intervalles horaires (08:00 – 19:00)",
+      "rule4": "La durée est de 1 à 6 heures, automatiquement limitée pour que l'heure de fin ne dépasse pas 20:00",
+      "rule5": "L'heure de fin est calculée automatiquement et ne peut pas dépasser 20:00"
+    },
+    "info": "Soumettez une demande de stationnement pour une date et un créneau horaire spécifiques ; un propriétaire l'examinera et l'approuvera ou la rejettera.",
+    "notifications": {
+      "limitExceeded": "Limite de demandes dépassée",
+      "limitExceededDesc": "Vous avez déjà le nombre maximum de demandes actives (3). Veuillez attendre qu'une demande existante expire.",
+      "submitted": "Demande soumise",
+      "submittedDesc": "Demande de stationnement soumise pour le {{date}} de {{startTime}} à {{endTime}}",
+      "failed": "Échec de la soumission",
+      "failedDesc": "Impossible de soumettre la demande. Veuillez réessayer."
+    },
+    "durationOption_one": "{{count}} heure",
+    "durationOption_other": "{{count}} heures"
+  },
+  "requestDetail": {
+    "title": "Détails de la demande",
+    "notFoundPrefix": "La demande ",
+    "notFoundSuffix": " est introuvable.",
+    "goBack": "Retour",
+    "requestInfo": {
+      "cardTitle": "Informations sur la demande",
+      "id": "ID de la demande",
+      "status": "Statut",
+      "requester": "Demandeur",
+      "date": "Date",
+      "timeSlot": "Créneau",
+      "duration": "Durée",
+      "submitted": "Soumis le",
+      "lastUpdated": "Dernière mise à jour",
+      "durationValue_one": "{{count}} heure",
+      "durationValue_other": "{{count}} heures"
+    },
+    "approvedInfo": {
+      "assignedLot": "Place attribuée",
+      "floor": "Étage",
+      "lotOwner": "Propriétaire",
+      "approvedAt": "Approuvé le"
+    },
+    "messages": {
+      "cardTitle": "Fil de messages",
+      "placeholder": "Saisissez votre message...",
+      "send": "Envoyer",
+      "loadFailed": "Échec du chargement des messages",
+      "sendFailed": "Échec de l'envoi du message"
+    }
   }
 }

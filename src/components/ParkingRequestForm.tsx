@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Form, DatePicker, Select, Button, Card, Alert, notification, Row, Col, Tag } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { useRequests } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
@@ -22,20 +23,17 @@ const HOUR_OPTIONS = [
   '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ];
 
-const ALL_DURATION_OPTIONS = [
-  { label: '1 hour', value: 1 },
-  { label: '2 hours', value: 2 },
-  { label: '3 hours', value: 3 },
-  { label: '4 hours', value: 4 },
-  { label: '5 hours', value: 5 },
-  { label: '6 hours', value: 6 },
-];
-
 const ParkingRequestForm: React.FC = () => {
   const [form] = Form.useForm<FormValues>();
   const [loading, setLoading] = useState(false);
   const { addPendingRequest, userRequests } = useRequests();
   const { user } = useAuth();
+  const { t } = useTranslation();
+
+  const ALL_DURATION_OPTIONS = [1, 2, 3, 4, 5, 6].map(n => ({
+    label: t('requestForm.durationOption', { count: n }),
+    value: n,
+  }));
 
   const activeRequests = userRequests.filter(
     r => r.status === 'pending' || r.status === 'approved'
@@ -52,7 +50,8 @@ const ParkingRequestForm: React.FC = () => {
     const startHour = parseInt(startTime.split(':')[0]);
     const maxDuration = MAX_END_HOUR - startHour;
     return ALL_DURATION_OPTIONS.filter(opt => opt.value <= maxDuration);
-  }, [startTime]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startTime, t]);
 
   // Clear duration when start time changes and the current value is no longer valid
   useEffect(() => {
@@ -79,8 +78,8 @@ const ParkingRequestForm: React.FC = () => {
   const handleSubmit = async (values: FormValues) => {
     if (hasMaxRequests) {
       notification.error({
-        message: 'Request Limit Exceeded',
-        description: 'You already have the maximum number of active requests (3). Please wait for an existing request to expire.',
+        message: t('requestForm.notifications.limitExceeded'),
+        description: t('requestForm.notifications.limitExceededDesc'),
       });
       return;
     }
@@ -96,15 +95,19 @@ const ParkingRequestForm: React.FC = () => {
         duration: values.duration,
       });
       notification.success({
-        message: 'Request Submitted',
-        description: `Parking request submitted for ${values.date?.format('YYYY-MM-DD')} from ${values.startTime} to ${endTime}`,
+        message: t('requestForm.notifications.submitted'),
+        description: t('requestForm.notifications.submittedDesc', {
+          date: values.date?.format('YYYY-MM-DD'),
+          startTime: values.startTime,
+          endTime,
+        }),
         duration: 3,
       });
       form.resetFields();
     } catch (err: any) {
       notification.error({
-        message: 'Submission Failed',
-        description: err.message || 'Failed to submit the request. Please try again.',
+        message: t('requestForm.notifications.failed'),
+        description: err.message || t('requestForm.notifications.failedDesc'),
       });
     } finally {
       setLoading(false);
@@ -113,13 +116,13 @@ const ParkingRequestForm: React.FC = () => {
 
   return (
     <div className="parking-request-form">
-      <h1>Submit Parking Request</h1>
+      <h1>{t('requestForm.title')}</h1>
 
       {/* Warning Banner */}
       {hasMaxRequests && (
         <Alert
-          title="Request Limit Reached"
-          description="You currently have the maximum number of active parking requests (3). You cannot submit new requests until one of your existing requests is approved or cancelled."
+          title={t('requestForm.limitAlert.title')}
+          description={t('requestForm.limitAlert.description')}
           type="warning"
           showIcon
           style={{ marginBottom: '24px' }}
@@ -129,7 +132,7 @@ const ParkingRequestForm: React.FC = () => {
       {/* Active Requests List */}
       {activeRequests.length > 0 && (
         <Card
-          title={`Your Active Requests (${activeRequests.length} / ${MAX_ACTIVE_REQUESTS})`}
+          title={t('requestForm.activeRequestsCard', { count: activeRequests.length, max: MAX_ACTIVE_REQUESTS })}
           style={{ marginBottom: '24px' }}
           size="small"
         >
@@ -138,15 +141,15 @@ const ParkingRequestForm: React.FC = () => {
               <div key={req.id} style={{ padding: '12px', backgroundColor: 'var(--item-bg)', borderRadius: '4px' }}>
                 <Row gutter={16}>
                   <Col xs={24} sm={6}>
-                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Date</div>
+                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>{t('requestForm.labels.date')}</div>
                     <div style={{ fontWeight: 'bold' }}>{dayjs(req.date).format('DD/MM/YYYY')}</div>
                   </Col>
                   <Col xs={24} sm={9}>
-                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Time Slot</div>
+                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>{t('requestForm.labels.timeSlot')}</div>
                     <div style={{ fontWeight: 'bold' }}>{req.startTime} – {req.endTime}</div>
                   </Col>
                   <Col xs={24} sm={9}>
-                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>Status</div>
+                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>{t('requestForm.labels.status')}</div>
                     <Tag color={getRequestStatusColor(req.status)}>
                       {getRequestStatusLabel(req.status)}
                     </Tag>
@@ -168,28 +171,28 @@ const ParkingRequestForm: React.FC = () => {
           disabled={hasMaxRequests}
         >
           <Form.Item
-            label="Parking Date"
+            label={t('requestForm.labels.parkingDate')}
             name="date"
-            rules={[{ required: true, message: 'Please select a date' }]}
+            rules={[{ required: true, message: t('requestForm.validation.dateRequired') }]}
           >
             <DatePicker
               style={{ width: '100%' }}
               disabledDate={(current) => {
                 return current && current < dayjs().startOf('day');
               }}
-              placeholder="Select date"
+              placeholder={t('requestForm.placeholders.selectDate')}
             />
           </Form.Item>
 
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Start Time"
+                label={t('requestForm.labels.startTime')}
                 name="startTime"
-                rules={[{ required: true, message: 'Please select start time' }]}
+                rules={[{ required: true, message: t('requestForm.validation.startTimeRequired') }]}
               >
                 <Select
-                  placeholder="Select start time (hourly boundaries)"
+                  placeholder={t('requestForm.placeholders.selectStartTime')}
                   options={HOUR_OPTIONS.map((hour) => ({
                     label: hour,
                     value: hour,
@@ -199,12 +202,12 @@ const ParkingRequestForm: React.FC = () => {
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Duration"
+                label={t('requestForm.labels.duration')}
                 name="duration"
-                rules={[{ required: true, message: 'Please select duration' }]}
+                rules={[{ required: true, message: t('requestForm.validation.durationRequired') }]}
               >
                 <Select
-                  placeholder="Select duration"
+                  placeholder={t('requestForm.placeholders.selectDuration')}
                   options={availableDurations}
                 />
               </Form.Item>
@@ -213,7 +216,7 @@ const ParkingRequestForm: React.FC = () => {
 
           {/* End Time Display */}
           {endTime ? (
-            <Form.Item label="End Time">
+            <Form.Item label={t('requestForm.labels.endTime')}>
               <div
                 style={{
                   padding: '10px 12px',
@@ -228,9 +231,9 @@ const ParkingRequestForm: React.FC = () => {
             </Form.Item>
           ) : (
             form.getFieldValue('startTime') && form.getFieldValue('duration') && (
-              <Form.Item label="End Time">
+              <Form.Item label={t('requestForm.labels.endTime')}>
                 <div style={{ color: '#ff4d4f', fontWeight: 'bold' }}>
-                  ⚠️ Invalid: End time would exceed 20:00
+                  {t('requestForm.endTimeInvalid')}
                 </div>
               </Form.Item>
             )
@@ -245,7 +248,7 @@ const ParkingRequestForm: React.FC = () => {
               loading={loading}
               disabled={hasMaxRequests || !endTime}
             >
-              {hasMaxRequests ? 'Cannot Submit (Max Requests Reached)' : 'Submit Request'}
+              {hasMaxRequests ? t('requestForm.submitButtonDisabled') : t('requestForm.submitButton')}
             </Button>
           </Form.Item>
         </Form>
@@ -253,18 +256,18 @@ const ParkingRequestForm: React.FC = () => {
 
       {/* Business Rules Info */}
       <Card style={{ marginTop: '24px' }} size="small">
-        <h3>Business Rules</h3>
+        <h3>{t('requestForm.businessRules.title')}</h3>
         <ul>
-          <li>You can have a maximum of <strong>3 concurrent active requests</strong></li>
-          <li>Select any date from today onwards</li>
-          <li>Start time must be on hourly boundaries (08:00 – 19:00)</li>
-          <li>Duration is 1–6 hours, automatically limited so end time never exceeds 20:00</li>
-          <li>End time is auto-calculated and cannot exceed 20:00</li>
+          <li>{t('requestForm.businessRules.rule1start')}<strong>{t('requestForm.businessRules.rule1bold')}</strong></li>
+          <li>{t('requestForm.businessRules.rule2')}</li>
+          <li>{t('requestForm.businessRules.rule3')}</li>
+          <li>{t('requestForm.businessRules.rule4')}</li>
+          <li>{t('requestForm.businessRules.rule5')}</li>
         </ul>
       </Card>
 
       <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>New Request:</strong> Submit a parking request for a specific date and time slot; an owner will review and approve or reject it.
+        <strong>{t('requestForm.title')}:</strong> {t('requestForm.info')}
       </Card>
     </div>
   );
