@@ -382,5 +382,191 @@
       "loadFailed": "Failed to load messages",
       "sendFailed": "Failed to send message"
     }
+  },
+  "notificationWindows": {
+    "title": "Notification Window Preferences",
+    "blackoutAlert": {
+      "message": "No notifications are delivered between 22:00 and 06:00",
+      "description": "This blackout period applies system-wide to prevent disturbances during nighttime hours."
+    },
+    "saving": "Saving…",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "noWindows": "No windows set — system default applies",
+    "addWindow": "Add Window",
+    "maxWindows": "Maximum {{max}} windows per day",
+    "modal": {
+      "title": "Add Notification Window — {{day}}",
+      "okText": "Add Window",
+      "timeRangeLabel": "Time Range",
+      "timeRangeRequired": "Please select a time range",
+      "endAfterStart": "End time must be after start time",
+      "startPlaceholder": "Start time",
+      "endPlaceholder": "End time"
+    },
+    "blackoutWarning": {
+      "title": "Blackout Period Warning",
+      "content": "This notification window overlaps with the blackout period (22:00–06:00). Notifications will not be delivered during this time.",
+      "ok": "Save Anyway",
+      "cancel": "Cancel"
+    },
+    "notifications": {
+      "loadFailed": "Failed to load notification preferences",
+      "saveFailed": "Failed to save notification preferences",
+      "removed": "Notification window removed",
+      "overlap": "This time range overlaps with an existing notification window",
+      "added": "Notification window added"
+    },
+    "info": "Set the time slots when you are willing to receive parking notifications. Up to {{max}} windows per day. Changes are saved immediately."
+  },
+  "adminPanel": {
+    "sidebarTitle": "Admin Panel",
+    "loadingTip": "Loading admin data...",
+    "menu": {
+      "users": "User Management",
+      "lots": "Lot Management",
+      "import": "Import / Export",
+      "config": "System Configuration",
+      "reports": "Reports",
+      "broadcast": "Broadcast"
+    },
+    "loadFailed": "Failed to load admin data",
+    "loadFailedDesc": "Could not reach the server.",
+    "defaultContent": "Select a menu item",
+    "users": {
+      "title": "User Management",
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "joined": "Joined",
+        "actions": "Actions"
+      },
+      "roles": { "user": "User", "owner": "Owner", "manager": "Manager" },
+      "deleteConfirm": "Delete this user?",
+      "deleteWarning": "This cannot be undone.",
+      "deleteOk": "Delete",
+      "deleteButton": "Delete",
+      "notifications": {
+        "roleUpdated": "Role updated",
+        "roleUpdatedDesc": "{{name}} is now {{role}}.",
+        "roleUpdateFailed": "Role update failed",
+        "userDeleted": "User deleted",
+        "deleteFailed": "Delete failed"
+      },
+      "info": "View all registered users and manage their roles. Manager accounts cannot be deleted or have their role changed here."
+    },
+    "lots": {
+      "title": "Lot Management",
+      "unownedAlert_one": "{{count}} lot without an owner",
+      "unownedAlert_other": "{{count}} lots without an owner",
+      "unownedAlertDesc": "Assign owners to ensure proper management of these lots.",
+      "filterLabel": "Filter:",
+      "filters": { "all": "All", "available": "Available", "blocked": "Blocked", "unowned": "Unowned" },
+      "columns": {
+        "lotId": "Lot ID",
+        "floorLabel": "Floor Label",
+        "floor": "Floor",
+        "status": "Status",
+        "owner": "Owner",
+        "lastModified": "Last Modified",
+        "actions": "Actions"
+      },
+      "unowned": "Unowned",
+      "assignOwnerButton": "Assign Owner",
+      "removeOwnerConfirm": "Remove owner from this lot?",
+      "removeOwnerOk": "Remove",
+      "removeOwnerButton": "Remove Owner",
+      "assignModal": {
+        "title": "Assign Owner to Lot",
+        "okText": "Assign",
+        "placeholder": "Select an owner"
+      },
+      "notifications": {
+        "ownerRemoved": "Owner removed",
+        "ownerRemoveFailed": "Failed to remove owner",
+        "ownerAssigned": "Owner assigned",
+        "ownerAssignedDesc": "{{name}} → {{lotId}}",
+        "ownerAssignFailed": "Failed to assign owner"
+      },
+      "info": "View all parking lots, filter by status, and assign or remove ownership."
+    },
+    "import": {
+      "title": "Import / Export",
+      "importCardTitle": "Import Data",
+      "exportCardTitle": "Export Data",
+      "uploadButton": "Upload Excel File",
+      "uploadHint": "Drag and drop or click to upload Excel files",
+      "downloadButton": "Download Master File",
+      "downloadHint": "Import data first to enable download",
+      "notifications": {
+        "uploadSuccess": "{{filename}} uploaded successfully",
+        "downloadSuccess": "Master file downloaded"
+      },
+      "info": "Upload an Excel file to bulk-import parking data, or download the current master file for offline use."
+    },
+    "config": {
+      "title": "System Configuration",
+      "cardTitle": "System Settings",
+      "timezone": "Timezone:",
+      "blackoutPeriod": "Blackout Period:",
+      "maxRequests": "Max Active Requests per User:",
+      "bookingWindow": "Booking Window:",
+      "info": "Read-only view of global system constants enforced by the backend."
+    },
+    "reports": {
+      "title": "Reports",
+      "dateRange": "Date Range:",
+      "exportButton": "Export to Excel",
+      "tabs": {
+        "all": "All ({{count}})",
+        "pending": "Pending ({{count}})",
+        "approved": "Approved ({{count}})",
+        "rejected": "Rejected ({{count}})"
+      },
+      "columns": {
+        "id": "ID",
+        "date": "Date",
+        "requester": "Requester",
+        "timeSlot": "Time Slot",
+        "status": "Status",
+        "duration": "Dur."
+      },
+      "notifications": {
+        "exportSuccess": "Exported {{count}} rows to {{filename}}"
+      },
+      "info": "View a complete history of all parking requests filtered by date range and status."
+    },
+    "broadcast": {
+      "title": "Broadcast Messages",
+      "simulateBlackout": "Simulate blackout period:",
+      "blackoutOn": "22:00–06:00",
+      "blackoutOff": "Normal hours",
+      "blackoutAlert": "Broadcast disabled during blackout period",
+      "blackoutAlertDesc": "Messages cannot be sent between 22:00 and 06:00 to prevent disturbances.",
+      "audienceLabel": "Target Audience:",
+      "audiences": {
+        "owners": "All Owners",
+        "users": "All Users",
+        "both": "Both Owners and Users"
+      },
+      "messageLabel": "Message:",
+      "messagePlaceholder": "Enter your broadcast message...",
+      "sendButton": "Send Broadcast",
+      "notifications": {
+        "blocked": "Broadcast blocked",
+        "blockedDesc": "Cannot send messages during the blackout period (22:00–06:00).",
+        "sent": "Broadcast sent",
+        "sentDesc": "Message sent to: {{audience}}"
+      },
+      "info": "Send a system-wide message to all owners, all users, or both audiences at once."
+    }
   }
 }
