@@ -179,7 +179,7 @@ const AppRoot: React.FC = () => {
       storeLanguage(lang);
       i18n.changeLanguage(lang);
     }
-  }, [user?.id]); // sync on login (user.id change); not on every preferences update
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps — intentional: only sync on login
 
   useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
