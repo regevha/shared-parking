@@ -1,2 +1,386 @@
 {
+  "login": {
+    "title": "Gestion du stationnement",
+    "subtitle": "Connectez-vous à votre compte",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "vous@parking.dev",
+    "emailRequired": "Veuillez saisir votre e-mail",
+    "emailInvalid": "Saisissez un e-mail valide",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Mot de passe",
+    "passwordRequired": "Veuillez saisir votre mot de passe",
+    "signIn": "Se connecter",
+    "loginFailed": "Échec de la connexion",
+    "demoAccounts": "Comptes de démonstration — mot de passe : password123",
+    "demoRoles": {
+      "user": "Utilisateur",
+      "owner": "Propriétaire",
+      "manager": "Gestionnaire"
+    }
+  },
+  "myRequests": {
+    "title": "Mes demandes",
+    "newRequest": "Nouvelle demande",
+    "noActiveRequests": "Aucune demande active",
+    "columns": {
+      "id": "ID",
+      "timeSlot": "Créneau",
+      "duration": "Dur.",
+      "status": "Statut",
+      "submitted": "Soumis le"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "cancel": "Annuler"
+    },
+    "mobile": {
+      "date": "Date",
+      "time": "Heure",
+      "submitted": "Soumis le"
+    },
+    "stats": {
+      "totalActive": "Total actif",
+      "pending": "En attente",
+      "approved": "Approuvé"
+    },
+    "info": "Gérez vos demandes de stationnement actives. Les demandes en attente peuvent être modifiées ; toute demande active peut être annulée. Les demandes rejetées ne sont pas affichées.",
+    "cancelConfirm": {
+      "title": "Annuler la demande",
+      "description": "Êtes-vous sûr de vouloir annuler la demande {{id}} ?",
+      "descriptionMobile": "Annuler la demande {{id}} ?",
+      "ok": "Oui, annuler",
+      "okMobile": "Oui",
+      "no": "Non"
+    },
+    "editModal": {
+      "title": "Modifier la demande {{id}}",
+      "parkingDate": "Date de stationnement",
+      "startTime": "Heure de début",
+      "duration": "Durée",
+      "selectDate": "Sélectionner une date",
+      "selectStartTime": "Sélectionner l'heure de début (intervalles horaires)",
+      "selectDuration": "Sélectionner la durée",
+      "dateRequired": "Veuillez sélectionner une date",
+      "startTimeRequired": "Veuillez sélectionner l'heure de début",
+      "durationRequired": "Veuillez sélectionner la durée",
+      "cancel": "Annuler",
+      "saveChanges": "Enregistrer les modifications"
+    },
+    "notifications": {
+      "invalidTime": "Heure invalide",
+      "invalidTimeDesc": "L'heure de fin {{endHour}}:00 dépasse l'heure maximale autorisée de 20:00.",
+      "updated": "Demande mise à jour",
+      "updatedDesc": "La demande {{id}} a été mise à jour avec succès.",
+      "updateFailed": "Échec de la mise à jour",
+      "updateFailedDesc": "Impossible de mettre à jour la demande. Veuillez réessayer.",
+      "cancelled": "Demande annulée",
+      "cancelledDesc": "La demande {{id}} a été annulée.",
+      "cancelFailed": "Échec de l'annulation",
+      "cancelFailedDesc": "Impossible d'annuler la demande. Veuillez réessayer."
+    },
+    "durationOption_one": "{{count}} heure",
+    "durationOption_other": "{{count}} heures"
+  },
+  "pendingRequests": {
+    "title": "Demandes en attente",
+    "filterLabel": "Afficher les demandes :",
+    "filterAll": "Tout afficher",
+    "filterHideRejected": "Masquer les déjà rejetées",
+    "columns": {
+      "requesterName": "Nom du demandeur",
+      "timeSlot": "Créneau",
+      "duration": "Durée",
+      "date": "Date",
+      "submitted": "Soumis le",
+      "actions": "Actions"
+    },
+    "youTag": "Vous",
+    "noActions": "Aucune action",
+    "cannotApproveOwn": "Impossible d'approuver sa propre demande",
+    "actions": {
+      "approve": "Approuver",
+      "reject": "Rejeter"
+    },
+    "approveModal": {
+      "title": "Approuver la demande",
+      "content": "Approuver la demande de stationnement de {{name}} ?",
+      "ok": "Approuver",
+      "cancel": "Annuler"
+    },
+    "rejectModal": {
+      "title": "Rejeter la demande",
+      "content": "Rejeter la demande de stationnement de {{name}} ?",
+      "ok": "Rejeter",
+      "cancel": "Annuler"
+    },
+    "notifications": {
+      "approved": "Demande approuvée",
+      "approvedDesc": "La demande de stationnement de {{name}} a été approuvée.",
+      "approvalFailed": "Échec de l'approbation",
+      "approvalFailedDesc": "Impossible d'approuver la demande. Veuillez réessayer.",
+      "rejected": "Demande rejetée",
+      "rejectedDesc": "La demande de stationnement de {{name}} a été rejetée.",
+      "rejectionFailed": "Échec du rejet",
+      "rejectionFailedDesc": "Impossible de rejeter la demande. Veuillez réessayer."
+    },
+    "rejectedLegend": "= Rejeté par vous (vous pouvez réapprouver en cliquant sur Approuver)",
+    "stats": {
+      "total": "Total des demandes",
+      "pending": "En attente",
+      "rejectedByYou": "Rejeté par vous"
+    },
+    "infoOwner": "Liste toutes les demandes de stationnement en attente de votre approbation. Les demandes que vous avez déjà rejetées apparaissent en gris.",
+    "infoManager": "Liste toutes les demandes de stationnement en attente d'approbation par un propriétaire."
+  },
+  "approvals": {
+    "title": "Approbations",
+    "columns": {
+      "requestId": "ID de la demande",
+      "requester": "Demandeur",
+      "date": "Date",
+      "timeSlot": "Créneau",
+      "duration": "Durée",
+      "assignedLot": "Place attribuée",
+      "lotOwner": "Propriétaire",
+      "approvedAt": "Approuvé le",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "Voir les détails",
+      "viewMessages": "Voir les messages"
+    },
+    "messagesModal": {
+      "title": "Messages pour {{id}}",
+      "requester": "Demandeur :",
+      "lotOwner": "Propriétaire :",
+      "hint": "Cliquez sur « Voir les détails » pour voir le fil de messages complet."
+    },
+    "stats": {
+      "total": "Total des approbations",
+      "today": "Approuvé aujourd'hui",
+      "thisWeek": "Cette semaine"
+    },
+    "info": "Historique complet de toutes les demandes de stationnement approuvées dans le système."
+  },
+  "requestForm": {
+    "title": "Soumettre une demande de stationnement",
+    "limitAlert": {
+      "title": "Limite de demandes atteinte",
+      "description": "Vous avez déjà le nombre maximum de demandes actives (3). Vous ne pouvez pas soumettre de nouvelles demandes tant qu'une demande existante n'est pas approuvée ou annulée."
+    },
+    "activeRequestsCard": "Vos demandes actives ({{count}} / {{max}})",
+    "labels": {
+      "date": "Date",
+      "timeSlot": "Créneau",
+      "status": "Statut",
+      "parkingDate": "Date de stationnement",
+      "startTime": "Heure de début",
+      "duration": "Durée",
+      "endTime": "Heure de fin"
+    },
+    "placeholders": {
+      "selectDate": "Sélectionner une date",
+      "selectStartTime": "Sélectionner l'heure de début (intervalles horaires)",
+      "selectDuration": "Sélectionner la durée"
+    },
+    "validation": {
+      "dateRequired": "Veuillez sélectionner une date",
+      "startTimeRequired": "Veuillez sélectionner l'heure de début",
+      "durationRequired": "Veuillez sélectionner la durée"
+    },
+    "endTimeInvalid": "⚠️ Invalide : l'heure de fin dépasserait 20:00",
+    "submitButton": "Soumettre la demande",
+    "submitButtonDisabled": "Impossible de soumettre (limite atteinte)",
+    "businessRules": {
+      "title": "Règles métier",
+      "rule1start": "Vous pouvez avoir au maximum ",
+      "rule1bold": "3 demandes actives simultanées",
+      "rule2": "Sélectionnez n'importe quelle date à partir d'aujourd'hui",
+      "rule3": "L'heure de début doit être sur des intervalles horaires (08:00 – 19:00)",
+      "rule4": "La durée est de 1 à 6 heures, automatiquement limitée pour que l'heure de fin ne dépasse pas 20:00",
+      "rule5": "L'heure de fin est calculée automatiquement et ne peut pas dépasser 20:00"
+    },
+    "info": "Soumettez une demande de stationnement pour une date et un créneau horaire spécifiques ; un propriétaire l'examinera et l'approuvera ou la rejettera.",
+    "notifications": {
+      "limitExceeded": "Limite de demandes dépassée",
+      "limitExceededDesc": "Vous avez déjà le nombre maximum de demandes actives (3). Veuillez attendre qu'une demande existante expire.",
+      "submitted": "Demande soumise",
+      "submittedDesc": "Demande de stationnement soumise pour le {{date}} de {{startTime}} à {{endTime}}",
+      "failed": "Échec de la soumission",
+      "failedDesc": "Impossible de soumettre la demande. Veuillez réessayer."
+    },
+    "durationOption_one": "{{count}} heure",
+    "durationOption_other": "{{count}} heures"
+  },
+  "calendarView": {
+    "toolbar": {
+      "today": "Aujourd'hui",
+      "weekShort": "Sem"
+    },
+    "viewNames": {
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "emptyState": "Aucune demande sur cette période",
+    "stats": {
+      "total": "Total des demandes",
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté"
+    },
+    "infoTitle": "Vue des demandes",
+    "info": "Un aperçu calendrier de toutes les demandes de stationnement — en attente, approuvées et rejetées.",
+    "legendTitle": "Légende",
+    "legend": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté",
+      "myRequest": "★ Ma demande"
+    },
+    "modal": {
+      "title": "Demande — {{name}}",
+      "close": "Fermer",
+      "requester": "Demandeur",
+      "date": "Date",
+      "time": "Heure",
+      "duration": "Durée",
+      "status": "Statut",
+      "submitted": "Soumis le",
+      "lot": "Place",
+      "floor": "Étage",
+      "lotOwner": "Propriétaire"
+    },
+    "notifications": {
+      "rescheduled": "Demande replanifiée",
+      "rescheduledDesc": "Demande {{id}} déplacée au {{from}} – {{to}}"
+    },
+    "statusRejected": "Rejeté"
+  },
+  "lotCalendarView": {
+    "allMyLots": "Toutes mes places",
+    "toolbar": {
+      "today": "Aujourd'hui",
+      "weekShort": "Sem"
+    },
+    "viewNames": {
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "emptyState": "Aucun événement sur cette période",
+    "stats": {
+      "total": "Total des événements",
+      "booked": "Réservé",
+      "pending": "En attente",
+      "blocked": "Bloqué"
+    },
+    "infoTitle": "Calendrier des places",
+    "info": "Vue calendrier de vos places montrant les réservations, les demandes en attente et les périodes bloquées.",
+    "legendTitle": "Légende",
+    "legend": {
+      "booked": "Réservé",
+      "pending": "En attente",
+      "blocked": "Bloqué"
+    },
+    "modal": {
+      "close": "Fermer",
+      "bookedTitle": "Réservé — {{name}}",
+      "pendingTitle": "En attente — {{name}}",
+      "blockedTitle": "Bloqué — {{id}}",
+      "requester": "Demandeur",
+      "date": "Date",
+      "time": "Heure",
+      "duration": "Durée",
+      "lot": "Place",
+      "floor": "Étage",
+      "status": "Statut",
+      "approvedAt": "Approuvé le",
+      "submitted": "Soumis le",
+      "lotId": "ID place",
+      "owner": "Propriétaire",
+      "blockedUntil": "Bloqué jusqu'au",
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "unowned": "Sans propriétaire"
+    },
+    "notifications": {
+      "approved": "Demande approuvée avec succès",
+      "rejected": "Demande rejetée"
+    }
+  },
+  "lotStatusBoard": {
+    "title": "État du stationnement",
+    "legendTitle": "Légende des statuts",
+    "legend": {
+      "available": "Disponible - Propriétaire, sans blocage",
+      "blocked": "Bloqué - Blocage actif",
+      "unowned": "Sans propriétaire - Aucun propriétaire",
+      "unownedBlocked": "Sans propriétaire bloqué - Blocage hérité"
+    },
+    "lotsCount_one": "{{count}} place",
+    "lotsCount_other": "{{count}} places",
+    "columns": {
+      "lotId": "ID place",
+      "owner": "Propriétaire",
+      "status": "Statut",
+      "blockedUntil": "Bloqué jusqu'au"
+    },
+    "unassigned": "Non attribué",
+    "stats": {
+      "available": "Disponible",
+      "blocked": "Bloqué",
+      "unowned": "Sans propriétaire",
+      "unownedBlocked": "Sans prop. bloqué"
+    },
+    "infoTitle": "État du stationnement",
+    "infoDesc": "Affiche l'état actuel de toutes les places de stationnement sur tous les étages."
+  },
+  "myLots": {
+    "title": "Mes places",
+    "ownerLabel": "Propriétaire :",
+    "totalLotsLabel": "Total des places :",
+    "columns": {
+      "lotId": "ID place",
+      "floor": "Étage",
+      "status": "Statut",
+      "blockedUntil": "Bloqué jusqu'au",
+      "actions": "Actions"
+    },
+    "viewUsage": "Voir l'utilisation",
+    "noLots": "Vous ne possédez actuellement aucune place.",
+    "info": "Affiche toutes les places de stationnement qui vous sont attribuées et leur statut de disponibilité actuel."
+  },
+  "requestDetail": {
+    "title": "Détails de la demande",
+    "notFoundPrefix": "La demande ",
+    "notFoundSuffix": " est introuvable.",
+    "goBack": "Retour",
+    "requestInfo": {
+      "cardTitle": "Informations sur la demande",
+      "id": "ID de la demande",
+      "status": "Statut",
+      "requester": "Demandeur",
+      "date": "Date",
+      "timeSlot": "Créneau",
+      "duration": "Durée",
+      "submitted": "Soumis le",
+      "lastUpdated": "Dernière mise à jour",
+      "durationValue_one": "{{count}} heure",
+      "durationValue_other": "{{count}} heures"
+    },
+    "approvedInfo": {
+      "assignedLot": "Place attribuée",
+      "floor": "Étage",
+      "lotOwner": "Propriétaire",
+      "approvedAt": "Approuvé le"
+    },
+    "messages": {
+      "cardTitle": "Fil de messages",
+      "placeholder": "Saisissez votre message...",
+      "send": "Envoyer",
+      "loadFailed": "Échec du chargement des messages",
+      "sendFailed": "Échec de l'envoi du message"
+    }
+  }
 }

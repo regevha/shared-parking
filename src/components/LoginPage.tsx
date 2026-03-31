@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Typography, Card, Alert, Divider, Tag, Space, theme } from 'antd';
 import { UserOutlined, LockOutlined, CrownOutlined, TeamOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 
 const { Title, Text } = Typography;
@@ -11,14 +12,15 @@ interface LoginForm {
 }
 
 const DEMO_ACCOUNTS = [
-  { label: 'User',    email: 'alice@parking.dev',  icon: <UserOutlined />,  color: 'blue'   },
-  { label: 'Owner',   email: 'sarah@parking.dev',  icon: <CrownOutlined />, color: 'gold'   },
-  { label: 'Manager', email: 'admin@parking.dev',  icon: <TeamOutlined />,  color: 'purple' },
+  { labelKey: 'login.demoRoles.user',    email: 'alice@parking.dev',  icon: <UserOutlined />,  color: 'blue'   },
+  { labelKey: 'login.demoRoles.owner',   email: 'sarah@parking.dev',  icon: <CrownOutlined />, color: 'gold'   },
+  { labelKey: 'login.demoRoles.manager', email: 'admin@parking.dev',  icon: <TeamOutlined />,  color: 'purple' },
 ];
 
 const LoginPage: React.FC = () => {
   const { token: { colorBgLayout } } = theme.useToken();
   const { login } = useAuth();
+  const { t } = useTranslation();
   const [form] = Form.useForm<LoginForm>();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -29,7 +31,7 @@ const LoginPage: React.FC = () => {
     try {
       await login(values.email, values.password);
     } catch (err: any) {
-      setErrorMsg(err.message || 'Login failed');
+      setErrorMsg(err.message || t('login.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -51,8 +53,8 @@ const LoginPage: React.FC = () => {
     }}>
       <Card style={{ width: '100%', maxWidth: 420 }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <Title level={3} style={{ marginBottom: 4 }}>Parking Management</Title>
-          <Text type="secondary">Sign in to your account</Text>
+          <Title level={3} style={{ marginBottom: 4 }}>{t('login.title')}</Title>
+          <Text type="secondary">{t('login.subtitle')}</Text>
         </div>
 
         {errorMsg && (
@@ -72,15 +74,15 @@ const LoginPage: React.FC = () => {
         >
           <Form.Item
             name="email"
-            label="Email"
+            label={t('login.emailLabel')}
             rules={[
-              { required: true, message: 'Please enter your email' },
-              { type: 'email', message: 'Enter a valid email' },
+              { required: true, message: t('login.emailRequired') },
+              { type: 'email', message: t('login.emailInvalid') },
             ]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="you@parking.dev"
+              placeholder={t('login.emailPlaceholder')}
               autoComplete="email"
               size="large"
             />
@@ -88,12 +90,12 @@ const LoginPage: React.FC = () => {
 
           <Form.Item
             name="password"
-            label="Password"
-            rules={[{ required: true, message: 'Please enter your password' }]}
+            label={t('login.passwordLabel')}
+            rules={[{ required: true, message: t('login.passwordRequired') }]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Password"
+              placeholder={t('login.passwordPlaceholder')}
               autoComplete="current-password"
               size="large"
             />
@@ -107,13 +109,13 @@ const LoginPage: React.FC = () => {
               block
               loading={loading}
             >
-              Sign In
+              {t('login.signIn')}
             </Button>
           </Form.Item>
         </Form>
 
         <Divider plain>
-          <Text type="secondary" style={{ fontSize: 12 }}>Demo accounts — password: password123</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>{t('login.demoAccounts')}</Text>
         </Divider>
 
         <Space wrap style={{ justifyContent: 'center', width: '100%' }}>
@@ -125,7 +127,7 @@ const LoginPage: React.FC = () => {
               style={{ cursor: 'pointer', padding: '4px 10px', fontSize: 13 }}
               onClick={() => fillDemo(acct.email)}
             >
-              {acct.label}
+              {t(acct.labelKey)}
             </Tag>
           ))}
         </Space>

@@ -1,2 +1,386 @@
 {
+  "login": {
+    "title": "Parking Management",
+    "subtitle": "Sign in to your account",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@parking.dev",
+    "emailRequired": "Please enter your email",
+    "emailInvalid": "Enter a valid email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Password",
+    "passwordRequired": "Please enter your password",
+    "signIn": "Sign In",
+    "loginFailed": "Login failed",
+    "demoAccounts": "Demo accounts — password: password123",
+    "demoRoles": {
+      "user": "User",
+      "owner": "Owner",
+      "manager": "Manager"
+    }
+  },
+  "myRequests": {
+    "title": "My Requests",
+    "newRequest": "New Request",
+    "noActiveRequests": "No active requests",
+    "columns": {
+      "id": "ID",
+      "timeSlot": "Time Slot",
+      "duration": "Dur.",
+      "status": "Status",
+      "submitted": "Submitted"
+    },
+    "actions": {
+      "edit": "Edit",
+      "cancel": "Cancel"
+    },
+    "mobile": {
+      "date": "Date",
+      "time": "Time",
+      "submitted": "Submitted"
+    },
+    "stats": {
+      "totalActive": "Total Active",
+      "pending": "Pending",
+      "approved": "Approved"
+    },
+    "info": "Manage your active parking requests. Pending requests can be edited; any active request can be cancelled. Rejected requests are not shown.",
+    "cancelConfirm": {
+      "title": "Cancel Request",
+      "description": "Are you sure you want to cancel request {{id}}?",
+      "descriptionMobile": "Cancel request {{id}}?",
+      "ok": "Yes, Cancel",
+      "okMobile": "Yes",
+      "no": "No"
+    },
+    "editModal": {
+      "title": "Edit Request {{id}}",
+      "parkingDate": "Parking Date",
+      "startTime": "Start Time",
+      "duration": "Duration",
+      "selectDate": "Select date",
+      "selectStartTime": "Select start time (hourly boundaries)",
+      "selectDuration": "Select duration",
+      "dateRequired": "Please select a date",
+      "startTimeRequired": "Please select start time",
+      "durationRequired": "Please select duration",
+      "cancel": "Cancel",
+      "saveChanges": "Save Changes"
+    },
+    "notifications": {
+      "invalidTime": "Invalid Time",
+      "invalidTimeDesc": "End time {{endHour}}:00 exceeds the maximum allowed time of 20:00.",
+      "updated": "Request Updated",
+      "updatedDesc": "Request {{id}} has been updated successfully.",
+      "updateFailed": "Update Failed",
+      "updateFailedDesc": "Failed to update the request. Please try again.",
+      "cancelled": "Request Cancelled",
+      "cancelledDesc": "Request {{id}} has been cancelled.",
+      "cancelFailed": "Cancellation Failed",
+      "cancelFailedDesc": "Failed to cancel the request. Please try again."
+    },
+    "durationOption_one": "{{count}} hour",
+    "durationOption_other": "{{count}} hours"
+  },
+  "pendingRequests": {
+    "title": "Pending Requests",
+    "filterLabel": "Show Requests:",
+    "filterAll": "Show all",
+    "filterHideRejected": "Hide already rejected",
+    "columns": {
+      "requesterName": "Requester Name",
+      "timeSlot": "Time Slot",
+      "duration": "Duration",
+      "date": "Date",
+      "submitted": "Submitted",
+      "actions": "Actions"
+    },
+    "youTag": "You",
+    "noActions": "No actions",
+    "cannotApproveOwn": "Cannot approve own request",
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "approveModal": {
+      "title": "Approve Request",
+      "content": "Approve parking request from {{name}}?",
+      "ok": "Approve",
+      "cancel": "Cancel"
+    },
+    "rejectModal": {
+      "title": "Reject Request",
+      "content": "Reject parking request from {{name}}?",
+      "ok": "Reject",
+      "cancel": "Cancel"
+    },
+    "notifications": {
+      "approved": "Request Approved",
+      "approvedDesc": "Parking request from {{name}} has been approved.",
+      "approvalFailed": "Approval Failed",
+      "approvalFailedDesc": "Failed to approve the request. Please try again.",
+      "rejected": "Request Rejected",
+      "rejectedDesc": "Parking request from {{name}} has been rejected.",
+      "rejectionFailed": "Rejection Failed",
+      "rejectionFailedDesc": "Failed to reject the request. Please try again."
+    },
+    "rejectedLegend": "= Rejected by you (can reapprove by clicking Approve)",
+    "stats": {
+      "total": "Total Requests",
+      "pending": "Pending",
+      "rejectedByYou": "Rejected by You"
+    },
+    "infoOwner": "Lists all parking requests awaiting your approval. Requests you have already rejected are shown in grey.",
+    "infoManager": "Lists all parking requests currently awaiting owner approval."
+  },
+  "approvals": {
+    "title": "Approvals",
+    "columns": {
+      "requestId": "Request ID",
+      "requester": "Requester",
+      "date": "Date",
+      "timeSlot": "Time Slot",
+      "duration": "Duration",
+      "assignedLot": "Assigned Lot",
+      "lotOwner": "Lot Owner",
+      "approvedAt": "Approved At",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "View Details",
+      "viewMessages": "View Messages"
+    },
+    "messagesModal": {
+      "title": "Messages for {{id}}",
+      "requester": "Requester:",
+      "lotOwner": "Lot Owner:",
+      "hint": "Click \"View Details\" to see the full message thread."
+    },
+    "stats": {
+      "total": "Total Approvals",
+      "today": "Approved Today",
+      "thisWeek": "This Week"
+    },
+    "info": "A complete history of all approved parking requests across the system."
+  },
+  "requestForm": {
+    "title": "Submit Parking Request",
+    "limitAlert": {
+      "title": "Request Limit Reached",
+      "description": "You currently have the maximum number of active parking requests (3). You cannot submit new requests until one of your existing requests is approved or cancelled."
+    },
+    "activeRequestsCard": "Your Active Requests ({{count}} / {{max}})",
+    "labels": {
+      "date": "Date",
+      "timeSlot": "Time Slot",
+      "status": "Status",
+      "parkingDate": "Parking Date",
+      "startTime": "Start Time",
+      "duration": "Duration",
+      "endTime": "End Time"
+    },
+    "placeholders": {
+      "selectDate": "Select date",
+      "selectStartTime": "Select start time (hourly boundaries)",
+      "selectDuration": "Select duration"
+    },
+    "validation": {
+      "dateRequired": "Please select a date",
+      "startTimeRequired": "Please select start time",
+      "durationRequired": "Please select duration"
+    },
+    "endTimeInvalid": "⚠️ Invalid: End time would exceed 20:00",
+    "submitButton": "Submit Request",
+    "submitButtonDisabled": "Cannot Submit (Max Requests Reached)",
+    "businessRules": {
+      "title": "Business Rules",
+      "rule1start": "You can have a maximum of ",
+      "rule1bold": "3 concurrent active requests",
+      "rule2": "Select any date from today onwards",
+      "rule3": "Start time must be on hourly boundaries (08:00 – 19:00)",
+      "rule4": "Duration is 1–6 hours, automatically limited so end time never exceeds 20:00",
+      "rule5": "End time is auto-calculated and cannot exceed 20:00"
+    },
+    "info": "Submit a parking request for a specific date and time slot; an owner will review and approve or reject it.",
+    "notifications": {
+      "limitExceeded": "Request Limit Exceeded",
+      "limitExceededDesc": "You already have the maximum number of active requests (3). Please wait for an existing request to expire.",
+      "submitted": "Request Submitted",
+      "submittedDesc": "Parking request submitted for {{date}} from {{startTime}} to {{endTime}}",
+      "failed": "Submission Failed",
+      "failedDesc": "Failed to submit the request. Please try again."
+    },
+    "durationOption_one": "{{count}} hour",
+    "durationOption_other": "{{count}} hours"
+  },
+  "calendarView": {
+    "toolbar": {
+      "today": "Today",
+      "weekShort": "Wk"
+    },
+    "viewNames": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "emptyState": "No requests this period",
+    "stats": {
+      "total": "Total Requests",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "infoTitle": "Requests View",
+    "info": "A calendar overview of all parking requests — pending, approved, and rejected.",
+    "legendTitle": "Legend",
+    "legend": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "myRequest": "★ My Request"
+    },
+    "modal": {
+      "title": "Request — {{name}}",
+      "close": "Close",
+      "requester": "Requester",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "status": "Status",
+      "submitted": "Submitted",
+      "lot": "Lot",
+      "floor": "Floor",
+      "lotOwner": "Lot Owner"
+    },
+    "notifications": {
+      "rescheduled": "Request Rescheduled",
+      "rescheduledDesc": "Request {{id}} moved to {{from}} – {{to}}"
+    },
+    "statusRejected": "Rejected"
+  },
+  "lotCalendarView": {
+    "allMyLots": "All My Lots",
+    "toolbar": {
+      "today": "Today",
+      "weekShort": "Wk"
+    },
+    "viewNames": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "emptyState": "No events this period",
+    "stats": {
+      "total": "Total Events",
+      "booked": "Booked",
+      "pending": "Pending",
+      "blocked": "Blocked"
+    },
+    "infoTitle": "Lot Calendar",
+    "info": "A calendar view of your lots showing bookings, pending requests, and blocked periods.",
+    "legendTitle": "Legend",
+    "legend": {
+      "booked": "Booked",
+      "pending": "Pending",
+      "blocked": "Blocked"
+    },
+    "modal": {
+      "close": "Close",
+      "bookedTitle": "Booked — {{name}}",
+      "pendingTitle": "Pending — {{name}}",
+      "blockedTitle": "Blocked — {{id}}",
+      "requester": "Requester",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "lot": "Lot",
+      "floor": "Floor",
+      "status": "Status",
+      "approvedAt": "Approved At",
+      "submitted": "Submitted",
+      "lotId": "Lot ID",
+      "owner": "Owner",
+      "blockedUntil": "Blocked Until",
+      "approve": "Approve",
+      "reject": "Reject",
+      "unowned": "Unowned"
+    },
+    "notifications": {
+      "approved": "Request approved successfully",
+      "rejected": "Request rejected"
+    }
+  },
+  "lotStatusBoard": {
+    "title": "Parking Status",
+    "legendTitle": "Status Legend",
+    "legend": {
+      "available": "Available - Owner, No Block",
+      "blocked": "Blocked - Active Block",
+      "unowned": "Unowned - No Owner",
+      "unownedBlocked": "Unowned-Blocked - Legacy Block"
+    },
+    "lotsCount_one": "{{count}} lot",
+    "lotsCount_other": "{{count}} lots",
+    "columns": {
+      "lotId": "Lot ID",
+      "owner": "Owner",
+      "status": "Status",
+      "blockedUntil": "Blocked Until"
+    },
+    "unassigned": "Unassigned",
+    "stats": {
+      "available": "Available",
+      "blocked": "Blocked",
+      "unowned": "Unowned",
+      "unownedBlocked": "Unowned-Blocked"
+    },
+    "infoTitle": "Parking Status",
+    "infoDesc": "Displays the current status of all parking lots across all floors."
+  },
+  "myLots": {
+    "title": "My Lots",
+    "ownerLabel": "Owner:",
+    "totalLotsLabel": "Total Lots:",
+    "columns": {
+      "lotId": "Lot ID",
+      "floor": "Floor",
+      "status": "Status",
+      "blockedUntil": "Blocked Until",
+      "actions": "Actions"
+    },
+    "viewUsage": "View Usage",
+    "noLots": "You do not currently own any lots.",
+    "info": "Shows all parking lots assigned to you and their current availability status."
+  },
+  "requestDetail": {
+    "title": "Request Details",
+    "notFoundPrefix": "Request ",
+    "notFoundSuffix": " was not found.",
+    "goBack": "Go Back",
+    "requestInfo": {
+      "cardTitle": "Request Information",
+      "id": "Request ID",
+      "status": "Status",
+      "requester": "Requester",
+      "date": "Date",
+      "timeSlot": "Time Slot",
+      "duration": "Duration",
+      "submitted": "Submitted",
+      "lastUpdated": "Last Updated",
+      "durationValue_one": "{{count}} hour",
+      "durationValue_other": "{{count}} hours"
+    },
+    "approvedInfo": {
+      "assignedLot": "Assigned Lot",
+      "floor": "Floor",
+      "lotOwner": "Lot Owner",
+      "approvedAt": "Approved At"
+    },
+    "messages": {
+      "cardTitle": "Message Thread",
+      "placeholder": "Type your message...",
+      "send": "Send",
+      "loadFailed": "Failed to load messages",
+      "sendFailed": "Failed to send message"
+    }
+  }
 }
