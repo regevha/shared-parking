@@ -212,6 +212,103 @@
     "durationOption_one": "{{count}} hour",
     "durationOption_other": "{{count}} hours"
   },
+  "calendarView": {
+    "toolbar": {
+      "today": "Today",
+      "weekShort": "Wk"
+    },
+    "viewNames": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "emptyState": "No requests this period",
+    "stats": {
+      "total": "Total Requests",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "infoTitle": "Requests View",
+    "info": "A calendar overview of all parking requests — pending, approved, and rejected.",
+    "legendTitle": "Legend",
+    "legend": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "myRequest": "★ My Request"
+    },
+    "modal": {
+      "title": "Request — {{name}}",
+      "close": "Close",
+      "requester": "Requester",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "status": "Status",
+      "submitted": "Submitted",
+      "lot": "Lot",
+      "floor": "Floor",
+      "lotOwner": "Lot Owner"
+    },
+    "notifications": {
+      "rescheduled": "Request Rescheduled",
+      "rescheduledDesc": "Request {{id}} moved to {{from}} – {{to}}"
+    },
+    "statusRejected": "Rejected"
+  },
+  "lotCalendarView": {
+    "allMyLots": "All My Lots",
+    "toolbar": {
+      "today": "Today",
+      "weekShort": "Wk"
+    },
+    "viewNames": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "emptyState": "No events this period",
+    "stats": {
+      "total": "Total Events",
+      "booked": "Booked",
+      "pending": "Pending",
+      "blocked": "Blocked"
+    },
+    "infoTitle": "Lot Calendar",
+    "info": "A calendar view of your lots showing bookings, pending requests, and blocked periods.",
+    "legendTitle": "Legend",
+    "legend": {
+      "booked": "Booked",
+      "pending": "Pending",
+      "blocked": "Blocked"
+    },
+    "modal": {
+      "close": "Close",
+      "bookedTitle": "Booked — {{name}}",
+      "pendingTitle": "Pending — {{name}}",
+      "blockedTitle": "Blocked — {{id}}",
+      "requester": "Requester",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "lot": "Lot",
+      "floor": "Floor",
+      "status": "Status",
+      "approvedAt": "Approved At",
+      "submitted": "Submitted",
+      "lotId": "Lot ID",
+      "owner": "Owner",
+      "blockedUntil": "Blocked Until",
+      "approve": "Approve",
+      "reject": "Reject",
+      "unowned": "Unowned"
+    },
+    "notifications": {
+      "approved": "Request approved successfully",
+      "rejected": "Request rejected"
+    }
+  },
   "lotStatusBoard": {
     "title": "Parking Status",
     "legendTitle": "Status Legend",

@@ -212,6 +212,103 @@
     "durationOption_one": "{{count}} heure",
     "durationOption_other": "{{count}} heures"
   },
+  "calendarView": {
+    "toolbar": {
+      "today": "Aujourd'hui",
+      "weekShort": "Sem"
+    },
+    "viewNames": {
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "emptyState": "Aucune demande sur cette période",
+    "stats": {
+      "total": "Total des demandes",
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté"
+    },
+    "infoTitle": "Vue des demandes",
+    "info": "Un aperçu calendrier de toutes les demandes de stationnement — en attente, approuvées et rejetées.",
+    "legendTitle": "Légende",
+    "legend": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté",
+      "myRequest": "★ Ma demande"
+    },
+    "modal": {
+      "title": "Demande — {{name}}",
+      "close": "Fermer",
+      "requester": "Demandeur",
+      "date": "Date",
+      "time": "Heure",
+      "duration": "Durée",
+      "status": "Statut",
+      "submitted": "Soumis le",
+      "lot": "Place",
+      "floor": "Étage",
+      "lotOwner": "Propriétaire"
+    },
+    "notifications": {
+      "rescheduled": "Demande replanifiée",
+      "rescheduledDesc": "Demande {{id}} déplacée au {{from}} – {{to}}"
+    },
+    "statusRejected": "Rejeté"
+  },
+  "lotCalendarView": {
+    "allMyLots": "Toutes mes places",
+    "toolbar": {
+      "today": "Aujourd'hui",
+      "weekShort": "Sem"
+    },
+    "viewNames": {
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "emptyState": "Aucun événement sur cette période",
+    "stats": {
+      "total": "Total des événements",
+      "booked": "Réservé",
+      "pending": "En attente",
+      "blocked": "Bloqué"
+    },
+    "infoTitle": "Calendrier des places",
+    "info": "Vue calendrier de vos places montrant les réservations, les demandes en attente et les périodes bloquées.",
+    "legendTitle": "Légende",
+    "legend": {
+      "booked": "Réservé",
+      "pending": "En attente",
+      "blocked": "Bloqué"
+    },
+    "modal": {
+      "close": "Fermer",
+      "bookedTitle": "Réservé — {{name}}",
+      "pendingTitle": "En attente — {{name}}",
+      "blockedTitle": "Bloqué — {{id}}",
+      "requester": "Demandeur",
+      "date": "Date",
+      "time": "Heure",
+      "duration": "Durée",
+      "lot": "Place",
+      "floor": "Étage",
+      "status": "Statut",
+      "approvedAt": "Approuvé le",
+      "submitted": "Soumis le",
+      "lotId": "ID place",
+      "owner": "Propriétaire",
+      "blockedUntil": "Bloqué jusqu'au",
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "unowned": "Sans propriétaire"
+    },
+    "notifications": {
+      "approved": "Demande approuvée avec succès",
+      "rejected": "Demande rejetée"
+    }
+  },
   "lotStatusBoard": {
     "title": "État du stationnement",
     "legendTitle": "Légende des statuts",
