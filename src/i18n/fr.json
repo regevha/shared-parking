@@ -1,4 +1,16 @@
 {
+  "nav": {
+    "myRequests": "Mes demandes",
+    "requestsView": "Vue des demandes",
+    "pendingRequests": "Demandes en attente",
+    "approvals": "Approbations",
+    "parkingStatus": "Statut du parking",
+    "lotCalendar": "Calendrier des places",
+    "myLots": "Mes places",
+    "adminPanel": "Panneau d'administration",
+    "notificationWindows": "Fenêtres de notification",
+    "signOut": "Se déconnecter"
+  },
   "login": {
     "title": "Gestion du stationnement",
     "subtitle": "Connectez-vous à votre compte",

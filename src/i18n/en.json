@@ -1,4 +1,16 @@
 {
+  "nav": {
+    "myRequests": "My Requests",
+    "requestsView": "Requests View",
+    "pendingRequests": "Pending Requests",
+    "approvals": "Approvals",
+    "parkingStatus": "Parking Status",
+    "lotCalendar": "Lot Calendar",
+    "myLots": "My Lots",
+    "adminPanel": "Admin Panel",
+    "notificationWindows": "Notification Windows",
+    "signOut": "Sign out"
+  },
   "login": {
     "title": "Parking Management",
     "subtitle": "Sign in to your account",
