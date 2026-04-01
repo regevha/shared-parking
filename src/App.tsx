@@ -113,7 +113,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                 items={getMenuItems()}
                 style={{ flex: 1, minWidth: 0, background: 'transparent' }}
               />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, direction: 'ltr' }}>
                 <Dropdown menu={languageMenu} trigger={['click']}>
                   <Button
                     type="text"
@@ -196,7 +196,7 @@ const AppRoot: React.FC = () => {
       storeLanguage(lang);
       i18n.changeLanguage(lang);
     }
-  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps — intentional: only sync on login
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
