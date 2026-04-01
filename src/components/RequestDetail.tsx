@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Tag, Button, Input, Avatar, Divider, Row, Col, Spin, notification } from 'antd';
 import { SendOutlined, UserOutlined, CrownOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,6 +15,7 @@ const RequestDetail: React.FC = () => {
   const navigate = useNavigate();
   const { pendingRequests, approvedRequests, userRequests } = useRequests();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const allRequests = [...pendingRequests, ...approvedRequests, ...userRequests];
   const seen = new Set<string>();
@@ -31,23 +33,22 @@ const RequestDetail: React.FC = () => {
     messagesApi.getForRequest(id)
       .then(setMessages)
       .catch((err: any) => {
-        notification.error({ message: 'Failed to load messages', description: err.message });
+        notification.error({ message: t('requestDetail.messages.loadFailed'), description: err.message });
       })
       .finally(() => setLoadingMessages(false));
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!request) {
     return (
       <div className="request-detail">
-        <h1>Request Details</h1>
+        <h1>{t('requestDetail.title')}</h1>
         <Card>
-          <p>Request <strong>{id}</strong> was not found.</p>
-          <Button onClick={() => navigate(-1)}>Go Back</Button>
+          <p>{t('requestDetail.notFoundPrefix')}<strong>{id}</strong>{t('requestDetail.notFoundSuffix')}</p>
+          <Button onClick={() => navigate(-1)}>{t('requestDetail.goBack')}</Button>
         </Card>
       </div>
     );
   }
-
 
   const handleSendMessage = async () => {
     const text = newMessage.trim();
@@ -59,7 +60,7 @@ const RequestDetail: React.FC = () => {
       setMessages(prev => [...prev, msg]);
       setNewMessage('');
     } catch (err: any) {
-      notification.error({ message: 'Failed to send message', description: err.message });
+      notification.error({ message: t('requestDetail.messages.sendFailed'), description: err.message });
     } finally {
       setSending(false);
     }
@@ -74,24 +75,24 @@ const RequestDetail: React.FC = () => {
 
   return (
     <div className="request-detail">
-      <h1>Request Details</h1>
+      <h1>{t('requestDetail.title')}</h1>
 
       {/* Request Info Card */}
       <Card
-        title="Request Information"
+        title={t('requestDetail.requestInfo.cardTitle')}
         style={{ marginBottom: '24px' }}
         size="small"
       >
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
-              <div className="label">Request ID</div>
+              <div className="label">{t('requestDetail.requestInfo.id')}</div>
               <div className="value"><strong>{request.id}</strong></div>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
-              <div className="label">Status</div>
+              <div className="label">{t('requestDetail.requestInfo.status')}</div>
               <div className="value">
                 <Tag color={getRequestStatusColor(request.status)}>
                   {getRequestStatusLabel(request.status)}
@@ -101,38 +102,38 @@ const RequestDetail: React.FC = () => {
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
-              <div className="label">Requester</div>
+              <div className="label">{t('requestDetail.requestInfo.requester')}</div>
               <div className="value">{request.requesterName}</div>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
-              <div className="label">Date</div>
+              <div className="label">{t('requestDetail.requestInfo.date')}</div>
               <div className="value">{dayjs(request.date).format('DD/MM/YYYY')}</div>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
-              <div className="label">Time Slot</div>
+              <div className="label">{t('requestDetail.requestInfo.timeSlot')}</div>
               <div className="value">{request.startTime} - {request.endTime}</div>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
-              <div className="label">Duration</div>
-              <div className="value">{request.duration} hours</div>
+              <div className="label">{t('requestDetail.requestInfo.duration')}</div>
+              <div className="value">{t('requestDetail.requestInfo.durationValue', { count: request.duration })}</div>
             </div>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <div className="info-item">
-              <div className="label">Submitted</div>
+              <div className="label">{t('requestDetail.requestInfo.submitted')}</div>
               <div className="value">{dayjs(request.submittedAt).format('DD/MM/YYYY HH:mm')}</div>
             </div>
           </Col>
           {request.updatedAt && (
             <Col xs={24} sm={12} md={6}>
               <div className="info-item">
-                <div className="label">Last Updated</div>
+                <div className="label">{t('requestDetail.requestInfo.lastUpdated')}</div>
                 <div className="value">{dayjs(request.updatedAt).format('DD/MM/YYYY HH:mm')}</div>
               </div>
             </Col>
@@ -146,25 +147,25 @@ const RequestDetail: React.FC = () => {
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={6}>
                 <div className="info-item">
-                  <div className="label">Assigned Lot</div>
+                  <div className="label">{t('requestDetail.approvedInfo.assignedLot')}</div>
                   <div className="value"><strong>{request.lotId}</strong></div>
                 </div>
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <div className="info-item">
-                  <div className="label">Floor</div>
+                  <div className="label">{t('requestDetail.approvedInfo.floor')}</div>
                   <div className="value">{request.floor}</div>
                 </div>
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <div className="info-item">
-                  <div className="label">Lot Owner</div>
+                  <div className="label">{t('requestDetail.approvedInfo.lotOwner')}</div>
                   <div className="value">{request.lotOwner}</div>
                 </div>
               </Col>
               <Col xs={24} sm={12} md={6}>
                 <div className="info-item">
-                  <div className="label">Approved At</div>
+                  <div className="label">{t('requestDetail.approvedInfo.approvedAt')}</div>
                   <div className="value">{request.approvedAt ? dayjs(request.approvedAt).format('DD/MM/YYYY HH:mm') : '—'}</div>
                 </div>
               </Col>
@@ -175,7 +176,7 @@ const RequestDetail: React.FC = () => {
 
       {/* Message Thread */}
       <Card
-        title="Message Thread"
+        title={t('requestDetail.messages.cardTitle')}
         style={{ marginBottom: '24px' }}
         bodyStyle={{ padding: '16px' }}
       >
@@ -210,7 +211,7 @@ const RequestDetail: React.FC = () => {
         <div className="message-input-container">
           <Input.Group compact>
             <Input
-              placeholder="Type your message..."
+              placeholder={t('requestDetail.messages.placeholder')}
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onPressEnter={handleKeyPress}
@@ -224,7 +225,7 @@ const RequestDetail: React.FC = () => {
               disabled={!newMessage.trim()}
               style={{ width: '80px' }}
             >
-              Send
+              {t('requestDetail.messages.send')}
             </Button>
           </Input.Group>
         </div>

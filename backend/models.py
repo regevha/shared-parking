@@ -29,6 +29,7 @@ class UserPreferences(Base):
     dark_mode = Column(Boolean, nullable=False, default=True)
     # JSON-encoded dict: { "Monday": [{"id":"..","startTime":"..","endTime":".."}], … }
     notification_windows = Column(String, nullable=True, default='{}')
+    language = Column(String, nullable=False, default='en')
     # ── add new preference columns here ────────────────────────────────────────
 
     user = relationship("User", back_populates="preferences")

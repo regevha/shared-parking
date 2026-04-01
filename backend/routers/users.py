@@ -123,6 +123,8 @@ def update_preferences(
         prefs.dark_mode = payload.dark_mode
     if payload.notification_windows is not None:
         prefs.notification_windows = payload.notification_windows
+    if payload.language is not None:
+        prefs.language = payload.language
     db.commit()
     db.refresh(prefs)
     return prefs

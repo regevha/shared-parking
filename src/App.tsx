@@ -172,8 +172,14 @@ const AppRoot: React.FC = () => {
   const [language, setLanguage] = useState<SupportedLanguage>(getStoredLanguage);
 
   useEffect(() => {
-    if (user) setDarkMode(user.preferences.darkMode);
-  }, [user]); // sync whenever the user object changes (login / preference update)
+    if (user) {
+      setDarkMode(user.preferences.darkMode);
+      const lang = (user.preferences.language ?? 'en') as SupportedLanguage;
+      setLanguage(lang);
+      storeLanguage(lang);
+      i18n.changeLanguage(lang);
+    }
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps — intentional: only sync on login
 
   useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
@@ -194,6 +200,10 @@ const AppRoot: React.FC = () => {
     setLanguage(next);
     storeLanguage(next);
     i18n.changeLanguage(next);
+    if (user) {
+      updateUser({ preferences: { ...user.preferences, language: next } });
+      usersApi.updatePreferences(user.id, { language: next }).catch(() => {});
+    }
   };
 
   const antdLocale = language === 'fr' ? frFR : enUS;
