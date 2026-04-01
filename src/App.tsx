@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Button, ConfigProvider, theme, Spin } from 'antd';
-import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined, SunOutlined, MoonOutlined, LogoutOutlined } from '@ant-design/icons';
+import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined, SunOutlined, MoonOutlined, LogoutOutlined, GlobalOutlined } from '@ant-design/icons';
 import enUS from 'antd/locale/en_US';
 import frFR from 'antd/locale/fr_FR';
+import heIL from 'antd/locale/he_IL';
+import dayjs from 'dayjs';
+import 'dayjs/locale/fr';
+import 'dayjs/locale/he';
 import { useTranslation } from 'react-i18next';
 import { Role } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { RequestsProvider } from './contexts/RequestsContext';
 import { usersApi } from './api/users';
-import { type SupportedLanguage, getStoredLanguage, storeLanguage } from './i18n';
+import { type SupportedLanguage, SUPPORTED_LANGUAGES, getStoredLanguage, storeLanguage, isRTL } from './i18n';
 import LotStatusBoard from './components/LotStatusBoard';
 import AllPendingRequests from './components/AllPendingRequests';
 import AllApprovals from './components/AllApprovals';
@@ -37,33 +41,33 @@ interface AppShellProps {
   darkMode: boolean;
   toggleDarkMode: () => void;
   language: SupportedLanguage;
-  toggleLanguage: () => void;
+  setLanguage: (lang: SupportedLanguage) => void;
 }
 
-const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language, toggleLanguage }) => {
+const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language, setLanguage }) => {
   const { user, logout } = useAuth();
-  const { i18n } = useTranslation();
+  const { t } = useTranslation();
   const role: Role = toAppRole(user?.role ?? 'user');
 
   const getMenuItems = () => {
     const items: { key: string; label: React.ReactNode }[] = [];
 
     if (role === 'User' || role === 'Owner') {
-      items.push({ key: 'my-requests', label: <Link to="/my-requests">My Requests</Link> });
+      items.push({ key: 'my-requests', label: <Link to="/my-requests">{t('nav.myRequests')}</Link> });
     }
 
-    items.push({ key: 'calendar',   label: <Link to="/calendar">Requests View</Link> });
-    items.push({ key: 'pending',    label: <Link to="/pending">Pending Requests</Link> });
-    items.push({ key: 'approvals',  label: <Link to="/approvals">Approvals</Link> });
-    items.push({ key: 'lot-status', label: <Link to="/lot-status">Parking Status</Link> });
+    items.push({ key: 'calendar',   label: <Link to="/calendar">{t('nav.requestsView')}</Link> });
+    items.push({ key: 'pending',    label: <Link to="/pending">{t('nav.pendingRequests')}</Link> });
+    items.push({ key: 'approvals',  label: <Link to="/approvals">{t('nav.approvals')}</Link> });
+    items.push({ key: 'lot-status', label: <Link to="/lot-status">{t('nav.parkingStatus')}</Link> });
 
     if (role === 'Owner') {
-      items.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">Lot Calendar</Link> });
-      items.push({ key: 'my-lots',      label: <Link to="/my-lots">My Lots</Link> });
+      items.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">{t('nav.lotCalendar')}</Link> });
+      items.push({ key: 'my-lots',      label: <Link to="/my-lots">{t('nav.myLots')}</Link> });
     }
 
     if (role === 'Manager') {
-      items.push({ key: 'admin', label: <Link to="/admin">Admin Panel</Link> });
+      items.push({ key: 'admin', label: <Link to="/admin">{t('nav.adminPanel')}</Link> });
     }
 
     return items;
@@ -71,8 +75,17 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
 
   const settingsMenu = {
     items: [
-      { key: 'notifications', label: <Link to="/notifications">Notification Windows</Link> },
+      { key: 'notifications', label: <Link to="/notifications">{t('nav.notificationWindows')}</Link> },
     ],
+  };
+
+  const languageMenu = {
+    items: SUPPORTED_LANGUAGES.map(lang => ({
+      key: lang.code,
+      label: lang.nativeLabel,
+      onClick: () => setLanguage(lang.code),
+    })),
+    selectedKeys: [language],
   };
 
   const roleIcon = role === 'Owner' ? <CrownOutlined /> : role === 'Manager' ? <TeamOutlined /> : <UserOutlined />;
@@ -87,6 +100,8 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
     borderBottom: darkMode ? 'none' : '1px solid #f0f0f0',
   };
 
+  const currentLangLabel = SUPPORTED_LANGUAGES.find(l => l.code === language)?.nativeLabel ?? 'EN';
+
   return (
     <RequestsProvider>
       <Router>
@@ -99,14 +114,16 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                 style={{ flex: 1, minWidth: 0, background: 'transparent' }}
               />
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Button
-                  type="text"
-                  onClick={toggleLanguage}
-                  style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13, minWidth: 44 }}
-                  title={language === 'en' ? 'Passer en français' : 'Switch to English'}
-                >
-                  {language === 'en' ? '🇫🇷 FR' : '🇬🇧 EN'}
-                </Button>
+                <Dropdown menu={languageMenu} trigger={['click']}>
+                  <Button
+                    type="text"
+                    icon={<GlobalOutlined />}
+                    style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13 }}
+                    title="Change language"
+                  >
+                    {currentLangLabel}
+                  </Button>
+                </Dropdown>
                 <Button
                   type="text"
                   icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
@@ -123,7 +140,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                     items: [
                       {
                         key: 'logout',
-                        label: 'Sign out',
+                        label: t('nav.signOut'),
                         icon: <LogoutOutlined />,
                         danger: true,
                         onClick: logout,
@@ -132,7 +149,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                   }}
                   trigger={['click']}
                 >
-                  <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8 }}>
+                  <Button type="text" style={{ ...headerBtnStyle, marginInlineStart: 8 }}>
                     {roleIcon} {user?.name ?? role}
                   </Button>
                 </Dropdown>
@@ -169,7 +186,7 @@ const AppRoot: React.FC = () => {
 
   // Default to dark while loading; sync from user.darkMode once authenticated
   const [darkMode, setDarkMode] = useState<boolean>(true);
-  const [language, setLanguage] = useState<SupportedLanguage>(getStoredLanguage);
+  const [language, setLanguageState] = useState<SupportedLanguage>(getStoredLanguage);
 
   useEffect(() => {
     if (user) {
@@ -185,6 +202,12 @@ const AppRoot: React.FC = () => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
 
+  useLayoutEffect(() => {
+    const dir = isRTL(language) ? 'rtl' : 'ltr';
+    document.documentElement.setAttribute('dir', dir);
+    document.documentElement.setAttribute('lang', language);
+  }, [language]);
+
   const toggleDarkMode = async () => {
     const next = !darkMode;
     setDarkMode(next);
@@ -195,22 +218,28 @@ const AppRoot: React.FC = () => {
     }
   };
 
-  const toggleLanguage = () => {
-    const next: SupportedLanguage = language === 'en' ? 'fr' : 'en';
-    setLanguage(next);
+  const setLanguage = (next: SupportedLanguage) => {
+    setLanguageState(next);
     storeLanguage(next);
     i18n.changeLanguage(next);
+
+    dayjs.locale(next);
     if (user) {
       updateUser({ preferences: { ...user.preferences, language: next } });
       usersApi.updatePreferences(user.id, { language: next }).catch(() => {});
     }
   };
 
-  const antdLocale = language === 'fr' ? frFR : enUS;
+  const antdLocale = language === 'fr' ? frFR : language === 'he' ? heIL : enUS;
+  const direction  = isRTL(language) ? 'rtl' : 'ltr';
 
   if (authLoading) {
     return (
-      <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }} locale={antdLocale}>
+      <ConfigProvider
+        theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }}
+        locale={antdLocale}
+        direction={direction}
+      >
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Spin size="large" />
         </div>
@@ -219,9 +248,13 @@ const AppRoot: React.FC = () => {
   }
 
   return (
-    <ConfigProvider theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }} locale={antdLocale}>
+    <ConfigProvider
+      theme={{ algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm }}
+      locale={antdLocale}
+      direction={direction}
+    >
       {user
-        ? <AppShell darkMode={darkMode} toggleDarkMode={toggleDarkMode} language={language} toggleLanguage={toggleLanguage} />
+        ? <AppShell darkMode={darkMode} toggleDarkMode={toggleDarkMode} language={language} setLanguage={setLanguage} />
         : <LoginPage />}
     </ConfigProvider>
   );
