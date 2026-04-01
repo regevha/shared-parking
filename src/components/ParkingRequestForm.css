@@ -14,7 +14,7 @@
 
 .parking-request-form ul {
   margin-bottom: 0;
-  padding-left: 24px;
+  padding-inline-start: 24px;
 }
 
 .parking-request-form ul li {

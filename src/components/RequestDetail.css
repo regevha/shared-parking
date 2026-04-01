@@ -54,37 +54,37 @@
 .message-left .message-content {
   background-color: var(--message-bubble-bg);
   border: 1px solid var(--message-bubble-border);
-  margin-left: 8px;
+  margin-inline-start: 8px;
 }
 
 .message-right .message-content {
   background-color: #1890ff;
   color: white;
-  margin-right: 8px;
+  margin-inline-end: 8px;
 }
 
 .message-left .message-content::before {
   content: '';
   position: absolute;
-  left: -8px;
+  inset-inline-start: -8px;
   top: 12px;
   width: 0;
   height: 0;
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
-  border-right: 8px solid var(--message-bubble-arrow);
+  border-inline-end: 8px solid var(--message-bubble-arrow);
 }
 
 .message-right .message-content::after {
   content: '';
   position: absolute;
-  right: -8px;
+  inset-inline-end: -8px;
   top: 12px;
   width: 0;
   height: 0;
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
-  border-left: 8px solid #1890ff;
+  border-inline-start: 8px solid #1890ff;
 }
 
 .message-header {
@@ -96,7 +96,7 @@
 
 .sender-name {
   font-weight: 600;
-  margin-right: 8px;
+  margin-inline-end: 8px;
 }
 
 .timestamp {
