@@ -75,7 +75,7 @@ def test_create_request_success(client, user_headers):
     data = resp.json()
     assert data["status"] == "pending"
     assert data["id"].startswith("REQ-")
-    assert data["date"] == "2026-04-01"
+    assert data["date"] == REQUEST_PAYLOAD["date"]
     # requester fields come from JWT, not payload
     assert data["requester_name"] == "Alice User"
 
