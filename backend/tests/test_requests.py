@@ -1,7 +1,7 @@
 """Tests for /api/requests/* endpoints."""
 
 import pytest
-from .conftest import REQUEST_PAYLOAD
+from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE
 
 
 # ── GET /api/requests ──────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ def test_create_request_success(client, user_headers):
     data = resp.json()
     assert data["status"] == "pending"
     assert data["id"].startswith("REQ-")
-    assert data["date"] == "2026-04-01"
+    assert data["date"] == _FUTURE_DATE
     # requester fields come from JWT, not payload
     assert data["requester_name"] == "Alice User"
 

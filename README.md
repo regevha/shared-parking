@@ -80,6 +80,19 @@ Runs on **http://localhost:3000** — start the backend first so the API is reac
 
 ---
 
+## Mobile / Local Network Access
+
+Both servers are configured to bind to all interfaces so you can open the app on a phone or tablet connected to the same WiFi.
+
+1. Find your machine's LAN IP: run `ipconfig` (Windows) or `ip addr` (Linux/Mac) and note the IPv4 address.
+2. Start the backend with `--host 0.0.0.0` (see below) and set `CORS_ORIGINS` to include your LAN IP.
+3. Start the frontend — the `.env` file already sets `HOST=0.0.0.0`.
+4. Open `http://<LAN-IP>:3000` on your phone.
+
+Full instructions: **[docs/MOBILE_ACCESS.md](docs/MOBILE_ACCESS.md)**
+
+---
+
 ## Python Dependencies
 
 ### Runtime packages (`requirements.txt`)

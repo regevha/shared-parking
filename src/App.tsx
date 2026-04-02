@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Layout, Menu, Dropdown, Button, ConfigProvider, theme, Spin } from 'antd';
+import { Layout, Menu, Dropdown, Button, ConfigProvider, theme, Spin, Grid } from 'antd';
 import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined, SunOutlined, MoonOutlined, LogoutOutlined } from '@ant-design/icons';
 import enUS from 'antd/locale/en_US';
 import frFR from 'antd/locale/fr_FR';
@@ -44,6 +44,8 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
   const { user, logout } = useAuth();
   const { i18n } = useTranslation();
   const role: Role = toAppRole(user?.role ?? 'user');
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
 
   const getMenuItems = () => {
     const items: { key: string; label: React.ReactNode }[] = [];
@@ -105,7 +107,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                   style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13, minWidth: 44 }}
                   title={language === 'en' ? 'Passer en français' : 'Switch to English'}
                 >
-                  {language === 'en' ? '🇫🇷 FR' : '🇬🇧 EN'}
+                  {language === 'en' ? (isMobile ? '🇫🇷' : '🇫🇷 FR') : (isMobile ? '🇬🇧' : '🇬🇧 EN')}
                 </Button>
                 <Button
                   type="text"
@@ -133,13 +135,13 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                   trigger={['click']}
                 >
                   <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8 }}>
-                    {roleIcon} {user?.name ?? role}
+                    {roleIcon}{!isMobile && ` ${user?.name ?? role}`}
                   </Button>
                 </Dropdown>
               </div>
             </Header>
-            <Content style={{ padding: '0 50px' }}>
-              <div style={{ padding: 24, minHeight: 380 }}>
+            <Content style={{ padding: isMobile ? '0 8px' : '0 50px' }}>
+              <div style={{ padding: isMobile ? 12 : 24, minHeight: 380 }}>
                 <Routes>
                   <Route path="/lot-status"   element={<LotStatusBoard />} />
                   <Route path="/pending"      element={<AllPendingRequests role={role} />} />

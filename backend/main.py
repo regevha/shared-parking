@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -34,10 +36,15 @@ app = FastAPI(
     version="2.0.0",
 )
 
-# Allow the React dev server (port 3000) to call the API
+# Allow the React dev server to call the API.
+# Set CORS_ORIGINS env var to a comma-separated list to add LAN IPs, e.g.:
+#   CORS_ORIGINS=http://localhost:3000,http://192.168.1.42:3000
+_raw_origins = os.environ.get("CORS_ORIGINS", "http://localhost:3000")
+cors_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
