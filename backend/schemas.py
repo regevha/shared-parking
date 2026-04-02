@@ -23,6 +23,7 @@ class ParkingRequestBase(BaseModel):
     floor: Optional[str] = None
     lot_owner: Optional[str] = None
     approved_at: Optional[str] = None
+    approved_by: Optional[str] = None
     updated_at: Optional[str] = None
 
 
@@ -179,10 +180,14 @@ class LotOut(BaseModel):
 
 # ── Users ─────────────────────────────────────────────────────────────────────
 
+_ALLOWED_LANGUAGES = {'en', 'fr', 'he'}
+
+
 class PreferencesOut(BaseModel):
     dark_mode: bool = True
     # JSON-encoded notification windows, e.g. '{"Monday":[{"id":"1","startTime":"09:00","endTime":"12:00"}]}'
     notification_windows: Optional[str] = '{}'
+    language: str = 'en'
     # ── add new preference fields here ─────────────────────────────────────────
 
     class Config:
@@ -192,6 +197,14 @@ class PreferencesOut(BaseModel):
 class PreferencesUpdate(BaseModel):
     dark_mode: Optional[bool] = None
     notification_windows: Optional[str] = None  # JSON-encoded
+    language: Optional[str] = None
+
+    @field_validator('language')
+    @classmethod
+    def validate_language(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and v not in _ALLOWED_LANGUAGES:
+            raise ValueError(f'language must be one of {sorted(_ALLOWED_LANGUAGES)}')
+        return v
     # ── add new preference fields here ─────────────────────────────────────────
 
 

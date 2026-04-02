@@ -10,6 +10,7 @@ import sys
 import os
 import datetime
 import pytest
+from datetime import date, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -103,7 +104,7 @@ def manager_headers(client) -> dict:
 
 # ── Request helpers ────────────────────────────────────────────────────────
 
-_FUTURE_DATE = (datetime.date.today() + datetime.timedelta(days=1)).isoformat()
+_FUTURE_DATE = (date.today() + timedelta(days=7)).isoformat()
 
 REQUEST_PAYLOAD = {
     "requester_id":   "ignored",

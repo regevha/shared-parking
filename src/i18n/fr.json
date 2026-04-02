@@ -1,2 +1,584 @@
 {
+  "nav": {
+    "myRequests": "Mes demandes",
+    "requestsView": "Vue des demandes",
+    "pendingRequests": "Demandes en attente",
+    "approvals": "Approbations",
+    "parkingStatus": "Statut du parking",
+    "lotCalendar": "Calendrier des places",
+    "myLots": "Mes places",
+    "adminPanel": "Panneau d'administration",
+    "notificationWindows": "Fenêtres de notification",
+    "signOut": "Se déconnecter"
+  },
+  "login": {
+    "title": "Gestion du stationnement",
+    "subtitle": "Connectez-vous à votre compte",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "vous@parking.dev",
+    "emailRequired": "Veuillez saisir votre e-mail",
+    "emailInvalid": "Saisissez un e-mail valide",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Mot de passe",
+    "passwordRequired": "Veuillez saisir votre mot de passe",
+    "signIn": "Se connecter",
+    "loginFailed": "Échec de la connexion",
+    "demoAccounts": "Comptes de démonstration — mot de passe : password123",
+    "demoRoles": {
+      "user": "Utilisateur",
+      "owner": "Propriétaire",
+      "manager": "Gestionnaire"
+    }
+  },
+  "myRequests": {
+    "title": "Mes demandes",
+    "newRequest": "Nouvelle demande",
+    "noActiveRequests": "Aucune demande active",
+    "columns": {
+      "id": "ID",
+      "timeSlot": "Créneau",
+      "duration": "Dur.",
+      "status": "Statut",
+      "submitted": "Soumis le"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "cancel": "Annuler"
+    },
+    "mobile": {
+      "date": "Date",
+      "time": "Heure",
+      "submitted": "Soumis le"
+    },
+    "stats": {
+      "totalActive": "Total actif",
+      "pending": "En attente",
+      "approved": "Approuvé"
+    },
+    "info": "Gérez vos demandes de stationnement actives. Les demandes en attente peuvent être modifiées ; toute demande active peut être annulée. Les demandes rejetées ne sont pas affichées.",
+    "cancelConfirm": {
+      "title": "Annuler la demande",
+      "description": "Êtes-vous sûr de vouloir annuler la demande {{id}} ?",
+      "descriptionMobile": "Annuler la demande {{id}} ?",
+      "ok": "Oui, annuler",
+      "okMobile": "Oui",
+      "no": "Non"
+    },
+    "editModal": {
+      "title": "Modifier la demande {{id}}",
+      "parkingDate": "Date de stationnement",
+      "startTime": "Heure de début",
+      "duration": "Durée",
+      "selectDate": "Sélectionner une date",
+      "selectStartTime": "Sélectionner l'heure de début (intervalles horaires)",
+      "selectDuration": "Sélectionner la durée",
+      "dateRequired": "Veuillez sélectionner une date",
+      "startTimeRequired": "Veuillez sélectionner l'heure de début",
+      "durationRequired": "Veuillez sélectionner la durée",
+      "cancel": "Annuler",
+      "saveChanges": "Enregistrer les modifications"
+    },
+    "notifications": {
+      "invalidTime": "Heure invalide",
+      "invalidTimeDesc": "L'heure de fin {{endHour}}:00 dépasse l'heure maximale autorisée de 20:00.",
+      "updated": "Demande mise à jour",
+      "updatedDesc": "La demande {{id}} a été mise à jour avec succès.",
+      "updateFailed": "Échec de la mise à jour",
+      "updateFailedDesc": "Impossible de mettre à jour la demande. Veuillez réessayer.",
+      "cancelled": "Demande annulée",
+      "cancelledDesc": "La demande {{id}} a été annulée.",
+      "cancelFailed": "Échec de l'annulation",
+      "cancelFailedDesc": "Impossible d'annuler la demande. Veuillez réessayer."
+    },
+    "durationOption_one": "{{count}} heure",
+    "durationOption_other": "{{count}} heures"
+  },
+  "pendingRequests": {
+    "title": "Demandes en attente",
+    "filterLabel": "Afficher les demandes :",
+    "filterAll": "Tout afficher",
+    "filterHideRejected": "Masquer les déjà rejetées",
+    "columns": {
+      "requesterName": "Nom du demandeur",
+      "timeSlot": "Créneau",
+      "duration": "Durée",
+      "date": "Date",
+      "submitted": "Soumis le",
+      "actions": "Actions"
+    },
+    "youTag": "Vous",
+    "noActions": "Aucune action",
+    "cannotApproveOwn": "Impossible d'approuver sa propre demande",
+    "actions": {
+      "approve": "Approuver",
+      "reject": "Rejeter"
+    },
+    "approveModal": {
+      "title": "Approuver la demande",
+      "content": "Approuver la demande de stationnement de {{name}} ?",
+      "ok": "Approuver",
+      "cancel": "Annuler"
+    },
+    "rejectModal": {
+      "title": "Rejeter la demande",
+      "content": "Rejeter la demande de stationnement de {{name}} ?",
+      "ok": "Rejeter",
+      "cancel": "Annuler"
+    },
+    "notifications": {
+      "approved": "Demande approuvée",
+      "approvedDesc": "La demande de stationnement de {{name}} a été approuvée.",
+      "approvalFailed": "Échec de l'approbation",
+      "approvalFailedDesc": "Impossible d'approuver la demande. Veuillez réessayer.",
+      "rejected": "Demande rejetée",
+      "rejectedDesc": "La demande de stationnement de {{name}} a été rejetée.",
+      "rejectionFailed": "Échec du rejet",
+      "rejectionFailedDesc": "Impossible de rejeter la demande. Veuillez réessayer."
+    },
+    "rejectedLegend": "= Rejeté par vous (vous pouvez réapprouver en cliquant sur Approuver)",
+    "stats": {
+      "total": "Total des demandes",
+      "pending": "En attente",
+      "rejectedByYou": "Rejeté par vous"
+    },
+    "infoOwner": "Liste toutes les demandes de stationnement en attente de votre approbation. Les demandes que vous avez déjà rejetées apparaissent en gris.",
+    "infoManager": "Liste toutes les demandes de stationnement en attente d'approbation par un propriétaire."
+  },
+  "approvals": {
+    "title": "Approbations",
+    "columns": {
+      "requestId": "ID de la demande",
+      "requester": "Demandeur",
+      "date": "Date",
+      "timeSlot": "Créneau",
+      "duration": "Durée",
+      "assignedLot": "Place attribuée",
+      "lotOwner": "Propriétaire",
+      "approvedAt": "Approuvé le",
+      "actions": "Actions"
+    },
+    "actions": {
+      "viewDetails": "Voir les détails",
+      "viewMessages": "Voir les messages"
+    },
+    "messagesModal": {
+      "title": "Messages pour {{id}}",
+      "requester": "Demandeur :",
+      "lotOwner": "Propriétaire :",
+      "hint": "Cliquez sur « Voir les détails » pour voir le fil de messages complet."
+    },
+    "stats": {
+      "total": "Total des approbations",
+      "today": "Approuvé aujourd'hui",
+      "thisWeek": "Cette semaine"
+    },
+    "info": "Historique complet de toutes les demandes de stationnement approuvées dans le système."
+  },
+  "requestForm": {
+    "title": "Soumettre une demande de stationnement",
+    "limitAlert": {
+      "title": "Limite de demandes atteinte",
+      "description": "Vous avez déjà le nombre maximum de demandes actives (3). Vous ne pouvez pas soumettre de nouvelles demandes tant qu'une demande existante n'est pas approuvée ou annulée."
+    },
+    "activeRequestsCard": "Vos demandes actives ({{count}} / {{max}})",
+    "labels": {
+      "date": "Date",
+      "timeSlot": "Créneau",
+      "status": "Statut",
+      "parkingDate": "Date de stationnement",
+      "startTime": "Heure de début",
+      "duration": "Durée",
+      "endTime": "Heure de fin"
+    },
+    "placeholders": {
+      "selectDate": "Sélectionner une date",
+      "selectStartTime": "Sélectionner l'heure de début (intervalles horaires)",
+      "selectDuration": "Sélectionner la durée"
+    },
+    "validation": {
+      "dateRequired": "Veuillez sélectionner une date",
+      "startTimeRequired": "Veuillez sélectionner l'heure de début",
+      "durationRequired": "Veuillez sélectionner la durée"
+    },
+    "endTimeInvalid": "⚠️ Invalide : l'heure de fin dépasserait 20:00",
+    "submitButton": "Soumettre la demande",
+    "submitButtonDisabled": "Impossible de soumettre (limite atteinte)",
+    "businessRules": {
+      "title": "Règles métier",
+      "rule1start": "Vous pouvez avoir au maximum ",
+      "rule1bold": "3 demandes actives simultanées",
+      "rule2": "Sélectionnez n'importe quelle date à partir d'aujourd'hui",
+      "rule3": "L'heure de début doit être sur des intervalles horaires (08:00 – 19:00)",
+      "rule4": "La durée est de 1 à 6 heures, automatiquement limitée pour que l'heure de fin ne dépasse pas 20:00",
+      "rule5": "L'heure de fin est calculée automatiquement et ne peut pas dépasser 20:00"
+    },
+    "info": "Soumettez une demande de stationnement pour une date et un créneau horaire spécifiques ; un propriétaire l'examinera et l'approuvera ou la rejettera.",
+    "notifications": {
+      "limitExceeded": "Limite de demandes dépassée",
+      "limitExceededDesc": "Vous avez déjà le nombre maximum de demandes actives (3). Veuillez attendre qu'une demande existante expire.",
+      "submitted": "Demande soumise",
+      "submittedDesc": "Demande de stationnement soumise pour le {{date}} de {{startTime}} à {{endTime}}",
+      "failed": "Échec de la soumission",
+      "failedDesc": "Impossible de soumettre la demande. Veuillez réessayer."
+    },
+    "durationOption_one": "{{count}} heure",
+    "durationOption_other": "{{count}} heures"
+  },
+  "calendarView": {
+    "toolbar": {
+      "today": "Aujourd'hui",
+      "weekShort": "Sem"
+    },
+    "viewNames": {
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "emptyState": "Aucune demande sur cette période",
+    "stats": {
+      "total": "Total des demandes",
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté"
+    },
+    "infoTitle": "Vue des demandes",
+    "info": "Un aperçu calendrier de toutes les demandes de stationnement — en attente, approuvées et rejetées.",
+    "legendTitle": "Légende",
+    "legend": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté",
+      "myRequest": "★ Ma demande"
+    },
+    "modal": {
+      "title": "Demande — {{name}}",
+      "close": "Fermer",
+      "requester": "Demandeur",
+      "date": "Date",
+      "time": "Heure",
+      "duration": "Durée",
+      "status": "Statut",
+      "submitted": "Soumis le",
+      "lot": "Place",
+      "floor": "Étage",
+      "lotOwner": "Propriétaire"
+    },
+    "notifications": {
+      "rescheduled": "Demande replanifiée",
+      "rescheduledDesc": "Demande {{id}} déplacée au {{from}} – {{to}}"
+    },
+    "statusRejected": "Rejeté"
+  },
+  "lotCalendarView": {
+    "allMyLots": "Toutes mes places",
+    "toolbar": {
+      "today": "Aujourd'hui",
+      "weekShort": "Sem"
+    },
+    "viewNames": {
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "emptyState": "Aucun événement sur cette période",
+    "stats": {
+      "total": "Total des événements",
+      "booked": "Réservé",
+      "pending": "En attente",
+      "blocked": "Bloqué"
+    },
+    "infoTitle": "Calendrier des places",
+    "info": "Vue calendrier de vos places montrant les réservations, les demandes en attente et les périodes bloquées.",
+    "legendTitle": "Légende",
+    "legend": {
+      "booked": "Réservé",
+      "pending": "En attente",
+      "blocked": "Bloqué"
+    },
+    "modal": {
+      "close": "Fermer",
+      "bookedTitle": "Réservé — {{name}}",
+      "pendingTitle": "En attente — {{name}}",
+      "blockedTitle": "Bloqué — {{id}}",
+      "requester": "Demandeur",
+      "date": "Date",
+      "time": "Heure",
+      "duration": "Durée",
+      "lot": "Place",
+      "floor": "Étage",
+      "status": "Statut",
+      "approvedAt": "Approuvé le",
+      "submitted": "Soumis le",
+      "lotId": "ID place",
+      "owner": "Propriétaire",
+      "blockedUntil": "Bloqué jusqu'au",
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "unowned": "Sans propriétaire"
+    },
+    "notifications": {
+      "approved": "Demande approuvée avec succès",
+      "rejected": "Demande rejetée"
+    }
+  },
+  "lotStatusBoard": {
+    "title": "État du stationnement",
+    "legendTitle": "Légende des statuts",
+    "legend": {
+      "available": "Disponible - Propriétaire, sans blocage",
+      "blocked": "Bloqué - Blocage actif",
+      "unowned": "Sans propriétaire - Aucun propriétaire",
+      "unownedBlocked": "Sans propriétaire bloqué - Blocage hérité"
+    },
+    "lotsCount_one": "{{count}} place",
+    "lotsCount_other": "{{count}} places",
+    "columns": {
+      "lotId": "ID place",
+      "owner": "Propriétaire",
+      "status": "Statut",
+      "blockedUntil": "Bloqué jusqu'au"
+    },
+    "unassigned": "Non attribué",
+    "stats": {
+      "available": "Disponible",
+      "blocked": "Bloqué",
+      "unowned": "Sans propriétaire",
+      "unownedBlocked": "Sans prop. bloqué"
+    },
+    "infoTitle": "État du stationnement",
+    "infoDesc": "Affiche l'état actuel de toutes les places de stationnement sur tous les étages."
+  },
+  "myLots": {
+    "title": "Mes places",
+    "ownerLabel": "Propriétaire :",
+    "totalLotsLabel": "Total des places :",
+    "columns": {
+      "lotId": "ID place",
+      "floor": "Étage",
+      "status": "Statut",
+      "blockedUntil": "Bloqué jusqu'au",
+      "actions": "Actions"
+    },
+    "viewUsage": "Voir l'utilisation",
+    "noLots": "Vous ne possédez actuellement aucune place.",
+    "info": "Affiche toutes les places de stationnement qui vous sont attribuées et leur statut de disponibilité actuel."
+  },
+  "requestDetail": {
+    "title": "Détails de la demande",
+    "notFoundPrefix": "La demande ",
+    "notFoundSuffix": " est introuvable.",
+    "goBack": "Retour",
+    "requestInfo": {
+      "cardTitle": "Informations sur la demande",
+      "id": "ID de la demande",
+      "status": "Statut",
+      "requester": "Demandeur",
+      "date": "Date",
+      "timeSlot": "Créneau",
+      "duration": "Durée",
+      "submitted": "Soumis le",
+      "lastUpdated": "Dernière mise à jour",
+      "durationValue_one": "{{count}} heure",
+      "durationValue_other": "{{count}} heures"
+    },
+    "approvedInfo": {
+      "assignedLot": "Place attribuée",
+      "floor": "Étage",
+      "lotOwner": "Propriétaire",
+      "approvedAt": "Approuvé le"
+    },
+    "messages": {
+      "cardTitle": "Fil de messages",
+      "placeholder": "Saisissez votre message...",
+      "send": "Envoyer",
+      "loadFailed": "Échec du chargement des messages",
+      "sendFailed": "Échec de l'envoi du message"
+    }
+  },
+  "notificationWindows": {
+    "title": "Préférences des fenêtres de notification",
+    "blackoutAlert": {
+      "message": "Aucune notification n'est envoyée entre 22:00 et 06:00",
+      "description": "Cette période de silence s'applique à l'ensemble du système pour éviter les perturbations nocturnes."
+    },
+    "saving": "Enregistrement…",
+    "days": {
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi",
+      "sunday": "Dimanche"
+    },
+    "noWindows": "Aucune fenêtre définie — valeur par défaut du système",
+    "addWindow": "Ajouter une fenêtre",
+    "maxWindows": "Maximum {{max}} fenêtres par jour",
+    "modal": {
+      "title": "Ajouter une fenêtre de notification — {{day}}",
+      "okText": "Ajouter une fenêtre",
+      "timeRangeLabel": "Plage horaire",
+      "timeRangeRequired": "Veuillez sélectionner une plage horaire",
+      "endAfterStart": "L'heure de fin doit être après l'heure de début",
+      "startPlaceholder": "Heure de début",
+      "endPlaceholder": "Heure de fin"
+    },
+    "blackoutWarning": {
+      "title": "Avertissement — période de silence",
+      "content": "Cette fenêtre de notification chevauche la période de silence (22:00–06:00). Les notifications ne seront pas envoyées pendant cette période.",
+      "ok": "Enregistrer quand même",
+      "cancel": "Annuler"
+    },
+    "notifications": {
+      "loadFailed": "Échec du chargement des préférences de notification",
+      "saveFailed": "Échec de l'enregistrement des préférences de notification",
+      "removed": "Fenêtre de notification supprimée",
+      "overlap": "Cette plage horaire chevauche une fenêtre de notification existante",
+      "added": "Fenêtre de notification ajoutée"
+    },
+    "info": "Définissez les créneaux horaires pendant lesquels vous souhaitez recevoir des notifications de stationnement. Jusqu'à {{max}} fenêtres par jour. Les modifications sont enregistrées immédiatement."
+  },
+  "adminPanel": {
+    "sidebarTitle": "Panneau d'administration",
+    "loadingTip": "Chargement des données d'administration...",
+    "menu": {
+      "users": "Gestion des utilisateurs",
+      "lots": "Gestion des places",
+      "import": "Importer / Exporter",
+      "config": "Configuration système",
+      "reports": "Rapports",
+      "broadcast": "Diffusion"
+    },
+    "loadFailed": "Échec du chargement des données d'administration",
+    "loadFailedDesc": "Impossible de joindre le serveur.",
+    "defaultContent": "Sélectionnez un élément de menu",
+    "users": {
+      "title": "Gestion des utilisateurs",
+      "columns": {
+        "name": "Nom",
+        "email": "E-mail",
+        "role": "Rôle",
+        "joined": "Inscrit le",
+        "actions": "Actions"
+      },
+      "roles": { "user": "Utilisateur", "owner": "Propriétaire", "manager": "Gestionnaire" },
+      "deleteConfirm": "Supprimer cet utilisateur ?",
+      "deleteWarning": "Cette action est irréversible.",
+      "deleteOk": "Supprimer",
+      "deleteButton": "Supprimer",
+      "notifications": {
+        "roleUpdated": "Rôle mis à jour",
+        "roleUpdatedDesc": "{{name}} est maintenant {{role}}.",
+        "roleUpdateFailed": "Échec de la mise à jour du rôle",
+        "userDeleted": "Utilisateur supprimé",
+        "deleteFailed": "Échec de la suppression"
+      },
+      "info": "Consultez tous les utilisateurs inscrits et gérez leurs rôles. Les comptes gestionnaire ne peuvent pas être supprimés ni voir leur rôle modifié ici."
+    },
+    "lots": {
+      "title": "Gestion des places",
+      "unownedAlert_one": "{{count}} place sans propriétaire",
+      "unownedAlert_other": "{{count}} places sans propriétaire",
+      "unownedAlertDesc": "Attribuez des propriétaires pour assurer une bonne gestion de ces places.",
+      "filterLabel": "Filtrer :",
+      "filters": { "all": "Tout", "available": "Disponible", "blocked": "Bloqué", "unowned": "Sans propriétaire" },
+      "columns": {
+        "lotId": "ID place",
+        "floorLabel": "Étiquette étage",
+        "floor": "Étage",
+        "status": "Statut",
+        "owner": "Propriétaire",
+        "lastModified": "Dernière modification",
+        "actions": "Actions"
+      },
+      "unowned": "Sans propriétaire",
+      "assignOwnerButton": "Attribuer un propriétaire",
+      "removeOwnerConfirm": "Retirer le propriétaire de cette place ?",
+      "removeOwnerOk": "Retirer",
+      "removeOwnerButton": "Retirer le propriétaire",
+      "assignModal": {
+        "title": "Attribuer un propriétaire à la place",
+        "okText": "Attribuer",
+        "placeholder": "Sélectionner un propriétaire"
+      },
+      "notifications": {
+        "ownerRemoved": "Propriétaire retiré",
+        "ownerRemoveFailed": "Échec du retrait du propriétaire",
+        "ownerAssigned": "Propriétaire attribué",
+        "ownerAssignedDesc": "{{name}} → {{lotId}}",
+        "ownerAssignFailed": "Échec de l'attribution du propriétaire"
+      },
+      "info": "Consultez toutes les places de stationnement, filtrez par statut et attribuez ou retirez les propriétaires."
+    },
+    "import": {
+      "title": "Importer / Exporter",
+      "importCardTitle": "Importer des données",
+      "exportCardTitle": "Exporter des données",
+      "uploadButton": "Téléverser un fichier Excel",
+      "uploadHint": "Glissez-déposez ou cliquez pour téléverser des fichiers Excel",
+      "downloadButton": "Télécharger le fichier maître",
+      "downloadHint": "Importez des données pour activer le téléchargement",
+      "notifications": {
+        "uploadSuccess": "{{filename}} téléversé avec succès",
+        "downloadSuccess": "Fichier maître téléchargé"
+      },
+      "info": "Téléversez un fichier Excel pour importer des données en masse, ou téléchargez le fichier maître actuel pour une utilisation hors ligne."
+    },
+    "config": {
+      "title": "Configuration système",
+      "cardTitle": "Paramètres système",
+      "timezone": "Fuseau horaire :",
+      "blackoutPeriod": "Période de silence :",
+      "maxRequests": "Demandes actives max. par utilisateur :",
+      "bookingWindow": "Fenêtre de réservation :",
+      "info": "Vue en lecture seule des constantes système globales appliquées par le serveur."
+    },
+    "reports": {
+      "title": "Rapports",
+      "dateRange": "Plage de dates :",
+      "exportButton": "Exporter en Excel",
+      "tabs": {
+        "all": "Tout ({{count}})",
+        "pending": "En attente ({{count}})",
+        "approved": "Approuvé ({{count}})",
+        "rejected": "Rejeté ({{count}})"
+      },
+      "columns": {
+        "id": "ID",
+        "date": "Date",
+        "requester": "Demandeur",
+        "timeSlot": "Créneau",
+        "status": "Statut",
+        "duration": "Dur."
+      },
+      "notifications": {
+        "exportSuccess": "{{count}} lignes exportées vers {{filename}}"
+      },
+      "info": "Consultez l'historique complet de toutes les demandes de stationnement filtrées par plage de dates et statut."
+    },
+    "broadcast": {
+      "title": "Messages de diffusion",
+      "simulateBlackout": "Simuler la période de silence :",
+      "blackoutOn": "22:00–06:00",
+      "blackoutOff": "Heures normales",
+      "blackoutAlert": "Diffusion désactivée pendant la période de silence",
+      "blackoutAlertDesc": "Les messages ne peuvent pas être envoyés entre 22:00 et 06:00 pour éviter les perturbations.",
+      "audienceLabel": "Audience cible :",
+      "audiences": {
+        "owners": "Tous les propriétaires",
+        "users": "Tous les utilisateurs",
+        "both": "Propriétaires et utilisateurs"
+      },
+      "messageLabel": "Message :",
+      "messagePlaceholder": "Saisissez votre message de diffusion...",
+      "sendButton": "Envoyer la diffusion",
+      "notifications": {
+        "blocked": "Diffusion bloquée",
+        "blockedDesc": "Impossible d'envoyer des messages pendant la période de silence (22:00–06:00).",
+        "sent": "Diffusion envoyée",
+        "sentDesc": "Message envoyé à : {{audience}}"
+      },
+      "info": "Envoyez un message à l'échelle du système à tous les propriétaires, tous les utilisateurs, ou les deux."
+    }
+  }
 }

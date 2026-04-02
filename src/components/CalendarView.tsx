@@ -4,6 +4,7 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification } from 'antd';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
@@ -75,6 +76,7 @@ const currentHourSlotPropGetter = (date: Date) => {
 
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const { pendingRequests, userRequests, updateUserRequest } = useRequests();
+  const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
   const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
@@ -108,7 +110,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   };
 
   const getStatusLabel = (req: ParkingRequest) => {
-    if (req.rejectedByOwner) return 'Rejected';
+    if (req.rejectedByOwner) return t('calendarView.statusRejected');
     return getRequestStatusLabel(req.status);
   };
 
@@ -152,8 +154,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       duration: endDayjs.diff(startDayjs, 'hour'),
     });
     notification.success({
-      message: 'Request Rescheduled',
-      description: `Request ${event.resource.id} moved to ${startDayjs.format('MMM D, HH:mm')} – ${endDayjs.format('HH:mm')}`,
+      message: t('calendarView.notifications.rescheduled'),
+      description: t('calendarView.notifications.rescheduledDesc', {
+        id: event.resource.id,
+        from: startDayjs.format('MMM D, HH:mm'),
+        to: endDayjs.format('HH:mm'),
+      }),
     });
   };
 
@@ -175,7 +181,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const CustomDesktopToolbar = useCallback((tb: any) => (
     <div className="desktop-toolbar">
       <div className="desktop-toolbar-nav">
-        <button onClick={() => tb.onNavigate('TODAY')}>Today</button>
+        <button onClick={() => tb.onNavigate('TODAY')}>{t('calendarView.toolbar.today')}</button>
         <button onClick={() => tb.onNavigate('PREV')}>‹</button>
         <button onClick={() => tb.onNavigate('NEXT')}>›</button>
       </div>
@@ -192,18 +198,18 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
         <div className="desktop-toolbar-views">
           {tb.views.map((v: View) => (
             <button key={v} className={tb.view === v ? 'rbc-active' : ''} onClick={() => tb.onView(v)}>
-              {v.charAt(0).toUpperCase() + v.slice(1)}
+              {t(`calendarView.viewNames.${v}`)}
             </button>
           ))}
         </div>
       </div>
     </div>
-  ), [date, setDate]);
+  ), [date, setDate, t]);
 
   const CustomMobileToolbar = useCallback((tb: any) => (
     <div className="mobile-toolbar">
       <div className="mobile-toolbar-nav">
-        <button onClick={() => tb.onNavigate('TODAY')}>Today</button>
+        <button onClick={() => tb.onNavigate('TODAY')}>{t('calendarView.toolbar.today')}</button>
         <button onClick={() => tb.onNavigate('PREV')}>‹</button>
         <button onClick={() => tb.onNavigate('NEXT')}>›</button>
       </div>
@@ -220,13 +226,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
         <div className="mobile-toolbar-views">
           {tb.views.map((v: View) => (
             <button key={v} className={tb.view === v ? 'rbc-active' : ''} onClick={() => tb.onView(v)}>
-              {v === 'week' ? 'Wk' : v.charAt(0).toUpperCase() + v.slice(1)}
+              {v === 'week' ? t('calendarView.toolbar.weekShort') : t(`calendarView.viewNames.${v}`)}
             </button>
           ))}
         </div>
       </div>
     </div>
-  ), [date, setDate]);
+  ), [date, setDate, t]);
 
   const desktopComponents = useMemo(() => ({
     toolbar: CustomDesktopToolbar,
@@ -297,7 +303,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             formats={view === 'week' ? mobileWeekFormats : undefined}
           />
           {!hasVisibleEvents && (
-            <div className="calendar-empty-state">No requests this period</div>
+            <div className="calendar-empty-state">{t('calendarView.emptyState')}</div>
           )}
         </div>
       ) : (
@@ -327,7 +333,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             components={desktopComponents}
           />
           {!hasVisibleEvents && (
-            <div className="calendar-empty-state">No requests this period</div>
+            <div className="calendar-empty-state">{t('calendarView.emptyState')}</div>
           )}
         </Card>
       )}
@@ -338,7 +344,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{totalRequests}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Total Requests</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.total')}</div>
             </div>
           </Card>
         </Col>
@@ -346,7 +352,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{pendingCount}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Pending</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.pending')}</div>
             </div>
           </Card>
         </Col>
@@ -354,7 +360,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#52c41a' }}>{approvedCount}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Approved</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.approved')}</div>
             </div>
           </Card>
         </Col>
@@ -362,7 +368,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#f5222d' }}>{rejectedCount}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Rejected</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.rejected')}</div>
             </div>
           </Card>
         </Col>
@@ -370,28 +376,28 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
 
       {/* Info */}
       <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>Requests View:</strong> A calendar overview of all parking requests — pending, approved, and rejected.
+        <strong>{t('calendarView.infoTitle')}:</strong> {t('calendarView.info')}
       </Card>
 
       {/* Legend */}
       <Card>
-        <h3>Legend</h3>
+        <h3>{t('calendarView.legendTitle')}</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.pending, borderRadius: 2 }} />
-            <span>Pending</span>
+            <span>{t('calendarView.legend.pending')}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.approved, borderRadius: 2 }} />
-            <span>Approved</span>
+            <span>{t('calendarView.legend.approved')}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.rejected, borderRadius: 2 }} />
-            <span>Rejected</span>
+            <span>{t('calendarView.legend.rejected')}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.pending, borderRadius: 2, outline: '2px solid #fadb14' }} />
-            <span>★ My Request</span>
+            <span>{t('calendarView.legend.myRequest')}</span>
           </div>
         </div>
       </Card>
@@ -400,22 +406,22 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       <Modal
         open={!!selectedRequest}
         onCancel={() => setSelectedRequest(null)}
-        footer={<Button onClick={() => setSelectedRequest(null)}>Close</Button>}
-        title={selectedRequest ? `Request — ${selectedRequest.requesterName}` : ''}
+        footer={<Button onClick={() => setSelectedRequest(null)}>{t('calendarView.modal.close')}</Button>}
+        title={selectedRequest ? t('calendarView.modal.title', { name: selectedRequest.requesterName }) : ''}
       >
         {selectedRequest && (
           <Descriptions column={1} size="small" bordered>
-            <Descriptions.Item label="Requester">{selectedRequest.requesterName}</Descriptions.Item>
-            <Descriptions.Item label="Date">{dayjs(selectedRequest.date).format('DD/MM/YYYY')}</Descriptions.Item>
-            <Descriptions.Item label="Time">{selectedRequest.startTime} – {selectedRequest.endTime}</Descriptions.Item>
-            <Descriptions.Item label="Duration">{selectedRequest.duration}h</Descriptions.Item>
-            <Descriptions.Item label="Status">
+            <Descriptions.Item label={t('calendarView.modal.requester')}>{selectedRequest.requesterName}</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.date')}>{dayjs(selectedRequest.date).format('DD/MM/YYYY')}</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.time')}>{selectedRequest.startTime} – {selectedRequest.endTime}</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.duration')}>{selectedRequest.duration}h</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.status')}>
               <Tag color={getStatusTagColor(selectedRequest)}>{getStatusLabel(selectedRequest)}</Tag>
             </Descriptions.Item>
-            <Descriptions.Item label="Submitted">{dayjs(selectedRequest.submittedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
-            {selectedRequest.lotId && <Descriptions.Item label="Lot">{selectedRequest.lotId}</Descriptions.Item>}
-            {selectedRequest.floor && <Descriptions.Item label="Floor">{selectedRequest.floor}</Descriptions.Item>}
-            {selectedRequest.lotOwner && <Descriptions.Item label="Lot Owner">{selectedRequest.lotOwner}</Descriptions.Item>}
+            <Descriptions.Item label={t('calendarView.modal.submitted')}>{dayjs(selectedRequest.submittedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
+            {selectedRequest.lotId && <Descriptions.Item label={t('calendarView.modal.lot')}>{selectedRequest.lotId}</Descriptions.Item>}
+            {selectedRequest.floor && <Descriptions.Item label={t('calendarView.modal.floor')}>{selectedRequest.floor}</Descriptions.Item>}
+            {selectedRequest.lotOwner && <Descriptions.Item label={t('calendarView.modal.lotOwner')}>{selectedRequest.lotOwner}</Descriptions.Item>}
           </Descriptions>
         )}
       </Modal>

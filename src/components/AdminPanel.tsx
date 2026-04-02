@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadProps } from 'antd';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import * as XLSX from 'xlsx';
 import { usersApi, UserData } from '../api/users';
@@ -41,6 +42,7 @@ const LOT_STATUS_COLOR: Record<string, string> = {
 const AdminPanel: React.FC = () => {
   // ── Theme ───────────────────────────────────────────────────────────────────
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isDark = user?.preferences?.darkMode ?? true;
   const [siderCollapsed, setSiderCollapsed] = useState(false);
 
@@ -96,43 +98,43 @@ const AdminPanel: React.FC = () => {
         setRequests(fetchedRequests);
       } catch (err: any) {
         notification.error({
-          message: 'Failed to load admin data',
-          description: err.message || 'Could not reach the server.',
+          message: t('adminPanel.loadFailed'),
+          description: err.message || t('adminPanel.loadFailedDesc'),
         });
       } finally {
         setLoading(false);
       }
     };
     load();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refreshUsers = () => usersApi.getAll().then(setUsers).catch(() => {});
   const refreshLots  = () => lotsApi.getAll().then(setLots).catch(() => {});
 
   // ── Menu items ──────────────────────────────────────────────────────────────
   const menuItems = [
-    { key: 'users',     icon: <UserOutlined />,    label: 'User Management' },
-    { key: 'lots',      icon: <CarOutlined />,      label: 'Lot Management' },
-    { key: 'import',    icon: <UploadOutlined />,   label: 'Import / Export' },
-    { key: 'config',    icon: <SettingOutlined />,  label: 'System Configuration' },
-    { key: 'reports',   icon: <BarChartOutlined />, label: 'Reports' },
-    { key: 'broadcast', icon: <SendOutlined />,     label: 'Broadcast' },
+    { key: 'users',     icon: <UserOutlined />,    label: t('adminPanel.menu.users') },
+    { key: 'lots',      icon: <CarOutlined />,      label: t('adminPanel.menu.lots') },
+    { key: 'import',    icon: <UploadOutlined />,   label: t('adminPanel.menu.import') },
+    { key: 'config',    icon: <SettingOutlined />,  label: t('adminPanel.menu.config') },
+    { key: 'reports',   icon: <BarChartOutlined />, label: t('adminPanel.menu.reports') },
+    { key: 'broadcast', icon: <SendOutlined />,     label: t('adminPanel.menu.broadcast') },
   ];
 
   // ── User Management columns ─────────────────────────────────────────────────
   const userColumns: ColumnsType<UserData> = [
     {
-      title: 'Name',
+      title: t('adminPanel.users.columns.name'),
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Email',
+      title: t('adminPanel.users.columns.email'),
       dataIndex: 'email',
       key: 'email',
     },
     {
-      title: 'Role',
+      title: t('adminPanel.users.columns.role'),
       dataIndex: 'role',
       key: 'role',
       render: (role: string, record: UserData) => (
@@ -143,21 +145,21 @@ const AdminPanel: React.FC = () => {
           disabled={record.role === 'manager'}
           loading={!!actionLoading[record.id]}
           options={[
-            { value: 'user',    label: 'User' },
-            { value: 'owner',   label: 'Owner' },
-            { value: 'manager', label: 'Manager' },
+            { value: 'user',    label: t('adminPanel.users.roles.user') },
+            { value: 'owner',   label: t('adminPanel.users.roles.owner') },
+            { value: 'manager', label: t('adminPanel.users.roles.manager') },
           ]}
           onChange={async (newRole: string) => {
             setActionLoading(prev => ({ ...prev, [record.id]: true }));
             try {
               await usersApi.update(record.id, { role: newRole });
               notification.success({
-                message: 'Role updated',
-                description: `${record.name} is now ${newRole}.`,
+                message: t('adminPanel.users.notifications.roleUpdated'),
+                description: t('adminPanel.users.notifications.roleUpdatedDesc', { name: record.name, role: newRole }),
               });
               await refreshUsers();
             } catch (err: any) {
-              notification.error({ message: 'Role update failed', description: err.message });
+              notification.error({ message: t('adminPanel.users.notifications.roleUpdateFailed'), description: err.message });
             } finally {
               setActionLoading(prev => ({ ...prev, [record.id]: false }));
             }
@@ -166,30 +168,30 @@ const AdminPanel: React.FC = () => {
       ),
     },
     {
-      title: 'Joined',
+      title: t('adminPanel.users.columns.joined'),
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 110,
       render: (v?: string) => v ? dayjs(v).format('DD/MM/YYYY') : <em style={{ color: 'var(--label-color)' }}>—</em>,
     },
     {
-      title: 'Actions',
+      title: t('adminPanel.users.columns.actions'),
       key: 'actions',
       render: (_: any, record: UserData) => (
         <Popconfirm
-          title="Delete this user?"
-          description="This cannot be undone."
-          okText="Delete"
+          title={t('adminPanel.users.deleteConfirm')}
+          description={t('adminPanel.users.deleteWarning')}
+          okText={t('adminPanel.users.deleteOk')}
           okButtonProps={{ danger: true }}
           disabled={record.role === 'manager'}
           onConfirm={async () => {
             setActionLoading(prev => ({ ...prev, [record.id]: true }));
             try {
               await usersApi.delete(record.id);
-              notification.success({ message: 'User deleted', description: record.name });
+              notification.success({ message: t('adminPanel.users.notifications.userDeleted'), description: record.name });
               await refreshUsers();
             } catch (err: any) {
-              notification.error({ message: 'Delete failed', description: err.message });
+              notification.error({ message: t('adminPanel.users.notifications.deleteFailed'), description: err.message });
             } finally {
               setActionLoading(prev => ({ ...prev, [record.id]: false }));
             }
@@ -201,7 +203,7 @@ const AdminPanel: React.FC = () => {
             disabled={record.role === 'manager'}
             loading={!!actionLoading[record.id]}
           >
-            Delete
+            {t('adminPanel.users.deleteButton')}
           </Button>
         </Popconfirm>
       ),
@@ -223,11 +225,11 @@ const AdminPanel: React.FC = () => {
   ).length;
 
   const lotColumns: ColumnsType<LotData> = [
-    { title: 'Lot ID',      dataIndex: 'id',         key: 'id',         width: 90  },
-    { title: 'Floor Label', dataIndex: 'floorLabel',  key: 'floorLabel'             },
-    { title: 'Floor',       dataIndex: 'floor',       key: 'floor',      width: 70  },
+    { title: t('adminPanel.lots.columns.lotId'),      dataIndex: 'id',         key: 'id',         width: 90  },
+    { title: t('adminPanel.lots.columns.floorLabel'), dataIndex: 'floorLabel',  key: 'floorLabel'             },
+    { title: t('adminPanel.lots.columns.floor'),      dataIndex: 'floor',       key: 'floor',      width: 70  },
     {
-      title: 'Status',
+      title: t('adminPanel.lots.columns.status'),
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => (
@@ -235,20 +237,20 @@ const AdminPanel: React.FC = () => {
       ),
     },
     {
-      title: 'Owner',
+      title: t('adminPanel.lots.columns.owner'),
       key: 'owner',
       render: (_: any, record: LotData) =>
-        record.owner ?? <em style={{ color: 'var(--label-color)' }}>Unowned</em>,
+        record.owner ?? <em style={{ color: 'var(--label-color)' }}>{t('adminPanel.lots.unowned')}</em>,
     },
     {
-      title: 'Last Modified',
+      title: t('adminPanel.lots.columns.lastModified'),
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       width: 130,
       render: (v?: string) => v ? dayjs(v).format('DD/MM/YYYY HH:mm') : <em style={{ color: 'var(--label-color)' }}>—</em>,
     },
     {
-      title: 'Actions',
+      title: t('adminPanel.lots.columns.actions'),
       key: 'actions',
       render: (_: any, record: LotData) => {
         if (!record.ownerId) {
@@ -259,23 +261,23 @@ const AdminPanel: React.FC = () => {
               icon={<UserAddOutlined />}
               onClick={() => { setAssignOwnerLotId(record.id); setAssignOwnerValue(null); }}
             >
-              Assign Owner
+              {t('adminPanel.lots.assignOwnerButton')}
             </Button>
           );
         }
         return (
           <Popconfirm
-            title="Remove owner from this lot?"
-            okText="Remove"
+            title={t('adminPanel.lots.removeOwnerConfirm')}
+            okText={t('adminPanel.lots.removeOwnerOk')}
             okButtonProps={{ danger: true }}
             onConfirm={async () => {
               setActionLoading(prev => ({ ...prev, [record.id]: true }));
               try {
                 await lotsApi.update(record.id, { owner: null, owner_id: null, status: 'unowned' });
-                notification.success({ message: 'Owner removed', description: record.id });
+                notification.success({ message: t('adminPanel.lots.notifications.ownerRemoved'), description: record.id });
                 await refreshLots();
               } catch (err: any) {
-                notification.error({ message: 'Failed to remove owner', description: err.message });
+                notification.error({ message: t('adminPanel.lots.notifications.ownerRemoveFailed'), description: err.message });
               } finally {
                 setActionLoading(prev => ({ ...prev, [record.id]: false }));
               }
@@ -286,7 +288,7 @@ const AdminPanel: React.FC = () => {
               size="small"
               loading={!!actionLoading[record.id]}
             >
-              Remove Owner
+              {t('adminPanel.lots.removeOwnerButton')}
             </Button>
           </Popconfirm>
         );
@@ -324,27 +326,27 @@ const AdminPanel: React.FC = () => {
     XLSX.utils.book_append_sheet(wb, ws, 'Requests');
     const filename = `parking-requests-${dayjs().format('YYYY-MM-DD')}.xlsx`;
     XLSX.writeFile(wb, filename);
-    notification.success({ message: `Exported ${rows.length} rows to ${filename}` });
+    notification.success({ message: t('adminPanel.reports.notifications.exportSuccess', { count: rows.length, filename }) });
   };
 
   const reportColumns: ColumnsType<ParkingRequest> = [
-    { title: 'ID',        dataIndex: 'id',            key: 'id',            width: 100 },
+    { title: t('adminPanel.reports.columns.id'),        dataIndex: 'id',            key: 'id',            width: 100 },
     {
-      title: 'Date',
+      title: t('adminPanel.reports.columns.date'),
       dataIndex: 'date',
       key: 'date',
       width: 110,
       render: (v: string) => dayjs(v).format('DD/MM/YYYY'),
     },
-    { title: 'Requester', dataIndex: 'requesterName', key: 'requesterName'            },
+    { title: t('adminPanel.reports.columns.requester'), dataIndex: 'requesterName', key: 'requesterName'            },
     {
-      title: 'Time Slot',
+      title: t('adminPanel.reports.columns.timeSlot'),
       key: 'timeSlot',
       width: 130,
       render: (_: any, r: ParkingRequest) => `${r.startTime} – ${r.endTime}`,
     },
     {
-      title: 'Status',
+      title: t('adminPanel.reports.columns.status'),
       dataIndex: 'status',
       key: 'status',
       width: 100,
@@ -355,7 +357,7 @@ const AdminPanel: React.FC = () => {
       ),
     },
     {
-      title: 'Dur.',
+      title: t('adminPanel.reports.columns.duration'),
       dataIndex: 'duration',
       key: 'duration',
       width: 60,
@@ -367,14 +369,14 @@ const AdminPanel: React.FC = () => {
   const handleBroadcastSend = () => {
     if (isBlackoutSimulated) {
       notification.error({
-        message: 'Broadcast blocked',
-        description: 'Cannot send messages during the blackout period (22:00–06:00).',
+        message: t('adminPanel.broadcast.notifications.blocked'),
+        description: t('adminPanel.broadcast.notifications.blockedDesc'),
       });
       return;
     }
     notification.success({
-      message: 'Broadcast sent',
-      description: `Message sent to: ${broadcastAudience}`,
+      message: t('adminPanel.broadcast.notifications.sent'),
+      description: t('adminPanel.broadcast.notifications.sentDesc', { audience: broadcastAudience }),
     });
     setBroadcastMessage('');
   };
@@ -382,7 +384,7 @@ const AdminPanel: React.FC = () => {
   // ── Import / Export ─────────────────────────────────────────────────────────
   const uploadProps: UploadProps = {
     beforeUpload: (file) => {
-      notification.success({ message: `${file.name} uploaded successfully` });
+      notification.success({ message: t('adminPanel.import.notifications.uploadSuccess', { filename: file.name }) });
       setHasImportedData(true);
       return false;
     },
@@ -395,20 +397,16 @@ const AdminPanel: React.FC = () => {
       case 'users':
         return (
           <div>
-            <h2>User Management</h2>
-            <div style={{ overflowX: 'auto' }}>
-              <Table
-                columns={userColumns}
-                dataSource={users}
-                rowKey="id"
-                loading={loading}
-                pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                scroll={{ x: 'max-content' }}
-              />
-            </div>
+            <h2>{t('adminPanel.users.title')}</h2>
+            <Table
+              columns={userColumns}
+              dataSource={users}
+              rowKey="id"
+              loading={loading}
+              pagination={{ pageSize: 10, hideOnSinglePage: true }}
+            />
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>User Management:</strong> View all registered users and manage their roles.
-              Manager accounts cannot be deleted or have their role changed here.
+              <strong>{t('adminPanel.users.title')}:</strong> {t('adminPanel.users.info')}
             </Card>
           </div>
         );
@@ -416,12 +414,12 @@ const AdminPanel: React.FC = () => {
       case 'lots':
         return (
           <div>
-            <h2>Lot Management</h2>
+            <h2>{t('adminPanel.lots.title')}</h2>
 
             {!loading && unownedCount > 0 && (
               <Alert
-                message={`${unownedCount} lot${unownedCount !== 1 ? 's' : ''} without an owner`}
-                description="Assign owners to ensure proper management of these lots."
+                message={t('adminPanel.lots.unownedAlert', { count: unownedCount })}
+                description={t('adminPanel.lots.unownedAlertDesc')}
                 type="warning"
                 showIcon
                 style={{ marginBottom: '16px' }}
@@ -430,20 +428,21 @@ const AdminPanel: React.FC = () => {
 
             <Card style={{ marginBottom: '16px' }}>
               <Space wrap>
-                <span>Filter:</span>
+                <span>{t('adminPanel.lots.filterLabel')}</span>
                 {(['All', 'Available', 'Blocked', 'Unowned'] as const).map(filter => {
                   const count =
                     filter === 'All'       ? lots.length :
                     filter === 'Available' ? lots.filter(l => l.status === 'available').length :
                     filter === 'Blocked'   ? lots.filter(l => l.status === 'blocked').length :
                     lots.filter(l => l.status === 'unowned' || l.status === 'unowned-blocked').length;
+                  const filterKey = filter.toLowerCase() as 'all' | 'available' | 'blocked' | 'unowned';
                   return (
                     <Button
                       key={filter}
                       type={lotFilter === filter ? 'primary' : 'default'}
                       onClick={() => setLotFilter(filter)}
                     >
-                      {filter} ({count})
+                      {t(`adminPanel.lots.filters.${filterKey}`)} ({count})
                     </Button>
                   );
                 })}
@@ -463,10 +462,10 @@ const AdminPanel: React.FC = () => {
 
             {/* Assign Owner modal */}
             <Modal
-              title="Assign Owner to Lot"
+              title={t('adminPanel.lots.assignModal.title')}
               open={assignOwnerLotId !== null}
               confirmLoading={assignOwnerLoading}
-              okText="Assign"
+              okText={t('adminPanel.lots.assignModal.okText')}
               onCancel={() => { setAssignOwnerLotId(null); setAssignOwnerValue(null); }}
               onOk={async () => {
                 if (!assignOwnerLotId || !assignOwnerValue) return;
@@ -479,15 +478,15 @@ const AdminPanel: React.FC = () => {
                     owner_id: ownerUser.id,
                   });
                   notification.success({
-                    message: 'Owner assigned',
-                    description: `${ownerUser.name} → ${assignOwnerLotId}`,
+                    message: t('adminPanel.lots.notifications.ownerAssigned'),
+                    description: t('adminPanel.lots.notifications.ownerAssignedDesc', { name: ownerUser.name, lotId: assignOwnerLotId }),
                   });
                   setAssignOwnerLotId(null);
                   setAssignOwnerValue(null);
                   await refreshLots();
                 } catch (err: any) {
                   notification.error({
-                    message: 'Failed to assign owner',
+                    message: t('adminPanel.lots.notifications.ownerAssignFailed'),
                     description: err.message,
                   });
                 } finally {
@@ -497,7 +496,7 @@ const AdminPanel: React.FC = () => {
             >
               <Select
                 style={{ width: '100%' }}
-                placeholder="Select an owner"
+                placeholder={t('adminPanel.lots.assignModal.placeholder')}
                 value={assignOwnerValue}
                 onChange={setAssignOwnerValue}
                 options={users
@@ -507,8 +506,7 @@ const AdminPanel: React.FC = () => {
             </Modal>
 
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>Lot Management:</strong> View all parking lots, filter by status, and assign
-              or remove ownership.
+              <strong>{t('adminPanel.lots.title')}:</strong> {t('adminPanel.lots.info')}
             </Card>
           </div>
         );
@@ -516,42 +514,41 @@ const AdminPanel: React.FC = () => {
       case 'import':
         return (
           <div>
-            <h2>Import / Export</h2>
+            <h2>{t('adminPanel.import.title')}</h2>
             <Row gutter={16}>
-              <Col xs={24} sm={12}>
-                <Card title="Import Data">
+              <Col span={12}>
+                <Card title={t('adminPanel.import.importCardTitle')}>
                   <Upload {...uploadProps} accept=".xlsx,.xls">
                     <Button icon={<UploadOutlined />} size="large" block>
-                      Upload Excel File
+                      {t('adminPanel.import.uploadButton')}
                     </Button>
                   </Upload>
                   <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--label-color)' }}>
-                    Drag and drop or click to upload Excel files
+                    {t('adminPanel.import.uploadHint')}
                   </div>
                 </Card>
               </Col>
-              <Col xs={24} sm={12}>
-                <Card title="Export Data">
+              <Col span={12}>
+                <Card title={t('adminPanel.import.exportCardTitle')}>
                   <Button
                     icon={<DownloadOutlined />}
                     size="large"
                     block
                     disabled={!hasImportedData}
-                    onClick={() => notification.success({ message: 'Master file downloaded' })}
+                    onClick={() => notification.success({ message: t('adminPanel.import.notifications.downloadSuccess') })}
                   >
-                    Download Master File
+                    {t('adminPanel.import.downloadButton')}
                   </Button>
                   {!hasImportedData && (
                     <div style={{ marginTop: '8px', fontSize: '12px', color: '#ff4d4f' }}>
-                      Import data first to enable download
+                      {t('adminPanel.import.downloadHint')}
                     </div>
                   )}
                 </Card>
               </Col>
             </Row>
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>Import / Export:</strong> Upload an Excel file to bulk-import parking data,
-              or download the current master file for offline use.
+              <strong>{t('adminPanel.import.title')}:</strong> {t('adminPanel.import.info')}
             </Card>
           </div>
         );
@@ -559,23 +556,23 @@ const AdminPanel: React.FC = () => {
       case 'config':
         return (
           <div>
-            <h2>System Configuration</h2>
+            <h2>{t('adminPanel.config.title')}</h2>
             <Spin spinning={configLoading}>
               <Row gutter={16}>
-                <Col xs={24} sm={12}>
-                  <Card title="System Settings">
+                <Col span={12}>
+                  <Card title={t('adminPanel.config.cardTitle')}>
                     <Space direction="vertical" style={{ width: '100%' }}>
-                      <div><strong>Timezone:</strong> {systemConfig?.timezone ?? '—'}</div>
+                      <div><strong>{t('adminPanel.config.timezone')}</strong> {systemConfig?.timezone ?? '—'}</div>
                       <div>
-                        <strong>Blackout Period:</strong>{' '}
+                        <strong>{t('adminPanel.config.blackoutPeriod')}</strong>{' '}
                         {systemConfig ? `${systemConfig.blackoutStart} – ${systemConfig.blackoutEnd}` : '—'}
                       </div>
                       <div>
-                        <strong>Max Active Requests per User:</strong>{' '}
+                        <strong>{t('adminPanel.config.maxRequests')}</strong>{' '}
                         {systemConfig?.maxActiveRequestsPerUser ?? '—'}
                       </div>
                       <div>
-                        <strong>Booking Window:</strong>{' '}
+                        <strong>{t('adminPanel.config.bookingWindow')}</strong>{' '}
                         {systemConfig ? `${systemConfig.bookingWindowStart} – ${systemConfig.bookingWindowEnd}` : '—'}
                       </div>
                     </Space>
@@ -584,8 +581,7 @@ const AdminPanel: React.FC = () => {
               </Row>
             </Spin>
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>System Configuration:</strong> Read-only view of global system constants
-              enforced by the backend.
+              <strong>{t('adminPanel.config.title')}:</strong> {t('adminPanel.config.info')}
             </Card>
           </div>
         );
@@ -593,10 +589,10 @@ const AdminPanel: React.FC = () => {
       case 'reports':
         return (
           <div>
-            <h2>Reports</h2>
+            <h2>{t('adminPanel.reports.title')}</h2>
             <Card style={{ marginBottom: '16px' }}>
               <Space wrap>
-                <span>Date Range:</span>
+                <span>{t('adminPanel.reports.dateRange')}</span>
                 <RangePicker
                   value={reportDateRange}
                   onChange={dates =>
@@ -609,26 +605,23 @@ const AdminPanel: React.FC = () => {
                   disabled={filteredRequests.length === 0}
                   onClick={handleExport}
                 >
-                  Export to Excel
+                  {t('adminPanel.reports.exportButton')}
                 </Button>
               </Space>
             </Card>
 
             <Tabs defaultActiveKey="all" destroyInactiveTabPane>
-              <Tabs.TabPane tab={`All (${filteredRequests.length})`} key="all">
-                <div style={{ overflowX: 'auto' }}>
-                  <Table
-                    columns={reportColumns}
-                    dataSource={filteredRequests}
-                    rowKey="id"
-                    loading={loading}
-                    pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                    scroll={{ x: 'max-content' }}
-                  />
-                </div>
+              <Tabs.TabPane tab={t('adminPanel.reports.tabs.all', { count: filteredRequests.length })} key="all">
+                <Table
+                  columns={reportColumns}
+                  dataSource={filteredRequests}
+                  rowKey="id"
+                  loading={loading}
+                  pagination={{ pageSize: 10, hideOnSinglePage: true }}
+                />
               </Tabs.TabPane>
               <Tabs.TabPane
-                tab={`Pending (${filteredRequests.filter(r => r.status === 'pending').length})`}
+                tab={t('adminPanel.reports.tabs.pending', { count: filteredRequests.filter(r => r.status === 'pending').length })}
                 key="pending"
               >
                 <div style={{ overflowX: 'auto' }}>
@@ -643,7 +636,7 @@ const AdminPanel: React.FC = () => {
                 </div>
               </Tabs.TabPane>
               <Tabs.TabPane
-                tab={`Approved (${filteredRequests.filter(r => r.status === 'approved').length})`}
+                tab={t('adminPanel.reports.tabs.approved', { count: filteredRequests.filter(r => r.status === 'approved').length })}
                 key="approved"
               >
                 <div style={{ overflowX: 'auto' }}>
@@ -658,7 +651,7 @@ const AdminPanel: React.FC = () => {
                 </div>
               </Tabs.TabPane>
               <Tabs.TabPane
-                tab={`Rejected (${filteredRequests.filter(r => r.status === 'rejected').length})`}
+                tab={t('adminPanel.reports.tabs.rejected', { count: filteredRequests.filter(r => r.status === 'rejected').length })}
                 key="rejected"
               >
                 <div style={{ overflowX: 'auto' }}>
@@ -675,8 +668,7 @@ const AdminPanel: React.FC = () => {
             </Tabs>
 
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>Reports:</strong> View a complete history of all parking requests filtered
-              by date range and status.
+              <strong>{t('adminPanel.reports.title')}:</strong> {t('adminPanel.reports.info')}
             </Card>
           </div>
         );
@@ -684,24 +676,24 @@ const AdminPanel: React.FC = () => {
       case 'broadcast':
         return (
           <div>
-            <h2>Broadcast Messages</h2>
+            <h2>{t('adminPanel.broadcast.title')}</h2>
 
             <Card style={{ marginBottom: '16px' }}>
               <Space>
-                <span>Simulate blackout period:</span>
+                <span>{t('adminPanel.broadcast.simulateBlackout')}</span>
                 <Switch
                   checked={isBlackoutSimulated}
                   onChange={setIsBlackoutSimulated}
-                  checkedChildren="22:00–06:00"
-                  unCheckedChildren="Normal hours"
+                  checkedChildren={t('adminPanel.broadcast.blackoutOn')}
+                  unCheckedChildren={t('adminPanel.broadcast.blackoutOff')}
                 />
               </Space>
             </Card>
 
             {isBlackoutSimulated && (
               <Alert
-                message="Broadcast disabled during blackout period"
-                description="Messages cannot be sent between 22:00 and 06:00 to prevent disturbances."
+                message={t('adminPanel.broadcast.blackoutAlert')}
+                description={t('adminPanel.broadcast.blackoutAlertDesc')}
                 type="warning"
                 showIcon
                 style={{ marginBottom: '16px' }}
@@ -711,26 +703,26 @@ const AdminPanel: React.FC = () => {
             <Card>
               <Space direction="vertical" style={{ width: '100%' }}>
                 <div>
-                  <strong>Target Audience:</strong>
+                  <strong>{t('adminPanel.broadcast.audienceLabel')}</strong>
                   <Select
                     value={broadcastAudience}
                     onChange={setBroadcastAudience}
                     style={{ width: '220px', marginLeft: '8px' }}
                     options={[
-                      { value: 'owners', label: 'All Owners' },
-                      { value: 'users',  label: 'All Users' },
-                      { value: 'both',   label: 'Both Owners and Users' },
+                      { value: 'owners', label: t('adminPanel.broadcast.audiences.owners') },
+                      { value: 'users',  label: t('adminPanel.broadcast.audiences.users') },
+                      { value: 'both',   label: t('adminPanel.broadcast.audiences.both') },
                     ]}
                   />
                 </div>
 
                 <div>
-                  <strong>Message:</strong>
+                  <strong>{t('adminPanel.broadcast.messageLabel')}</strong>
                   <TextArea
                     rows={4}
                     value={broadcastMessage}
                     onChange={e => setBroadcastMessage(e.target.value)}
-                    placeholder="Enter your broadcast message..."
+                    placeholder={t('adminPanel.broadcast.messagePlaceholder')}
                     style={{ marginTop: '8px' }}
                   />
                 </div>
@@ -742,20 +734,19 @@ const AdminPanel: React.FC = () => {
                   onClick={handleBroadcastSend}
                   size="large"
                 >
-                  Send Broadcast
+                  {t('adminPanel.broadcast.sendButton')}
                 </Button>
               </Space>
             </Card>
 
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>Broadcast Messages:</strong> Send a system-wide message to all owners,
-              all users, or both audiences at once.
+              <strong>{t('adminPanel.broadcast.title')}:</strong> {t('adminPanel.broadcast.info')}
             </Card>
           </div>
         );
 
       default:
-        return <div>Select a menu item</div>;
+        return <div>{t('adminPanel.defaultContent')}</div>;
     }
   };
 
@@ -770,7 +761,7 @@ const AdminPanel: React.FC = () => {
         onCollapse={setSiderCollapsed}
       >
         <div style={{ padding: '16px', fontSize: '18px', fontWeight: 'bold', textAlign: 'center' }}>
-          Admin Panel
+          {t('adminPanel.sidebarTitle')}
         </div>
         <Menu
           mode="inline"
@@ -781,7 +772,7 @@ const AdminPanel: React.FC = () => {
       </Sider>
       <Layout>
         <Content style={{ padding: '24px' }}>
-          <Spin spinning={loading} tip="Loading admin data...">
+          <Spin spinning={loading} tip={t('adminPanel.loadingTip')}>
             {renderContent()}
           </Spin>
         </Content>

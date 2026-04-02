@@ -10,6 +10,7 @@ A React + Python parking management system. Users request parking slots; owners 
 | Backend | Python, FastAPI, SQLAlchemy |
 | Database | SQLite (`backend/parking.db`) |
 | Auth | JWT (python-jose), bcrypt passwords (passlib) |
+| i18n | i18next v23 + react-i18next v14 — English and French |
 | Tests | pytest, FastAPI TestClient, in-memory SQLite |
 
 ---
@@ -142,6 +143,58 @@ The suite runs **119 tests** against a fresh in-memory SQLite database — it ne
 
 Every endpoint is tested for: success cases · 401 (no/bad token) · 403 (wrong role) · 404 (not found) · 400 (business rule violations) · 422 (validation errors).
 
+---
+
+## Internationalisation (i18n)
+
+The app ships with full English and French support powered by **i18next v23** and **react-i18next v14**.
+
+### Supported languages
+
+| Code | Language | Toggle label |
+|------|----------|--------------|
+| `en` | English  | 🇬🇧 EN |
+| `fr` | Français | 🇫🇷 FR |
+
+### How it works
+
+- A language toggle button in the header switches between EN and FR instantly.
+- All UI text is served through `t('key.path')` calls — no hardcoded English strings in components.
+- Translation files use a **nested key structure** grouped by component (e.g. `adminPanel.users.columns.name`).
+
+### Translation files
+
+```
+src/i18n/
+├── index.ts     # i18next initialisation; getStoredLanguage / storeLanguage helpers
+├── en.json      # English strings
+└── fr.json      # French strings — real translations, not machine-generated
+```
+
+All 12 screen components are fully translated:
+
+| Component | Translation namespace |
+|-----------|----------------------|
+| `LoginPage` | `login.*` |
+| `MyRequests` | `myRequests.*` |
+| `AllPendingRequests` | `pendingRequests.*` |
+| `AllApprovals` | `approvals.*` |
+| `ParkingRequestForm` | `requestForm.*` |
+| `RequestDetail` | `requestDetail.*` |
+| `LotStatusBoard` | `lotStatusBoard.*` |
+| `MyLots` | `myLots.*` |
+| `CalendarView` | `calendarView.*` |
+| `LotCalendarView` | `lotCalendarView.*` |
+| `NotificationWindows` | `notificationWindows.*` |
+| `AdminPanel` | `adminPanel.*` |
+
+### Language preference persistence
+
+Language preference is stored in the **database** in the `user_preferences` table (same pattern as dark mode):
+
+- **On toggle:** `PATCH /api/users/{id}/preferences` is called with `{ language: 'fr' }` (fire-and-forget — the UI updates immediately without waiting for the network).
+- **On login:** The stored language is read from `user.preferences.language` returned by `/auth/me` and applied to i18next before the app shell renders. This means a user's language follows them across devices and sessions.
+- **Fallback:** `localStorage` (`parking_language` key) is kept in sync as a fast-read cache; it is always overwritten by the value from the DB on login.
 
 ---
 
@@ -174,15 +227,19 @@ parking-mockup/
 └── src/
     ├── api/
     │   ├── client.ts         # Base fetch wrapper (auto-attaches Bearer token)
-    │   ├── auth.ts           # Login / me API calls
+    │   ├── auth.ts           # Login / me API calls + UserPreferences type
     │   ├── requests.ts       # Parking request API calls
     │   ├── lots.ts           # Lots API calls
     │   ├── messages.ts       # Request message API calls
-    │   └── users.ts          # Users API calls
-    ├── components/           # Screen components
+    │   └── users.ts          # Users API calls + preferences PATCH
+    ├── components/           # Screen components (all 12 fully translated)
     ├── contexts/
     │   ├── AuthContext.tsx   # Token storage, login/logout, useAuth() hook
     │   └── RequestsContext.tsx  # Global request + lot state, loaded from API
+    ├── i18n/
+    │   ├── index.ts          # i18next init, getStoredLanguage/storeLanguage helpers
+    │   ├── en.json           # English translation strings (nested key structure)
+    │   └── fr.json           # French translation strings
     ├── utils/
     │   └── statusUtils.ts    # Centralised status colour/label helpers
     └── types/
@@ -250,3 +307,17 @@ Messages survive request deletion for auditing — `request_id` is set to `NULL`
 | GET | `/api/users/{id}` | Manager / Self | Get user |
 | PATCH | `/api/users/{id}` | Manager / Self | Update (role: manager only) |
 | DELETE | `/api/users/{id}` | Manager | Delete user |
+| GET | `/api/users/{id}/preferences` | Manager / Self | Get preferences |
+| PATCH | `/api/users/{id}/preferences` | Manager / Self | Update preferences |
+
+**Preferences payload** (`PATCH /api/users/{id}/preferences`):
+
+```json
+{
+  "dark_mode": true,
+  "language": "fr",
+  "notification_windows": "{\"Monday\":[{\"id\":\"1\",\"startTime\":\"09:00\",\"endTime\":\"12:00\"}]}"
+}
+```
+
+All fields are optional — only the fields present in the payload are updated.
