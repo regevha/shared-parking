@@ -22,6 +22,7 @@ def _run_migrations() -> None:
             "ALTER TABLE users ADD COLUMN created_at TEXT",
             "ALTER TABLE lots ADD COLUMN created_at TEXT",
             "ALTER TABLE lots ADD COLUMN updated_at TEXT",
+            "ALTER TABLE user_preferences ADD COLUMN language TEXT DEFAULT 'en'",
         ]
         for sql in migrations:
             try:

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, TimePicker, Alert, Space, Row, Col, Tag, Modal, Form, notification, Spin } from 'antd';
 import { PlusOutlined, DeleteOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { usersApi } from '../api/users';
 import type { NotificationWindow } from '../api/auth';
@@ -47,6 +48,7 @@ function overlapsWithBlackout(startTime: string, endTime: string): boolean {
 
 const NotificationWindows: React.FC = () => {
   const { user, updateUser } = useAuth();
+  const { t } = useTranslation();
   const [windows, setWindows] = useState<DayWindows>(normalise({}));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -59,7 +61,7 @@ const NotificationWindows: React.FC = () => {
     if (!user) return;
     usersApi.getPreferences(user.id)
       .then(prefs => setWindows(normalise(prefs.notificationWindows)))
-      .catch(() => notification.error({ message: 'Failed to load notification preferences' }))
+      .catch(() => notification.error({ message: t('notificationWindows.notifications.loadFailed') }))
       .finally(() => setLoading(false));
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -74,7 +76,7 @@ const NotificationWindows: React.FC = () => {
       // Keep AuthContext in sync so other components see the latest preferences
       updateUser({ preferences: { ...user.preferences, notificationWindows: updated.notificationWindows } });
     } catch {
-      notification.error({ message: 'Failed to save notification preferences' });
+      notification.error({ message: t('notificationWindows.notifications.saveFailed') });
     } finally {
       setSaving(false);
     }
@@ -91,7 +93,7 @@ const NotificationWindows: React.FC = () => {
     const next = { ...windows, [day]: windows[day].filter(w => w.id !== windowId) };
     setWindows(next);
     await persist(next);
-    notification.success({ message: 'Notification window removed' });
+    notification.success({ message: t('notificationWindows.notifications.removed') });
   };
 
   const handleModalOk = () => {
@@ -103,16 +105,16 @@ const NotificationWindows: React.FC = () => {
         timeRangesOverlap(startTime, endTime, w.startTime, w.endTime)
       );
       if (hasOverlap) {
-        notification.error({ message: 'This time range overlaps with an existing notification window' });
+        notification.error({ message: t('notificationWindows.notifications.overlap') });
         return;
       }
 
       if (overlapsWithBlackout(startTime, endTime)) {
         Modal.confirm({
-          title: 'Blackout Period Warning',
-          content: 'This notification window overlaps with the blackout period (22:00–06:00). Notifications will not be delivered during this time.',
-          okText: 'Save Anyway',
-          cancelText: 'Cancel',
+          title: t('notificationWindows.blackoutWarning.title'),
+          content: t('notificationWindows.blackoutWarning.content'),
+          okText: t('notificationWindows.blackoutWarning.ok'),
+          cancelText: t('notificationWindows.blackoutWarning.cancel'),
           onOk: () => saveWindow(startTime, endTime),
         });
       } else {
@@ -127,7 +129,7 @@ const NotificationWindows: React.FC = () => {
     setWindows(next);
     setAddModalVisible(false);
     await persist(next);
-    notification.success({ message: 'Notification window added' });
+    notification.success({ message: t('notificationWindows.notifications.added') });
   };
 
   const canAddWindow = (day: string) => (windows[day] || []).length < MAX_WINDOWS_PER_DAY;
@@ -142,22 +144,22 @@ const NotificationWindows: React.FC = () => {
 
   return (
     <div className="notification-windows">
-      <h1>Notification Window Preferences</h1>
+      <h1>{t('notificationWindows.title')}</h1>
 
       <Alert
-        message="No notifications are delivered between 22:00 and 06:00"
-        description="This blackout period applies system-wide to prevent disturbances during nighttime hours."
+        message={t('notificationWindows.blackoutAlert.message')}
+        description={t('notificationWindows.blackoutAlert.description')}
         type="info"
         showIcon
         style={{ marginBottom: '24px' }}
       />
 
-      <Spin spinning={saving} tip="Saving…">
+      <Spin spinning={saving} tip={t('notificationWindows.saving')}>
         <Row gutter={[16, 16]}>
           {DAYS_OF_WEEK.map(day => (
             <Col xs={24} sm={12} lg={8} key={day}>
               <Card
-                title={<Space><ClockCircleOutlined />{day}</Space>}
+                title={<Space><ClockCircleOutlined />{t(`notificationWindows.days.${day.toLowerCase()}`)}</Space>}
                 size="small"
               >
                 <div style={{ minHeight: '120px' }}>
@@ -178,7 +180,7 @@ const NotificationWindows: React.FC = () => {
                     </Space>
                   ) : (
                     <div style={{ color: '#999', fontStyle: 'italic', padding: '20px 0' }}>
-                      No windows set — system default applies
+                      {t('notificationWindows.noWindows')}
                     </div>
                   )}
                 </div>
@@ -191,11 +193,11 @@ const NotificationWindows: React.FC = () => {
                     onClick={() => handleAddWindow(day)}
                     size="small"
                   >
-                    Add Window
+                    {t('notificationWindows.addWindow')}
                   </Button>
                   {!canAddWindow(day) && (
                     <div style={{ fontSize: '12px', color: '#ff4d4f', marginTop: '4px' }}>
-                      Maximum {MAX_WINDOWS_PER_DAY} windows per day
+                      {t('notificationWindows.maxWindows', { max: MAX_WINDOWS_PER_DAY })}
                     </div>
                   )}
                 </div>
@@ -207,23 +209,23 @@ const NotificationWindows: React.FC = () => {
 
       {/* Add Window Modal */}
       <Modal
-        title={`Add Notification Window — ${selectedDay}`}
+        title={t('notificationWindows.modal.title', { day: t(`notificationWindows.days.${selectedDay.toLowerCase()}`) })}
         open={addModalVisible}
         onOk={handleModalOk}
         onCancel={() => setAddModalVisible(false)}
-        okText="Add Window"
+        okText={t('notificationWindows.modal.okText')}
       >
         <Form form={form} layout="vertical">
           <Form.Item
             name="timeRange"
-            label="Time Range"
+            label={t('notificationWindows.modal.timeRangeLabel')}
             rules={[
-              { required: true, message: 'Please select a time range' },
+              { required: true, message: t('notificationWindows.modal.timeRangeRequired') },
               {
                 validator: (_, value) => {
                   if (!value) return Promise.resolve();
                   if (value[0].isSameOrAfter(value[1]))
-                    return Promise.reject('End time must be after start time');
+                    return Promise.reject(t('notificationWindows.modal.endAfterStart'));
                   return Promise.resolve();
                 },
               },
@@ -232,7 +234,7 @@ const NotificationWindows: React.FC = () => {
             <TimePicker.RangePicker
               format="HH:mm"
               minuteStep={15}
-              placeholder={['Start time', 'End time']}
+              placeholder={[t('notificationWindows.modal.startPlaceholder'), t('notificationWindows.modal.endPlaceholder')]}
               style={{ width: '100%' }}
             />
           </Form.Item>
@@ -240,8 +242,7 @@ const NotificationWindows: React.FC = () => {
       </Modal>
 
       <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>Notification Windows:</strong> Set the time slots when you are willing to receive
-        parking notifications. Up to {MAX_WINDOWS_PER_DAY} windows per day. Changes are saved immediately.
+        <strong>{t('notificationWindows.title')}:</strong> {t('notificationWindows.info', { max: MAX_WINDOWS_PER_DAY })}
       </Card>
     </div>
   );
