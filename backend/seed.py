@@ -74,7 +74,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F2-003", floor="F2 - Level 1",      lot_owner="Lisa Anderson",
         approved_at=_ts(7, hour=9, minute=0),
-        approved_by="Lisa Anderson",   # manual approval
+        approved_by="Lisa Anderson",
     ),
     dict(
         id="REQ-002",
@@ -84,7 +84,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F1-002", floor="F1 - Ground Floor", lot_owner="Sarah Johnson",
         approved_at=_ts(7, hour=10, minute=15),
-        approved_by="auto",
+        approved_by="Sarah Johnson",
     ),
     dict(
         id="REQ-003",
@@ -94,7 +94,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F3-005", floor="F3 - Level 2",      lot_owner="Jennifer Lee",
         approved_at=_ts(6, hour=11, minute=30),
-        approved_by="auto",
+        approved_by="Jennifer Lee",
     ),
     dict(
         id="REQ-004",
@@ -104,7 +104,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F2-001", floor="F2 - Level 1",      lot_owner="David Wilson",
         approved_at=_ts(5, hour=14, minute=20),
-        approved_by="auto",
+        approved_by="auto",   # ← auto-approved by scheduler (exercises the badge)
     ),
     dict(
         id="REQ-005",
@@ -114,7 +114,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F1-004", floor="F1 - Ground Floor", lot_owner="Mike Chen",
         approved_at=_ts(7, hour=16, minute=0),
-        approved_by="auto",
+        approved_by="Mike Chen",
     ),
     dict(
         id="REQ-006",
@@ -124,7 +124,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F3-001", floor="F3 - Level 2",      lot_owner="Patricia Brown",
         approved_at=_ts(6, hour=9, minute=45),
-        approved_by="auto",
+        approved_by="Patricia Brown",
     ),
     dict(
         id="REQ-007",
@@ -134,7 +134,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F2-004", floor="F2 - Level 1",      lot_owner="James Taylor",
         approved_at=_ts(5, hour=12, minute=30),
-        approved_by="auto",
+        approved_by="James Taylor",
     ),
     dict(
         id="REQ-008",
@@ -144,7 +144,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F1-003", floor="F1 - Ground Floor", lot_owner="Mike Chen",
         approved_at=_ts(4, hour=8, minute=30),
-        approved_by="auto",
+        approved_by="Mike Chen",
     ),
     dict(
         id="REQ-009",
@@ -154,7 +154,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F1-006", floor="F1 - Ground Floor", lot_owner="Sarah Johnson",
         approved_at=_ts(4, hour=11, minute=0),
-        approved_by="auto",
+        approved_by="Sarah Johnson",
     ),
     dict(
         id="REQ-010",
@@ -164,7 +164,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F3-003", floor="F3 - Level 2",      lot_owner="Robert Garcia",
         approved_at=_ts(5, hour=11, minute=0),
-        approved_by="auto",
+        approved_by="Robert Garcia",
     ),
     dict(
         id="REQ-011",
@@ -174,7 +174,7 @@ APPROVED_REQUESTS = [
         status="approved",
         lot_id="F1-001", floor="F1 - Ground Floor", lot_owner="Sarah Johnson",
         approved_at=_ts(2, hour=13, minute=0),
-        approved_by="auto",
+        approved_by="Sarah Johnson",
     ),
 ]
 
