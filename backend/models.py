@@ -52,6 +52,7 @@ class ParkingRequest(Base):
     floor = Column(String, nullable=True)
     lot_owner = Column(String, nullable=True)
     approved_at = Column(String, nullable=True)
+    approved_by = Column(String, nullable=True)            # "auto" | owner name — set on approval
     updated_at = Column(String, nullable=True)             # ISO string — set on every status/field change
 
 

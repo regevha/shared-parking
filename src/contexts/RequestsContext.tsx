@@ -18,6 +18,7 @@ export interface ParkingRequest {
   floor?: string;
   lotOwner?: string;
   approvedAt?: string;
+  approvedBy?: string;
   updatedAt?: string;
 }
 
