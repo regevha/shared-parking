@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Table, Button, Tag, Space, Modal, Form, DatePicker, Select, notification, Popconfirm, Card, Row, Col } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
@@ -23,15 +24,6 @@ const HOUR_OPTIONS = [
   '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ];
 
-const ALL_DURATION_OPTIONS = [
-  { label: '1 hour', value: 1 },
-  { label: '2 hours', value: 2 },
-  { label: '3 hours', value: 3 },
-  { label: '4 hours', value: 4 },
-  { label: '5 hours', value: 5 },
-  { label: '6 hours', value: 6 },
-];
-
 const MyRequests: React.FC = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingRequest, setEditingRequest] = useState<ParkingRequest | null>(null);
@@ -39,7 +31,13 @@ const MyRequests: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { userRequests, cancelUserRequest, updateUserRequest } = useRequests();
+
+  const ALL_DURATION_OPTIONS = [1, 2, 3, 4, 5, 6].map(n => ({
+    label: t('myRequests.durationOption', { count: n }),
+    value: n,
+  }));
 
   const editStartTime = Form.useWatch('startTime', form);
 
@@ -47,7 +45,8 @@ const MyRequests: React.FC = () => {
     if (!editStartTime) return ALL_DURATION_OPTIONS;
     const startHour = parseInt(editStartTime.split(':')[0]);
     return ALL_DURATION_OPTIONS.filter(opt => opt.value <= MAX_END_HOUR - startHour);
-  }, [editStartTime]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editStartTime, t]);
 
   // Clear duration when start time changes and current value is no longer valid
   useEffect(() => {
@@ -101,8 +100,8 @@ const MyRequests: React.FC = () => {
 
     if (endHour > MAX_END_HOUR) {
       notification.error({
-        message: 'Invalid Time',
-        description: `End time ${endHour}:00 exceeds the maximum allowed time of 20:00.`,
+        message: t('myRequests.notifications.invalidTime'),
+        description: t('myRequests.notifications.invalidTimeDesc', { endHour }),
       });
       return;
     }
@@ -121,13 +120,13 @@ const MyRequests: React.FC = () => {
       setEditingRequest(null);
       form.resetFields();
       notification.success({
-        message: 'Request Updated',
-        description: `Request ${editingRequest.id} has been updated successfully.`,
+        message: t('myRequests.notifications.updated'),
+        description: t('myRequests.notifications.updatedDesc', { id: editingRequest.id }),
       });
     } catch (err: any) {
       notification.error({
-        message: 'Update Failed',
-        description: err.message || 'Failed to update the request. Please try again.',
+        message: t('myRequests.notifications.updateFailed'),
+        description: err.message || t('myRequests.notifications.updateFailedDesc'),
       });
     } finally {
       setLoading(false);
@@ -138,33 +137,33 @@ const MyRequests: React.FC = () => {
     try {
       await cancelUserRequest(requestId);
       notification.success({
-        message: 'Request Cancelled',
-        description: `Request ${requestId} has been cancelled.`,
+        message: t('myRequests.notifications.cancelled'),
+        description: t('myRequests.notifications.cancelledDesc', { id: requestId }),
       });
     } catch (err: any) {
       notification.error({
-        message: 'Cancellation Failed',
-        description: err.message || 'Failed to cancel the request. Please try again.',
+        message: t('myRequests.notifications.cancelFailed'),
+        description: err.message || t('myRequests.notifications.cancelFailedDesc'),
       });
     }
   };
 
   const columns: ColumnsType<ParkingRequest> = [
     {
-      title: 'ID',
+      title: t('myRequests.columns.id'),
       dataIndex: 'id',
       key: 'id',
       width: 60,
       render: (text: string) => <strong>{text}</strong>,
     },
     {
-      title: 'Time Slot',
+      title: t('myRequests.columns.timeSlot'),
       key: 'timeSlot',
       width: 130,
       render: (_, record: ParkingRequest) => `${record.startTime} - ${record.endTime}`,
     },
     {
-      title: 'Dur.',
+      title: t('myRequests.columns.duration'),
       dataIndex: 'duration',
       key: 'duration',
       width: 55,
@@ -172,18 +171,23 @@ const MyRequests: React.FC = () => {
       render: (duration: number) => `${duration}h`,
     },
     {
-      title: 'Status',
+      title: t('myRequests.columns.status'),
       dataIndex: 'status',
       key: 'status',
       width: 90,
-      render: (status: string) => (
-        <Tag color={getRequestStatusColor(status)}>
-          {getRequestStatusLabel(status)}
-        </Tag>
+      render: (_: any, record: ParkingRequest) => (
+        <>
+          <Tag color={getRequestStatusColor(record.status)}>
+            {getRequestStatusLabel(record.status)}
+          </Tag>
+          {record.approvedBy === 'auto' && (
+            <Tag color="purple" style={{ fontSize: '11px' }}>Auto</Tag>
+          )}
+        </>
       ),
     },
     {
-      title: 'Submitted',
+      title: t('myRequests.columns.submitted'),
       dataIndex: 'submittedAt',
       key: 'submittedAt',
       width: 140,
@@ -202,15 +206,15 @@ const MyRequests: React.FC = () => {
               icon={<EditOutlined />}
               onClick={() => handleEdit(record)}
               size="small"
-              title="Edit"
+              title={t('myRequests.actions.edit')}
             />
           )}
           <Popconfirm
-            title="Cancel Request"
-            description={`Are you sure you want to cancel request ${record.id}?`}
+            title={t('myRequests.cancelConfirm.title')}
+            description={t('myRequests.cancelConfirm.description', { id: record.id })}
             onConfirm={() => handleCancelRequest(record.id)}
-            okText="Yes, Cancel"
-            cancelText="No"
+            okText={t('myRequests.cancelConfirm.ok')}
+            cancelText={t('myRequests.cancelConfirm.no')}
             okButtonProps={{ danger: true }}
           >
             <Button
@@ -218,7 +222,7 @@ const MyRequests: React.FC = () => {
               type="link"
               icon={<DeleteOutlined />}
               size="small"
-              title="Cancel"
+              title={t('myRequests.actions.cancel')}
             />
           </Popconfirm>
         </Space>
@@ -235,9 +239,9 @@ const MyRequests: React.FC = () => {
   return (
     <div className="my-requests">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h1 style={{ margin: 0 }}>My Requests</h1>
+        <h1 style={{ margin: 0 }}>{t('myRequests.title')}</h1>
         <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/submit-request')}>
-          New Request
+          {t('myRequests.newRequest')}
         </Button>
       </div>
 
@@ -245,39 +249,48 @@ const MyRequests: React.FC = () => {
       {isMobile ? (
         <div className="requests-card-list">
           {visibleRequests.length === 0 && (
-            <div className="requests-card-empty">No active requests</div>
+            <div className="requests-card-empty">{t('myRequests.noActiveRequests')}</div>
           )}
           {visibleRequests.map((record: ParkingRequest) => (
             <Card key={record.id} size="small" className="request-card">
               <div className="request-card-header">
                 <strong>{record.id}</strong>
-                <Tag color={getRequestStatusColor(record.status)}>{getRequestStatusLabel(record.status)}</Tag>
+                <div>
+                  <Tag color={getRequestStatusColor(record.status)}>{getRequestStatusLabel(record.status)}</Tag>
+                  {record.approvedBy === 'auto' && (
+                    <Tag color="purple" style={{ fontSize: '11px' }}>Auto</Tag>
+                  )}
+                </div>
               </div>
               <div className="request-card-row">
-                <span className="request-card-label">Date</span>
+                <span className="request-card-label">{t('myRequests.mobile.date')}</span>
                 <span>{dayjs(record.date).format('DD/MM/YYYY')}</span>
               </div>
               <div className="request-card-row">
-                <span className="request-card-label">Time</span>
+                <span className="request-card-label">{t('myRequests.mobile.time')}</span>
                 <span>{record.startTime} – {record.endTime} ({record.duration}h)</span>
               </div>
               <div className="request-card-row">
-                <span className="request-card-label">Submitted</span>
+                <span className="request-card-label">{t('myRequests.mobile.submitted')}</span>
                 <span>{dayjs(record.submittedAt).format('DD/MM/YYYY HH:mm')}</span>
               </div>
               <div className="request-card-actions">
                 {record.status === 'pending' && (
-                  <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>Edit</Button>
+                  <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+                    {t('myRequests.actions.edit')}
+                  </Button>
                 )}
                 <Popconfirm
-                  title="Cancel Request"
-                  description={`Cancel request ${record.id}?`}
+                  title={t('myRequests.cancelConfirm.title')}
+                  description={t('myRequests.cancelConfirm.descriptionMobile', { id: record.id })}
                   onConfirm={() => handleCancelRequest(record.id)}
-                  okText="Yes"
-                  cancelText="No"
+                  okText={t('myRequests.cancelConfirm.okMobile')}
+                  cancelText={t('myRequests.cancelConfirm.no')}
                   okButtonProps={{ danger: true }}
                 >
-                  <Button size="small" danger icon={<DeleteOutlined />}>Cancel</Button>
+                  <Button size="small" danger icon={<DeleteOutlined />}>
+                    {t('myRequests.actions.cancel')}
+                  </Button>
                 </Popconfirm>
               </div>
             </Card>
@@ -300,7 +313,7 @@ const MyRequests: React.FC = () => {
           <Card size="small">
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '22px', fontWeight: 'bold' }}>{stats.total}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Total Active</div>
+              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>{t('myRequests.stats.totalActive')}</div>
             </div>
           </Card>
         </Col>
@@ -308,7 +321,7 @@ const MyRequests: React.FC = () => {
           <Card size="small">
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Pending</div>
+              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>{t('myRequests.stats.pending')}</div>
             </div>
           </Card>
         </Col>
@@ -316,7 +329,7 @@ const MyRequests: React.FC = () => {
           <Card size="small">
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#52c41a' }}>{stats.approved}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>Approved</div>
+              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>{t('myRequests.stats.approved')}</div>
             </div>
           </Card>
         </Col>
@@ -324,17 +337,17 @@ const MyRequests: React.FC = () => {
 
       {/* Info */}
       <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>My Requests:</strong> Manage your active parking requests. Pending requests can be edited; any active request can be cancelled. Rejected requests are not shown.
+        <strong>{t('myRequests.title')}:</strong> {t('myRequests.info')}
       </Card>
 
       {/* Edit Modal */}
       <Modal
-        title={`Edit Request ${editingRequest?.id}`}
+        title={t('myRequests.editModal.title', { id: editingRequest?.id })}
         open={editModalVisible}
         onCancel={handleCancelEdit}
         footer={[
           <Button key="cancel" onClick={handleCancelEdit}>
-            Cancel
+            {t('myRequests.editModal.cancel')}
           </Button>,
           <Button
             key="save"
@@ -342,7 +355,7 @@ const MyRequests: React.FC = () => {
             loading={loading}
             onClick={() => form.submit()}
           >
-            Save Changes
+            {t('myRequests.editModal.saveChanges')}
           </Button>,
         ]}
         width={600}
@@ -353,28 +366,28 @@ const MyRequests: React.FC = () => {
           onFinish={handleSaveEdit}
         >
           <Form.Item
-            label="Parking Date"
+            label={t('myRequests.editModal.parkingDate')}
             name="date"
-            rules={[{ required: true, message: 'Please select a date' }]}
+            rules={[{ required: true, message: t('myRequests.editModal.dateRequired') }]}
           >
             <DatePicker
               style={{ width: '100%' }}
               disabledDate={(current) => {
                 return current && current < dayjs().startOf('day');
               }}
-              placeholder="Select date"
+              placeholder={t('myRequests.editModal.selectDate')}
             />
           </Form.Item>
 
           <div style={{ display: 'flex', gap: '16px' }}>
             <Form.Item
-              label="Start Time"
+              label={t('myRequests.editModal.startTime')}
               name="startTime"
-              rules={[{ required: true, message: 'Please select start time' }]}
+              rules={[{ required: true, message: t('myRequests.editModal.startTimeRequired') }]}
               style={{ flex: 1 }}
             >
               <Select
-                placeholder="Select start time (hourly boundaries)"
+                placeholder={t('myRequests.editModal.selectStartTime')}
                 options={HOUR_OPTIONS.map((hour) => ({
                   label: hour,
                   value: hour,
@@ -382,13 +395,13 @@ const MyRequests: React.FC = () => {
               />
             </Form.Item>
             <Form.Item
-              label="Duration"
+              label={t('myRequests.editModal.duration')}
               name="duration"
-              rules={[{ required: true, message: 'Please select duration' }]}
+              rules={[{ required: true, message: t('myRequests.editModal.durationRequired') }]}
               style={{ flex: 1 }}
             >
               <Select
-                placeholder="Select duration"
+                placeholder={t('myRequests.editModal.selectDuration')}
                 options={availableDurations}
               />
             </Form.Item>

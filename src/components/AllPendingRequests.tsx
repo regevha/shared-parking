@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { Table, Button, Tag, Space, Row, Col, Card, Segmented, Modal, notification } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import { Role } from '../types';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
@@ -29,6 +30,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const [approvalInProgress, setApprovalInProgress] = useState<string | null>(null);
   const { pendingRequests, approveRequest, rejectRequest } = useRequests();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const isOwner = role === 'Owner';
 
@@ -49,22 +51,22 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   const handleApprove = (requestId: string, requesterName: string) => {
     Modal.confirm({
-      title: 'Approve Request',
-      content: `Approve parking request from ${requesterName}?`,
-      okText: 'Approve',
-      cancelText: 'Cancel',
+      title: t('pendingRequests.approveModal.title'),
+      content: t('pendingRequests.approveModal.content', { name: requesterName }),
+      okText: t('pendingRequests.approveModal.ok'),
+      cancelText: t('pendingRequests.approveModal.cancel'),
       onOk: async () => {
         setApprovalInProgress(requestId);
         try {
           await approveRequest(requestId);
           notification.success({
-            message: 'Request Approved',
-            description: `Parking request from ${requesterName} has been approved.`,
+            message: t('pendingRequests.notifications.approved'),
+            description: t('pendingRequests.notifications.approvedDesc', { name: requesterName }),
           });
         } catch (err: any) {
           notification.error({
-            message: 'Approval Failed',
-            description: err.message || 'Failed to approve the request. Please try again.',
+            message: t('pendingRequests.notifications.approvalFailed'),
+            description: err.message || t('pendingRequests.notifications.approvalFailedDesc'),
           });
         } finally {
           setApprovalInProgress(null);
@@ -75,23 +77,23 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   const handleReject = (requestId: string, requesterName: string) => {
     Modal.confirm({
-      title: 'Reject Request',
-      content: `Reject parking request from ${requesterName}?`,
-      okText: 'Reject',
+      title: t('pendingRequests.rejectModal.title'),
+      content: t('pendingRequests.rejectModal.content', { name: requesterName }),
+      okText: t('pendingRequests.rejectModal.ok'),
       okButtonProps: { danger: true },
-      cancelText: 'Cancel',
+      cancelText: t('pendingRequests.rejectModal.cancel'),
       onOk: async () => {
         setApprovalInProgress(requestId);
         try {
           await rejectRequest(requestId);
           notification.success({
-            message: 'Request Rejected',
-            description: `Parking request from ${requesterName} has been rejected.`,
+            message: t('pendingRequests.notifications.rejected'),
+            description: t('pendingRequests.notifications.rejectedDesc', { name: requesterName }),
           });
         } catch (err: any) {
           notification.error({
-            message: 'Rejection Failed',
-            description: err.message || 'Failed to reject the request. Please try again.',
+            message: t('pendingRequests.notifications.rejectionFailed'),
+            description: err.message || t('pendingRequests.notifications.rejectionFailedDesc'),
           });
         } finally {
           setApprovalInProgress(null);
@@ -102,7 +104,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   const columns: ColumnsType<PendingRequest> = [
     {
-      title: 'Requester Name',
+      title: t('pendingRequests.columns.requesterName'),
       dataIndex: 'requesterName',
       key: 'requesterName',
       width: '20%',
@@ -111,51 +113,51 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
         return (
           <div>
             <strong>{text}</strong>
-            {isOwnRequest && <Tag color="blue" style={{ marginLeft: '8px' }}>(You)</Tag>}
+            {isOwnRequest && <Tag color="blue" style={{ marginLeft: '8px' }}>({t('pendingRequests.youTag')})</Tag>}
           </div>
         );
       },
     },
     {
-      title: 'Time Slot',
+      title: t('pendingRequests.columns.timeSlot'),
       key: 'timeSlot',
       width: '18%',
       render: (_, record: PendingRequest) => `${record.startTime} - ${record.endTime}`,
     },
     {
-      title: 'Duration',
+      title: t('pendingRequests.columns.duration'),
       dataIndex: 'duration',
       key: 'duration',
       width: '12%',
       render: (duration: number) => `${duration}h`,
     },
     {
-      title: 'Date',
+      title: t('pendingRequests.columns.date'),
       dataIndex: 'date',
       key: 'date',
       width: '15%',
       render: (v: string) => dayjs(v).format('DD/MM/YYYY'),
     },
     {
-      title: 'Submitted',
+      title: t('pendingRequests.columns.submitted'),
       dataIndex: 'submittedAt',
       key: 'submittedAt',
       width: '15%',
       render: (v: string) => dayjs(v).format('DD/MM/YYYY HH:mm'),
     },
     {
-      title: 'Actions',
+      title: t('pendingRequests.columns.actions'),
       key: 'actions',
       width: '20%',
       render: (_, record: PendingRequest) => {
         const isOwnRequest = record.requesterId === user?.id;
 
         if (!isOwner) {
-          return <span style={{ color: '#999' }}>No actions</span>;
+          return <span style={{ color: '#999' }}>{t('pendingRequests.noActions')}</span>;
         }
 
         if (isOwnRequest) {
-          return <span style={{ color: '#999' }}>Cannot approve own request</span>;
+          return <span style={{ color: '#999' }}>{t('pendingRequests.cannotApproveOwn')}</span>;
         }
 
         return (
@@ -167,7 +169,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
               loading={approvalInProgress === record.id}
               onClick={() => handleApprove(record.id, record.requesterName)}
             >
-              Approve
+              {t('pendingRequests.actions.approve')}
             </Button>
             <Button
               danger
@@ -176,7 +178,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
               loading={approvalInProgress === record.id}
               onClick={() => handleReject(record.id, record.requesterName)}
             >
-              Reject
+              {t('pendingRequests.actions.reject')}
             </Button>
           </Space>
         );
@@ -199,21 +201,21 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   return (
     <div className="all-pending-requests">
-      <h1>Pending Requests</h1>
+      <h1>{t('pendingRequests.title')}</h1>
 
       {/* Filter Toggle (Owner only) */}
       {isOwner && (
         <Card style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>
-              <strong>Show Requests:</strong>
+              <strong>{t('pendingRequests.filterLabel')}</strong>
             </span>
             <Segmented
               value={filterMode}
               onChange={(value) => setFilterMode(value as 'all' | 'active')}
               options={[
-                { label: 'Show all', value: 'all' },
-                { label: 'Hide already rejected', value: 'active' },
+                { label: t('pendingRequests.filterAll'), value: 'all' },
+                { label: t('pendingRequests.filterHideRejected'), value: 'active' },
               ]}
             />
           </div>
@@ -244,7 +246,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
                 border: '1px solid #d9d9d9',
               }}
             />
-            <span>= Rejected by you (can reapprove by clicking Approve)</span>
+            <span>{t('pendingRequests.rejectedLegend')}</span>
           </div>
         </Card>
       )}
@@ -255,7 +257,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.total}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Total Requests</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('pendingRequests.stats.total')}</div>
             </div>
           </Card>
         </Col>
@@ -263,7 +265,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Pending</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('pendingRequests.stats.pending')}</div>
             </div>
           </Card>
         </Col>
@@ -272,7 +274,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
             <Card>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#999' }}>{stats.rejected}</div>
-                <div style={{ fontSize: '12px', color: '#666' }}>Rejected by You</div>
+                <div style={{ fontSize: '12px', color: '#666' }}>{t('pendingRequests.stats.rejectedByYou')}</div>
               </div>
             </Card>
           </Col>
@@ -283,11 +285,11 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
         {isOwner ? (
           <div>
-            <strong>Pending Requests:</strong> Lists all parking requests awaiting your approval. Requests you have already rejected are shown in grey.
+            <strong>{t('pendingRequests.title')}:</strong> {t('pendingRequests.infoOwner')}
           </div>
         ) : (
           <div>
-            <strong>Pending Requests:</strong> Lists all parking requests currently awaiting owner approval.
+            <strong>{t('pendingRequests.title')}:</strong> {t('pendingRequests.infoManager')}
           </div>
         )}
       </Card>

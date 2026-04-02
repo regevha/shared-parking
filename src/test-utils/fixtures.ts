@@ -39,7 +39,7 @@ export function makeUser(overrides: Partial<AuthUser> = {}): AuthUser {
     name: 'Alice Johnson',
     email: 'alice@parking.dev',
     role: 'user',
-    preferences: { darkMode: false, notificationWindows: {} },
+    preferences: { darkMode: false, notificationWindows: {}, language: 'en' },
     ...overrides,
   };
 }

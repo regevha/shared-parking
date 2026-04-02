@@ -9,6 +9,7 @@ export interface NotificationWindow {
 export interface UserPreferences {
   darkMode: boolean;
   notificationWindows: Record<string, NotificationWindow[]>;
+  language: string;
   // add new preference fields here
 }
 
@@ -17,7 +18,7 @@ function mapPreferences(raw: any): UserPreferences {
   if (raw?.notification_windows) {
     try { notificationWindows = JSON.parse(raw.notification_windows); } catch { /* ignore */ }
   }
-  return { darkMode: raw?.dark_mode ?? true, notificationWindows };
+  return { darkMode: raw?.dark_mode ?? true, notificationWindows, language: raw?.language ?? 'en' };
 }
 
 export interface AuthUser {

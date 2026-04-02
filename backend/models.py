@@ -29,6 +29,7 @@ class UserPreferences(Base):
     dark_mode = Column(Boolean, nullable=False, default=True)
     # JSON-encoded dict: { "Monday": [{"id":"..","startTime":"..","endTime":".."}], … }
     notification_windows = Column(String, nullable=True, default='{}')
+    language = Column(String, nullable=False, default='en')
     # ── add new preference columns here ────────────────────────────────────────
 
     user = relationship("User", back_populates="preferences")
@@ -51,6 +52,7 @@ class ParkingRequest(Base):
     floor = Column(String, nullable=True)
     lot_owner = Column(String, nullable=True)
     approved_at = Column(String, nullable=True)
+    approved_by = Column(String, nullable=True)            # "auto" | owner name — set on approval
     updated_at = Column(String, nullable=True)             # ISO string — set on every status/field change
 
 

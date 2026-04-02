@@ -6,10 +6,11 @@ A React + FastAPI parking management system. Users request parking slots; owners
 ## Tech Stack
 ### Frontend
 - **React 19** + **TypeScript** + **Create React App**
-- **Ant Design (antd v6)** — UI components
-- **react-big-calendar** with `dayjsLocalizer` — calendar views (day/week/month)
+- **Ant Design (antd v6)** — UI components; RTL via `ConfigProvider direction="rtl"`
+- **react-big-calendar** with `dayjsLocalizer` — calendar views (day/week/month); LTR-only (no RTL support in library)
 - **react-router-dom** — routing
-- **dayjs** — date formatting
+- **dayjs** — date formatting; locale activated via `dayjs.locale(lang)` on language change
+- **react-i18next** + **i18next** — internationalisation (EN / FR / HE)
 
 ### Backend
 - **FastAPI** + **uvicorn** — REST API on port 8000
@@ -91,6 +92,15 @@ pytest tests/ --cov=. --cov-report=term-missing  # with coverage
 
 ## Key Files
 
+### Internationalisation (i18n)
+- `src/i18n/index.ts` — i18next init; `SupportedLanguage` type (`'en' | 'fr' | 'he'`); `SUPPORTED_LANGUAGES` array (with `nativeLabel`); `isRTL(lang)` helper; `getStoredLanguage()` / `storeLanguage()`
+- `src/i18n/en.json` — English translations (12 namespaces: nav, common, login, myRequests, pendingRequests, approvals, requestForm, requestDetail, notificationWindows, adminPanel, calendarView, lotCalendarView, lotStatusBoard, myLots, app)
+- `src/i18n/fr.json` — French translations (same 12 namespaces)
+- `src/i18n/he.json` — Hebrew translations (same 12 namespaces; RTL)
+- Language is persisted in `localStorage` (`parking_language`) and synced to/from the DB (`UserPreferences.language`)
+- `App.tsx` — `ConfigProvider direction="rtl"` when Hebrew; `useLayoutEffect` syncs `<html dir>` and `<html lang>`; language dropdown in header (globe icon); `dayjs.locale()` activated on change
+- react-big-calendar is LTR-only — left as-is with explanatory comment in CalendarView/LotCalendarView
+
 ### Auth Layer
 - `src/api/auth.ts` — `authApi.login()` (form-encoded) + `authApi.me()`
 - `src/contexts/AuthContext.tsx` — token/user state, `useAuth()` hook
@@ -110,7 +120,7 @@ pytest tests/ --cov=. --cov-report=term-missing  # with coverage
 ### Backend
 - `backend/main.py` — FastAPI app, CORS, router registration
 - `backend/models.py` — `User`, `UserPreferences`, `ParkingRequest`, `Lot`, `RequestMessage` SQLAlchemy models
-  - `UserPreferences`: `ondelete="CASCADE"` (preferences have no meaning without the owner)
+  - `UserPreferences`: `ondelete="CASCADE"` (preferences have no meaning without the owner); columns: `dark_mode`, `notification_windows` (JSON), `language` (allowlist: `en|fr|he`)
   - `RequestMessage.request_id`: nullable, `ondelete="SET NULL"` — messages are preserved for 7-day audit retention after a request is deleted; FK is nulled explicitly in `delete_request()` because SQLite does not enforce FK actions without `PRAGMA foreign_keys=ON`
 - `backend/auth.py` — JWT utilities, `get_current_user`, `require_owner`, `require_manager`
 - `backend/routers/auth.py` — `/auth/login`, `/auth/register`, `/auth/me`
@@ -193,4 +203,5 @@ Both `CalendarView` and `LotCalendarView`:
 ## Pending TODOs
 1. Improve overlapping events display — hover tooltip for narrow calendar events
 2. Empty state UI for all tables (currently shows empty table when no data)
-3. Audit trail — `created_at` / `updated_at` timestamps on records
+3. Audit trail — `created_at` / `updated_at` timestamps on records (timestamps added to DB; full audit trail UI pending)
+4. RTL layout for react-big-calendar — library has no RTL support; calendar stays LTR even in Hebrew mode

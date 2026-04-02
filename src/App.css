@@ -35,13 +35,13 @@
 
 @media (max-width: 768px) {
   .ant-layout-content {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
+    padding-inline-start: 12px !important;
+    padding-inline-end: 12px !important;
   }
   /* Reduce inner content padding so calendar columns get more horizontal space */
   .ant-layout-content > div {
-    padding-left: 4px !important;
-    padding-right: 4px !important;
+    padding-inline-start: 4px !important;
+    padding-inline-end: 4px !important;
   }
 }
 

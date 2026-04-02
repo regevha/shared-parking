@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Collapse, Tag, Table, Space, Row, Col, Card, Alert, Spin } from 'antd';
+import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import { LotStatus } from '../types';
 import { LotData } from '../api/lots';
@@ -9,24 +10,25 @@ import './LotStatusBoard.css';
 
 const LotStatusBoard: React.FC = () => {
   const { allLots, loading } = useRequests();
+  const { t } = useTranslation();
 
   const columns: ColumnsType<LotData> = [
     {
-      title: 'Lot ID',
+      title: t('lotStatusBoard.columns.lotId'),
       dataIndex: 'id',
       key: 'id',
       width: '20%',
       render: (text: string) => <strong>{text}</strong>,
     },
     {
-      title: 'Owner',
+      title: t('lotStatusBoard.columns.owner'),
       dataIndex: 'owner',
       key: 'owner',
       width: '30%',
-      render: (owner: string | null) => owner || 'Unassigned',
+      render: (owner: string | null) => owner || t('lotStatusBoard.unassigned'),
     },
     {
-      title: 'Status',
+      title: t('lotStatusBoard.columns.status'),
       dataIndex: 'status',
       key: 'status',
       width: '25%',
@@ -37,7 +39,7 @@ const LotStatusBoard: React.FC = () => {
       ),
     },
     {
-      title: 'Blocked Until',
+      title: t('lotStatusBoard.columns.blockedUntil'),
       dataIndex: 'blockedUntil',
       key: 'blockedUntil',
       width: '25%',
@@ -65,7 +67,7 @@ const LotStatusBoard: React.FC = () => {
     key: index.toString(),
     label: (
       <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-        {floorData.floor} ({floorData.lots.length} lots)
+        {floorData.floor} ({t('lotStatusBoard.lotsCount', { count: floorData.lots.length })})
       </div>
     ),
     children: (
@@ -89,33 +91,33 @@ const LotStatusBoard: React.FC = () => {
 
   return (
     <div className="lot-status-board">
-      <h1>Parking Status</h1>
+      <h1>{t('lotStatusBoard.title')}</h1>
 
       {/* Legend */}
-      <Card style={{ marginBottom: '24px' }} title="Status Legend" size="small">
+      <Card style={{ marginBottom: '24px' }} title={t('lotStatusBoard.legendTitle')} size="small">
         <Row gutter={[24, 16]}>
           <Col xs={24} sm={12} md={6}>
             <Space>
               <div style={{ width: '20px', height: '20px', backgroundColor: '#52c41a', borderRadius: '4px' }} />
-              <span>Available - Owner, No Block</span>
+              <span>{t('lotStatusBoard.legend.available')}</span>
             </Space>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <Space>
               <div style={{ width: '20px', height: '20px', backgroundColor: '#ff4d4f', borderRadius: '4px' }} />
-              <span>Blocked - Active Block</span>
+              <span>{t('lotStatusBoard.legend.blocked')}</span>
             </Space>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <Space>
               <div style={{ width: '20px', height: '20px', backgroundColor: '#d9d9d9', borderRadius: '4px', border: '1px solid #999' }} />
-              <span>Unowned - No Owner</span>
+              <span>{t('lotStatusBoard.legend.unowned')}</span>
             </Space>
           </Col>
           <Col xs={24} sm={12} md={6}>
             <Space>
               <div style={{ width: '20px', height: '20px', backgroundColor: '#faad14', borderRadius: '4px' }} />
-              <span>Unowned-Blocked - Legacy Block</span>
+              <span>{t('lotStatusBoard.legend.unownedBlocked')}</span>
             </Space>
           </Col>
         </Row>
@@ -132,7 +134,7 @@ const LotStatusBoard: React.FC = () => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#52c41a' }}>{stats.available}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Available</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotStatusBoard.stats.available')}</div>
             </div>
           </Card>
         </Col>
@@ -140,7 +142,7 @@ const LotStatusBoard: React.FC = () => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff4d4f' }}>{stats.blocked}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Blocked</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotStatusBoard.stats.blocked')}</div>
             </div>
           </Card>
         </Col>
@@ -148,7 +150,7 @@ const LotStatusBoard: React.FC = () => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#999' }}>{stats.unowned}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Unowned</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotStatusBoard.stats.unowned')}</div>
             </div>
           </Card>
         </Col>
@@ -156,15 +158,15 @@ const LotStatusBoard: React.FC = () => {
           <Card>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#faad14' }}>{stats.unownedBlocked}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Unowned-Blocked</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotStatusBoard.stats.unownedBlocked')}</div>
             </div>
           </Card>
         </Col>
       </Row>
 
       <Alert
-        message="Parking Status"
-        description="Displays the current status of all parking lots across all floors."
+        message={t('lotStatusBoard.infoTitle')}
+        description={t('lotStatusBoard.infoDesc')}
         type="info"
         showIcon
         style={{ marginTop: '24px' }}
