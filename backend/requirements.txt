@@ -4,5 +4,5 @@ sqlalchemy==2.0.35
 pydantic==2.9.2
 PyJWT>=2.8.0
 bcrypt==5.0.0
-python-multipart==0.0.12
+python-multipart==0.0.22
 apscheduler==3.10.4
