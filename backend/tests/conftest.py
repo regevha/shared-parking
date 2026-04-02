@@ -9,6 +9,7 @@ connection so schema and data are visible across the ORM's pool.
 import sys
 import os
 import pytest
+from datetime import date, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -102,10 +103,12 @@ def manager_headers(client) -> dict:
 
 # ── Request helpers ────────────────────────────────────────────────────────
 
+_FUTURE_DATE = (date.today() + timedelta(days=7)).isoformat()
+
 REQUEST_PAYLOAD = {
     "requester_id":   "ignored",
     "requester_name": "ignored",
-    "date":           "2026-04-01",
+    "date":           _FUTURE_DATE,
     "start_time":     "09:00",
     "end_time":       "11:00",
     "duration":       2,

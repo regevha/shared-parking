@@ -16,6 +16,32 @@ def _generate_id(db: Session) -> str:
     return f"REQ-{count + 1:03d}"
 
 
+def _has_conflict(
+    db: Session,
+    lot_id: str | None,
+    date: str,
+    start_time: str,
+    end_time: str,
+    exclude_id: str | None = None,
+) -> bool:
+    """Return True if an approved request already occupies lot_id on date during start_time–end_time."""
+    if not lot_id:
+        return False
+    q = (
+        db.query(models.ParkingRequest)
+        .filter(
+            models.ParkingRequest.lot_id == lot_id,
+            models.ParkingRequest.date == date,
+            models.ParkingRequest.status == "approved",
+            models.ParkingRequest.start_time < end_time,
+            models.ParkingRequest.end_time > start_time,
+        )
+    )
+    if exclude_id:
+        q = q.filter(models.ParkingRequest.id != exclude_id)
+    return q.first() is not None
+
+
 @router.get("", response_model=List[schemas.ParkingRequestOut])
 def get_all_requests(
     db: Session = Depends(get_db),
@@ -97,31 +123,18 @@ def approve_request(
     if req.status != "pending":
         raise HTTPException(status_code=400, detail="Only pending requests can be approved")
 
-    if payload.lot_id:
-        conflict = (
-            db.query(models.ParkingRequest)
-            .filter(
-                models.ParkingRequest.lot_id == payload.lot_id,
-                models.ParkingRequest.date == req.date,
-                models.ParkingRequest.status == "approved",
-                models.ParkingRequest.id != request_id,
-                models.ParkingRequest.start_time < req.end_time,
-                models.ParkingRequest.end_time > req.start_time,
-            )
-            .first()
+    if payload.lot_id and _has_conflict(
+        db, payload.lot_id, req.date, req.start_time, req.end_time, exclude_id=request_id
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Time slot conflict: lot {payload.lot_id} is already approved for this time on {req.date}",
         )
-        if conflict:
-            raise HTTPException(
-                status_code=409,
-                detail=(
-                    f"Time slot conflict: lot {payload.lot_id} is already approved "
-                    f"for {conflict.start_time}–{conflict.end_time} on {req.date}"
-                ),
-            )
 
     now = datetime.now(timezone.utc).isoformat()
     req.status = "approved"
     req.approved_at = now
+    req.approved_by = current_user.name
     req.updated_at = now
     req.rejected_by_owner = False
     if payload.lot_id:

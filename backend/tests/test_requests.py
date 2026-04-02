@@ -75,7 +75,7 @@ def test_create_request_success(client, user_headers):
     data = resp.json()
     assert data["status"] == "pending"
     assert data["id"].startswith("REQ-")
-    assert data["date"] == "2026-04-01"
+    assert data["date"] == REQUEST_PAYLOAD["date"]
     # requester fields come from JWT, not payload
     assert data["requester_name"] == "Alice User"
 
@@ -247,7 +247,7 @@ def test_delete_requires_auth(client, created_request_id):
 # ── Input validation (POST /api/requests) ────────────────────────────────
 
 def test_create_request_rejects_past_date(client, user_headers):
-    bad = {**REQUEST_PAYLOAD, "date": "2025-01-01"}
+    bad = {**REQUEST_PAYLOAD, "date": "2020-01-01"}
     resp = client.post("/api/requests", json=bad, headers=user_headers)
     assert resp.status_code == 422
     assert "past" in resp.text.lower()

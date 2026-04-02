@@ -1,9 +1,12 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from database import engine, Base
 from routers import requests, lots, auth, users, messages, config
+from scheduler import scheduler
 
 # Create all tables on startup
 Base.metadata.create_all(bind=engine)
@@ -15,6 +18,7 @@ def _run_migrations() -> None:
         migrations = [
             "ALTER TABLE user_preferences ADD COLUMN notification_windows TEXT DEFAULT '{}'",
             "ALTER TABLE parking_requests ADD COLUMN updated_at TEXT",
+            "ALTER TABLE parking_requests ADD COLUMN approved_by TEXT",
             "ALTER TABLE users ADD COLUMN created_at TEXT",
             "ALTER TABLE lots ADD COLUMN created_at TEXT",
             "ALTER TABLE lots ADD COLUMN updated_at TEXT",
@@ -28,10 +32,19 @@ def _run_migrations() -> None:
 
 _run_migrations()
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler.start()
+    yield
+    scheduler.shutdown()
+
+
 app = FastAPI(
     title="Parking Management API",
     description="REST API for the parking management mockup",
     version="2.0.0",
+    lifespan=lifespan,
 )
 
 # Allow the React dev server (port 3000) to call the API

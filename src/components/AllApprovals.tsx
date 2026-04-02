@@ -1,6 +1,6 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { Table, Space, Card, Row, Col, Button, Modal } from 'antd';
+import { Table, Space, Card, Row, Col, Button, Modal, Tag } from 'antd';
 import { EyeOutlined, MessageOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
@@ -66,10 +66,16 @@ const AllApprovals: React.FC = () => {
     },
     {
       title: 'Approved At',
-      dataIndex: 'approvedAt',
       key: 'approvedAt',
       width: '15%',
-      render: (v: string) => v ? dayjs(v).format('DD/MM/YYYY HH:mm') : '—',
+      render: (_: any, record: ParkingRequest) => (
+        <div>
+          <div>{record.approvedAt ? dayjs(record.approvedAt).format('DD/MM/YYYY HH:mm') : '—'}</div>
+          {record.approvedBy === 'auto' && (
+            <Tag color="purple" style={{ fontSize: '11px', marginTop: '2px' }}>Auto</Tag>
+          )}
+        </div>
+      ),
     },
     {
       title: 'Actions',

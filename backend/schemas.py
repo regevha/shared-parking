@@ -23,6 +23,7 @@ class ParkingRequestBase(BaseModel):
     floor: Optional[str] = None
     lot_owner: Optional[str] = None
     approved_at: Optional[str] = None
+    approved_by: Optional[str] = None
     updated_at: Optional[str] = None
 
 

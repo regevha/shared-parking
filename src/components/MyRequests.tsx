@@ -173,13 +173,17 @@ const MyRequests: React.FC = () => {
     },
     {
       title: 'Status',
-      dataIndex: 'status',
       key: 'status',
       width: 90,
-      render: (status: string) => (
-        <Tag color={getRequestStatusColor(status)}>
-          {getRequestStatusLabel(status)}
-        </Tag>
+      render: (_: any, record: ParkingRequest) => (
+        <>
+          <Tag color={getRequestStatusColor(record.status)}>
+            {getRequestStatusLabel(record.status)}
+          </Tag>
+          {record.approvedBy === 'auto' && (
+            <Tag color="purple" style={{ fontSize: '11px' }}>Auto</Tag>
+          )}
+        </>
       ),
     },
     {
@@ -251,7 +255,12 @@ const MyRequests: React.FC = () => {
             <Card key={record.id} size="small" className="request-card">
               <div className="request-card-header">
                 <strong>{record.id}</strong>
-                <Tag color={getRequestStatusColor(record.status)}>{getRequestStatusLabel(record.status)}</Tag>
+                <div>
+                  <Tag color={getRequestStatusColor(record.status)}>{getRequestStatusLabel(record.status)}</Tag>
+                  {record.approvedBy === 'auto' && (
+                    <Tag color="purple" style={{ fontSize: '11px' }}>Auto</Tag>
+                  )}
+                </div>
               </div>
               <div className="request-card-row">
                 <span className="request-card-label">Date</span>
