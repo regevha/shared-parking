@@ -8,6 +8,7 @@ connection so schema and data are visible across the ORM's pool.
 
 import sys
 import os
+import datetime
 import pytest
 from datetime import date, timedelta
 from sqlalchemy import create_engine

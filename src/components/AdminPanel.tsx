@@ -44,6 +44,7 @@ const AdminPanel: React.FC = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const isDark = user?.preferences?.darkMode ?? true;
+  const [siderCollapsed, setSiderCollapsed] = useState(false);
 
   // ── Navigation ─────────────────────────────────────────────────────────────
   const [selectedMenu, setSelectedMenu] = useState('users');
@@ -448,13 +449,16 @@ const AdminPanel: React.FC = () => {
               </Space>
             </Card>
 
-            <Table
-              columns={lotColumns}
-              dataSource={filteredLots}
-              rowKey="id"
-              loading={loading}
-              pagination={{ pageSize: 10, hideOnSinglePage: true }}
-            />
+            <div style={{ overflowX: 'auto' }}>
+              <Table
+                columns={lotColumns}
+                dataSource={filteredLots}
+                rowKey="id"
+                loading={loading}
+                pagination={{ pageSize: 10, hideOnSinglePage: true }}
+                scroll={{ x: 'max-content' }}
+              />
+            </div>
 
             {/* Assign Owner modal */}
             <Modal
@@ -620,37 +624,46 @@ const AdminPanel: React.FC = () => {
                 tab={t('adminPanel.reports.tabs.pending', { count: filteredRequests.filter(r => r.status === 'pending').length })}
                 key="pending"
               >
-                <Table
-                  columns={reportColumns}
-                  dataSource={filteredRequests.filter(r => r.status === 'pending')}
-                  rowKey="id"
-                  loading={loading}
-                  pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                />
+                <div style={{ overflowX: 'auto' }}>
+                  <Table
+                    columns={reportColumns}
+                    dataSource={filteredRequests.filter(r => r.status === 'pending')}
+                    rowKey="id"
+                    loading={loading}
+                    pagination={{ pageSize: 10, hideOnSinglePage: true }}
+                    scroll={{ x: 'max-content' }}
+                  />
+                </div>
               </Tabs.TabPane>
               <Tabs.TabPane
                 tab={t('adminPanel.reports.tabs.approved', { count: filteredRequests.filter(r => r.status === 'approved').length })}
                 key="approved"
               >
-                <Table
-                  columns={reportColumns}
-                  dataSource={filteredRequests.filter(r => r.status === 'approved')}
-                  rowKey="id"
-                  loading={loading}
-                  pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                />
+                <div style={{ overflowX: 'auto' }}>
+                  <Table
+                    columns={reportColumns}
+                    dataSource={filteredRequests.filter(r => r.status === 'approved')}
+                    rowKey="id"
+                    loading={loading}
+                    pagination={{ pageSize: 10, hideOnSinglePage: true }}
+                    scroll={{ x: 'max-content' }}
+                  />
+                </div>
               </Tabs.TabPane>
               <Tabs.TabPane
                 tab={t('adminPanel.reports.tabs.rejected', { count: filteredRequests.filter(r => r.status === 'rejected').length })}
                 key="rejected"
               >
-                <Table
-                  columns={reportColumns}
-                  dataSource={filteredRequests.filter(r => r.status === 'rejected')}
-                  rowKey="id"
-                  loading={loading}
-                  pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                />
+                <div style={{ overflowX: 'auto' }}>
+                  <Table
+                    columns={reportColumns}
+                    dataSource={filteredRequests.filter(r => r.status === 'rejected')}
+                    rowKey="id"
+                    loading={loading}
+                    pagination={{ pageSize: 10, hideOnSinglePage: true }}
+                    scroll={{ x: 'max-content' }}
+                  />
+                </div>
               </Tabs.TabPane>
             </Tabs>
 
@@ -739,7 +752,14 @@ const AdminPanel: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider width={250} theme={isDark ? 'dark' : 'light'}>
+      <Sider
+        width={250}
+        theme={isDark ? 'dark' : 'light'}
+        breakpoint="md"
+        collapsedWidth={0}
+        collapsed={siderCollapsed}
+        onCollapse={setSiderCollapsed}
+      >
         <div style={{ padding: '16px', fontSize: '18px', fontWeight: 'bold', textAlign: 'center' }}>
           {t('adminPanel.sidebarTitle')}
         </div>

@@ -48,6 +48,8 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
   const { user, logout } = useAuth();
   const { t } = useTranslation();
   const role: Role = toAppRole(user?.role ?? 'user');
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
 
   const getMenuItems = () => {
     const items: { key: string; label: React.ReactNode }[] = [];
@@ -149,14 +151,14 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                   }}
                   trigger={['click']}
                 >
-                  <Button type="text" style={{ ...headerBtnStyle, marginInlineStart: 8 }}>
-                    {roleIcon} {user?.name ?? role}
+                  <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8 }}>
+                    {roleIcon}{!isMobile && ` ${user?.name ?? role}`}
                   </Button>
                 </Dropdown>
               </div>
             </Header>
-            <Content style={{ padding: '0 50px' }}>
-              <div style={{ padding: 24, minHeight: 380 }}>
+            <Content style={{ padding: isMobile ? '0 8px' : '0 50px' }}>
+              <div style={{ padding: isMobile ? 12 : 24, minHeight: 380 }}>
                 <Routes>
                   <Route path="/lot-status"   element={<LotStatusBoard />} />
                   <Route path="/pending"      element={<AllPendingRequests role={role} />} />
