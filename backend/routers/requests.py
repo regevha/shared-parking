@@ -14,14 +14,21 @@ router = APIRouter(prefix="/api/requests", tags=["requests"])
 
 
 def _generate_id(db: Session) -> str:
-    count = db.query(models.ParkingRequest).count()
-    return f"REQ-{count + 1:03d}"
+    from sqlalchemy import func
+    last = db.query(models.ParkingRequest.id).order_by(models.ParkingRequest.id.desc()).first()
+    if not last:
+        return "REQ-001"
+    try:
+        last_num = int(last[0].split("-")[1])
+        return f"REQ-{last_num + 1:03d}"
+    except (IndexError, ValueError):
+        import uuid
+        return f"REQ-{uuid.uuid4().hex[:6].upper()}"
 
 
 def _add_audit_log(
     db: Session, request_id: str, user_id: str, user_name: str, action: str, details: str | None = None
 ):
-    from datetime import datetime, timezone
     log = models.AuditLog(
         request_id=request_id,
         user_id=user_id,
@@ -46,7 +53,6 @@ def _has_conflict(
     if not lot_id:
         return None
     
-    from datetime import datetime
     new_start = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
     new_end = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
 
@@ -92,7 +98,6 @@ def _is_outside_availability(
     if not prefs:
         return True
 
-    from datetime import datetime, timedelta
     try:
         current_dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
         end_dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
@@ -307,10 +312,9 @@ def update_request(
     effective_start = payload.start_time if payload.start_time is not None else req.start_time
     effective_dur   = payload.duration   if payload.duration   is not None else req.duration
 
-    from datetime import datetime, timedelta
     try:
         start_dt = datetime.strptime(f"{effective_date} {effective_start}", "%Y-%m-%d %H:%M")
-        end_dt = start_dt + timedelta(hours=effective_dur)
+        end_dt = start_dt + dt_mod.timedelta(hours=effective_dur)
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid date or start time")
 
@@ -320,7 +324,7 @@ def update_request(
     req.end_time = end_dt.strftime("%H:%M")
     req.duration = effective_dur
     req.updated_at = datetime.now(timezone.utc).isoformat()
-
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "updated")
     db.commit()
     db.refresh(req)
     return req
@@ -343,6 +347,9 @@ def delete_request(
     db.query(models.RequestMessage)\
         .filter(models.RequestMessage.request_id == request_id)\
         .update({"request_id": None})
+    
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "cancelled")
+    
     db.delete(req)
     db.commit()
 
@@ -368,6 +375,14 @@ def get_request_audit(
     current_user: models.User = Depends(get_current_user),
 ):
     from typing import List
+    req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
+    if not req:
+        raise HTTPException(status_code=404, detail="Request not found")
+        
+    # Security: only the requester or a manager can see the history
+    if req.requester_id != current_user.id and current_user.role == "user":
+        raise HTTPException(status_code=403, detail="Permission denied")
+
     return (
         db.query(models.AuditLog)
         .filter(models.AuditLog.request_id == request_id)
