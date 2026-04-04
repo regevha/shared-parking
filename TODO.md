@@ -28,6 +28,12 @@ The following test suites and refinements are recommended to further harden the 
 - [ ] **Interactive System Config**: Move backend constants (e.g., `blackoutLimit`) to UI-editable settings.
 - [ ] **User Search & Bulk Actions**: Add a search bar and batch role updates (e.g., "Set 5 users to Owner").
 
+### 6. 🕒 Pending Requests (Owner UX)
+- [ ] **Conflict Highlighting**: Visually tag overlapping requests for the same lot/time to prevent double-booking.
+- [ ] **Visual Timeline Mini-Bars**: Add a horizontal 24h bar in each row to visualize the requested segment.
+- [ ] **Bulk Approval/Rejection**: Add checkboxes and batch actions ("Approve All Selected").
+- [ ] **Mobile Swipe Actions**: Implement intuitive swipe-to-approve/reject on mobile card views.
+
 ## 🛠️ Refactor Ideas
 - [ ] **Native Date Handling**: Migrate all ISO strings to native `DateTime` objects in the Database layer if we move away from SQLite.
 - [ ] **Real-time Notifications**: Replace polling with WebSockets for immediate approval/rejection alerts.
