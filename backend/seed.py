@@ -30,7 +30,8 @@ USERS = [
 
 # ── 3 Lots ────────────────────────────────────────────────────────────────────
 LOTS = [
-    dict(id="LOT-101", floor="F1", floor_label="Floor 1", owner="Owner One",   owner_id="O1", status="available"),
+    dict(id="LOT-101-A", floor="F1", floor_label="Floor 1 (A)", owner="Owner One",   owner_id="O1", status="available"),
+    dict(id="LOT-101-B", floor="F1", floor_label="Floor 1 (B)", owner="Owner One",   owner_id="O1", status="available"),
     dict(id="LOT-102", floor="F1", floor_label="Floor 1", owner="Owner Two",   owner_id="O2", status="available"),
     dict(id="LOT-201", floor="F2", floor_label="Floor 2", owner="Owner Three", owner_id="O3", status="available"),
 ]
@@ -41,7 +42,7 @@ REQUESTS = [
     dict(
         id="REQ-001", requester_id="A1", requester_name="Admin One",
         date=_fd(1), start_time="09:00", duration=4, status="approved",
-        lot_id="LOT-101", floor="Floor 1", lot_owner="Owner One",
+        lot_id="LOT-101-A", floor="Floor 1 (A)", lot_owner="Owner One",
         approved_by="Owner One"
     ),
     dict(

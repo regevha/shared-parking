@@ -33,24 +33,43 @@ def run_auto_approval(db=None):
             .order_by(models.ParkingRequest.submitted_at)
             .all()
         )
-        for req in pending:
-            # Multi-day support: pass end_date and end_time
-            if _has_conflict(
-                db, req.lot_id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=req.id
-            ):
-                continue  # conflicted — leave for manual owner review
+        
+        all_lots = db.query(models.Lot).filter(models.Lot.status != "unowned").all()
 
-            # NEW: Respect availability slots across multiple days
-            if req.lot_id and _is_outside_availability(
-                db, req.lot_id, req.date, req.start_time, req.end_date, req.end_time
-            ):
-                continue  # outside — leave for manual review
-            now = datetime.now(timezone.utc).isoformat()
-            req.status = "approved"
-            req.approved_by = "auto"
-            req.approved_at = now
-            req.updated_at = now
-            db.commit()
+        for req in pending:
+            target_lot = None
+            
+            # If request already has a lot specified, check only that one
+            if req.lot_id:
+                lot = next((l for l in all_lots if l.id == req.lot_id), None)
+                if lot and lot.status == "available":
+                    if not _has_conflict(db, lot.id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=req.id) and \
+                       not _is_outside_availability(db, lot.id, req.date, req.start_time, req.end_date, req.end_time):
+                        target_lot = lot
+            else:
+                # Try to find ANY available lot
+                for lot in all_lots:
+                    if lot.status != "available":
+                        continue
+                    
+                    # Check for conflicts and availability for THIS lot
+                    if not _has_conflict(db, lot.id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=req.id) and \
+                       not _is_outside_availability(db, lot.id, req.date, req.start_time, req.end_date, req.end_time):
+                        target_lot = lot
+                        break
+            
+            if target_lot:
+                now = datetime.now(timezone.utc).isoformat()
+                req.status = "approved"
+                req.approved_by = "auto"
+                req.approved_at = now
+                req.updated_at = now
+                # Assign lot info
+                req.lot_id = target_lot.id
+                req.floor = target_lot.floor_label
+                req.lot_owner = target_lot.owner
+                
+                db.commit()
     finally:
         if close_db:
             db.close()
