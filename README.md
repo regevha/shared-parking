@@ -10,10 +10,27 @@ A prototype application for managing corporate parking resources. Users request 
 | Backend | Python, FastAPI, SQLAlchemy |
 | Database | SQLite (`backend/parking.db`) |
 | Auth | JWT (python-jose), bcrypt passwords (passlib) |
-| i18n | i18next v23 + react-i18next v14 — English and French |
+| i18n | i18next v23 + react-i18next v14 — English, French and Hebrew |
 | Tests | pytest, FastAPI TestClient, in-memory SQLite |
+| **Audit Trail** | SQLite-backed `audit_log` with timeline UI |
 
 ---
+
+## Key Features (v2.0)
+
+### 🚀 24/7 Multi-Day Bookings
+The system now supports round-the-clock booking across multiple days.
+- **36-Hour Window**: Requests can span across midnight for a maximum of 36 hours.
+- **Auto-Calculated Endings**: Users only need to provide a start time and duration; the system precisely calculates the end date and time.
+- **Intelligent Conflict Detection**: Multi-day overlaps are handled correctly at the database level.
+
+### 📜 Robust Audit Trail
+Every request carries a complete, immutable history of its lifecycle.
+- **Timeline View**: A dedicated "View History" modal shows the full sequence of events (submission, owner approval, auto-approval, cancellation).
+- **Transparent Automation**: Actions taken by the background scheduler are explicitly logged.
+
+### 🌍 Hebrew & RTL Support
+The application is fully translated into Hebrew, featuring a right-to-left layout and localized parking statistics.
 
 ## Getting Started
 
@@ -45,7 +62,7 @@ cd backend
 python seed.py
 ```
 
-Creates `backend/parking.db` with 21 sample users, 20 requests, and 17 lots. Only needed once — data persists across restarts. Re-run to reset to the original sample data.
+Creates `backend/parking.db` with 5 sample users, 3 requests, and 3 lots. Only needed once — data persists across restarts. Re-run to reset to the original sample data.
 
 **Demo accounts** (password: `password123`):
 
@@ -131,7 +148,7 @@ With coverage report:
 pytest tests/ --cov=. --cov-report=term-missing
 ```
 
-The suite runs **119 tests** against a fresh in-memory SQLite database — it never touches `parking.db`.
+The suite runs **125 tests** against a fresh in-memory SQLite database — it never touches `parking.db`.
 
 | File | Tests | Covers |
 |------|-------|--------|
@@ -147,7 +164,7 @@ Every endpoint is tested for: success cases · 401 (no/bad token) · 403 (wrong 
 
 ## Internationalisation (i18n)
 
-The app ships with full English and French support powered by **i18next v23** and **react-i18next v14**.
+The app ships with full English, French and Hebrew support powered by **i18next v23** and **react-i18next v14**.
 
 ### Supported languages
 
@@ -155,6 +172,7 @@ The app ships with full English and French support powered by **i18next v23** an
 |------|----------|--------------|
 | `en` | English  | 🇬🇧 EN |
 | `fr` | Français | 🇫🇷 FR |
+| `he` | עברית    | 🇮🇱 HE |
 
 ### How it works
 
@@ -276,6 +294,7 @@ Authorization: Bearer <token>
 | PATCH | `/api/requests/{id}/reject` | Owner | Reject |
 | PATCH | `/api/requests/{id}` | Requester | Edit date/time (pending only) |
 | DELETE | `/api/requests/{id}` | Requester | Cancel |
+| GET | `/api/requests/{id}/audit` | Requester / Manager | View request audit history |
 
 ### Lots
 
@@ -314,8 +333,8 @@ Messages survive request deletion for auditing — `request_id` is set to `NULL`
 
 | Method | Path | Role | Description |
 |--------|------|------|-------------|
-| GET | `/api/config` | Any | Global system constants (booking windows, blackout periods) |
-| POST | `/api/config/run-auto-approval` | Manager | Trigger the auto-approval scheduler |
+| GET | `/api/config` | Any | Global system constants (booking windows) |
+| POST | `/api/requests/run-auto-approve` | Manager | Trigger the auto-approval scheduler |
 
 **Preferences payload** (`PATCH /api/users/{id}/preferences`):
 
@@ -327,4 +346,14 @@ Messages survive request deletion for auditing — `request_id` is set to `NULL`
 }
 ```
 
-All fields are optional — only the fields present in the payload are updated.
+---
+
+## Future Roadmap / Advanced Testing
+
+The following areas are slated for further refinement and robust stress testing:
+- **🕒 DST Transitions**: Verifying 24/7 multi-day logic during "spring forward" and "fall back".
+- **🛡️ Scheduler Stress**: Handling lot depletion and race conditions during bulk auto-approvals.
+- **🌐 Visual RTL Audit**: Automated screenshot testing for the Hebrew mobile experience.
+- **📜 Detailed Audit Diffs**: Storing field-level changes (e.g., specific updated fields) in the `AuditLog`.
+
+See **[TODO.md](TODO.md)** for the full technical task list.

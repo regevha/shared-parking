@@ -29,12 +29,12 @@ class ParkingRequestBase(BaseModel):
 
 
 class ParkingRequestCreate(BaseModel):
-    requester_id: str
-    requester_name: str
+    requester_id: Optional[str] = None
+    requester_name: Optional[str] = None
     date: str
     start_time: str
     end_date: Optional[str] = None
-    end_time: str
+    end_time: Optional[str] = None
     duration: int
 
     @field_validator('date')
@@ -52,7 +52,9 @@ class ParkingRequestCreate(BaseModel):
 
     @field_validator('start_time', 'end_time')
     @classmethod
-    def validate_time_format(cls, v: str) -> str:
+    def validate_time_format(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
         if not _TIME_RE.match(v):
             raise ValueError('time must be in HH:MM format')
         return v
@@ -60,28 +62,24 @@ class ParkingRequestCreate(BaseModel):
     @model_validator(mode='after')
     def validate_time_range(self) -> 'ParkingRequestCreate':
         from datetime import datetime, timedelta
-        s, e = self.start_time, self.end_time
         
         if self.duration < 1 or self.duration > 36:
             raise ValueError('duration must be between 1 and 36 hours')
 
         try:
-            start_dt = datetime.strptime(f"{self.date} {s}", "%Y-%m-%d %H:%M")
+            start_dt = datetime.strptime(f"{self.date} {self.start_time}", "%Y-%m-%d %H:%M")
             calc_end_dt = start_dt + timedelta(hours=self.duration)
             
-            # Verify provided end_time matches duration
-            provided_end_dt = datetime.strptime(f"{self.end_date or self.date} {e}", "%Y-%m-%d %H:%M")
-            
-            # Since end_date might not be provided in the payload yet (calculated by frontend),
-            # we mainly ensure the duration and end_time represent the same point in time.
-            # If end_date is present, verify it. Otherwise, calc it now.
-            if self.end_date:
-                if provided_end_dt != calc_end_dt:
-                    raise ValueError(f'end_time/end_date do not match duration. Expected {calc_end_dt}')
-            else:
+            # If not provided, set them now
+            if not self.end_date:
                 self.end_date = calc_end_dt.strftime("%Y-%m-%d")
-                if e != calc_end_dt.strftime("%H:%M"):
-                    raise ValueError(f'end_time does not match duration. Expected {calc_end_dt.strftime("%H:%M")}')
+            if not self.end_time:
+                self.end_time = calc_end_dt.strftime("%H:%M")
+                
+            # Verify they are consistent if they WERE provided
+            provided_end_dt = datetime.strptime(f"{self.end_date} {self.end_time}", "%Y-%m-%d %H:%M")
+            if abs((provided_end_dt - calc_end_dt).total_seconds()) > 60:
+                raise ValueError(f'end_date/end_time do not match duration {self.duration}h. Expected {calc_end_dt}')
 
         except Exception as ex:
             if isinstance(ex, ValueError): raise ex
@@ -260,6 +258,7 @@ class UserUpdate(BaseModel):
 class AuditLogOut(BaseModel):
     id: int
     request_id: str
+    requester_id: Optional[str] = None
     user_id: str
     user_name: str
     action: str

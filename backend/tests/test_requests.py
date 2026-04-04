@@ -265,11 +265,14 @@ def test_create_request_rejects_invalid_time_format(client, user_headers):
     assert resp.status_code == 422
 
 
-def test_create_request_rejects_start_after_end(client, user_headers):
-    bad = {**REQUEST_PAYLOAD, "start_time": "14:00", "end_time": "10:00", "duration": 2}
+def test_create_request_rejects_outside_36h(client, user_headers):
+    # 40h request should fail
+    bad = {**REQUEST_PAYLOAD, "start_time": "10:00", "duration": 40}
+    bad.pop("end_date", None)
+    bad.pop("end_time", None)
     resp = client.post("/api/requests", json=bad, headers=user_headers)
     assert resp.status_code == 422
-    assert "before" in resp.text.lower()
+    assert "36" in resp.text.lower()
 
 
 def test_create_request_rejects_start_equals_end(client, user_headers):
@@ -278,18 +281,19 @@ def test_create_request_rejects_start_equals_end(client, user_headers):
     assert resp.status_code == 422
 
 
-def test_create_request_rejects_end_time_after_20(client, user_headers):
-    bad = {**REQUEST_PAYLOAD, "start_time": "19:00", "end_time": "21:00", "duration": 2}
-    resp = client.post("/api/requests", json=bad, headers=user_headers)
-    assert resp.status_code == 422
-    assert "20:00" in resp.text
-
-
-def test_create_request_rejects_start_before_07(client, user_headers):
-    bad = {**REQUEST_PAYLOAD, "start_time": "06:00", "end_time": "08:00", "duration": 2}
-    resp = client.post("/api/requests", json=bad, headers=user_headers)
-    assert resp.status_code == 422
-    assert "07:00" in resp.text
+def test_create_request_success_36h_across_midnight(client, user_headers):
+    # 30h request starting at 20:00 should end at 02:00 two days later (30h = day1(4h) + day2(24h) + day3(2h))
+    payload = {**REQUEST_PAYLOAD, "start_time": "20:00", "duration": 30}
+    payload.pop("end_date", None)
+    payload.pop("end_time", None)
+    resp = client.post("/api/requests", json=payload, headers=user_headers)
+    if resp.status_code != 201:
+        print(f"DEBUG FAIL: {resp.status_code} {resp.json()}")
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["duration"] == 30
+    assert data["end_time"] == "02:00"
+    assert data["end_date"] != data["date"]
 
 
 def test_create_request_rejects_wrong_duration(client, user_headers):
