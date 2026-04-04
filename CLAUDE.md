@@ -208,3 +208,5 @@ Both `CalendarView` and `LotCalendarView`:
 4. RTL layout for react-big-calendar — library has no RTL support; calendar stays LTR even in Hebrew mode
 5. Remove restriction on time of day for requests — allow any time of day and max duration of 36 hours (multi-day support)
 6. Hide old requests from table views — except for admin screens, show only requests starting from 'yesterday' forward to keep views clean for users
+7. Invert availability logic — lots should be 'Blocked by Default'. Owners must define explicit availability windows/time slots for sharing; sharing is prohibited outside these slots
+8. Implement 'Availability Windows' UI — for owners to define when their lots are open for requests (possibly repurposing or extending NotificationWindows)
