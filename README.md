@@ -346,4 +346,14 @@ Messages survive request deletion for auditing — `request_id` is set to `NULL`
 }
 ```
 
-All fields are optional — only the fields present in the payload are updated.
+---
+
+## Future Roadmap / Advanced Testing
+
+The following areas are slated for further refinement and robust stress testing:
+- **🕒 DST Transitions**: Verifying 24/7 multi-day logic during "spring forward" and "fall back".
+- **🛡️ Scheduler Stress**: Handling lot depletion and race conditions during bulk auto-approvals.
+- **🌐 Visual RTL Audit**: Automated screenshot testing for the Hebrew mobile experience.
+- **📜 Detailed Audit Diffs**: Storing field-level changes (e.g., specific updated fields) in the `AuditLog`.
+
+See **[TODO.md](TODO.md)** for the full technical task list.
