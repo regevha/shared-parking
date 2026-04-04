@@ -27,10 +27,12 @@ def _generate_id(db: Session) -> str:
 
 
 def _add_audit_log(
-    db: Session, request_id: str, user_id: str, user_name: str, action: str, details: str | None = None
+    db: Session, request_id: str, user_id: str, user_name: str, action: str, 
+    details: str | None = None, requester_id: str | None = None
 ):
     log = models.AuditLog(
         request_id=request_id,
+        requester_id=requester_id,
         user_id=user_id,
         user_name=user_name,
         action=action,
@@ -218,7 +220,7 @@ def create_request(
         status="pending",
     )
     db.add(req)
-    _add_audit_log(db, req.id, current_user.id, current_user.name, "submitted")
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "submitted", requester_id=current_user.id)
     db.commit()
     db.refresh(req)
     return req
@@ -258,7 +260,8 @@ def approve_request(
     
     _add_audit_log(
         db, req.id, current_user.id, current_user.name, "approved", 
-        details=f"Assigned lot {payload.lot_id} (Floor {payload.floor})"
+        details=f"Assigned lot {payload.lot_id} (Floor {payload.floor})",
+        requester_id=req.requester_id
     )
     
     req.rejected_by_owner = False
@@ -287,7 +290,7 @@ def reject_request(
     req.status = "rejected"
     req.rejected_by_owner = True
     req.updated_at = datetime.now(timezone.utc).isoformat()
-    _add_audit_log(db, req.id, current_user.id, current_user.name, "rejected")
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "rejected", requester_id=req.requester_id)
     db.commit()
     db.refresh(req)
     return req
@@ -324,7 +327,7 @@ def update_request(
     req.end_time = end_dt.strftime("%H:%M")
     req.duration = effective_dur
     req.updated_at = datetime.now(timezone.utc).isoformat()
-    _add_audit_log(db, req.id, current_user.id, current_user.name, "updated")
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "updated", requester_id=req.requester_id)
     db.commit()
     db.refresh(req)
     return req
@@ -348,7 +351,7 @@ def delete_request(
         .filter(models.RequestMessage.request_id == request_id)\
         .update({"request_id": None})
     
-    _add_audit_log(db, req.id, current_user.id, current_user.name, "cancelled")
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "cancelled", requester_id=req.requester_id)
     
     db.delete(req)
     db.commit()
@@ -375,17 +378,22 @@ def get_request_audit(
     current_user: models.User = Depends(get_current_user),
 ):
     from typing import List
-    req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
-    if not req:
-        raise HTTPException(status_code=404, detail="Request not found")
-        
-    # Security: only the requester or a manager can see the history
-    if req.requester_id != current_user.id and current_user.role == "user":
-        raise HTTPException(status_code=403, detail="Permission denied")
+    logs = db.query(models.AuditLog).filter(models.AuditLog.request_id == request_id).order_by(models.AuditLog.timestamp.desc()).all()
+    if not logs:
+        raise HTTPException(status_code=404, detail="No audit logs found for this request")
+    
+    # We use the FIRST log entry (usually 'submitted') to find the original requester if the request is gone
+    # Or just check any entry that has requester_id set
+    requester_id = None
+    for log in logs:
+        if log.requester_id:
+            requester_id = log.requester_id
+            break
+            
+    # Check access (Manager or original Requester)
+    if current_user.role != "manager" and current_user.id != requester_id:
+         # Double check if request STILL exists, maybe current_user is the owner?
+         # But owners can't see the full audit trail (privacy requirement #2)
+         raise HTTPException(status_code=403, detail="Permission denied")
 
-    return (
-        db.query(models.AuditLog)
-        .filter(models.AuditLog.request_id == request_id)
-        .order_by(models.AuditLog.timestamp.desc())
-        .all()
-    )
+    return logs

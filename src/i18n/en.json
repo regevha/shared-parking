@@ -54,7 +54,8 @@
     "stats": {
       "totalActive": "Total Active",
       "pending": "Pending",
-      "approved": "Approved"
+      "approved": "Approved",
+      "rejected": "Rejected"
     },
     "info": "Manage your active parking requests. Pending requests can be edited; any active request can be cancelled. Rejected requests are not shown.",
     "cancelConfirm": {

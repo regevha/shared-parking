@@ -7,8 +7,9 @@
     "parkingStatus": "Statut du parking",
     "lotCalendar": "Calendrier des places",
     "myLots": "Mes places",
-    "adminPanel": "Panneau d'administration",
+    "availabilityWindows": "Availability Settings",
     "notificationWindows": "Fenêtres de notification",
+    "adminPanel": "Panneau d'administration",
     "signOut": "Se déconnecter"
   },
   "login": {
@@ -53,7 +54,8 @@
     "stats": {
       "totalActive": "Total actif",
       "pending": "En attente",
-      "approved": "Approuvé"
+      "approved": "Approuvé",
+      "rejected": "Rejeté"
     },
     "info": "Gérez vos demandes de stationnement actives. Les demandes en attente peuvent être modifiées ; toute demande active peut être annulée. Les demandes rejetées ne sont pas affichées.",
     "cancelConfirm": {
@@ -178,7 +180,7 @@
     "title": "Soumettre une demande de stationnement",
     "limitAlert": {
       "title": "Limite de demandes atteinte",
-      "description": "Vous avez déjà le nombre maximum de demandes actives (3). Vous ne pouvez pas soumettre de nouvelles demandes tant qu'une demande existante n'est pas approuvée ou annulée."
+      "description": "Vous avez déjà le nombre maximum de demandes actives (5). Vous ne pouvez pas soumettre de nouvelles demandes tant qu'une demande existante n'est pas approuvée ou annulée."
     },
     "activeRequestsCard": "Vos demandes actives ({{count}} / {{max}})",
     "labels": {
@@ -206,7 +208,7 @@
     "businessRules": {
       "title": "Règles métier",
       "rule1start": "Vous pouvez avoir au maximum ",
-      "rule1bold": "3 demandes actives simultanées",
+      "rule1bold": "5 demandes actives simultanées",
       "rule2": "Sélectionnez n'importe quelle date à partir d'aujourd'hui",
       "rule3": "L'heure de début doit être sur des intervalles horaires (08:00 – 19:00)",
       "rule4": "La durée est de 1 à 6 heures, automatiquement limitée pour que l'heure de fin ne dépasse pas 20:00",
@@ -215,7 +217,7 @@
     "info": "Soumettez une demande de stationnement pour une date et un créneau horaire spécifiques ; un propriétaire l'examinera et l'approuvera ou la rejettera.",
     "notifications": {
       "limitExceeded": "Limite de demandes dépassée",
-      "limitExceededDesc": "Vous avez déjà le nombre maximum de demandes actives (3). Veuillez attendre qu'une demande existante expire.",
+      "limitExceededDesc": "Vous avez déjà le nombre maximum de demandes actives (5). Veuillez attendre qu'une demande existante expire.",
       "submitted": "Demande soumise",
       "submittedDesc": "Demande de stationnement soumise pour le {{date}} de {{startTime}} à {{endTime}}",
       "failed": "Échec de la soumission",
@@ -395,6 +397,49 @@
       "sendFailed": "Échec de l'envoi du message"
     }
   },
+  "availabilityWindows": {
+    "title": "Lot Availability Settings",
+    "blackoutAlert": {
+      "message": "Lot sharing is restricted between 22:00 and 06:00",
+      "description": "System-wide security policy prevents parking sharing during late-night hours."
+    },
+    "saving": "Saving availability...",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "noWindows": "Closed for sharing — no windows set",
+    "addWindow": "Add Availability Window",
+    "maxWindows": "Maximum {{max}} slots per day",
+    "modal": {
+      "title": "Add Availability Slot — {{day}}",
+      "okText": "Add Slot",
+      "timeRangeLabel": "Time Range",
+      "timeRangeRequired": "Please select a time range",
+      "endAfterStart": "End time must be after start time",
+      "startPlaceholder": "Start time",
+      "endPlaceholder": "End time"
+    },
+    "blackoutWarning": {
+      "title": "Late Night Restriction",
+      "content": "This slot overlaps with the overnight restriction (22:00–06:00). Sharing is not permitted during this time.",
+      "ok": "Trim & Save",
+      "cancel": "Cancel"
+    },
+    "notifications": {
+      "loadFailed": "Failed to load availability settings",
+      "saveFailed": "Failed to save availability settings",
+      "removed": "Availability slot removed",
+      "overlap": "This time range overlaps with an existing slot",
+      "added": "Availability slot added"
+    },
+    "info": "Define the time slots when your lot is available for others to request. Your lot is blocked by default outside of these windows. Up to {{max}} slots per day."
+  },
   "notificationWindows": {
     "title": "Préférences des fenêtres de notification",
     "blackoutAlert": {
@@ -461,7 +506,11 @@
         "joined": "Inscrit le",
         "actions": "Actions"
       },
-      "roles": { "user": "Utilisateur", "owner": "Propriétaire", "manager": "Gestionnaire" },
+      "roles": {
+        "user": "Utilisateur",
+        "owner": "Propriétaire",
+        "manager": "Gestionnaire"
+      },
       "deleteConfirm": "Supprimer cet utilisateur ?",
       "deleteWarning": "Cette action est irréversible.",
       "deleteOk": "Supprimer",
@@ -481,7 +530,12 @@
       "unownedAlert_other": "{{count}} places sans propriétaire",
       "unownedAlertDesc": "Attribuez des propriétaires pour assurer une bonne gestion de ces places.",
       "filterLabel": "Filtrer :",
-      "filters": { "all": "Tout", "available": "Disponible", "blocked": "Bloqué", "unowned": "Sans propriétaire" },
+      "filters": {
+        "all": "Tout",
+        "available": "Disponible",
+        "blocked": "Bloqué",
+        "unowned": "Sans propriétaire"
+      },
       "columns": {
         "lotId": "ID place",
         "floorLabel": "Étiquette étage",

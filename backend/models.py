@@ -92,8 +92,9 @@ class AuditLog(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     request_id = Column(String, index=True, nullable=False)
+    requester_id = Column(String, index=True, nullable=True) # ID of the user who submitted the request
     user_id = Column(String, nullable=False)
     user_name = Column(String, nullable=False)
-    action = Column(String, nullable=False)  # submitted | approved | rejected | cancelled | auto-assigned
+    action = Column(String, nullable=False)  # submitted | approved | rejected | cancelled | auto-assigned | updated
     details = Column(String, nullable=True)  # additional info like lot ID
     timestamp = Column(String, nullable=False) # ISO timestamp

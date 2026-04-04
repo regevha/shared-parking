@@ -323,7 +323,7 @@ const MyRequests: React.FC = () => {
         <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
           <div>
             <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.total}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.total')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.totalActive')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.pending}</strong>
