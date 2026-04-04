@@ -14,14 +14,9 @@ interface FormValues {
   duration: number;
 }
 
-const MAX_END_HOUR = 20;
-const MAX_ACTIVE_REQUESTS = 3;
+const MAX_PENDING_REQUESTS = 5;
 
-// 20:00 is excluded: no valid duration fits (min 1h would exceed 20:00)
-const HOUR_OPTIONS = [
-  '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
-  '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
-];
+const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
 
 const ParkingRequestForm: React.FC = () => {
   const [form] = Form.useForm<FormValues>();
@@ -30,46 +25,37 @@ const ParkingRequestForm: React.FC = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
 
-  const ALL_DURATION_OPTIONS = [1, 2, 3, 4, 5, 6].map(n => ({
+  const ALL_DURATION_OPTIONS = Array.from({ length: 36 }, (_, i) => i + 1).map(n => ({
     label: t('requestForm.durationOption', { count: n }),
     value: n,
   }));
 
-  const activeRequests = userRequests.filter(
-    r => r.status === 'pending' || r.status === 'approved'
-  );
-  const hasMaxRequests = activeRequests.length >= MAX_ACTIVE_REQUESTS;
+  const activeRequests = useMemo(() => {
+    return userRequests
+      .filter(r => r.status === 'pending')
+      .sort((a, b) => {
+        const d = a.date.localeCompare(b.date);
+        return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
+      });
+  }, [userRequests]);
 
-  // Watch form values for end time calculation and duration filtering
+  const hasMaxRequests = activeRequests.length >= MAX_PENDING_REQUESTS;
+
+  // Watch form values for end time calculation
+  const dateValue = Form.useWatch('date', form);
   const startTime = Form.useWatch('startTime', form);
   const duration = Form.useWatch('duration', form);
 
-  // Filter durations so end time never exceeds MAX_END_HOUR
-  const availableDurations = useMemo(() => {
-    if (!startTime) return ALL_DURATION_OPTIONS;
+  // Auto-calculate end date and time
+  const { endDate, endTime } = useMemo(() => {
+    if (!dateValue || !startTime || !duration) return { endDate: null, endTime: null };
     const startHour = parseInt(startTime.split(':')[0]);
-    const maxDuration = MAX_END_HOUR - startHour;
-    return ALL_DURATION_OPTIONS.filter(opt => opt.value <= maxDuration);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startTime, t]);
-
-  // Clear duration when start time changes and the current value is no longer valid
-  useEffect(() => {
-    if (!startTime || !duration) return;
-    const startHour = parseInt(startTime.split(':')[0]);
-    if (startHour + duration > MAX_END_HOUR) {
-      form.setFieldValue('duration', undefined);
-    }
-  }, [startTime]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Auto-calculate end time
-  const endTime = useMemo(() => {
-    if (!startTime || !duration) return null;
-    const startHour = parseInt(startTime.split(':')[0]);
-    const endHour = startHour + duration;
-    if (endHour > MAX_END_HOUR) return null;
-    return `${String(endHour).padStart(2, '0')}:00`;
-  }, [startTime, duration]);
+    const endDateTime = dayjs(dateValue).startOf('day').add(startHour + duration, 'hour');
+    return {
+      endDate: endDateTime.format('YYYY-MM-DD'),
+      endTime: endDateTime.format('HH:mm'),
+    };
+  }, [dateValue, startTime, duration]);
 
   const handleFormChange = () => {
     form.validateFields();
@@ -91,6 +77,7 @@ const ParkingRequestForm: React.FC = () => {
         requesterName: user?.name ?? '',
         date: values.date?.format('YYYY-MM-DD') || '',
         startTime: values.startTime,
+        endDate: endDate || '',
         endTime: endTime || '',
         duration: values.duration,
       });
@@ -132,7 +119,7 @@ const ParkingRequestForm: React.FC = () => {
       {/* Active Requests List */}
       {activeRequests.length > 0 && (
         <Card
-          title={t('requestForm.activeRequestsCard', { count: activeRequests.length, max: MAX_ACTIVE_REQUESTS })}
+          title={t('requestForm.activeRequestsCard', { count: activeRequests.length, max: MAX_PENDING_REQUESTS })}
           style={{ marginBottom: '24px' }}
           size="small"
         >
@@ -208,7 +195,7 @@ const ParkingRequestForm: React.FC = () => {
               >
                 <Select
                   placeholder={t('requestForm.placeholders.selectDuration')}
-                  options={availableDurations}
+                  options={ALL_DURATION_OPTIONS}
                 />
               </Form.Item>
             </Col>
@@ -226,6 +213,11 @@ const ParkingRequestForm: React.FC = () => {
                   fontWeight: 'bold',
                 }}
               >
+                {endDate !== dateValue?.format('YYYY-MM-DD') && (
+                  <Tag color="blue" style={{ marginRight: '8px' }}>
+                    {dayjs(endDate).format('DD/MM')}
+                  </Tag>
+                )}
                 {endTime}
               </div>
             </Form.Item>

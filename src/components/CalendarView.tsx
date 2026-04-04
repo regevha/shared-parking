@@ -3,12 +3,13 @@ import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification } from 'antd';
+import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import './CalendarView.css';
+import AuditTrailModal from './AuditTrailModal';
 
 const DnDCalendar = withDragAndDrop(Calendar as any) as any;
 
@@ -75,15 +76,16 @@ const currentHourSlotPropGetter = (date: Date) => {
 };
 
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
-  const { pendingRequests, userRequests, updateUserRequest } = useRequests();
+  const { pendingRequests, approvedRequests, userRequests, updateUserRequest } = useRequests();
   const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
   const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
-  const minTime = useMemo(() => { const d = new Date(); d.setHours(7, 0, 0, 0); return d; }, []);
-  const maxTime = useMemo(() => { const d = new Date(); d.setHours(20, 0, 0, 0); return d; }, []);
+  const minTime = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
+  const maxTime = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
   const [date, setDate] = useState(new Date());
   const [selectedRequest, setSelectedRequest] = useState<ParkingRequest | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
@@ -94,15 +96,16 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
 
   const myRequestIds = useMemo(() => new Set(userRequests.map((r) => r.id)), [userRequests]);
 
-  // Merge pendingRequests + non-rejected userRequests, deduped by ID
+  // Merge pendingRequests + approvedRequests + userRequests, deduped by ID
   const allRequests = useMemo(() => {
     const map = new Map<string, ParkingRequest>();
     pendingRequests.forEach((r) => map.set(r.id, r));
+    approvedRequests.forEach((r) => map.set(r.id, r));
     userRequests
       .filter((r) => r.status !== 'rejected')
       .forEach((r) => map.set(r.id, r));
     return Array.from(map.values());
-  }, [pendingRequests, userRequests]);
+  }, [pendingRequests, approvedRequests, userRequests]);
 
   const getStatusColor = (req: ParkingRequest) => {
     if (req.rejectedByOwner) return STATUS_COLORS.rejected;
@@ -124,7 +127,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       id: req.id,
       title: `${myRequestIds.has(req.id) ? '★ ' : ''}${req.requesterName.split(' ')[0]}`,
       start: new Date(`${req.date}T${req.startTime}:00`),
-      end: new Date(`${req.date}T${req.endTime}:00`),
+      end: new Date(`${req.endDate || req.date}T${req.endTime}:00`),
       resource: req,
       isMine: myRequestIds.has(req.id),
     })),
@@ -150,6 +153,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
     updateUserRequest(event.resource.id, {
       date: startDayjs.format('YYYY-MM-DD'),
       startTime: startDayjs.format('HH:mm'),
+      endDate: endDayjs.format('YYYY-MM-DD'),
       endTime: endDayjs.format('HH:mm'),
       duration: endDayjs.diff(startDayjs, 'hour'),
     });
@@ -301,6 +305,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             slotPropGetter={currentHourSlotPropGetter}
             components={view === 'week' ? mobileWeekComponents : mobileComponents}
             formats={view === 'week' ? mobileWeekFormats : undefined}
+            dayLayoutAlgorithm="no-overlap"
           />
           {!hasVisibleEvents && (
             <div className="calendar-empty-state">{t('calendarView.emptyState')}</div>
@@ -331,6 +336,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             max={maxTime}
             slotPropGetter={currentHourSlotPropGetter}
             components={desktopComponents}
+            dayLayoutAlgorithm="no-overlap"
           />
           {!hasVisibleEvents && (
             <div className="calendar-empty-state">{t('calendarView.emptyState')}</div>
@@ -339,40 +345,26 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       )}
 
       {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{totalRequests}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.total')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{pendingCount}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.pending')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#52c41a' }}>{approvedCount}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.approved')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#f5222d' }}>{rejectedCount}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.rejected')}</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+      <Card size="small" style={{ marginBottom: '24px' }}>
+        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
+          <div>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{totalRequests}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.total')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{pendingCount}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.pending')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{approvedCount}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.approved')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#f5222d', marginRight: '8px' }}>{rejectedCount}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.rejected')}</span>
+          </div>
+        </Space>
+      </Card>
 
       {/* Info */}
       <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">
@@ -406,14 +398,26 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       <Modal
         open={!!selectedRequest}
         onCancel={() => setSelectedRequest(null)}
-        footer={<Button onClick={() => setSelectedRequest(null)}>{t('calendarView.modal.close')}</Button>}
+        footer={
+          <Space>
+            <Button onClick={() => setShowHistory(true)}>{t('calendarView.modal.history') || 'View History'}</Button>
+            <Button type="primary" onClick={() => setSelectedRequest(null)}>{t('calendarView.modal.close')}</Button>
+          </Space>
+        }
         title={selectedRequest ? t('calendarView.modal.title', { name: selectedRequest.requesterName }) : ''}
       >
         {selectedRequest && (
           <Descriptions column={1} size="small" bordered>
             <Descriptions.Item label={t('calendarView.modal.requester')}>{selectedRequest.requesterName}</Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.date')}>{dayjs(selectedRequest.date).format('DD/MM/YYYY')}</Descriptions.Item>
-            <Descriptions.Item label={t('calendarView.modal.time')}>{selectedRequest.startTime} – {selectedRequest.endTime}</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.time')}>
+              {selectedRequest.startTime} – {selectedRequest.endTime}
+              {selectedRequest.endDate && selectedRequest.endDate !== selectedRequest.date && (
+                <span style={{ fontSize: '11px', color: 'var(--label-color)', marginLeft: '8px' }}>
+                  ({dayjs(selectedRequest.endDate).format('DD/MM')})
+                </span>
+              )}
+            </Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.duration')}>{selectedRequest.duration}h</Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.status')}>
               <Tag color={getStatusTagColor(selectedRequest)}>{getStatusLabel(selectedRequest)}</Tag>
@@ -425,6 +429,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           </Descriptions>
         )}
       </Modal>
+
+      {showHistory && selectedRequest && (
+        <AuditTrailModal 
+          requestId={selectedRequest.id} 
+          onClose={() => setShowHistory(false)} 
+        />
+      )}
     </div>
   );
 };

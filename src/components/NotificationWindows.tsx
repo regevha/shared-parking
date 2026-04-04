@@ -19,14 +19,12 @@ const BLACKOUT_START = '22:00';
 const BLACKOUT_END = '06:00';
 const MAX_WINDOWS_PER_DAY = 2;
 
-// Ensure every day of the week has an entry (even if empty)
 function normalise(raw: Record<string, NotificationWindow[]>): DayWindows {
   const out: DayWindows = {};
   DAYS_OF_WEEK.forEach(day => { out[day] = raw[day] ?? []; });
   return out;
 }
 
-// Convert HH:MM to minutes since midnight
 function timeToMinutes(time: string): number {
   const [h, m] = time.split(':').map(Number);
   return h * 60 + m;
@@ -36,13 +34,11 @@ function timeRangesOverlap(s1: string, e1: string, s2: string, e2: string): bool
   return timeToMinutes(s1) < timeToMinutes(e2) && timeToMinutes(e1) > timeToMinutes(s2);
 }
 
-// Check if a window overlaps the overnight blackout period (22:00–06:00)
 function overlapsWithBlackout(startTime: string, endTime: string): boolean {
-  const bs = timeToMinutes(BLACKOUT_START); // 1320
-  const be = timeToMinutes(BLACKOUT_END);   // 360
+  const bs = timeToMinutes(BLACKOUT_START);
+  const be = timeToMinutes(BLACKOUT_END);
   const ws = timeToMinutes(startTime);
   const we = timeToMinutes(endTime);
-  // Blackout spans midnight: any window that starts at/after 22:00 or ends at/before 06:00
   return ws >= bs || we <= be;
 }
 
@@ -56,16 +52,12 @@ const NotificationWindows: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [form] = Form.useForm();
 
-  // ── Load preferences on mount ─────────────────────────────────────────────
   useEffect(() => {
     if (!user) return;
-    usersApi.getPreferences(user.id)
-      .then(prefs => setWindows(normalise(prefs.notificationWindows)))
-      .catch(() => notification.error({ message: t('notificationWindows.notifications.loadFailed') }))
-      .finally(() => setLoading(false));
+    setWindows(normalise(user.preferences.notificationWindows));
+    setLoading(false);
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Persist windows to backend ────────────────────────────────────────────
   const persist = async (next: DayWindows) => {
     if (!user) return;
     setSaving(true);
@@ -73,7 +65,6 @@ const NotificationWindows: React.FC = () => {
       const updated = await usersApi.updatePreferences(user.id, {
         notification_windows: JSON.stringify(next),
       });
-      // Keep AuthContext in sync so other components see the latest preferences
       updateUser({ preferences: { ...user.preferences, notificationWindows: updated.notificationWindows } });
     } catch {
       notification.error({ message: t('notificationWindows.notifications.saveFailed') });
@@ -82,7 +73,6 @@ const NotificationWindows: React.FC = () => {
     }
   };
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
   const handleAddWindow = (day: string) => {
     setSelectedDay(day);
     setAddModalVisible(true);
@@ -132,14 +122,8 @@ const NotificationWindows: React.FC = () => {
     notification.success({ message: t('notificationWindows.notifications.added') });
   };
 
-  const canAddWindow = (day: string) => (windows[day] || []).length < MAX_WINDOWS_PER_DAY;
-
   if (loading) {
-    return (
-      <div className="notification-windows" style={{ textAlign: 'center', paddingTop: '80px' }}>
-        <Spin size="large" />
-      </div>
-    );
+    return <div style={{ textAlign: 'center', paddingTop: '80px' }}><Spin size="large" /></div>;
   }
 
   return (
@@ -179,7 +163,7 @@ const NotificationWindows: React.FC = () => {
                       ))}
                     </Space>
                   ) : (
-                    <div style={{ color: '#999', fontStyle: 'italic', padding: '20px 0' }}>
+                    <div className="no-windows-text">
                       {t('notificationWindows.noWindows')}
                     </div>
                   )}
@@ -189,17 +173,12 @@ const NotificationWindows: React.FC = () => {
                   <Button
                     type="dashed"
                     icon={<PlusOutlined />}
-                    disabled={!canAddWindow(day)}
+                    disabled={(windows[day] || []).length >= MAX_WINDOWS_PER_DAY}
                     onClick={() => handleAddWindow(day)}
                     size="small"
                   >
                     {t('notificationWindows.addWindow')}
                   </Button>
-                  {!canAddWindow(day) && (
-                    <div style={{ fontSize: '12px', color: '#ff4d4f', marginTop: '4px' }}>
-                      {t('notificationWindows.maxWindows', { max: MAX_WINDOWS_PER_DAY })}
-                    </div>
-                  )}
                 </div>
               </Card>
             </Col>
@@ -207,7 +186,6 @@ const NotificationWindows: React.FC = () => {
         </Row>
       </Spin>
 
-      {/* Add Window Modal */}
       <Modal
         title={t('notificationWindows.modal.title', { day: t(`notificationWindows.days.${selectedDay.toLowerCase()}`) })}
         open={addModalVisible}
@@ -224,8 +202,7 @@ const NotificationWindows: React.FC = () => {
               {
                 validator: (_, value) => {
                   if (!value) return Promise.resolve();
-                  if (value[0].isSameOrAfter(value[1]))
-                    return Promise.reject(t('notificationWindows.modal.endAfterStart'));
+                  if (value[0].isSameOrAfter(value[1])) return Promise.reject(t('notificationWindows.modal.endAfterStart'));
                   return Promise.resolve();
                 },
               },

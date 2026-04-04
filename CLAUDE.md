@@ -1,4 +1,4 @@
-# CLAUDE.md — Parking Mockup Project
+# CLAUDE.md — Shared Parking Project
 
 ## Project Overview
 A React + FastAPI parking management system. Users request parking slots; owners approve/reject; managers administer. Data is persisted in SQLite via SQLAlchemy. Authentication uses JWT (bcrypt passwords, 8-hour tokens).
@@ -58,6 +58,7 @@ All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the ful
 | `python-jose[cryptography]` | JWT creation and verification (`create_access_token`, `get_current_user`) |
 | `bcrypt` | Password hashing — `hash_password()` / `verify_password()` in `auth.py` call bcrypt directly (passlib dropped — incompatible with bcrypt ≥ 4.0) |
 | `python-multipart` | Form-data parsing — **required** for `OAuth2PasswordRequestForm` on `POST /auth/login` |
+| `apscheduler` | Background job execution (auto-approves conflict-free parking requests every 15 mins) |
 
 ### Test packages (`backend/requirements-test.txt`)
 | Package | Why it's needed |
@@ -205,3 +206,7 @@ Both `CalendarView` and `LotCalendarView`:
 2. Empty state UI for all tables (currently shows empty table when no data)
 3. Audit trail — `created_at` / `updated_at` timestamps on records (timestamps added to DB; full audit trail UI pending)
 4. RTL layout for react-big-calendar — library has no RTL support; calendar stays LTR even in Hebrew mode
+5. Remove restriction on time of day for requests — allow any time of day and max duration of 36 hours (multi-day support)
+6. Hide old requests from table views — except for admin screens, show only requests starting from 'yesterday' forward to keep views clean for users
+7. Invert availability logic — lots should be 'Blocked by Default'. Owners must define explicit availability windows/time slots for sharing; sharing is prohibited outside these slots
+8. Implement 'Availability Windows' UI — for owners to define when their lots are open for requests (possibly repurposing or extending NotificationWindows)

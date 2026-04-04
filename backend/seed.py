@@ -1,320 +1,157 @@
 """
-Seed the SQLite database with sample users, requests and lots.
-Run once: python seed.py
-Safe to re-run — clears existing data first.
-
-Dates are computed relative to today so the seed stays fresh.
+Seed the SQLite database with simplified sample data: 3 Owners, 2 Admins.
 """
 
 from datetime import datetime, timezone, date, timedelta
+import json
+import models
 from database import SessionLocal, engine, Base
 from auth import hash_password
-import models
 
 Base.metadata.create_all(bind=engine)
 
-# ── Date helpers ──────────────────────────────────────────────────────────────
-
 _TODAY = date.today()
 
-
 def _fd(days: int) -> str:
-    """Future date string: today + N days."""
     return (_TODAY + timedelta(days=days)).isoformat()
 
-
 def _ts(days_ago: int, hour: int = 10, minute: int = 0) -> str:
-    """ISO timestamp N days ago at the given UTC hour:minute."""
     dt = datetime.now(timezone.utc) - timedelta(days=days_ago)
     return dt.replace(hour=hour, minute=minute, second=0, microsecond=0).isoformat()
 
-
-def _blocked_until(days: int, hour: int = 10) -> str:
-    """Readable datetime string for lot.blocked_until."""
-    return f"{_fd(days)} {hour:02d}:00"
-
-
-# ── Sample users ──────────────────────────────────────────────────────────────
-# Passwords are all "password123" for development convenience.
-# role is set directly on the model (seed bypasses the /auth/register API which
-# forces role="user"; owners/managers are set up here as a privileged operation).
+# ── 5 Users ───────────────────────────────────────────────────────────────────
 USERS = [
-    dict(id="owner-001", name="Sarah Johnson",   email="sarah@parking.dev",       role="owner"),
-    dict(id="owner-002", name="Mike Chen",        email="mike@parking.dev",        role="owner"),
-    dict(id="owner-003", name="David Wilson",     email="david@parking.dev",       role="owner"),
-    dict(id="owner-004", name="Lisa Anderson",    email="lisa@parking.dev",        role="owner"),
-    dict(id="owner-005", name="James Taylor",     email="james@parking.dev",       role="owner"),
-    dict(id="owner-006", name="Patricia Brown",   email="patricia@parking.dev",    role="owner"),
-    dict(id="owner-007", name="Robert Garcia",    email="robert@parking.dev",      role="owner"),
-    dict(id="owner-008", name="Jennifer Lee",     email="jennifer@parking.dev",    role="owner"),
-    dict(id="user-001",  name="Alice Johnson",    email="alice@parking.dev",       role="user"),
-    dict(id="user-002",  name="Bob Smith",        email="bob@parking.dev",         role="user"),
-    dict(id="user-003",  name="Carol Williams",   email="carol@parking.dev",       role="user"),
-    dict(id="user-004",  name="Emma Brown",       email="emma@parking.dev",        role="user"),
-    dict(id="user-005",  name="Frank Davis",      email="frank@parking.dev",       role="user"),
-    dict(id="user-006",  name="George Miller",    email="george@parking.dev",      role="user"),
-    dict(id="user-007",  name="Helen Garcia",     email="helen@parking.dev",       role="user"),
-    dict(id="user-008",  name="Tom Harris",       email="tom@parking.dev",         role="user"),
-    dict(id="user-009",  name="Nina Patel",       email="nina@parking.dev",        role="user"),
-    dict(id="user-010",  name="David Lee",        email="davidlee@parking.dev",    role="user"),
-    dict(id="user-011",  name="Maria Garcia",     email="maria@parking.dev",       role="user"),
-    dict(id="user-012",  name="James Wilson",     email="jameswilson@parking.dev", role="user"),
-    dict(id="manager-001", name="Admin Manager",  email="admin@parking.dev",       role="manager"),
+    dict(id="O1", name="Owner One",   email="o1@parking.dev", role="owner"),
+    dict(id="O2", name="Owner Two",   email="o2@parking.dev", role="owner"),
+    dict(id="O3", name="Owner Three", email="o3@parking.dev", role="owner"),
+    dict(id="A1", name="Admin One",   email="a1@parking.dev", role="manager"),
+    dict(id="A2", name="Admin Two",   email="a2@parking.dev", role="manager"),
 ]
 
-# ── Approved requests ─────────────────────────────────────────────────────────
-# approved_by = owner name for manual approvals; "auto" for scheduler approvals.
-# Parking dates are all in the future so they appear on the calendar.
-APPROVED_REQUESTS = [
-    dict(
-        id="REQ-001",
-        requester_id="user-001",  requester_name="Alice Johnson",
-        date=_fd(3),  start_time="09:00", end_time="11:00", duration=2,
-        submitted_at=_ts(8, hour=14, minute=30),
-        status="approved",
-        lot_id="F2-003", floor="F2 - Level 1",      lot_owner="Lisa Anderson",
-        approved_at=_ts(7, hour=9, minute=0),
-        approved_by="Lisa Anderson",
-    ),
-    dict(
-        id="REQ-002",
-        requester_id="user-002",  requester_name="Bob Smith",
-        date=_fd(3),  start_time="13:00", end_time="15:00", duration=2,
-        submitted_at=_ts(8, hour=9, minute=45),
-        status="approved",
-        lot_id="F1-002", floor="F1 - Ground Floor", lot_owner="Sarah Johnson",
-        approved_at=_ts(7, hour=10, minute=15),
-        approved_by="Sarah Johnson",
-    ),
-    dict(
-        id="REQ-003",
-        requester_id="user-003",  requester_name="Carol Williams",
-        date=_fd(5),  start_time="10:00", end_time="13:00", duration=3,
-        submitted_at=_ts(7, hour=10, minute=0),
-        status="approved",
-        lot_id="F3-005", floor="F3 - Level 2",      lot_owner="Jennifer Lee",
-        approved_at=_ts(6, hour=11, minute=30),
-        approved_by="Jennifer Lee",
-    ),
-    dict(
-        id="REQ-004",
-        requester_id="user-005",  requester_name="Frank Davis",
-        date=_fd(6),  start_time="15:00", end_time="18:00", duration=3,
-        submitted_at=_ts(7, hour=13, minute=15),
-        status="approved",
-        lot_id="F2-001", floor="F2 - Level 1",      lot_owner="David Wilson",
-        approved_at=_ts(5, hour=14, minute=20),
-        approved_by="auto",   # ← auto-approved by scheduler (exercises the badge)
-    ),
-    dict(
-        id="REQ-005",
-        requester_id="user-004",  requester_name="Emma Brown",
-        date=_fd(3),  start_time="08:00", end_time="12:00", duration=4,
-        submitted_at=_ts(8, hour=15, minute=30),
-        status="approved",
-        lot_id="F1-004", floor="F1 - Ground Floor", lot_owner="Mike Chen",
-        approved_at=_ts(7, hour=16, minute=0),
-        approved_by="Mike Chen",
-    ),
-    dict(
-        id="REQ-006",
-        requester_id="user-006",  requester_name="George Miller",
-        date=_fd(4),  start_time="14:00", end_time="17:00", duration=3,
-        submitted_at=_ts(7, hour=9, minute=0),
-        status="approved",
-        lot_id="F3-001", floor="F3 - Level 2",      lot_owner="Patricia Brown",
-        approved_at=_ts(6, hour=9, minute=45),
-        approved_by="Patricia Brown",
-    ),
-    dict(
-        id="REQ-007",
-        requester_id="user-007",  requester_name="Helen Garcia",
-        date=_fd(5),  start_time="11:00", end_time="13:00", duration=2,
-        submitted_at=_ts(6, hour=11, minute=45),
-        status="approved",
-        lot_id="F2-004", floor="F2 - Level 1",      lot_owner="James Taylor",
-        approved_at=_ts(5, hour=12, minute=30),
-        approved_by="James Taylor",
-    ),
-    dict(
-        id="REQ-008",
-        requester_id="user-008",  requester_name="Tom Harris",
-        date=_fd(5),  start_time="09:00", end_time="11:00", duration=2,
-        submitted_at=_ts(5, hour=8, minute=0),
-        status="approved",
-        lot_id="F1-003", floor="F1 - Ground Floor", lot_owner="Mike Chen",
-        approved_at=_ts(4, hour=8, minute=30),
-        approved_by="Mike Chen",
-    ),
-    dict(
-        id="REQ-009",
-        requester_id="user-009",  requester_name="Nina Patel",
-        date=_fd(7),  start_time="14:00", end_time="17:00", duration=3,
-        submitted_at=_ts(5, hour=10, minute=30),
-        status="approved",
-        lot_id="F1-006", floor="F1 - Ground Floor", lot_owner="Sarah Johnson",
-        approved_at=_ts(4, hour=11, minute=0),
-        approved_by="Sarah Johnson",
-    ),
-    dict(
-        id="REQ-010",
-        requester_id="owner-001", requester_name="Sarah Johnson",
-        date=_fd(4),  start_time="14:00", end_time="16:00", duration=2,
-        submitted_at=_ts(6, hour=10, minute=0),
-        status="approved",
-        lot_id="F3-003", floor="F3 - Level 2",      lot_owner="Robert Garcia",
-        approved_at=_ts(5, hour=11, minute=0),
-        approved_by="Robert Garcia",
-    ),
-    dict(
-        id="REQ-011",
-        requester_id="user-012", requester_name="James Wilson",
-        date=_fd(4),  start_time="16:00", end_time="18:00", duration=2,
-        submitted_at=_ts(3, hour=12, minute=0),
-        status="approved",
-        lot_id="F1-001", floor="F1 - Ground Floor", lot_owner="Sarah Johnson",
-        approved_at=_ts(2, hour=13, minute=0),
-        approved_by="Sarah Johnson",
-    ),
-]
-
-# ── Pending requests ──────────────────────────────────────────────────────────
-PENDING_REQUESTS = [
-    dict(
-        id="REQ-012",
-        requester_id="user-001",  requester_name="Alice Johnson",
-        date=_fd(8),  start_time="09:00", end_time="11:00", duration=2,
-        submitted_at=_ts(2, hour=14, minute=30),
-        status="pending",
-    ),
-    dict(
-        id="REQ-013",
-        requester_id="user-002",  requester_name="Bob Smith",
-        date=_fd(9),  start_time="13:00", end_time="15:00", duration=2,
-        submitted_at=_ts(2, hour=15, minute=45),
-        status="pending",
-    ),
-    dict(
-        id="REQ-014",
-        requester_id="user-003",  requester_name="Carol Williams",
-        date=_fd(9),  start_time="10:00", end_time="13:00", duration=3,
-        submitted_at=_ts(2, hour=16, minute=0),
-        status="pending",
-        rejected_by_owner=True,
-    ),
-    dict(
-        id="REQ-015",
-        requester_id="owner-001", requester_name="Sarah Johnson",
-        date=_fd(10), start_time="14:00", end_time="17:00", duration=3,
-        submitted_at=_ts(1, hour=16, minute=30),
-        status="pending",
-    ),
-    dict(
-        id="REQ-016",
-        requester_id="user-004",  requester_name="Emma Brown",
-        date=_fd(10), start_time="08:00", end_time="12:00", duration=4,
-        submitted_at=_ts(1, hour=9, minute=0),
-        status="pending",
-    ),
-    dict(
-        id="REQ-017",
-        requester_id="user-005",  requester_name="Frank Davis",
-        date=_fd(11), start_time="15:00", end_time="18:00", duration=3,
-        submitted_at=_ts(1, hour=10, minute=0),
-        status="pending",
-    ),
-    dict(
-        id="REQ-018",
-        requester_id="user-010", requester_name="David Lee",
-        date=_fd(8),  start_time="17:00", end_time="19:00", duration=2,
-        submitted_at=_ts(1, hour=14, minute=0),
-        status="pending",
-    ),
-    dict(
-        id="REQ-019",
-        requester_id="user-011", requester_name="Maria Garcia",
-        date=_fd(8),  start_time="11:00", end_time="13:00", duration=2,
-        submitted_at=_ts(0, hour=15, minute=0),
-        status="pending",
-    ),
-]
-
-# ── Rejected requests ─────────────────────────────────────────────────────────
-REJECTED_REQUESTS = [
-    dict(
-        id="REQ-020",
-        requester_id="owner-001", requester_name="Sarah Johnson",
-        date=_fd(14), start_time="10:00", end_time="12:00", duration=2,
-        submitted_at=_ts(5, hour=12, minute=0),
-        status="rejected",
-        lot_id="F2-001", floor="F2 - Level 1", lot_owner="David Wilson",
-    ),
-]
-
+# ── 3 Lots ────────────────────────────────────────────────────────────────────
 LOTS = [
-    dict(id="F1-001", floor="F1", floor_label="F1 - Ground Floor", owner="Sarah Johnson",  owner_id="owner-001", status="available"),
-    dict(id="F1-002", floor="F1", floor_label="F1 - Ground Floor", owner="Sarah Johnson",  owner_id="owner-001", status="blocked",  blocked_until=_blocked_until(6,  hour=14)),
-    dict(id="F1-003", floor="F1", floor_label="F1 - Ground Floor", owner="Mike Chen",      owner_id="owner-002", status="available"),
-    dict(id="F1-004", floor="F1", floor_label="F1 - Ground Floor", owner="Mike Chen",      owner_id="owner-002", status="available"),
-    dict(id="F1-005", floor="F1", floor_label="F1 - Ground Floor", owner="Mike Chen",      owner_id="owner-002", status="blocked",  blocked_until=_blocked_until(7,  hour=10)),
-    dict(id="F1-006", floor="F1", floor_label="F1 - Ground Floor", owner="Sarah Johnson",  owner_id="owner-001", status="available"),
-    dict(id="F2-001", floor="F2", floor_label="F2 - Level 1",      owner="David Wilson",   owner_id="owner-003", status="available"),
-    dict(id="F2-002", floor="F2", floor_label="F2 - Level 1",      owner="David Wilson",   owner_id="owner-003", status="available"),
-    dict(id="F2-003", floor="F2", floor_label="F2 - Level 1",      owner="Lisa Anderson",  owner_id="owner-004", status="blocked",  blocked_until=_blocked_until(5,  hour=9)),
-    dict(id="F2-004", floor="F2", floor_label="F2 - Level 1",      owner="James Taylor",   owner_id="owner-005", status="available"),
-    dict(id="F2-005", floor="F2", floor_label="F2 - Level 1",      owner="James Taylor",   owner_id="owner-005", status="blocked",  blocked_until=_blocked_until(10, hour=18)),
-    dict(id="F3-001", floor="F3", floor_label="F3 - Level 2",      owner="Patricia Brown", owner_id="owner-006", status="available"),
-    dict(id="F3-002", floor="F3", floor_label="F3 - Level 2",      owner="Robert Garcia",  owner_id="owner-007", status="available"),
-    dict(id="F3-003", floor="F3", floor_label="F3 - Level 2",      owner="Robert Garcia",  owner_id="owner-007", status="available"),
-    dict(id="F3-004", floor="F3", floor_label="F3 - Level 2",      owner="Jennifer Lee",   owner_id="owner-008", status="blocked",  blocked_until=_blocked_until(6,  hour=16)),
-    dict(id="F3-005", floor="F3", floor_label="F3 - Level 2",      owner="Jennifer Lee",   owner_id="owner-008", status="blocked",  blocked_until=_blocked_until(9,  hour=11)),
-    dict(id="F3-006", floor="F3", floor_label="F3 - Level 2",      owner=None,             owner_id=None,        status="unowned"),
+    dict(id="LOT-101-A", floor="F1", floor_label="Floor 1 (A)", owner="Owner One",   owner_id="O1", status="available"),
+    dict(id="LOT-101-B", floor="F1", floor_label="Floor 1 (B)", owner="Owner One",   owner_id="O1", status="available"),
+    dict(id="LOT-102", floor="F1", floor_label="Floor 1", owner="Owner Two",   owner_id="O2", status="available"),
+    dict(id="LOT-201", floor="F2", floor_label="Floor 2", owner="Owner Three", owner_id="O3", status="available"),
 ]
 
+# ── Sample Requests ───────────────────────────────────────────────────────────
+# We define them with duration and let seed() compute end_date/end_time.
+REQUESTS = [
+    dict(
+        id="REQ-001", requester_id="A1", requester_name="Admin One",
+        date=_fd(1), start_time="09:00", duration=4, status="approved",
+        lot_id="LOT-101-A", floor="Floor 1 (A)", lot_owner="Owner One",
+        approved_by="Owner One"
+    ),
+    dict(
+        id="REQ-002", requester_id="O1", requester_name="Owner One",
+        date=_fd(2), start_time="18:00", duration=30, status="pending"
+    ),
+    dict(
+        id="REQ-003", requester_id="O2", requester_name="Owner Two",
+        date=_fd(1), start_time="10:00", duration=2, status="pending"
+    ),
+    # 10 More Pending Requests
+    dict(id="REQ-P01", requester_id="A1", requester_name="Admin One",   date=_fd(0), start_time="14:00", duration=2,  status="pending"),
+    dict(id="REQ-P02", requester_id="A2", requester_name="Admin Two",   date=_fd(0), start_time="16:00", duration=4,  status="pending"),
+    dict(id="REQ-P03", requester_id="O3", requester_name="Owner Three", date=_fd(1), start_time="08:00", duration=12, status="pending"),
+    dict(id="REQ-P04", requester_id="O1", requester_name="Owner One",   date=_fd(1), start_time="20:00", duration=24, status="pending"), # Multi-day
+    dict(id="REQ-P05", requester_id="O2", requester_name="Owner Two",   date=_fd(1), start_time="13:00", duration=8,  status="pending"),
+    dict(id="REQ-P06", requester_id="A1", requester_name="Admin One",   date=_fd(2), start_time="09:00", duration=3,  status="pending"),
+    dict(id="REQ-P07", requester_id="A2", requester_name="Admin Two",   date=_fd(2), start_time="10:00", duration=36, status="pending"), # Max multi-day
+    dict(id="REQ-P08", requester_id="O3", requester_name="Owner Three", date=_fd(2), start_time="18:00", duration=4,  status="pending"),
+    dict(id="REQ-P09", requester_id="O1", requester_name="Owner One",   date=_fd(3), start_time="07:00", duration=5,  status="pending"),
+    dict(id="REQ-P10", requester_id="O2", requester_name="Owner Two",   date=_fd(3), start_time="12:00", duration=6,  status="pending"),
+]
 
 def seed():
     db = SessionLocal()
     try:
+        # Clear existing data
         db.query(models.UserPreferences).delete()
         db.query(models.ParkingRequest).delete()
         db.query(models.Lot).delete()
         db.query(models.User).delete()
         db.commit()
 
-        now = datetime.now(timezone.utc).isoformat()
+        now_iso = datetime.now(timezone.utc).isoformat()
+        pw_hash = hash_password("password123")
 
+        # Add Users & Preferences
         for u in USERS:
             db.add(models.User(
-                id=u["id"],
-                name=u["name"],
-                email=u["email"],
-                password_hash=hash_password("password123"),
-                role=u["role"],
-                created_at=now,
+                id=u["id"], name=u["name"], email=u["email"],
+                password_hash=pw_hash, role=u["role"], created_at=now_iso
             ))
-            db.add(models.UserPreferences(user_id=u["id"]))
+            
+            # Default 24/7 availability for owners
+            avail = "{}"
+            if u["role"] == "owner":
+                avail = json.dumps({
+                    day: [{"id": f"w{i}", "startTime": "00:00", "endTime": "23:59"}]
+                    for i, day in enumerate(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+                })
+            
+            db.add(models.UserPreferences(
+                user_id=u["id"], 
+                availability_windows=avail,
+                dark_mode=True,
+                language="en"
+            ))
 
-        all_requests = APPROVED_REQUESTS + PENDING_REQUESTS + REJECTED_REQUESTS
-        for r in all_requests:
-            updated_at = r.get("approved_at") or r["submitted_at"]
-            db.add(models.ParkingRequest(**r, updated_at=updated_at))
-
+        # Add Lots
         for lot in LOTS:
-            db.add(models.Lot(**lot, created_at=now, updated_at=now))
+            db.add(models.Lot(**lot, created_at=now_iso, updated_at=now_iso))
+
+        # Add Requests
+        for r in REQUESTS:
+            start_dt = datetime.strptime(f"{r['date']} {r['start_time']}", "%Y-%m-%d %H:%M")
+            end_dt = start_dt + timedelta(hours=r['duration'])
+            
+            # Clean dictionary for model creation (remove duration from splat if needed, but model has it)
+            req_data = r.copy()
+            req_data["end_date"] = end_dt.strftime("%Y-%m-%d")
+            req_data["end_time"] = end_dt.strftime("%H:%M")
+            req_data["submitted_at"] = _ts(1)
+            req_data["updated_at"] = now_iso
+            
+            # Extract approved_by before popping
+            approved_by = req_data.pop("approved_by", None)
+            
+            db.add(models.ParkingRequest(**req_data))
+            
+            # Add Audit Logs for seed data
+            log_sub = models.AuditLog(
+                request_id=req_data["id"],
+                user_id=req_data["requester_id"],
+                user_name=req_data["requester_name"],
+                action="submitted",
+                timestamp=now_iso
+            )
+            db.add(log_sub)
+            
+            if req_data.get("status") == "approved":
+                log_app = models.AuditLog(
+                    request_id=req_data["id"],
+                    user_id="seed",
+                    user_name=approved_by or "System",
+                    action="approved",
+                    details=f"Assigned lot {req_data.get('lot_id')} (Floor {req_data.get('floor')})",
+                    timestamp=now_iso
+                )
+                db.add(log_app)
 
         db.commit()
-        print(f"OK: Seeded {len(USERS)} users, {len(all_requests)} requests, {len(LOTS)} lots.")
-        print("Credentials: <email>@parking.dev / password123")
-        print("Example: sarah@parking.dev / password123  (Owner)")
-        print("Example: alice@parking.dev / password123  (User)")
-        print("Example: admin@parking.dev / password123  (Manager)")
+        print(f"OK: Seeded {len(USERS)} users, {len(REQUESTS)} requests, {len(LOTS)} lots.")
+        print("Credentials: <o1|o2|o3|a1|a2>@parking.dev / password123")
     except Exception as e:
         db.rollback()
         print(f"ERROR: Seed failed: {e}")
         raise
     finally:
         db.close()
-
 
 if __name__ == "__main__":
     seed()

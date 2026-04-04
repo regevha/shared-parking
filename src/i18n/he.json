@@ -7,8 +7,9 @@
     "parkingStatus": "סטטוס חניה",
     "lotCalendar": "לוח שנה לחניות",
     "myLots": "החניות שלי",
+    "availabilityWindows": "הגדרות זמינות",
+    "notificationWindows": "העדפות התראה",
     "adminPanel": "לוח ניהול",
-    "notificationWindows": "חלונות התראה",
     "signOut": "התנתקות"
   },
   "common": {
@@ -172,8 +173,8 @@
   "requestForm": {
     "title": "הגשת בקשת חניה",
     "limitWarningTitle": "הגעת למגבלת הבקשות",
-    "limitWarningDesc": "כרגע יש לך את המספר המרבי של בקשות חניה פעילות (3). לא ניתן להגיש בקשות חדשות עד שאחת מהבקשות הקיימות תאושר או תבוטל.",
-    "activeRequests": "הבקשות הפעילות שלך ({{count}} / {{max}})",
+    "limitWarningDesc": "כרגע יש לך את המספר המרבי של בקשות חניה ממתינות (5). לא ניתן להגיש בקשות חדשות עד שאחת מהבקשות הקיימות תאושר או תבוטל.",
+    "activeRequests": "הבקשות הממתינות שלך ({{count}} / {{max}})",
     "activeLabels": {
       "date": "תאריך",
       "timeSlot": "חלון זמן",
@@ -193,7 +194,7 @@
     "submitButtonDisabled": "לא ניתן להגיש (הגעת למגבלה)",
     "businessRules": {
       "title": "כללי עסק",
-      "maxRequests": "ניתן לקיים לכל היותר 3 בקשות פעילות בו-זמנית",
+      "maxRequests": "ניתן לקיים לכל היותר 5 בקשות ממתינות בו-זמנית",
       "dateRange": "בחר כל תאריך מהיום ואילך",
       "startTimeRule": "שעת ההתחלה חייבת להיות על גבולות שעתיים (08:00 – 19:00)",
       "durationRule": "משך הזמן הוא 1–6 שעות, מוגבל אוטומטית כך ששעת הסיום לא תחרוג מ-20:00",
@@ -207,7 +208,7 @@
     },
     "notifications": {
       "limitExceeded": "חרגת ממגבלת הבקשות",
-      "limitExceededDesc": "כבר יש לך את המספר המרבי של בקשות פעילות (3). המתן לפקיעת בקשה קיימת.",
+      "limitExceededDesc": "כבר יש לך את המספר המרבי של בקשות ממתינות (5). המתן לפקיעת בקשה קיימת.",
       "submitted": "הבקשה הוגשה",
       "submittedDesc": "בקשת חניה הוגשה לתאריך {{date}} מ-{{start}} עד {{end}}",
       "failed": "ההגשה נכשלה",
@@ -242,60 +243,20 @@
       "sendFailed": "שליחת ההודעה נכשלה"
     }
   },
-  "notificationWindows": {
-    "title": "העדפות חלונות התראה",
-    "blackoutAlert": "אין התראות בין 22:00 ל-06:00",
-    "blackoutAlertDesc": "תקופת שקט זו חלה על כל המערכת כדי למנוע הפרעות בשעות הלילה.",
-    "saving": "שומר…",
-    "noWindows": "לא הוגדרו חלונות — ברירת מחדל של המערכת",
-    "addWindow": "הוסף חלון",
-    "maxWindows": "מקסימום {{max}} חלונות ליום",
-    "modal": {
-      "title": "הוסף חלון התראה — {{day}}",
-      "timeRange": "טווח זמן",
-      "timeRequired": "נא לבחור טווח זמן",
-      "endAfterStart": "שעת הסיום חייבת להיות אחרי שעת ההתחלה",
-      "okText": "הוסף חלון",
-      "startPlaceholder": "שעת התחלה",
-      "endPlaceholder": "שעת סיום"
-    },
-    "blackoutWarning": {
-      "title": "אזהרת תקופת שקט",
-      "content": "חלון ההתראה הזה חופף לתקופת השקט (22:00–06:00). התראות לא יישלחו במהלך תקופה זו.",
-      "okText": "שמור בכל זאת",
-      "cancelText": "ביטול"
-    },
-    "notifications": {
-      "loadFailed": "טעינת העדפות ההתראה נכשלה",
-      "saveFailed": "שמירת העדפות ההתראה נכשלה",
-      "windowRemoved": "חלון ההתראה הוסר",
-      "windowAdded": "חלון ההתראה נוסף",
-      "overlapError": "טווח זמן זה חופף לחלון התראה קיים"
-    },
-    "info": "חלונות התראה: הגדר את חלוני הזמן בהם אתה מוכן לקבל התראות חניה. עד {{max}} חלונות ביום. השינויים נשמרים מיידית.",
-    "days": {
-      "Monday": "יום שני",
-      "Tuesday": "יום שלישי",
-      "Wednesday": "יום רביעי",
-      "Thursday": "יום חמישי",
-      "Friday": "יום שישי",
-      "Saturday": "שבת",
-      "Sunday": "יום ראשון"
-    }
-  },
   "adminPanel": {
-    "title": "לוח ניהול",
-    "loadingData": "טוען נתוני ניהול...",
-    "loadFailed": "טעינת נתוני הניהול נכשלה",
-    "serverError": "לא ניתן להגיע לשרת.",
+    "sidebarTitle": "לוח ניהול",
+    "loadingTip": "טוען נתוני ניהול...",
     "menu": {
-      "userManagement": "ניהול משתמשים",
-      "lotManagement": "ניהול חניות",
-      "importExport": "ייבוא / ייצוא",
-      "systemConfig": "הגדרות מערכת",
+      "users": "ניהול משתמשים",
+      "lots": "ניהול חניות",
+      "import": "ייבוא / ייצוא",
+      "config": "הגדרות מערכת",
       "reports": "דוחות",
       "broadcast": "שידור"
     },
+    "loadFailed": "טעינת נתוני הניהול נכשלה",
+    "loadFailedDesc": "לא ניתן להגיע לשרת.",
+    "defaultContent": "בחר פריט מהתפריט",
     "users": {
       "title": "ניהול משתמשים",
       "columns": {
@@ -305,14 +266,10 @@
         "joined": "הצטרף",
         "actions": "פעולות"
       },
-      "roles": {
-        "user": "משתמש",
-        "owner": "בעלים",
-        "manager": "מנהל"
-      },
-      "deleteTitle": "למחוק משתמש זה?",
-      "deleteDesc": "פעולה זו אינה הפיכה.",
-      "deleteConfirm": "מחק",
+      "roles": { "user": "משתמש", "owner": "בעלים", "manager": "מנהל" },
+      "deleteConfirm": "למחוק משתמש זה?",
+      "deleteWarning": "פעולה זו אינה הפיכה.",
+      "deleteOk": "מחק",
       "deleteButton": "מחק",
       "notifications": {
         "roleUpdated": "התפקיד עודכן",
@@ -325,13 +282,11 @@
     },
     "lots": {
       "title": "ניהול חניות",
-      "unownedAlert": "{{count}} חניה/ות ללא בעלים",
+      "unownedAlert_one": "חניה אחת ללא בעלים",
+      "unownedAlert_other": "{{count}} חניות ללא בעלים",
       "unownedAlertDesc": "הקצה בעלים כדי להבטיח ניהול תקין של חניות אלו.",
-      "filter": "סינון:",
-      "filterAll": "הכל",
-      "filterAvailable": "זמין",
-      "filterBlocked": "חסום",
-      "filterUnowned": "ללא בעלים",
+      "filterLabel": "סינון:",
+      "filters": { "all": "הכל", "available": "זמין", "blocked": "חסום", "unowned": "ללא בעלים" },
       "columns": {
         "lotId": "מזהה חניה",
         "floorLabel": "תווית קומה",
@@ -341,53 +296,58 @@
         "lastModified": "עדכון אחרון",
         "actions": "פעולות"
       },
-      "unownedText": "ללא בעלים",
-      "assignOwner": "הקצה בעלים",
-      "removeOwner": "הסר בעלים",
-      "assignOwnerModal": {
+      "unowned": "ללא בעלים",
+      "assignOwnerButton": "הקצה בעלים",
+      "removeOwnerButton": "הסר בעלים",
+      "removeOwnerConfirm": "להסיר את הבעלים מחניה זו?",
+      "removeOwnerOk": "הסר",
+      "assignModal": {
         "title": "הקצה בעלים לחניה",
-        "placeholder": "בחר בעלים",
-        "okText": "הקצה"
-      },
-      "removeOwnerConfirm": {
-        "title": "להסיר את הבעלים מחניה זו?",
-        "okText": "הסר"
+        "okText": "הקצה",
+        "placeholder": "בחר בעלים"
       },
       "notifications": {
-        "ownerAssigned": "הבעלים הוקצה",
-        "assignFailed": "ההקצאה נכשלה",
         "ownerRemoved": "הבעלים הוסר",
-        "removeFailed": "ההסרה נכשלה"
+        "ownerRemoveFailed": "הסרת הבעלים נכשלה",
+        "ownerAssigned": "הבעלים הוקצה",
+        "ownerAssignedDesc": "{{name}} ← {{lotId}}",
+        "ownerAssignFailed": "הקצאת הבעלים נכשלה"
       },
       "info": "ניהול חניות: צפה בכל חניות החניה, סנן לפי סטטוס, והקצה או הסר בעלות."
     },
     "import": {
       "title": "ייבוא / ייצוא",
-      "importCard": "ייבוא נתונים",
+      "importCardTitle": "ייבוא נתונים",
+      "exportCardTitle": "ייצוא נתונים",
       "uploadButton": "העלה קובץ Excel",
       "uploadHint": "גרור ושחרר או לחץ להעלאת קבצי Excel",
-      "exportCard": "ייצוא נתונים",
       "downloadButton": "הורד קובץ ראשי",
-      "importFirstHint": "ייבא נתונים תחילה כדי לאפשר הורדה",
+      "downloadHint": "ייבא נתונים תחילה כדי לאפשר הורדה",
       "notifications": {
-        "uploaded": "{{name}} הועלה בהצלחה",
-        "downloaded": "הקובץ הראשי הורד"
+        "uploadSuccess": "{{filename}} הועלה בהצלחה",
+        "downloadSuccess": "הקובץ הראשי הורד"
       },
       "info": "ייבוא / ייצוא: העלה קובץ Excel לייבוא בנפח גדול של נתוני חניה, או הורד את הקובץ הראשי הנוכחי לשימוש לא מקוון."
     },
     "config": {
       "title": "הגדרות מערכת",
-      "settingsCard": "הגדרות המערכת",
+      "cardTitle": "הגדרות המערכת",
       "timezone": "אזור זמן:",
       "blackoutPeriod": "תקופת שקט:",
-      "maxActiveRequests": "מקסימום בקשות פעילות למשתמש:",
+      "maxRequests": "מקסימום בקשות ממתינות למשתמש:",
       "bookingWindow": "חלון הזמנות:",
-      "info": "הגדרות מערכת: תצוגת קריאה בלבד של קבועי המערכת הגלובליים הנאכפים על ידי ה-backend."
+      "info": "תצוגת קריאה בלבד של קבועי המערכת הגלובליים הנאכפים על ידי ה-backend.",
+      "schedulerTitle": "מתזמן אישור אוטומטי",
+      "schedulerDesc": "המתזמן פועל כל 15 דקות ומאשר אוטומטית בקשות ממתינות ללא כפילויות. לחץ למטה כדי להפעילו ידנית.",
+      "runAutoApproval": "הפעל אישור אוטומטי עכשיו",
+      "autoApprovalSuccess": "האישור האוטומטי הושלם",
+      "autoApprovalSuccessDesc": "{{approved}} בקשות אושרו. {{remaining}} עדיין ממתינות.",
+      "autoApprovalFailed": "האישור האוטומטי נכשל"
     },
     "reports": {
       "title": "דוחות",
       "dateRange": "טווח תאריכים:",
-      "exportToExcel": "ייצוא ל-Excel",
+      "exportButton": "ייצוא ל-Excel",
       "tabs": {
         "all": "הכל ({{count}})",
         "pending": "ממתין ({{count}})",
@@ -400,21 +360,21 @@
         "requester": "מבקש",
         "timeSlot": "חלון זמן",
         "status": "סטטוס",
-        "dur": "משך"
+        "duration": "משך"
       },
       "notifications": {
-        "exported": "יוצאו {{count}} שורות אל {{filename}}"
+        "exportSuccess": "יוצאו {{count}} שורות אל {{filename}}"
       },
       "info": "דוחות: צפה בהיסטוריה מלאה של כל בקשות החניה מסוננות לפי טווח תאריכים וסטטוס."
     },
     "broadcast": {
       "title": "הודעות שידור",
       "simulateBlackout": "סמלץ תקופת שקט:",
-      "blackoutChecked": "22:00–06:00",
-      "blackoutUnchecked": "שעות רגילות",
-      "blackoutWarning": "השידור מושבת בתקופת השקט",
-      "blackoutWarningDesc": "לא ניתן לשלוח הודעות בין 22:00 ל-06:00 כדי למנוע הפרעות.",
-      "targetAudience": "קהל יעד:",
+      "blackoutOn": "22:00–06:00",
+      "blackoutOff": "שעות רגילות",
+      "blackoutAlert": "השידור מושבת בתקופת השקט",
+      "blackoutAlertDesc": "לא ניתן לשלוח הודעות בין 22:00 ל-06:00 כדי למנוע הפרעות.",
+      "audienceLabel": "קהל יעד:",
       "audiences": {
         "owners": "כל הבעלים",
         "users": "כל המשתמשים",
@@ -431,6 +391,92 @@
       },
       "info": "הודעות שידור: שלח הודעה מערכתית לכל הבעלים, כל המשתמשים, או לשני הקהלים בו-זמנית."
     }
+  },
+  "availabilityWindows": {
+    "title": "הגדרות זמינות חניה",
+    "blackoutAlert": {
+      "message": "שיתוף חניה מוגבל בין השעות 22:00 ל-06:00",
+      "description": "מדיניות אבטחה כלל-מערכתית מונעת שיתוף חניה בשעות הלילה המאוחרות."
+    },
+    "saving": "שומר זמינות...",
+    "days": {
+      "monday": "שני",
+      "tuesday": "שלישי",
+      "wednesday": "רביעי",
+      "thursday": "חמישי",
+      "friday": "שישי",
+      "saturday": "שבת",
+      "sunday": "ראשון"
+    },
+    "noWindows": "סגור לשיתוף — לא הוגדרו חלונות זמן",
+    "addWindow": "הוסף חלון זמינות",
+    "maxWindows": "מקסימום {{max}} חלונות ביום",
+    "modal": {
+      "title": "הוסף חלון זמינות — {{day}}",
+      "okText": "הוסף חלון",
+      "timeRangeLabel": "טווח זמן",
+      "timeRangeRequired": "אנא בחר טווח זמן",
+      "endAfterStart": "שעת הסיום חייבת להיות אחרי שעת ההתחלה",
+      "startPlaceholder": "שעת התחלה",
+      "endPlaceholder": "שעת סיום"
+    },
+    "blackoutWarning": {
+      "title": "הגבלת שעות לילה",
+      "content": "חלון זה חופף להגבלת הלילה (22:00–06:00). שיתוף אינו מותר בזמן זה.",
+      "ok": "חתוך ושמור",
+      "cancel": "ביטול"
+    },
+    "notifications": {
+      "loadFailed": "טעינת הגדרות זמינות נכשלה",
+      "saveFailed": "שמירת הגדרות זמינות נכשלה",
+      "removed": "חלון זמינות הוסר",
+      "overlap": "טווח זמן זה חופף לחלון זמינות קיים",
+      "added": "חלון זמינות נוסף"
+    },
+    "info": "הגדר את חלונות הזמן בהם החניה שלך זמינה לבקשות של אחרים. החניה שלך חסומה כברירת מחדל מחוץ לחלונות אלה. עד {{max}} חלונות ביום."
+  },
+  "notificationWindows": {
+    "title": "העדפות התראה",
+    "blackoutAlert": {
+      "message": "התראות אינן נשלחות בין השעות 22:00 ל-06:00",
+      "description": "תקופת שקט זו חלה על כל המערכת כדי למנוע הפרעות בשעות הלילה."
+    },
+    "saving": "שומר...",
+    "days": {
+      "monday": "שני",
+      "tuesday": "שלישי",
+      "wednesday": "רביעי",
+      "thursday": "חמישי",
+      "friday": "שישי",
+      "saturday": "שבת",
+      "sunday": "ראשון"
+    },
+    "noWindows": "לא הוגדרו חלונות — ברירת המחדל חלה",
+    "addWindow": "הוסף חלון התראה",
+    "maxWindows": "מקסימום {{max}} חלונות ביום",
+    "modal": {
+      "title": "הוסף חלון התראה — {{day}}",
+      "okText": "הוסף חלון",
+      "timeRangeLabel": "טווח זמן",
+      "timeRangeRequired": "אנא בחר טווח זמן",
+      "endAfterStart": "שעת הסיום חייבת להיות אחרי שעת ההתחלה",
+      "startPlaceholder": "שעת התחלה",
+      "endPlaceholder": "שעת סיום"
+    },
+    "blackoutWarning": {
+      "title": "אזהרת תקופת שקט",
+      "content": "חלון התראה זה חופף לתקופת השקט (22:00–06:00). התראות לא יישלחו בזמן זה.",
+      "ok": "שמור בכל זאת",
+      "cancel": "ביטול"
+    },
+    "notifications": {
+      "loadFailed": "טעינת העדפות התראה נכשלה",
+      "saveFailed": "שמירת העדפות התראה נכשלה",
+      "removed": "חלון התראה הוסר",
+      "overlap": "טווח זמן זה חופף לחלון התראה קיים",
+      "added": "חלון התראה נוסף"
+    },
+    "info": "הגדר את חלונות הזמן בהם אתה מוכן לקבל התראות על חניה. עד {{max}} חלונות ביום. השינויים נשמרים באופן מיידי."
   },
   "calendarView": {
     "noRequestsThisPeriod": "אין בקשות בתקופה זו",

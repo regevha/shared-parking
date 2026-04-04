@@ -12,9 +12,8 @@ interface LoginForm {
 }
 
 const DEMO_ACCOUNTS = [
-  { labelKey: 'login.demoRoles.user',    email: 'alice@parking.dev',  icon: <UserOutlined />,  color: 'blue'   },
-  { labelKey: 'login.demoRoles.owner',   email: 'sarah@parking.dev',  icon: <CrownOutlined />, color: 'gold'   },
-  { labelKey: 'login.demoRoles.manager', email: 'admin@parking.dev',  icon: <TeamOutlined />,  color: 'purple' },
+  { labelKey: 'login.demoRoles.owner',   email: 'o1@parking.dev',  icon: <CrownOutlined />, color: 'gold'   },
+  { labelKey: 'login.demoRoles.manager', email: 'a1@parking.dev',  icon: <TeamOutlined />,  color: 'purple' },
 ];
 
 const LoginPage: React.FC = () => {

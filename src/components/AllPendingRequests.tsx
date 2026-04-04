@@ -15,6 +15,7 @@ interface PendingRequest {
   requesterName: string;
   date: string;
   startTime: string;
+  endDate: string;
   endTime: string;
   duration: number;
   submittedAt: string;
@@ -42,10 +43,10 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       filtered = filtered.filter((req) => !req.rejectedByOwner);
     }
 
-    // Newest date + time first
+    // Oldest date + time first (ascending)
     return filtered.sort((a, b) => {
-      const d = b.date.localeCompare(a.date);
-      return d !== 0 ? d : b.startTime.localeCompare(a.startTime);
+      const d = a.date.localeCompare(b.date);
+      return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
     });
   }, [filterMode, isOwner, pendingRequests]);
 
@@ -122,7 +123,16 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       title: t('pendingRequests.columns.timeSlot'),
       key: 'timeSlot',
       width: '18%',
-      render: (_, record: PendingRequest) => `${record.startTime} - ${record.endTime}`,
+      render: (_, record: PendingRequest) => (
+        <>
+          {record.startTime} - {record.endTime}
+          {record.endDate && record.endDate !== record.date && (
+            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
+              ({dayjs(record.endDate).format('DD/MM')})
+            </div>
+          )}
+        </>
+      ),
     },
     {
       title: t('pendingRequests.columns.duration'),
@@ -252,34 +262,24 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       )}
 
       {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.total}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('pendingRequests.stats.total')}</div>
+      <Card size="small" style={{ marginTop: '24px' }}>
+        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
+          <div>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.total}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('pendingRequests.stats.total')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.pending}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('pendingRequests.stats.pending')}</span>
+          </div>
+          {isOwner && (
+            <div>
+              <strong style={{ fontSize: '18px', color: '#999', marginRight: '8px' }}>{stats.rejected}</strong>
+              <span style={{ color: 'var(--label-color)' }}>{t('pendingRequests.stats.rejectedByYou')}</span>
             </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('pendingRequests.stats.pending')}</div>
-            </div>
-          </Card>
-        </Col>
-        {isOwner && (
-          <Col xs={12} sm={6}>
-            <Card>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#999' }}>{stats.rejected}</div>
-                <div style={{ fontSize: '12px', color: '#666' }}>{t('pendingRequests.stats.rejectedByYou')}</div>
-              </div>
-            </Card>
-          </Col>
-        )}
-      </Row>
+          )}
+        </Space>
+      </Card>
 
       {/* Role-specific Info */}
       <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">

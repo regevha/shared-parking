@@ -7,8 +7,9 @@
     "parkingStatus": "Parking Status",
     "lotCalendar": "Lot Calendar",
     "myLots": "My Lots",
+    "availabilityWindows": "Availability Settings",
+    "notificationWindows": "Notification Preferences",
     "adminPanel": "Admin Panel",
-    "notificationWindows": "Notification Windows",
     "signOut": "Sign out"
   },
   "login": {
@@ -178,9 +179,9 @@
     "title": "Submit Parking Request",
     "limitAlert": {
       "title": "Request Limit Reached",
-      "description": "You currently have the maximum number of active parking requests (3). You cannot submit new requests until one of your existing requests is approved or cancelled."
+      "description": "You currently have the maximum number of pending parking requests (5). You cannot submit new requests until one of your existing requests is approved or cancelled."
     },
-    "activeRequestsCard": "Your Active Requests ({{count}} / {{max}})",
+    "activeRequestsCard": "Your Pending Requests ({{count}} / {{max}})",
     "labels": {
       "date": "Date",
       "timeSlot": "Time Slot",
@@ -206,7 +207,7 @@
     "businessRules": {
       "title": "Business Rules",
       "rule1start": "You can have a maximum of ",
-      "rule1bold": "3 concurrent active requests",
+      "rule1bold": "5 concurrent pending requests",
       "rule2": "Select any date from today onwards",
       "rule3": "Start time must be on hourly boundaries (08:00 – 19:00)",
       "rule4": "Duration is 1–6 hours, automatically limited so end time never exceeds 20:00",
@@ -215,7 +216,7 @@
     "info": "Submit a parking request for a specific date and time slot; an owner will review and approve or reject it.",
     "notifications": {
       "limitExceeded": "Request Limit Exceeded",
-      "limitExceededDesc": "You already have the maximum number of active requests (3). Please wait for an existing request to expire.",
+      "limitExceededDesc": "You already have the maximum number of pending requests (5). Please wait for an existing request to expire.",
       "submitted": "Request Submitted",
       "submittedDesc": "Parking request submitted for {{date}} from {{startTime}} to {{endTime}}",
       "failed": "Submission Failed",
@@ -395,49 +396,92 @@
       "sendFailed": "Failed to send message"
     }
   },
-  "notificationWindows": {
-    "title": "Notification Window Preferences",
-    "blackoutAlert": {
-      "message": "No notifications are delivered between 22:00 and 06:00",
-      "description": "This blackout period applies system-wide to prevent disturbances during nighttime hours."
+    "availabilityWindows": {
+      "title": "Lot Availability Settings",
+      "blackoutAlert": {
+        "message": "Lot sharing is restricted between 22:00 and 06:00",
+        "description": "System-wide security policy prevents parking sharing during late-night hours."
+      },
+      "saving": "Saving availability...",
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "noWindows": "Closed for sharing — no windows set",
+      "addWindow": "Add Availability Window",
+      "maxWindows": "Maximum {{max}} slots per day",
+      "modal": {
+        "title": "Add Availability Slot — {{day}}",
+        "okText": "Add Slot",
+        "timeRangeLabel": "Time Range",
+        "timeRangeRequired": "Please select a time range",
+        "endAfterStart": "End time must be after start time",
+        "startPlaceholder": "Start time",
+        "endPlaceholder": "End time"
+      },
+      "blackoutWarning": {
+        "title": "Late Night Restriction",
+        "content": "This slot overlaps with the overnight restriction (22:00–06:00). Sharing is not permitted during this time.",
+        "ok": "Trim & Save",
+        "cancel": "Cancel"
+      },
+      "notifications": {
+        "loadFailed": "Failed to load availability settings",
+        "saveFailed": "Failed to save availability settings",
+        "removed": "Availability slot removed",
+        "overlap": "This time range overlaps with an existing slot",
+        "added": "Availability slot added"
+      },
+      "info": "Define the time slots when your lot is available for others to request. Your lot is blocked by default outside of these windows. Up to {{max}} slots per day."
     },
-    "saving": "Saving…",
-    "days": {
-      "monday": "Monday",
-      "tuesday": "Tuesday",
-      "wednesday": "Wednesday",
-      "thursday": "Thursday",
-      "friday": "Friday",
-      "saturday": "Saturday",
-      "sunday": "Sunday"
+    "notificationWindows": {
+      "title": "Notification Preferences",
+      "blackoutAlert": {
+        "message": "No notifications are delivered between 22:00 and 06:00",
+        "description": "This blackout period applies system-wide to prevent disturbances during nighttime hours."
+      },
+      "saving": "Saving…",
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "noWindows": "No windows set — system default applies",
+      "addWindow": "Add Window",
+      "maxWindows": "Maximum {{max}} windows per day",
+      "modal": {
+        "title": "Add Notification Window — {{day}}",
+        "okText": "Add Window",
+        "timeRangeLabel": "Time Range",
+        "timeRangeRequired": "Please select a time range",
+        "endAfterStart": "End time must be after start time",
+        "startPlaceholder": "Start time",
+        "endPlaceholder": "End time"
+      },
+      "blackoutWarning": {
+        "title": "Blackout Period Warning",
+        "content": "This notification window overlaps with the blackout period (22:00–06:00). Notifications will not be delivered during this time.",
+        "ok": "Save Anyway",
+        "cancel": "Cancel"
+      },
+      "notifications": {
+        "loadFailed": "Failed to load notification preferences",
+        "saveFailed": "Failed to save notification preferences",
+        "removed": "Notification window removed",
+        "overlap": "This time range overlaps with an existing notification window",
+        "added": "Notification window added"
+      },
+      "info": "Set the time slots when you are willing to receive parking notifications. Up to {{max}} windows per day. Changes are saved immediately."
     },
-    "noWindows": "No windows set — system default applies",
-    "addWindow": "Add Window",
-    "maxWindows": "Maximum {{max}} windows per day",
-    "modal": {
-      "title": "Add Notification Window — {{day}}",
-      "okText": "Add Window",
-      "timeRangeLabel": "Time Range",
-      "timeRangeRequired": "Please select a time range",
-      "endAfterStart": "End time must be after start time",
-      "startPlaceholder": "Start time",
-      "endPlaceholder": "End time"
-    },
-    "blackoutWarning": {
-      "title": "Blackout Period Warning",
-      "content": "This notification window overlaps with the blackout period (22:00–06:00). Notifications will not be delivered during this time.",
-      "ok": "Save Anyway",
-      "cancel": "Cancel"
-    },
-    "notifications": {
-      "loadFailed": "Failed to load notification preferences",
-      "saveFailed": "Failed to save notification preferences",
-      "removed": "Notification window removed",
-      "overlap": "This time range overlaps with an existing notification window",
-      "added": "Notification window added"
-    },
-    "info": "Set the time slots when you are willing to receive parking notifications. Up to {{max}} windows per day. Changes are saved immediately."
-  },
   "adminPanel": {
     "sidebarTitle": "Admin Panel",
     "loadingTip": "Loading admin data...",
@@ -529,9 +573,15 @@
       "cardTitle": "System Settings",
       "timezone": "Timezone:",
       "blackoutPeriod": "Blackout Period:",
-      "maxRequests": "Max Active Requests per User:",
+      "maxRequests": "Max Pending Requests per User:",
       "bookingWindow": "Booking Window:",
-      "info": "Read-only view of global system constants enforced by the backend."
+      "info": "Read-only view of global system constants enforced by the backend.",
+      "schedulerTitle": "Auto-Approval Scheduler",
+      "schedulerDesc": "The scheduler runs every 15 minutes and auto-approves conflict-free pending requests. Click below to trigger it manually.",
+      "runAutoApproval": "Run Auto-Approval Now",
+      "autoApprovalSuccess": "Auto-Approval Complete",
+      "autoApprovalSuccessDesc": "{{approved}} request(s) approved. {{remaining}} still pending.",
+      "autoApprovalFailed": "Auto-Approval Failed"
     },
     "reports": {
       "title": "Reports",

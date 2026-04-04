@@ -525,13 +525,19 @@
       "info": "Téléversez un fichier Excel pour importer des données en masse, ou téléchargez le fichier maître actuel pour une utilisation hors ligne."
     },
     "config": {
-      "title": "Configuration système",
-      "cardTitle": "Paramètres système",
+      "title": "Configuration Système",
+      "cardTitle": "Paramètres Système",
       "timezone": "Fuseau horaire :",
       "blackoutPeriod": "Période de silence :",
       "maxRequests": "Demandes actives max. par utilisateur :",
       "bookingWindow": "Fenêtre de réservation :",
-      "info": "Vue en lecture seule des constantes système globales appliquées par le serveur."
+      "info": "Vue en lecture seule des constantes système globales appliquées par le serveur.",
+      "schedulerTitle": "Planificateur d'auto-approbation",
+      "schedulerDesc": "Le planificateur s'exécute toutes les 15 minutes et approuve automatiquement les demandes en attente sans conflit. Cliquez ci-dessous pour le déclencher manuellement.",
+      "runAutoApproval": "Lancer l'auto-approbation maintenant",
+      "autoApprovalSuccess": "Auto-approbation terminée",
+      "autoApprovalSuccessDesc": "{{approved}} demande(s) approuvée(s). {{remaining}} toujours en attente.",
+      "autoApprovalFailed": "L'auto-approbation a échoué"
     },
     "reports": {
       "title": "Rapports",

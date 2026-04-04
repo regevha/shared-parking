@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
+import datetime as dt_mod
+import json
 from typing import List
 
 from database import get_db
@@ -12,34 +14,129 @@ router = APIRouter(prefix="/api/requests", tags=["requests"])
 
 
 def _generate_id(db: Session) -> str:
-    count = db.query(models.ParkingRequest).count()
-    return f"REQ-{count + 1:03d}"
+    from sqlalchemy import func
+    last = db.query(models.ParkingRequest.id).order_by(models.ParkingRequest.id.desc()).first()
+    if not last:
+        return "REQ-001"
+    try:
+        last_num = int(last[0].split("-")[1])
+        return f"REQ-{last_num + 1:03d}"
+    except (IndexError, ValueError):
+        import uuid
+        return f"REQ-{uuid.uuid4().hex[:6].upper()}"
+
+
+def _add_audit_log(
+    db: Session, request_id: str, user_id: str, user_name: str, action: str, details: str | None = None
+):
+    log = models.AuditLog(
+        request_id=request_id,
+        user_id=user_id,
+        user_name=user_name,
+        action=action,
+        details=details,
+        timestamp=datetime.now(timezone.utc).isoformat()
+    )
+    db.add(log)
 
 
 def _has_conflict(
     db: Session,
     lot_id: str | None,
-    date: str,
+    start_date: str,
     start_time: str,
+    end_date: str,
     end_time: str,
     exclude_id: str | None = None,
+) -> str | None:
+    """Return the ID of the conflicting approved request if one overlaps, else None."""
+    if not lot_id:
+        return None
+    
+    new_start = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+    new_end = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+
+    # We check all approved requests for that lot.
+    existing = db.query(models.ParkingRequest).filter(
+        models.ParkingRequest.lot_id == lot_id,
+        models.ParkingRequest.status == "approved"
+    ).all()
+
+    for r in existing:
+        if exclude_id and r.id == exclude_id:
+            continue
+        r_start = datetime.strptime(f"{r.date} {r.start_time}", "%Y-%m-%d %H:%M")
+        r_end = datetime.strptime(f"{r.end_date} {r.end_time}", "%Y-%m-%d %H:%M")
+        
+        # Standard overlap check: (s1 < e2) and (e1 > s2)
+        if new_start < r_end and new_end > r_start:
+            return r.id
+            
+    return None
+
+
+def _is_outside_availability(
+    db: Session,
+    lot_id: str | None,
+    start_date: str,
+    start_time: str,
+    end_date: str,
+    end_time: str,
 ) -> bool:
-    """Return True if an approved request already occupies lot_id on date during start_time–end_time."""
+    """
+    Return True if the slot is NOT fully contained within the owner's availability windows.
+    Checked day-by-day for multi-day requests.
+    """
     if not lot_id:
         return False
-    q = (
-        db.query(models.ParkingRequest)
-        .filter(
-            models.ParkingRequest.lot_id == lot_id,
-            models.ParkingRequest.date == date,
-            models.ParkingRequest.status == "approved",
-            models.ParkingRequest.start_time < end_time,
-            models.ParkingRequest.end_time > start_time,
-        )
-    )
-    if exclude_id:
-        q = q.filter(models.ParkingRequest.id != exclude_id)
-    return q.first() is not None
+
+    lot = db.query(models.Lot).filter(models.Lot.id == lot_id).first()
+    if not lot or not lot.owner_id:
+        return False
+
+    prefs = db.query(models.UserPreferences).filter(models.UserPreferences.user_id == lot.owner_id).first()
+    if not prefs:
+        return True
+
+    try:
+        current_dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+        end_dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+        
+        windows_raw = json.loads(prefs.availability_windows or '{}')
+
+        # We evaluate the span day by day
+        check_dt = current_dt
+        while check_dt < end_dt:
+            day_name = check_dt.strftime('%A')
+            day_slots = windows_raw.get(day_name, [])
+            
+            # Determine the segment of this request that falls on THIS day
+            segment_start_str = check_dt.strftime("%H:%M")
+            
+            # If end_dt is on the same day as check_dt
+            if end_dt.date() == check_dt.date():
+                segment_end_str = end_dt.strftime("%H:%M")
+            else:
+                segment_end_str = "23:59"
+
+            # Check if THIS segment is covered by any window on THIS day
+            segment_covered = False
+            for slot in day_slots:
+                # If segment_end_str is 23:59, we treat it as being covered if the slot ends at 23:59
+                if segment_start_str >= slot['startTime'] and segment_end_str <= slot['endTime']:
+                    segment_covered = True
+                    break
+            
+            if not segment_covered:
+                return True
+            
+            # Move to the start of the next day (00:00)
+            next_day = check_dt.date() + timedelta(days=1)
+            check_dt = datetime.combine(next_day, datetime.min.time())
+        
+        return False
+    except Exception:
+        return True
 
 
 @router.get("", response_model=List[schemas.ParkingRequestOut])
@@ -93,18 +190,35 @@ def create_request(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    """Create a new parking request. Limit: 5 pending requests per user."""
+    pending_count = (
+        db.query(models.ParkingRequest)
+        .filter(
+            models.ParkingRequest.requester_id == current_user.id,
+            models.ParkingRequest.status == "pending"
+        )
+        .count()
+    )
+    if pending_count >= 5:
+        raise HTTPException(
+            status_code=400,
+            detail="Maximum limit of 5 pending requests reached. Please wait for an existing request to be approved or rejected."
+        )
+
     req = models.ParkingRequest(
         id=_generate_id(db),
         requester_id=current_user.id,
         requester_name=current_user.name,
         date=payload.date,
         start_time=payload.start_time,
+        end_date=payload.end_date,
         end_time=payload.end_time,
         duration=payload.duration,
         submitted_at=datetime.now(timezone.utc).isoformat(),
         status="pending",
     )
     db.add(req)
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "submitted")
     db.commit()
     db.refresh(req)
     return req
@@ -122,20 +236,31 @@ def approve_request(
         raise HTTPException(status_code=404, detail="Request not found")
     if req.status != "pending":
         raise HTTPException(status_code=400, detail="Only pending requests can be approved")
-
-    if payload.lot_id and _has_conflict(
-        db, payload.lot_id, req.date, req.start_time, req.end_time, exclude_id=request_id
-    ):
-        raise HTTPException(
-            status_code=409,
-            detail=f"Time slot conflict: lot {payload.lot_id} is already approved for this time on {req.date}",
+    if payload.lot_id:
+        conflict_id = _has_conflict(
+            db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=request_id
         )
+        if conflict_id:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Time slot conflict: lot {payload.lot_id} is already approved for request {conflict_id} during this period",
+            )
+
+    # Check availability slots (Allow manual override for managers/owners if they explicitly approve)
+    # However, to be helpful, we can keep it as a soft warning or just allow it if it's manual.
+    # The user is experiencing a hard error here, let's remove it for manual approval.
 
     now = datetime.now(timezone.utc).isoformat()
     req.status = "approved"
     req.approved_at = now
     req.approved_by = current_user.name
     req.updated_at = now
+    
+    _add_audit_log(
+        db, req.id, current_user.id, current_user.name, "approved", 
+        details=f"Assigned lot {payload.lot_id} (Floor {payload.floor})"
+    )
+    
     req.rejected_by_owner = False
     if payload.lot_id:
         req.lot_id = payload.lot_id
@@ -162,6 +287,7 @@ def reject_request(
     req.status = "rejected"
     req.rejected_by_owner = True
     req.updated_at = datetime.now(timezone.utc).isoformat()
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "rejected")
     db.commit()
     db.refresh(req)
     return req
@@ -182,30 +308,23 @@ def update_request(
     if req.status != "pending":
         raise HTTPException(status_code=400, detail="Only pending requests can be edited")
 
+    effective_date  = payload.date       if payload.date       is not None else req.date
     effective_start = payload.start_time if payload.start_time is not None else req.start_time
-    effective_end   = payload.end_time   if payload.end_time   is not None else req.end_time
     effective_dur   = payload.duration   if payload.duration   is not None else req.duration
 
-    if effective_start >= effective_end:
-        raise HTTPException(status_code=400, detail="start_time must be before end_time")
-    if effective_start < '07:00':
-        raise HTTPException(status_code=400, detail="start_time must be 07:00 or later")
-    if effective_end > '20:00':
-        raise HTTPException(status_code=400, detail="end_time cannot be later than 20:00")
-    expected_dur = int(effective_end.split(':')[0]) - int(effective_start.split(':')[0])
-    if effective_dur != expected_dur:
-        raise HTTPException(status_code=400, detail=f"duration must be {expected_dur} hour(s) to match start and end times")
+    try:
+        start_dt = datetime.strptime(f"{effective_date} {effective_start}", "%Y-%m-%d %H:%M")
+        end_dt = start_dt + dt_mod.timedelta(hours=effective_dur)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid date or start time")
 
-    if payload.date is not None:
-        req.date = payload.date
-    if payload.start_time is not None:
-        req.start_time = payload.start_time
-    if payload.end_time is not None:
-        req.end_time = payload.end_time
-    if payload.duration is not None:
-        req.duration = payload.duration
+    req.date = effective_date
+    req.start_time = effective_start
+    req.end_date = end_dt.strftime("%Y-%m-%d")
+    req.end_time = end_dt.strftime("%H:%M")
+    req.duration = effective_dur
     req.updated_at = datetime.now(timezone.utc).isoformat()
-
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "updated")
     db.commit()
     db.refresh(req)
     return req
@@ -228,5 +347,45 @@ def delete_request(
     db.query(models.RequestMessage)\
         .filter(models.RequestMessage.request_id == request_id)\
         .update({"request_id": None})
+    
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "cancelled")
+    
     db.delete(req)
     db.commit()
+
+
+@router.post("/run-auto-approve")
+def trigger_auto_approve(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Manually trigger the background auto-approval scheduler."""
+    if current_user.role != "manager":
+        raise HTTPException(status_code=403, detail="Only managers can run auto-approve")
+
+    from scheduler import run_auto_approval
+    run_auto_approval(db)
+    return {"status": "ok"}
+
+
+@router.get("/{request_id}/audit", response_model=List[schemas.AuditLogOut])
+def get_request_audit(
+    request_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    from typing import List
+    req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
+    if not req:
+        raise HTTPException(status_code=404, detail="Request not found")
+        
+    # Security: only the requester or a manager can see the history
+    if req.requester_id != current_user.id and current_user.role == "user":
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    return (
+        db.query(models.AuditLog)
+        .filter(models.AuditLog.request_id == request_id)
+        .order_by(models.AuditLog.timestamp.desc())
+        .all()
+    )

@@ -14,6 +14,7 @@ class ParkingRequestBase(BaseModel):
     requester_name: str
     date: str
     start_time: str
+    end_date: Optional[str] = None
     end_time: str
     duration: int
     submitted_at: str
@@ -32,6 +33,7 @@ class ParkingRequestCreate(BaseModel):
     requester_name: str
     date: str
     start_time: str
+    end_date: Optional[str] = None
     end_time: str
     duration: int
 
@@ -57,16 +59,34 @@ class ParkingRequestCreate(BaseModel):
 
     @model_validator(mode='after')
     def validate_time_range(self) -> 'ParkingRequestCreate':
+        from datetime import datetime, timedelta
         s, e = self.start_time, self.end_time
-        if s >= e:
-            raise ValueError('start_time must be before end_time')
-        if s < '07:00':
-            raise ValueError('start_time must be 07:00 or later')
-        if e > '20:00':
-            raise ValueError('end_time cannot be later than 20:00')
-        expected = int(e.split(':')[0]) - int(s.split(':')[0])
-        if self.duration != expected:
-            raise ValueError(f'duration must be {expected} hour(s) to match start and end times')
+        
+        if self.duration < 1 or self.duration > 36:
+            raise ValueError('duration must be between 1 and 36 hours')
+
+        try:
+            start_dt = datetime.strptime(f"{self.date} {s}", "%Y-%m-%d %H:%M")
+            calc_end_dt = start_dt + timedelta(hours=self.duration)
+            
+            # Verify provided end_time matches duration
+            provided_end_dt = datetime.strptime(f"{self.end_date or self.date} {e}", "%Y-%m-%d %H:%M")
+            
+            # Since end_date might not be provided in the payload yet (calculated by frontend),
+            # we mainly ensure the duration and end_time represent the same point in time.
+            # If end_date is present, verify it. Otherwise, calc it now.
+            if self.end_date:
+                if provided_end_dt != calc_end_dt:
+                    raise ValueError(f'end_time/end_date do not match duration. Expected {calc_end_dt}')
+            else:
+                self.end_date = calc_end_dt.strftime("%Y-%m-%d")
+                if e != calc_end_dt.strftime("%H:%M"):
+                    raise ValueError(f'end_time does not match duration. Expected {calc_end_dt.strftime("%H:%M")}')
+
+        except Exception as ex:
+            if isinstance(ex, ValueError): raise ex
+            raise ValueError(f'Invalid date/time combination: {ex}')
+
         return self
 
 
@@ -185,7 +205,8 @@ _ALLOWED_LANGUAGES = {'en', 'fr', 'he'}
 
 class PreferencesOut(BaseModel):
     dark_mode: bool = True
-    # JSON-encoded notification windows, e.g. '{"Monday":[{"id":"1","startTime":"09:00","endTime":"12:00"}]}'
+    # JSON-encoded dict: { "Monday": [{"id":"..","startTime":"..","endTime":".."}], … }
+    availability_windows: Optional[str] = '{}'
     notification_windows: Optional[str] = '{}'
     language: str = 'en'
     # ── add new preference fields here ─────────────────────────────────────────
@@ -196,6 +217,7 @@ class PreferencesOut(BaseModel):
 
 class PreferencesUpdate(BaseModel):
     dark_mode: Optional[bool] = None
+    availability_windows: Optional[str] = None  # JSON-encoded
     notification_windows: Optional[str] = None  # JSON-encoded
     language: Optional[str] = None
 
@@ -233,3 +255,16 @@ class UserUpdate(BaseModel):
     email: Optional[str] = None
     role: Optional[str] = None      # manager only
     password: Optional[str] = None  # plain text — will be hashed
+
+
+class AuditLogOut(BaseModel):
+    id: int
+    request_id: str
+    user_id: str
+    user_name: str
+    action: str
+    details: Optional[str] = None
+    timestamp: str
+
+    class Config:
+        from_attributes = True

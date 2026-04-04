@@ -27,6 +27,12 @@ jest.mock('../../api/requests', () => ({
   },
 }));
 
+jest.mock('../../api/config', () => ({
+  configApi: {
+    get: jest.fn(() => Promise.resolve({})),
+  },
+}));
+
 // Silence antd notification portals in jsdom
 jest.spyOn(notification, 'error').mockImplementation(() => ({ destroy: jest.fn() }));
 jest.spyOn(notification, 'success').mockImplementation(() => ({ destroy: jest.fn() }));
@@ -39,6 +45,8 @@ const { usersApi }    = require('../../api/users');
 const { lotsApi }     = require('../../api/lots');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { requestsApi } = require('../../api/requests');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { configApi } = require('../../api/config');
 
 // ── Shared test data ─────────────────────────────────────────────────────────
 const alice   = makeUser({ id: 'u1', name: 'Alice Johnson', email: 'alice@parking.dev', role: 'user' });
@@ -61,6 +69,7 @@ function setup(overrides: {
   usersApi.getAll.mockResolvedValue(overrides.users    ?? [alice, sarah, admin]);
   lotsApi.getAll.mockResolvedValue(overrides.lots      ?? [ownedLot, unownedLot]);
   requestsApi.getAll.mockResolvedValue(overrides.requests ?? [pendingReq, approvedReq, rejectedReq]);
+  configApi.get.mockResolvedValue({});
 
   return renderWithProviders(<AdminPanel />, {
     authValue: { user: admin },
@@ -99,6 +108,7 @@ describe('AdminPanel — User Management', () => {
     usersApi.getAll.mockRejectedValue(new Error('Network error'));
     lotsApi.getAll.mockResolvedValue([]);
     requestsApi.getAll.mockResolvedValue([]);
+    configApi.get.mockResolvedValue({});
     renderWithProviders(<AdminPanel />, { authValue: { user: admin } });
     await waitFor(() => {
       expect(notification.error).toHaveBeenCalledWith(

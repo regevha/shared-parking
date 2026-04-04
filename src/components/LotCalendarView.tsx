@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification } from 'antd';
+import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
@@ -10,6 +10,7 @@ import { LotData } from '../api/lots';
 import { getRequestStatusColor, getRequestStatusLabel, getLotStatusTagColor } from '../utils/statusUtils';
 import './CalendarView.css';
 import './LotCalendarView.css';
+import AuditTrailModal from './AuditTrailModal';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -77,10 +78,11 @@ const LotCalendarView: React.FC = () => {
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<LotCalendarEvent | null>(null);
   const [selectedLot, setSelectedLot] = useState<string>('all');
+  const [showHistory, setShowHistory] = useState(false);
 
   const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
-  const minTime    = useMemo(() => { const d = new Date(); d.setHours(7, 0, 0, 0); return d; }, []);
-  const maxTime    = useMemo(() => { const d = new Date(); d.setHours(20, 0, 0, 0); return d; }, []);
+  const minTime    = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
+  const maxTime    = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
@@ -104,7 +106,7 @@ const LotCalendarView: React.FC = () => {
         id: a.id,
         title: `${a.requesterName.split(' ')[0]} · ${a.lotId}`,
         start: new Date(`${a.date}T${a.startTime}:00`),
-        end: new Date(`${a.date}T${a.endTime}:00`),
+        end: new Date(`${a.endDate || a.date}T${a.endTime}:00`),
         type: 'booked' as EventType,
         resource: a as ParkingRequest,
       })),
@@ -119,7 +121,7 @@ const LotCalendarView: React.FC = () => {
         id: `pending-${r.id}`,
         title: `⏳ ${r.requesterName.split(' ')[0]}`,
         start: new Date(`${r.date}T${r.startTime}:00`),
-        end: new Date(`${r.date}T${r.endTime}:00`),
+        end: new Date(`${r.endDate || r.date}T${r.endTime}:00`),
         type: 'pending' as EventType,
         resource: r as ParkingRequest,
       })),
@@ -285,7 +287,14 @@ const LotCalendarView: React.FC = () => {
         <Descriptions column={1} size="small" bordered>
           <Descriptions.Item label={t('lotCalendarView.modal.requester')}>{a.requesterName}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.date')}>{dayjs(a.date).format('DD/MM/YYYY')}</Descriptions.Item>
-          <Descriptions.Item label={t('lotCalendarView.modal.time')}>{a.startTime} – {a.endTime}</Descriptions.Item>
+          <Descriptions.Item label={t('lotCalendarView.modal.time')}>
+            {a.startTime} – {a.endTime}
+            {a.endDate && a.endDate !== a.date && (
+              <span style={{ fontSize: '11px', color: 'var(--label-color)', marginLeft: '8px' }}>
+                ({dayjs(a.endDate).format('DD/MM')})
+              </span>
+            )}
+          </Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.duration')}>{a.duration}h</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.lot')}>{a.lotId}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.floor')}>{a.floor}</Descriptions.Item>
@@ -302,7 +311,14 @@ const LotCalendarView: React.FC = () => {
           <Descriptions column={1} size="small" bordered>
             <Descriptions.Item label={t('lotCalendarView.modal.requester')}>{r.requesterName}</Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.date')}>{dayjs(r.date).format('DD/MM/YYYY')}</Descriptions.Item>
-            <Descriptions.Item label={t('lotCalendarView.modal.time')}>{r.startTime} – {r.endTime}</Descriptions.Item>
+            <Descriptions.Item label={t('lotCalendarView.modal.time')}>
+              {r.startTime} – {r.endTime}
+              {r.endDate && r.endDate !== r.date && (
+                <span style={{ fontSize: '11px', color: 'var(--label-color)', marginLeft: '8px' }}>
+                  ({dayjs(r.endDate).format('DD/MM')})
+                </span>
+              )}
+            </Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.duration')}>{r.duration}h</Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.status')}><Tag color={getRequestStatusColor('pending')}>{getRequestStatusLabel('pending')}</Tag></Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.submitted')}>{dayjs(r.submittedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
@@ -365,6 +381,7 @@ const LotCalendarView: React.FC = () => {
             slotPropGetter={currentHourSlotPropGetter}
             components={view === 'week' ? mobileWeekComponents : mobileComponents}
             formats={view === 'week' ? mobileWeekFormats : undefined}
+            dayLayoutAlgorithm="no-overlap"
           />
           {!hasVisibleEvents && (
             <div className="calendar-empty-state">{t('lotCalendarView.emptyState')}</div>
@@ -391,6 +408,7 @@ const LotCalendarView: React.FC = () => {
             max={maxTime}
             slotPropGetter={currentHourSlotPropGetter}
             components={desktopComponents}
+            dayLayoutAlgorithm="no-overlap"
           />
           {!hasVisibleEvents && (
             <div className="calendar-empty-state">{t('lotCalendarView.emptyState')}</div>
@@ -399,42 +417,28 @@ const LotCalendarView: React.FC = () => {
       )}
 
       {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
-                {bookedEvents.length + pendingEvents.length + blockedEvents.length}
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotCalendarView.stats.total')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: EVENT_COLORS.booked }}>{bookedEvents.length}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotCalendarView.stats.booked')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: EVENT_COLORS.pending }}>{pendingEvents.length}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotCalendarView.stats.pending')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: EVENT_COLORS.blocked }}>{blockedEvents.length}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotCalendarView.stats.blocked')}</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+      <Card size="small" style={{ marginBottom: '24px' }}>
+        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
+          <div>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>
+              {bookedEvents.length + pendingEvents.length + blockedEvents.length}
+            </strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.total')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: EVENT_COLORS.booked, marginRight: '8px' }}>{bookedEvents.length}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.booked')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: EVENT_COLORS.pending, marginRight: '8px' }}>{pendingEvents.length}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.pending')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: EVENT_COLORS.blocked, marginRight: '8px' }}>{blockedEvents.length}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.blocked')}</span>
+          </div>
+        </Space>
+      </Card>
 
       {/* Info */}
       <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">
@@ -458,11 +462,25 @@ const LotCalendarView: React.FC = () => {
       <Modal
         open={!!selectedEvent}
         onCancel={() => setSelectedEvent(null)}
-        footer={<Button onClick={() => setSelectedEvent(null)}>{t('lotCalendarView.modal.close')}</Button>}
+        footer={
+          <Space>
+            {(selectedEvent?.type === 'booked' || selectedEvent?.type === 'pending') && (
+              <Button onClick={() => setShowHistory(true)}>{t('lotCalendarView.modal.history') || 'View History'}</Button>
+            )}
+            <Button type="primary" onClick={() => setSelectedEvent(null)}>{t('lotCalendarView.modal.close')}</Button>
+          </Space>
+        }
         title={modalTitle}
       >
         {renderModalContent()}
       </Modal>
+
+      {showHistory && selectedEvent?.resource?.id && (
+        <AuditTrailModal 
+          requestId={selectedEvent.resource.id} 
+          onClose={() => setShowHistory(false)} 
+        />
+      )}
     </div>
   );
 };

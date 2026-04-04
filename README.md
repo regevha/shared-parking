@@ -1,6 +1,6 @@
-# Parking Management Mockup
+# Shared Parking
 
-A React + Python parking management system. Users request parking slots; owners approve or reject requests and manage their lots; managers administer users and lots. Authentication uses JWT.
+A prototype application for managing corporate parking resources. Users request parking slots; owners approve or reject requests and manage their lots; managers administer users and lots. Authentication uses JWT.
 
 ## Tech Stack
 
@@ -198,12 +198,12 @@ Language preference is stored in the **database** in the `user_preferences` tabl
 
 ---
 
-## Project Structure
+## The project follows a standard React + FastAPI structure:
 
-```
-parking-mockup/
-├── backend/
-│   ├── main.py               # FastAPI app + CORS + router registration
+```text
+shared-parking/
+├── backend/               # FastAPI Python application
+│   ├── main.py            # API endpoints & app setup+ CORS + router registration
 │   ├── database.py           # SQLite connection (SQLAlchemy)
 │   ├── models.py             # User, ParkingRequest, Lot table definitions
 │   ├── schemas.py            # Pydantic request/response schemas
@@ -309,6 +309,13 @@ Messages survive request deletion for auditing — `request_id` is set to `NULL`
 | DELETE | `/api/users/{id}` | Manager | Delete user |
 | GET | `/api/users/{id}/preferences` | Manager / Self | Get preferences |
 | PATCH | `/api/users/{id}/preferences` | Manager / Self | Update preferences |
+
+### Config
+
+| Method | Path | Role | Description |
+|--------|------|------|-------------|
+| GET | `/api/config` | Any | Global system constants (booking windows, blackout periods) |
+| POST | `/api/config/run-auto-approval` | Manager | Trigger the auto-approval scheduler |
 
 **Preferences payload** (`PATCH /api/users/{id}/preferences`):
 

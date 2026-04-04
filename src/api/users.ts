@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { NotificationWindow } from './auth';
+import type { AvailabilityWindow, NotificationWindow } from './auth';
 
 export interface UserData {
   id: string;
@@ -22,6 +22,7 @@ export interface UserUpdatePayload {
 
 export interface PreferencesData {
   darkMode: boolean;
+  availabilityWindows: Record<string, AvailabilityWindow[]>;
   notificationWindows: Record<string, NotificationWindow[]>;
   language: string;
   // add new preference fields here
@@ -29,17 +30,26 @@ export interface PreferencesData {
 
 export interface PreferencesUpdatePayload {
   dark_mode?: boolean;
-  notification_windows?: string; // JSON-serialized Record<string, NotificationWindow[]>
-  language?: string;             // 'en' | 'fr'
-  // add new preference fields here (snake_case — matches backend)
+  availability_windows?: string; // JSON
+  notification_windows?: string; // JSON
+  language?: string;
 }
 
 function mapPreferences(raw: any): PreferencesData {
+  let availabilityWindows: Record<string, AvailabilityWindow[]> = {};
+  if (raw?.availability_windows) {
+    try { availabilityWindows = JSON.parse(raw.availability_windows); } catch { /* ignore */ }
+  }
   let notificationWindows: Record<string, NotificationWindow[]> = {};
   if (raw?.notification_windows) {
     try { notificationWindows = JSON.parse(raw.notification_windows); } catch { /* ignore */ }
   }
-  return { darkMode: raw.dark_mode ?? true, notificationWindows, language: raw?.language ?? 'en' };
+  return {
+    darkMode: raw.dark_mode ?? true,
+    availabilityWindows,
+    notificationWindows,
+    language: raw?.language ?? 'en'
+  };
 }
 
 export const usersApi = {

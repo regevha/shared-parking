@@ -12,6 +12,7 @@ export function makeParkingRequest(overrides: Partial<ParkingRequest> = {}): Par
     requesterName: 'Alice Johnson',
     date: '2026-04-10',
     startTime: '09:00',
+    endDate: '2026-04-10',
     endTime: '10:00',
     duration: 1,
     submittedAt: '2026-03-28T08:00:00Z',
@@ -39,7 +40,12 @@ export function makeUser(overrides: Partial<AuthUser> = {}): AuthUser {
     name: 'Alice Johnson',
     email: 'alice@parking.dev',
     role: 'user',
-    preferences: { darkMode: false, notificationWindows: {}, language: 'en' },
+    preferences: {
+      darkMode: false,
+      availabilityWindows: {},
+      notificationWindows: {},
+      language: 'en'
+    },
     ...overrides,
   };
 }

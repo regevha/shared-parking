@@ -23,6 +23,9 @@
   font-size: 14px;
 }
 
-.window-item .ant-btn {
-  padding: 2px 8px;
+.no-windows-text {
+  color: #999;
+  font-style: italic;
+  padding: 20px 0;
+  text-align: center;
 }

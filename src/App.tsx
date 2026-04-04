@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Layout, Menu, Dropdown, Button, ConfigProvider, theme, Spin } from 'antd';
+import { Layout, Menu, Dropdown, Button, ConfigProvider, theme, Spin, Grid } from 'antd';
 import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined, SunOutlined, MoonOutlined, LogoutOutlined, GlobalOutlined } from '@ant-design/icons';
 import enUS from 'antd/locale/en_US';
 import frFR from 'antd/locale/fr_FR';
@@ -20,6 +20,7 @@ import AllApprovals from './components/AllApprovals';
 import MyRequests from './components/MyRequests';
 import ParkingRequestForm from './components/ParkingRequestForm';
 import RequestDetail from './components/RequestDetail';
+import AvailabilityWindows from './components/AvailabilityWindows';
 import NotificationWindows from './components/NotificationWindows';
 import AdminPanel from './components/AdminPanel';
 import MyLots from './components/MyLots';
@@ -77,6 +78,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
 
   const settingsMenu = {
     items: [
+      { key: 'availability', label: <Link to="/availability">{t('nav.availabilityWindows')}</Link> },
       { key: 'notifications', label: <Link to="/notifications">{t('nav.notificationWindows')}</Link> },
     ],
   };
@@ -169,6 +171,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                   <Route path="/my-lots"      element={<MyLots />} />
                   <Route path="/lot-calendar" element={<LotCalendarView />} />
                   <Route path="/admin"        element={<AdminPanel />} />
+                   <Route path="/availability" element={<AvailabilityWindows />} />
                   <Route path="/notifications" element={<NotificationWindows />} />
                   <Route path="/request/:id"  element={<RequestDetail />} />
                   <Route path="/"             element={<LotStatusBoard />} />

@@ -71,8 +71,8 @@ const MyRequests: React.FC = () => {
   const visibleRequests = userRequests
     .filter((req: ParkingRequest) => req.status === 'pending' || req.status === 'approved')
     .sort((a, b) => {
-      const d = b.date.localeCompare(a.date);
-      return d !== 0 ? d : b.startTime.localeCompare(a.startTime);
+      const d = a.date.localeCompare(b.date);
+      return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
     });
 
 
@@ -113,6 +113,7 @@ const MyRequests: React.FC = () => {
       await updateUserRequest(editingRequest.id, {
         date: values.date?.format('YYYY-MM-DD') || editingRequest.date,
         startTime: values.startTime,
+        endDate: editingRequest.endDate,
         endTime,
         duration: values.duration,
       });
@@ -160,7 +161,16 @@ const MyRequests: React.FC = () => {
       title: t('myRequests.columns.timeSlot'),
       key: 'timeSlot',
       width: 130,
-      render: (_, record: ParkingRequest) => `${record.startTime} - ${record.endTime}`,
+      render: (_, record: ParkingRequest) => (
+        <>
+          {record.startTime} - {record.endTime}
+          {record.endDate !== record.date && (
+            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
+              ({dayjs(record.endDate).format('DD/MM')})
+            </div>
+          )}
+        </>
+      ),
     },
     {
       title: t('myRequests.columns.duration'),
@@ -231,9 +241,10 @@ const MyRequests: React.FC = () => {
   ];
 
   const stats = {
-    total: visibleRequests.length,
-    pending: visibleRequests.filter((r: ParkingRequest) => r.status === 'pending').length,
-    approved: visibleRequests.filter((r: ParkingRequest) => r.status === 'approved').length,
+    total: userRequests.filter(r => r.status !== 'rejected').length,
+    pending: userRequests.filter(r => r.status === 'pending').length,
+    approved: userRequests.filter(r => r.status === 'approved').length,
+    rejected: userRequests.filter(r => r.status === 'rejected').length,
   };
 
   return (
@@ -308,32 +319,26 @@ const MyRequests: React.FC = () => {
       )}
 
       {/* Stats */}
-      <Row gutter={[12, 12]} style={{ marginTop: '24px' }}>
-        <Col xs={8}>
-          <Card size="small">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 'bold' }}>{stats.total}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>{t('myRequests.stats.totalActive')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={8}>
-          <Card size="small">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>{t('myRequests.stats.pending')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={8}>
-          <Card size="small">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#52c41a' }}>{stats.approved}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>{t('myRequests.stats.approved')}</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+      <Card size="small" style={{ marginTop: '24px' }}>
+        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
+          <div>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.total}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.total')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.pending}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.pending')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{stats.approved}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.approved')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#f5222d', marginRight: '8px' }}>{stats.rejected}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.rejected')}</span>
+          </div>
+        </Space>
+      </Card>
 
       {/* Info */}
       <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>

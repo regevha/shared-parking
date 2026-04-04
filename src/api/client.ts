@@ -1,4 +1,7 @@
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// Use the same hostname the browser used to load the app, but on port 8000.
+// This makes LAN/mobile access work automatically (e.g. http://192.168.1.x:8000).
+// Override with REACT_APP_API_URL env var if needed.
+const BASE_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:8000`;
 const TOKEN_KEY = 'parking_token';
 
 export class ApiError extends Error {
