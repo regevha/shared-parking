@@ -85,3 +85,15 @@ class Lot(Base):
     blocked_until = Column(String, nullable=True)
     created_at = Column(String, nullable=True)             # ISO string — set on creation
     updated_at = Column(String, nullable=True)             # ISO string — set on every update
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_log"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    request_id = Column(String, index=True, nullable=False)
+    user_id = Column(String, nullable=False)
+    user_name = Column(String, nullable=False)
+    action = Column(String, nullable=False)  # submitted | approved | rejected | cancelled | auto-assigned
+    details = Column(String, nullable=True)  # additional info like lot ID
+    timestamp = Column(String, nullable=False) # ISO timestamp

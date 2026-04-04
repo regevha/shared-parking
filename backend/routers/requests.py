@@ -18,6 +18,21 @@ def _generate_id(db: Session) -> str:
     return f"REQ-{count + 1:03d}"
 
 
+def _add_audit_log(
+    db: Session, request_id: str, user_id: str, user_name: str, action: str, details: str | None = None
+):
+    from datetime import datetime, timezone
+    log = models.AuditLog(
+        request_id=request_id,
+        user_id=user_id,
+        user_name=user_name,
+        action=action,
+        details=details,
+        timestamp=datetime.now(timezone.utc).isoformat()
+    )
+    db.add(log)
+
+
 def _has_conflict(
     db: Session,
     lot_id: str | None,
@@ -26,17 +41,16 @@ def _has_conflict(
     end_date: str,
     end_time: str,
     exclude_id: str | None = None,
-) -> bool:
-    """Return True if an approved request overlaps with the start_dt–end_dt range."""
+) -> str | None:
+    """Return the ID of the conflicting approved request if one overlaps, else None."""
     if not lot_id:
-        return False
+        return None
     
     from datetime import datetime
     new_start = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
     new_end = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
 
-    # We check all approved requests for that lot. Since most are local to a few days, 
-    # we can filter by start_date - 2 days to start_date + 2 days for performance.
+    # We check all approved requests for that lot.
     existing = db.query(models.ParkingRequest).filter(
         models.ParkingRequest.lot_id == lot_id,
         models.ParkingRequest.status == "approved"
@@ -50,9 +64,9 @@ def _has_conflict(
         
         # Standard overlap check: (s1 < e2) and (e1 > s2)
         if new_start < r_end and new_end > r_start:
-            return True
+            return r.id
             
-    return False
+    return None
 
 
 def _is_outside_availability(
@@ -199,6 +213,7 @@ def create_request(
         status="pending",
     )
     db.add(req)
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "submitted")
     db.commit()
     db.refresh(req)
     return req
@@ -216,13 +231,15 @@ def approve_request(
         raise HTTPException(status_code=404, detail="Request not found")
     if req.status != "pending":
         raise HTTPException(status_code=400, detail="Only pending requests can be approved")
-    if payload.lot_id and _has_conflict(
-        db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=request_id
-    ):
-        raise HTTPException(
-            status_code=409,
-            detail=f"Time slot conflict: lot {payload.lot_id} is already approved for this period",
+    if payload.lot_id:
+        conflict_id = _has_conflict(
+            db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=request_id
         )
+        if conflict_id:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Time slot conflict: lot {payload.lot_id} is already approved for request {conflict_id} during this period",
+            )
 
     # Check availability slots (Allow manual override for managers/owners if they explicitly approve)
     # However, to be helpful, we can keep it as a soft warning or just allow it if it's manual.
@@ -233,6 +250,12 @@ def approve_request(
     req.approved_at = now
     req.approved_by = current_user.name
     req.updated_at = now
+    
+    _add_audit_log(
+        db, req.id, current_user.id, current_user.name, "approved", 
+        details=f"Assigned lot {payload.lot_id} (Floor {payload.floor})"
+    )
+    
     req.rejected_by_owner = False
     if payload.lot_id:
         req.lot_id = payload.lot_id
@@ -259,6 +282,7 @@ def reject_request(
     req.status = "rejected"
     req.rejected_by_owner = True
     req.updated_at = datetime.now(timezone.utc).isoformat()
+    _add_audit_log(db, req.id, current_user.id, current_user.name, "rejected")
     db.commit()
     db.refresh(req)
     return req
@@ -335,3 +359,18 @@ def trigger_auto_approve(
     from scheduler import run_auto_approval
     run_auto_approval(db)
     return {"status": "ok"}
+
+
+@router.get("/{request_id}/audit", response_model=List[schemas.AuditLogOut])
+def get_request_audit(
+    request_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    from typing import List
+    return (
+        db.query(models.AuditLog)
+        .filter(models.AuditLog.request_id == request_id)
+        .order_by(models.AuditLog.timestamp.desc())
+        .all()
+    )

@@ -82,4 +82,7 @@ export const requestsApi = {
 
   runAutoApprove: () =>
     api.post<any>('/api/requests/run-auto-approve', {}),
+
+  getAuditTrail: (id: string) =>
+    api.get<any[]>(`/api/requests/${id}/audit`),
 };

@@ -117,10 +117,31 @@ def seed():
             req_data["submitted_at"] = _ts(1)
             req_data["updated_at"] = now_iso
             
-            # Remove any keys that shouldn't be in the model
-            req_data.pop("approved_by", None) # Not in model yet or handled differently
+            # Extract approved_by before popping
+            approved_by = req_data.pop("approved_by", None)
             
             db.add(models.ParkingRequest(**req_data))
+            
+            # Add Audit Logs for seed data
+            log_sub = models.AuditLog(
+                request_id=req_data["id"],
+                user_id=req_data["requester_id"],
+                user_name=req_data["requester_name"],
+                action="submitted",
+                timestamp=now_iso
+            )
+            db.add(log_sub)
+            
+            if req_data.get("status") == "approved":
+                log_app = models.AuditLog(
+                    request_id=req_data["id"],
+                    user_id="seed",
+                    user_name=approved_by or "System",
+                    action="approved",
+                    details=f"Assigned lot {req_data.get('lot_id')} (Floor {req_data.get('floor')})",
+                    timestamp=now_iso
+                )
+                db.add(log_app)
 
         db.commit()
         print(f"OK: Seeded {len(USERS)} users, {len(REQUESTS)} requests, {len(LOTS)} lots.")

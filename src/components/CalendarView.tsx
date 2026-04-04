@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import './CalendarView.css';
+import AuditTrailModal from './AuditTrailModal';
 
 const DnDCalendar = withDragAndDrop(Calendar as any) as any;
 
@@ -84,6 +85,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const maxTime = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
   const [date, setDate] = useState(new Date());
   const [selectedRequest, setSelectedRequest] = useState<ParkingRequest | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
@@ -396,7 +398,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       <Modal
         open={!!selectedRequest}
         onCancel={() => setSelectedRequest(null)}
-        footer={<Button onClick={() => setSelectedRequest(null)}>{t('calendarView.modal.close')}</Button>}
+        footer={
+          <Space>
+            <Button onClick={() => setShowHistory(true)}>{t('calendarView.modal.history') || 'View History'}</Button>
+            <Button type="primary" onClick={() => setSelectedRequest(null)}>{t('calendarView.modal.close')}</Button>
+          </Space>
+        }
         title={selectedRequest ? t('calendarView.modal.title', { name: selectedRequest.requesterName }) : ''}
       >
         {selectedRequest && (
@@ -422,6 +429,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           </Descriptions>
         )}
       </Modal>
+
+      {showHistory && selectedRequest && (
+        <AuditTrailModal 
+          requestId={selectedRequest.id} 
+          onClose={() => setShowHistory(false)} 
+        />
+      )}
     </div>
   );
 };

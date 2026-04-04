@@ -10,6 +10,7 @@ import { LotData } from '../api/lots';
 import { getRequestStatusColor, getRequestStatusLabel, getLotStatusTagColor } from '../utils/statusUtils';
 import './CalendarView.css';
 import './LotCalendarView.css';
+import AuditTrailModal from './AuditTrailModal';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -77,6 +78,7 @@ const LotCalendarView: React.FC = () => {
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<LotCalendarEvent | null>(null);
   const [selectedLot, setSelectedLot] = useState<string>('all');
+  const [showHistory, setShowHistory] = useState(false);
 
   const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
   const minTime    = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
@@ -460,11 +462,25 @@ const LotCalendarView: React.FC = () => {
       <Modal
         open={!!selectedEvent}
         onCancel={() => setSelectedEvent(null)}
-        footer={<Button onClick={() => setSelectedEvent(null)}>{t('lotCalendarView.modal.close')}</Button>}
+        footer={
+          <Space>
+            {(selectedEvent?.type === 'booked' || selectedEvent?.type === 'pending') && (
+              <Button onClick={() => setShowHistory(true)}>{t('lotCalendarView.modal.history') || 'View History'}</Button>
+            )}
+            <Button type="primary" onClick={() => setSelectedEvent(null)}>{t('lotCalendarView.modal.close')}</Button>
+          </Space>
+        }
         title={modalTitle}
       >
         {renderModalContent()}
       </Modal>
+
+      {showHistory && selectedEvent?.resource?.id && (
+        <AuditTrailModal 
+          requestId={selectedEvent.resource.id} 
+          onClose={() => setShowHistory(false)} 
+        />
+      )}
     </div>
   );
 };

@@ -255,3 +255,16 @@ class UserUpdate(BaseModel):
     email: Optional[str] = None
     role: Optional[str] = None      # manager only
     password: Optional[str] = None  # plain text — will be hashed
+
+
+class AuditLogOut(BaseModel):
+    id: int
+    request_id: str
+    user_id: str
+    user_name: str
+    action: str
+    details: Optional[str] = None
+    timestamp: str
+
+    class Config:
+        from_attributes = True

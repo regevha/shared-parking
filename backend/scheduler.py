@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 from database import SessionLocal
 import models
-from routers.requests import _has_conflict, _is_outside_availability
+from routers.requests import _has_conflict, _is_outside_availability, _add_audit_log
 
 scheduler = BackgroundScheduler()
 
@@ -68,6 +68,11 @@ def run_auto_approval(db=None):
                 req.lot_id = target_lot.id
                 req.floor = target_lot.floor_label
                 req.lot_owner = target_lot.owner
+                
+                _add_audit_log(
+                    db, req.id, "system", "Auto Scheduler", "auto-assigned",
+                    details=f"Assigned lot {target_lot.id} (Floor {target_lot.floor_label})"
+                )
                 
                 db.commit()
     finally:
