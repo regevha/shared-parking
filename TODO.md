@@ -22,6 +22,12 @@ The following test suites and refinements are recommended to further harden the 
 - [ ] **Detailed Diffs**: In `AuditLog`, store the specific fields that were updated (e.g., "Duration changed from 2h to 4h").
 - [ ] **Bulk Management Hub**: A manager-only view for the entire system's audit trail, searchable by date range.
 
+### 5. 👑 Admin Dashboard (UX Refactor)
+- [ ] **Visual Lot Map**: Replace the flat table with a grid-based floor map for ownership assignment.
+- [ ] **Import Staging Area**: Add a preview/validation step before Excel data is committed to the DB.
+- [ ] **Interactive System Config**: Move backend constants (e.g., `blackoutLimit`) to UI-editable settings.
+- [ ] **User Search & Bulk Actions**: Add a search bar and batch role updates (e.g., "Set 5 users to Owner").
+
 ## 🛠️ Refactor Ideas
 - [ ] **Native Date Handling**: Migrate all ISO strings to native `DateTime` objects in the Database layer if we move away from SQLite.
 - [ ] **Real-time Notifications**: Replace polling with WebSockets for immediate approval/rejection alerts.
