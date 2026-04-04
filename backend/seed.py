@@ -86,12 +86,12 @@ def seed():
                 password_hash=pw_hash, role=u["role"], created_at=now_iso
             ))
             
-            # Default working hours availability for owners
+            # Default 24/7 availability for owners
             avail = "{}"
             if u["role"] == "owner":
                 avail = json.dumps({
-                    day: [{"id": "w1", "startTime": "08:00", "endTime": "20:00"}]
-                    for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+                    day: [{"id": f"w{i}", "startTime": "00:00", "endTime": "23:59"}]
+                    for i, day in enumerate(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
                 })
             
             db.add(models.UserPreferences(

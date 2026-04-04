@@ -111,6 +111,7 @@ REQUEST_PAYLOAD = {
     "requester_name": "ignored",
     "date":           _FUTURE_DATE,
     "start_time":     "09:00",
+    "end_date":       _FUTURE_DATE,
     "end_time":       "11:00",
     "duration":       2,
 }
