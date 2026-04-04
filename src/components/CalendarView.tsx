@@ -75,7 +75,7 @@ const currentHourSlotPropGetter = (date: Date) => {
 };
 
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
-  const { pendingRequests, userRequests, updateUserRequest } = useRequests();
+  const { pendingRequests, approvedRequests, userRequests, updateUserRequest } = useRequests();
   const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
@@ -94,15 +94,16 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
 
   const myRequestIds = useMemo(() => new Set(userRequests.map((r) => r.id)), [userRequests]);
 
-  // Merge pendingRequests + non-rejected userRequests, deduped by ID
+  // Merge pendingRequests + approvedRequests + userRequests, deduped by ID
   const allRequests = useMemo(() => {
     const map = new Map<string, ParkingRequest>();
     pendingRequests.forEach((r) => map.set(r.id, r));
+    approvedRequests.forEach((r) => map.set(r.id, r));
     userRequests
       .filter((r) => r.status !== 'rejected')
       .forEach((r) => map.set(r.id, r));
     return Array.from(map.values());
-  }, [pendingRequests, userRequests]);
+  }, [pendingRequests, approvedRequests, userRequests]);
 
   const getStatusColor = (req: ParkingRequest) => {
     if (req.rejectedByOwner) return STATUS_COLORS.rejected;
