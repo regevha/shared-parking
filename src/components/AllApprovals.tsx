@@ -140,8 +140,8 @@ const AllApprovals: React.FC = () => {
       <Table
         columns={columns}
         dataSource={[...approvedRequests].sort((a, b) => {
-          const d = b.date.localeCompare(a.date);
-          return d !== 0 ? d : b.startTime.localeCompare(a.startTime);
+          const d = a.date.localeCompare(b.date);
+          return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
         })}
         rowKey="id"
         loading={loading}

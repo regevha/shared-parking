@@ -42,10 +42,10 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       filtered = filtered.filter((req) => !req.rejectedByOwner);
     }
 
-    // Newest date + time first
+    // Oldest date + time first (ascending)
     return filtered.sort((a, b) => {
-      const d = b.date.localeCompare(a.date);
-      return d !== 0 ? d : b.startTime.localeCompare(a.startTime);
+      const d = a.date.localeCompare(b.date);
+      return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
     });
   }, [filterMode, isOwner, pendingRequests]);
 

@@ -93,6 +93,21 @@ def create_request(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    """Create a new parking request. Limit: 5 pending requests per user."""
+    pending_count = (
+        db.query(models.ParkingRequest)
+        .filter(
+            models.ParkingRequest.requester_id == current_user.id,
+            models.ParkingRequest.status == "pending"
+        )
+        .count()
+    )
+    if pending_count >= 5:
+        raise HTTPException(
+            status_code=400,
+            detail="Maximum limit of 5 pending requests reached. Please wait for an existing request to be approved or rejected."
+        )
+
     req = models.ParkingRequest(
         id=_generate_id(db),
         requester_id=current_user.id,

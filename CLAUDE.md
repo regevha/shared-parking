@@ -206,5 +206,3 @@ Both `CalendarView` and `LotCalendarView`:
 2. Empty state UI for all tables (currently shows empty table when no data)
 3. Audit trail — `created_at` / `updated_at` timestamps on records (timestamps added to DB; full audit trail UI pending)
 4. RTL layout for react-big-calendar — library has no RTL support; calendar stays LTR even in Hebrew mode
-5. Default sorting across tables — ensure all tables displayed are sorted by date ascending
-6. Change validation criteria — set max pending requests per user to 5 (instead of 3 total requests per user)

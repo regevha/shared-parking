@@ -15,7 +15,7 @@ interface FormValues {
 }
 
 const MAX_END_HOUR = 20;
-const MAX_ACTIVE_REQUESTS = 3;
+const MAX_PENDING_REQUESTS = 5;
 
 // 20:00 is excluded: no valid duration fits (min 1h would exceed 20:00)
 const HOUR_OPTIONS = [
@@ -35,10 +35,16 @@ const ParkingRequestForm: React.FC = () => {
     value: n,
   }));
 
-  const activeRequests = userRequests.filter(
-    r => r.status === 'pending' || r.status === 'approved'
-  );
-  const hasMaxRequests = activeRequests.length >= MAX_ACTIVE_REQUESTS;
+  const activeRequests = useMemo(() => {
+    return userRequests
+      .filter(r => r.status === 'pending')
+      .sort((a, b) => {
+        const d = a.date.localeCompare(b.date);
+        return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
+      });
+  }, [userRequests]);
+
+  const hasMaxRequests = activeRequests.length >= MAX_PENDING_REQUESTS;
 
   // Watch form values for end time calculation and duration filtering
   const startTime = Form.useWatch('startTime', form);
@@ -132,7 +138,7 @@ const ParkingRequestForm: React.FC = () => {
       {/* Active Requests List */}
       {activeRequests.length > 0 && (
         <Card
-          title={t('requestForm.activeRequestsCard', { count: activeRequests.length, max: MAX_ACTIVE_REQUESTS })}
+          title={t('requestForm.activeRequestsCard', { count: activeRequests.length, max: MAX_PENDING_REQUESTS })}
           style={{ marginBottom: '24px' }}
           size="small"
         >
