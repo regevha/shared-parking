@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification } from 'antd';
+import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
@@ -399,42 +399,28 @@ const LotCalendarView: React.FC = () => {
       )}
 
       {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
-                {bookedEvents.length + pendingEvents.length + blockedEvents.length}
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotCalendarView.stats.total')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: EVENT_COLORS.booked }}>{bookedEvents.length}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotCalendarView.stats.booked')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: EVENT_COLORS.pending }}>{pendingEvents.length}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotCalendarView.stats.pending')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: EVENT_COLORS.blocked }}>{blockedEvents.length}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotCalendarView.stats.blocked')}</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+      <Card size="small" style={{ marginBottom: '24px' }}>
+        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#000', marginRight: '8px' }}>
+              {bookedEvents.length + pendingEvents.length + blockedEvents.length}
+            </strong>
+            <span style={{ color: '#666' }}>{t('lotCalendarView.stats.total')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: EVENT_COLORS.booked, marginRight: '8px' }}>{bookedEvents.length}</strong>
+            <span style={{ color: '#666' }}>{t('lotCalendarView.stats.booked')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: EVENT_COLORS.pending, marginRight: '8px' }}>{pendingEvents.length}</strong>
+            <span style={{ color: '#666' }}>{t('lotCalendarView.stats.pending')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: EVENT_COLORS.blocked, marginRight: '8px' }}>{blockedEvents.length}</strong>
+            <span style={{ color: '#666' }}>{t('lotCalendarView.stats.blocked')}</span>
+          </div>
+        </Space>
+      </Card>
 
       {/* Info */}
       <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">

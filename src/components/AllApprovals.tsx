@@ -154,38 +154,22 @@ const AllApprovals: React.FC = () => {
       />
 
       {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#52c41a' }}>
-                {stats.total}
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('approvals.stats.total')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>
-                {stats.today}
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('approvals.stats.today')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#722ed1' }}>
-                {stats.thisWeek}
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('approvals.stats.thisWeek')}</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+      <Card size="small" style={{ marginTop: '24px' }}>
+        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{stats.total}</strong>
+            <span style={{ color: '#666' }}>{t('approvals.stats.total')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.today}</strong>
+            <span style={{ color: '#666' }}>{t('approvals.stats.today')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#722ed1', marginRight: '8px' }}>{stats.thisWeek}</strong>
+            <span style={{ color: '#666' }}>{t('approvals.stats.thisWeek')}</span>
+          </div>
+        </Space>
+      </Card>
 
       {/* Info */}
       <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">

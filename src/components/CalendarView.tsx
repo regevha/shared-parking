@@ -3,7 +3,7 @@ import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification } from 'antd';
+import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
@@ -339,40 +339,26 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       )}
 
       {/* Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{totalRequests}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.total')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>{pendingCount}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.pending')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#52c41a' }}>{approvedCount}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.approved')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#f5222d' }}>{rejectedCount}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('calendarView.stats.rejected')}</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+      <Card size="small" style={{ marginBottom: '24px' }}>
+        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#000', marginRight: '8px' }}>{totalRequests}</strong>
+            <span style={{ color: '#666' }}>{t('calendarView.stats.total')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{pendingCount}</strong>
+            <span style={{ color: '#666' }}>{t('calendarView.stats.pending')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{approvedCount}</strong>
+            <span style={{ color: '#666' }}>{t('calendarView.stats.approved')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#f5222d', marginRight: '8px' }}>{rejectedCount}</strong>
+            <span style={{ color: '#666' }}>{t('calendarView.stats.rejected')}</span>
+          </div>
+        </Space>
+      </Card>
 
       {/* Info */}
       <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">

@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
-import { Collapse, Tag, Table, Space, Row, Col, Card, Alert, Spin } from 'antd';
+import React, { useMemo, useState } from 'react';
+import { Tabs, Tag, Space, Row, Col, Card, Alert, Spin, Modal } from 'antd';
+import { CarOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import type { ColumnsType } from 'antd/es/table';
 import { LotStatus } from '../types';
 import { LotData } from '../api/lots';
 import { useRequests } from '../contexts/RequestsContext';
@@ -12,45 +12,7 @@ const LotStatusBoard: React.FC = () => {
   const { allLots, loading } = useRequests();
   const { t } = useTranslation();
 
-  const columns: ColumnsType<LotData> = [
-    {
-      title: t('lotStatusBoard.columns.lotId'),
-      dataIndex: 'id',
-      key: 'id',
-      width: '20%',
-      render: (text: string) => <strong>{text}</strong>,
-    },
-    {
-      title: t('lotStatusBoard.columns.owner'),
-      dataIndex: 'owner',
-      key: 'owner',
-      width: '30%',
-      render: (owner: string | null) => owner || t('lotStatusBoard.unassigned'),
-    },
-    {
-      title: t('lotStatusBoard.columns.status'),
-      dataIndex: 'status',
-      key: 'status',
-      width: '25%',
-      render: (status: LotStatus) => (
-        <Tag color={getStatusColor(status)} style={{ color: '#000' }}>
-          {getStatusLabel(status)}
-        </Tag>
-      ),
-    },
-    {
-      title: t('lotStatusBoard.columns.blockedUntil'),
-      dataIndex: 'blockedUntil',
-      key: 'blockedUntil',
-      width: '25%',
-      render: (blockedUntil: string | undefined, record: LotData) => {
-        if (record.status === 'blocked' || record.status === 'unowned-blocked') {
-          return blockedUntil || '-';
-        }
-        return '-';
-      },
-    },
-  ];
+  const [selectedLot, setSelectedLot] = useState<LotData | null>(null);
 
   // Group flat lots by floorLabel
   const floorGroups = useMemo(() => {
@@ -65,20 +27,25 @@ const LotStatusBoard: React.FC = () => {
 
   const floorItems = floorGroups.map((floorData, index) => ({
     key: index.toString(),
-    label: (
-      <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
-        {floorData.floor} ({t('lotStatusBoard.lotsCount', { count: floorData.lots.length })})
-      </div>
-    ),
+    label: `${floorData.floor} (${t('lotStatusBoard.lotsCount', { count: floorData.lots.length })})`,
     children: (
-      <Table
-        columns={columns}
-        dataSource={floorData.lots}
-        rowKey="id"
-        pagination={false}
-        size="small"
-        scroll={{ x: 600 }}
-      />
+      <div className="parking-grid">
+        {floorData.lots.map(lot => {
+          const bgColor = getStatusColor(lot.status);
+          const isBlocked = lot.status === 'blocked' || lot.status === 'unowned-blocked';
+          return (
+            <div 
+              key={lot.id} 
+              className="parking-spot" 
+              style={{ backgroundColor: bgColor }}
+              onClick={() => setSelectedLot(lot)}
+            >
+              <div className="lot-id">{lot.id}</div>
+              {isBlocked && <CarOutlined className="car-icon" />}
+            </div>
+          );
+        })}
+      </div>
     ),
   }));
 
@@ -92,6 +59,35 @@ const LotStatusBoard: React.FC = () => {
   return (
     <div className="lot-status-board">
       <h1>{t('lotStatusBoard.title')}</h1>
+
+      {/* Floors Tabs */}
+      <Spin spinning={loading}>
+        <Card style={{ marginBottom: '24px' }}>
+          <Tabs items={floorItems} defaultActiveKey="0" size="large" />
+        </Card>
+      </Spin>
+
+      {/* Summary Stats */}
+      <Card size="small" style={{ marginBottom: '24px' }}>
+        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{stats.available}</strong>
+            <span style={{ color: '#666' }}>{t('lotStatusBoard.stats.available')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#ff4d4f', marginRight: '8px' }}>{stats.blocked}</strong>
+            <span style={{ color: '#666' }}>{t('lotStatusBoard.stats.blocked')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#999', marginRight: '8px' }}>{stats.unowned}</strong>
+            <span style={{ color: '#666' }}>{t('lotStatusBoard.stats.unowned')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#faad14', marginRight: '8px' }}>{stats.unownedBlocked}</strong>
+            <span style={{ color: '#666' }}>{t('lotStatusBoard.stats.unownedBlocked')}</span>
+          </div>
+        </Space>
+      </Card>
 
       {/* Legend */}
       <Card style={{ marginBottom: '24px' }} title={t('lotStatusBoard.legendTitle')} size="small">
@@ -123,46 +119,33 @@ const LotStatusBoard: React.FC = () => {
         </Row>
       </Card>
 
-      {/* Floors Collapse */}
-      <Spin spinning={loading}>
-        <Collapse items={floorItems} accordion />
-      </Spin>
-
-      {/* Summary Stats */}
-      <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#52c41a' }}>{stats.available}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotStatusBoard.stats.available')}</div>
+      <Modal
+        title={`${t('lotStatusBoard.columns.lotId')}: ${selectedLot?.id}`}
+        open={!!selectedLot}
+        onCancel={() => setSelectedLot(null)}
+        footer={null}
+      >
+        {selectedLot && (
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <div>
+              <strong>{t('lotStatusBoard.columns.status')}: </strong>
+              <Tag color={getStatusColor(selectedLot.status)} style={{ color: '#000' }}>
+                {getStatusLabel(selectedLot.status)}
+              </Tag>
             </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff4d4f' }}>{stats.blocked}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotStatusBoard.stats.blocked')}</div>
+            <div>
+              <strong>{t('lotStatusBoard.columns.owner')}: </strong>
+              {selectedLot.owner || t('lotStatusBoard.unassigned')}
             </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#999' }}>{stats.unowned}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotStatusBoard.stats.unowned')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#faad14' }}>{stats.unownedBlocked}</div>
-              <div style={{ fontSize: '12px', color: '#666' }}>{t('lotStatusBoard.stats.unownedBlocked')}</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+            {(selectedLot.status === 'blocked' || selectedLot.status === 'unowned-blocked') && (
+              <div>
+                <strong>{t('lotStatusBoard.columns.blockedUntil')}: </strong>
+                {selectedLot.blockedUntil || '-'}
+              </div>
+            )}
+          </Space>
+        )}
+      </Modal>
 
       <Alert
         message={t('lotStatusBoard.infoTitle')}

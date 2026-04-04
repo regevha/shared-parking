@@ -308,32 +308,22 @@ const MyRequests: React.FC = () => {
       )}
 
       {/* Stats */}
-      <Row gutter={[12, 12]} style={{ marginTop: '24px' }}>
-        <Col xs={8}>
-          <Card size="small">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 'bold' }}>{stats.total}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>{t('myRequests.stats.totalActive')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={8}>
-          <Card size="small">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#1890ff' }}>{stats.pending}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>{t('myRequests.stats.pending')}</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={8}>
-          <Card size="small">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#52c41a' }}>{stats.approved}</div>
-              <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>{t('myRequests.stats.approved')}</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+      <Card size="small" style={{ marginTop: '24px' }}>
+        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#000', marginRight: '8px' }}>{stats.total}</strong>
+            <span style={{ color: '#666' }}>{t('myRequests.stats.totalActive')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.pending}</strong>
+            <span style={{ color: '#666' }}>{t('myRequests.stats.pending')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{stats.approved}</strong>
+            <span style={{ color: '#666' }}>{t('myRequests.stats.approved')}</span>
+          </div>
+        </Space>
+      </Card>
 
       {/* Info */}
       <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>

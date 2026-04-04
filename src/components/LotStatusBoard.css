@@ -7,6 +7,44 @@
   margin-bottom: 24px;
 }
 
+.parking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.parking-spot {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
+  color: #000;
+  text-align: center;
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.parking-spot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.parking-spot .lot-id {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.parking-spot .car-icon {
+  font-size: 24px;
+}
+
 @media (max-width: 768px) {
   .lot-status-board {
     padding: 12px;
@@ -15,5 +53,10 @@
   .lot-status-board h1 {
     font-size: 24px;
     margin-bottom: 16px;
+  }
+  
+  .parking-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
   }
 }
