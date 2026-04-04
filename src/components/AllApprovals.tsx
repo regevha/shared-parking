@@ -157,16 +157,16 @@ const AllApprovals: React.FC = () => {
       <Card size="small" style={{ marginTop: '24px' }}>
         <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
           <div>
-            <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{stats.total}</strong>
-            <span style={{ color: '#666' }}>{t('approvals.stats.total')}</span>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.total}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('approvals.stats.total')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.today}</strong>
-            <span style={{ color: '#666' }}>{t('approvals.stats.today')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('approvals.stats.today')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#722ed1', marginRight: '8px' }}>{stats.thisWeek}</strong>
-            <span style={{ color: '#666' }}>{t('approvals.stats.thisWeek')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('approvals.stats.thisWeek')}</span>
           </div>
         </Space>
       </Card>

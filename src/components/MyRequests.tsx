@@ -231,9 +231,10 @@ const MyRequests: React.FC = () => {
   ];
 
   const stats = {
-    total: visibleRequests.length,
-    pending: visibleRequests.filter((r: ParkingRequest) => r.status === 'pending').length,
-    approved: visibleRequests.filter((r: ParkingRequest) => r.status === 'approved').length,
+    total: userRequests.filter(r => r.status !== 'rejected').length,
+    pending: userRequests.filter(r => r.status === 'pending').length,
+    approved: userRequests.filter(r => r.status === 'approved').length,
+    rejected: userRequests.filter(r => r.status === 'rejected').length,
   };
 
   return (
@@ -311,16 +312,20 @@ const MyRequests: React.FC = () => {
       <Card size="small" style={{ marginTop: '24px' }}>
         <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
           <div>
-            <strong style={{ fontSize: '18px', color: '#000', marginRight: '8px' }}>{stats.total}</strong>
-            <span style={{ color: '#666' }}>{t('myRequests.stats.totalActive')}</span>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.total}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.total')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.pending}</strong>
-            <span style={{ color: '#666' }}>{t('myRequests.stats.pending')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.pending')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{stats.approved}</strong>
-            <span style={{ color: '#666' }}>{t('myRequests.stats.approved')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.approved')}</span>
+          </div>
+          <div>
+            <strong style={{ fontSize: '18px', color: '#f5222d', marginRight: '8px' }}>{stats.rejected}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('myRequests.stats.rejected')}</span>
           </div>
         </Space>
       </Card>

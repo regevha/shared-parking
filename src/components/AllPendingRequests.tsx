@@ -255,17 +255,17 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       <Card size="small" style={{ marginTop: '24px' }}>
         <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
           <div>
-            <strong style={{ fontSize: '18px', color: '#000', marginRight: '8px' }}>{stats.total}</strong>
-            <span style={{ color: '#666' }}>{t('pendingRequests.stats.total')}</span>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.total}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('pendingRequests.stats.total')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.pending}</strong>
-            <span style={{ color: '#666' }}>{t('pendingRequests.stats.pending')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('pendingRequests.stats.pending')}</span>
           </div>
           {isOwner && (
             <div>
               <strong style={{ fontSize: '18px', color: '#999', marginRight: '8px' }}>{stats.rejected}</strong>
-              <span style={{ color: '#666' }}>{t('pendingRequests.stats.rejectedByYou')}</span>
+              <span style={{ color: 'var(--label-color)' }}>{t('pendingRequests.stats.rejectedByYou')}</span>
             </div>
           )}
         </Space>

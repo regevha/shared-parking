@@ -72,19 +72,19 @@ const LotStatusBoard: React.FC = () => {
         <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
           <div>
             <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{stats.available}</strong>
-            <span style={{ color: '#666' }}>{t('lotStatusBoard.stats.available')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotStatusBoard.stats.available')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#ff4d4f', marginRight: '8px' }}>{stats.blocked}</strong>
-            <span style={{ color: '#666' }}>{t('lotStatusBoard.stats.blocked')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotStatusBoard.stats.blocked')}</span>
           </div>
           <div>
-            <strong style={{ fontSize: '18px', color: '#999', marginRight: '8px' }}>{stats.unowned}</strong>
-            <span style={{ color: '#666' }}>{t('lotStatusBoard.stats.unowned')}</span>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.unowned}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotStatusBoard.stats.unowned')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#faad14', marginRight: '8px' }}>{stats.unownedBlocked}</strong>
-            <span style={{ color: '#666' }}>{t('lotStatusBoard.stats.unownedBlocked')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotStatusBoard.stats.unownedBlocked')}</span>
           </div>
         </Space>
       </Card>

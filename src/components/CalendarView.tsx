@@ -343,20 +343,20 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       <Card size="small" style={{ marginBottom: '24px' }}>
         <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
           <div>
-            <strong style={{ fontSize: '18px', color: '#000', marginRight: '8px' }}>{totalRequests}</strong>
-            <span style={{ color: '#666' }}>{t('calendarView.stats.total')}</span>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{totalRequests}</strong>
+            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.total')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{pendingCount}</strong>
-            <span style={{ color: '#666' }}>{t('calendarView.stats.pending')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.pending')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{approvedCount}</strong>
-            <span style={{ color: '#666' }}>{t('calendarView.stats.approved')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.approved')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: '#f5222d', marginRight: '8px' }}>{rejectedCount}</strong>
-            <span style={{ color: '#666' }}>{t('calendarView.stats.rejected')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.rejected')}</span>
           </div>
         </Space>
       </Card>

@@ -402,22 +402,22 @@ const LotCalendarView: React.FC = () => {
       <Card size="small" style={{ marginBottom: '24px' }}>
         <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
           <div>
-            <strong style={{ fontSize: '18px', color: '#000', marginRight: '8px' }}>
+            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>
               {bookedEvents.length + pendingEvents.length + blockedEvents.length}
             </strong>
-            <span style={{ color: '#666' }}>{t('lotCalendarView.stats.total')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.total')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: EVENT_COLORS.booked, marginRight: '8px' }}>{bookedEvents.length}</strong>
-            <span style={{ color: '#666' }}>{t('lotCalendarView.stats.booked')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.booked')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: EVENT_COLORS.pending, marginRight: '8px' }}>{pendingEvents.length}</strong>
-            <span style={{ color: '#666' }}>{t('lotCalendarView.stats.pending')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.pending')}</span>
           </div>
           <div>
             <strong style={{ fontSize: '18px', color: EVENT_COLORS.blocked, marginRight: '8px' }}>{blockedEvents.length}</strong>
-            <span style={{ color: '#666' }}>{t('lotCalendarView.stats.blocked')}</span>
+            <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.blocked')}</span>
           </div>
         </Space>
       </Card>
