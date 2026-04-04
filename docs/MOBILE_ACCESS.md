@@ -55,38 +55,21 @@ On your phone's browser, go to:
 
 ---
 
-## Step 4 — Allow the backend to accept requests from the phone
+## Step 4 — Configure Windows Firewall (If necessary)
 
-The backend's CORS policy must include the frontend's origin as seen from the phone.
-Set the `CORS_ORIGINS` environment variable before starting uvicorn:
+If the app fails to load or API calls fail with "Network Error" or "Failed to fetch", your computer's firewall is likely blocking local traffic. You must allow traffic on ports `3000` (React) and `8000` (FastAPI).
 
-**Windows (PowerShell)**
+Open an **elevated PowerShell** (Run as Administrator) and run:
+
 ```powershell
-$env:CORS_ORIGINS = "http://localhost:3000,http://192.168.1.42:3000"
-uvicorn main:app --reload --host 0.0.0.0
+New-NetFirewallRule -DisplayName "Shared Parking - React Dev (3000)" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 3000
+New-NetFirewallRule -DisplayName "Shared Parking - API (8000)" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8000
 ```
-
-**Windows (cmd)**
-```cmd
-set CORS_ORIGINS=http://localhost:3000,http://192.168.1.42:3000
-uvicorn main:app --reload --host 0.0.0.0
-```
-
-**macOS / Linux**
-```bash
-CORS_ORIGINS="http://localhost:3000,http://192.168.1.42:3000" uvicorn main:app --reload --host 0.0.0.0
-```
-
-Replace `192.168.1.42` with your actual LAN IP from Step 1.
 
 ---
 
 ## Notes
 
 - Both devices must be on the **same WiFi network**.
-- If the app loads but API calls fail (401/network error), double-check the `CORS_ORIGINS`
-  value and make sure the backend is started with `--host 0.0.0.0`.
-- The `SameSite=Strict` cookie setting works fine for LAN access — the phone sends the
-  cookie back to the same host it received it from.
-- Firewall: Windows may prompt you to allow Node.js and Python on your local network the
-  first time. Allow both.
+- **CORS is handled automatically**: In development, the backend automatically allows all origins (`*`) unless explicitly overridden with the `CORS_ORIGINS` env var, so LAN access works out of the box.
+- **Dynamic API Host**: The frontend automatically uses the hostname the browser loaded (`window.location.hostname`), meaning both `localhost` and your LAN IP will resolve the backend appropriately on port `8000`.

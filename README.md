@@ -310,6 +310,13 @@ Messages survive request deletion for auditing — `request_id` is set to `NULL`
 | GET | `/api/users/{id}/preferences` | Manager / Self | Get preferences |
 | PATCH | `/api/users/{id}/preferences` | Manager / Self | Update preferences |
 
+### Config
+
+| Method | Path | Role | Description |
+|--------|------|------|-------------|
+| GET | `/api/config` | Any | Global system constants (booking windows, blackout periods) |
+| POST | `/api/config/run-auto-approval` | Manager | Trigger the auto-approval scheduler |
+
 **Preferences payload** (`PATCH /api/users/{id}/preferences`):
 
 ```json

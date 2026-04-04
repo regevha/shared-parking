@@ -58,6 +58,7 @@ All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the ful
 | `python-jose[cryptography]` | JWT creation and verification (`create_access_token`, `get_current_user`) |
 | `bcrypt` | Password hashing — `hash_password()` / `verify_password()` in `auth.py` call bcrypt directly (passlib dropped — incompatible with bcrypt ≥ 4.0) |
 | `python-multipart` | Form-data parsing — **required** for `OAuth2PasswordRequestForm` on `POST /auth/login` |
+| `apscheduler` | Background job execution (auto-approves conflict-free parking requests every 15 mins) |
 
 ### Test packages (`backend/requirements-test.txt`)
 | Package | Why it's needed |
