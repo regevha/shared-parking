@@ -573,10 +573,6 @@ const AdminPanel: React.FC = () => {
                         <strong>{t('adminPanel.config.maxRequests')}</strong>{' '}
                         {systemConfig?.maxPendingRequestsPerUser ?? '—'}
                       </div>
-                      <div>
-                        <strong>{t('adminPanel.config.bookingWindow')}</strong>{' '}
-                        {systemConfig ? `${systemConfig.bookingWindowStart} – ${systemConfig.bookingWindowEnd}` : '—'}
-                      </div>
                     </Space>
                   </Card>
                 </Col>

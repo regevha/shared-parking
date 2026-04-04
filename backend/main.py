@@ -18,6 +18,7 @@ def _run_migrations() -> None:
     with engine.connect() as conn:
         migrations = [
             "ALTER TABLE user_preferences ADD COLUMN notification_windows TEXT DEFAULT '{}'",
+            "ALTER TABLE user_preferences ADD COLUMN availability_windows TEXT DEFAULT '{}'",
             "ALTER TABLE parking_requests ADD COLUMN updated_at TEXT",
             "ALTER TABLE parking_requests ADD COLUMN approved_by TEXT",
             "ALTER TABLE users ADD COLUMN created_at TEXT",

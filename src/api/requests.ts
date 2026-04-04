@@ -6,6 +6,7 @@ export interface CreateRequestPayload {
   requester_name: string;
   date: string;
   start_time: string;
+  end_date: string;
   end_time: string;
   duration: number;
 }
@@ -13,6 +14,7 @@ export interface CreateRequestPayload {
 export interface UpdateRequestPayload {
   date?: string;
   start_time?: string;
+  end_date?: string;
   end_time?: string;
   duration?: number;
 }
@@ -31,6 +33,7 @@ function mapRequest(r: any): ParkingRequest {
     requesterName: r.requester_name,
     date: r.date,
     startTime: r.start_time,
+    endDate: r.end_date,
     endTime: r.end_time,
     duration: r.duration,
     submittedAt: r.submitted_at,
@@ -69,10 +72,14 @@ export const requestsApi = {
     api.patch<any>(`/api/requests/${id}`, {
       date:       payload.date,
       start_time: payload.start_time,
+      end_date:   payload.end_date,
       end_time:   payload.end_time,
       duration:   payload.duration,
     }).then(mapRequest),
 
   cancel: (id: string) =>
     api.delete<void>(`/api/requests/${id}`),
+
+  runAutoApprove: () =>
+    api.post<any>('/api/requests/run-auto-approve', {}),
 };

@@ -113,6 +113,7 @@ const MyRequests: React.FC = () => {
       await updateUserRequest(editingRequest.id, {
         date: values.date?.format('YYYY-MM-DD') || editingRequest.date,
         startTime: values.startTime,
+        endDate: editingRequest.endDate,
         endTime,
         duration: values.duration,
       });
@@ -160,7 +161,16 @@ const MyRequests: React.FC = () => {
       title: t('myRequests.columns.timeSlot'),
       key: 'timeSlot',
       width: 130,
-      render: (_, record: ParkingRequest) => `${record.startTime} - ${record.endTime}`,
+      render: (_, record: ParkingRequest) => (
+        <>
+          {record.startTime} - {record.endTime}
+          {record.endDate !== record.date && (
+            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
+              ({dayjs(record.endDate).format('DD/MM')})
+            </div>
+          )}
+        </>
+      ),
     },
     {
       title: t('myRequests.columns.duration'),

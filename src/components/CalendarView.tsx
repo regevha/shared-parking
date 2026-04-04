@@ -80,8 +80,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
   const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
-  const minTime = useMemo(() => { const d = new Date(); d.setHours(7, 0, 0, 0); return d; }, []);
-  const maxTime = useMemo(() => { const d = new Date(); d.setHours(20, 0, 0, 0); return d; }, []);
+  const minTime = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
+  const maxTime = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
   const [date, setDate] = useState(new Date());
   const [selectedRequest, setSelectedRequest] = useState<ParkingRequest | null>(null);
 
@@ -125,7 +125,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       id: req.id,
       title: `${myRequestIds.has(req.id) ? '★ ' : ''}${req.requesterName.split(' ')[0]}`,
       start: new Date(`${req.date}T${req.startTime}:00`),
-      end: new Date(`${req.date}T${req.endTime}:00`),
+      end: new Date(`${req.endDate || req.date}T${req.endTime}:00`),
       resource: req,
       isMine: myRequestIds.has(req.id),
     })),
@@ -151,6 +151,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
     updateUserRequest(event.resource.id, {
       date: startDayjs.format('YYYY-MM-DD'),
       startTime: startDayjs.format('HH:mm'),
+      endDate: endDayjs.format('YYYY-MM-DD'),
       endTime: endDayjs.format('HH:mm'),
       duration: endDayjs.diff(startDayjs, 'hour'),
     });
@@ -302,6 +303,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             slotPropGetter={currentHourSlotPropGetter}
             components={view === 'week' ? mobileWeekComponents : mobileComponents}
             formats={view === 'week' ? mobileWeekFormats : undefined}
+            dayLayoutAlgorithm="no-overlap"
           />
           {!hasVisibleEvents && (
             <div className="calendar-empty-state">{t('calendarView.emptyState')}</div>
@@ -332,6 +334,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             max={maxTime}
             slotPropGetter={currentHourSlotPropGetter}
             components={desktopComponents}
+            dayLayoutAlgorithm="no-overlap"
           />
           {!hasVisibleEvents && (
             <div className="calendar-empty-state">{t('calendarView.emptyState')}</div>
@@ -400,7 +403,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           <Descriptions column={1} size="small" bordered>
             <Descriptions.Item label={t('calendarView.modal.requester')}>{selectedRequest.requesterName}</Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.date')}>{dayjs(selectedRequest.date).format('DD/MM/YYYY')}</Descriptions.Item>
-            <Descriptions.Item label={t('calendarView.modal.time')}>{selectedRequest.startTime} – {selectedRequest.endTime}</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.time')}>
+              {selectedRequest.startTime} – {selectedRequest.endTime}
+              {selectedRequest.endDate && selectedRequest.endDate !== selectedRequest.date && (
+                <span style={{ fontSize: '11px', color: 'var(--label-color)', marginLeft: '8px' }}>
+                  ({dayjs(selectedRequest.endDate).format('DD/MM')})
+                </span>
+              )}
+            </Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.duration')}>{selectedRequest.duration}h</Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.status')}>
               <Tag color={getStatusTagColor(selectedRequest)}>{getStatusLabel(selectedRequest)}</Tag>

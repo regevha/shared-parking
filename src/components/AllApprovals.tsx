@@ -53,7 +53,16 @@ const AllApprovals: React.FC = () => {
       title: t('approvals.columns.timeSlot'),
       key: 'timeSlot',
       width: '15%',
-      render: (_, record: ParkingRequest) => `${record.startTime} - ${record.endTime}`,
+      render: (_, record: ParkingRequest) => (
+        <>
+          {record.startTime} - {record.endTime}
+          {record.endDate && record.endDate !== record.date && (
+            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
+              ({dayjs(record.endDate).format('DD/MM')})
+            </div>
+          )}
+        </>
+      ),
     },
     {
       title: t('approvals.columns.duration'),

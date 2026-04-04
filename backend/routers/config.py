@@ -12,8 +12,6 @@ _SYSTEM_CONFIG = {
     "blackout_start": "22:00",
     "blackout_end": "06:00",
     "max_pending_requests_per_user": 5,
-    "booking_window_start": "08:00",
-    "booking_window_end": "20:00",
 }
 
 

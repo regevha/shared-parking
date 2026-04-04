@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
+import datetime as dt_mod
+import json
 from typing import List
 
 from database import get_db
@@ -19,27 +21,102 @@ def _generate_id(db: Session) -> str:
 def _has_conflict(
     db: Session,
     lot_id: str | None,
-    date: str,
+    start_date: str,
     start_time: str,
+    end_date: str,
     end_time: str,
     exclude_id: str | None = None,
 ) -> bool:
-    """Return True if an approved request already occupies lot_id on date during start_time–end_time."""
+    """Return True if an approved request overlaps with the start_dt–end_dt range."""
     if not lot_id:
         return False
-    q = (
-        db.query(models.ParkingRequest)
-        .filter(
-            models.ParkingRequest.lot_id == lot_id,
-            models.ParkingRequest.date == date,
-            models.ParkingRequest.status == "approved",
-            models.ParkingRequest.start_time < end_time,
-            models.ParkingRequest.end_time > start_time,
-        )
-    )
-    if exclude_id:
-        q = q.filter(models.ParkingRequest.id != exclude_id)
-    return q.first() is not None
+    
+    from datetime import datetime
+    new_start = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+    new_end = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+
+    # We check all approved requests for that lot. Since most are local to a few days, 
+    # we can filter by start_date - 2 days to start_date + 2 days for performance.
+    existing = db.query(models.ParkingRequest).filter(
+        models.ParkingRequest.lot_id == lot_id,
+        models.ParkingRequest.status == "approved"
+    ).all()
+
+    for r in existing:
+        if exclude_id and r.id == exclude_id:
+            continue
+        r_start = datetime.strptime(f"{r.date} {r.start_time}", "%Y-%m-%d %H:%M")
+        r_end = datetime.strptime(f"{r.end_date} {r.end_time}", "%Y-%m-%d %H:%M")
+        
+        # Standard overlap check: (s1 < e2) and (e1 > s2)
+        if new_start < r_end and new_end > r_start:
+            return True
+            
+    return False
+
+
+def _is_outside_availability(
+    db: Session,
+    lot_id: str | None,
+    start_date: str,
+    start_time: str,
+    end_date: str,
+    end_time: str,
+) -> bool:
+    """
+    Return True if the slot is NOT fully contained within the owner's availability windows.
+    Checked day-by-day for multi-day requests.
+    """
+    if not lot_id:
+        return False
+
+    lot = db.query(models.Lot).filter(models.Lot.id == lot_id).first()
+    if not lot or not lot.owner_id:
+        return False
+
+    prefs = db.query(models.UserPreferences).filter(models.UserPreferences.user_id == lot.owner_id).first()
+    if not prefs:
+        return True
+
+    from datetime import datetime, timedelta
+    try:
+        current_dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+        end_dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+        
+        windows_raw = json.loads(prefs.availability_windows or '{}')
+
+        # We evaluate the span day by day
+        check_dt = current_dt
+        while check_dt < end_dt:
+            day_name = check_dt.strftime('%A')
+            day_slots = windows_raw.get(day_name, [])
+            
+            # Determine the segment of this request that falls on THIS day
+            # Either it ends at the end of the request OR at 23:59 of this day
+            segment_start_str = check_dt.strftime("%H:%M")
+            
+            # If end_dt is on the same day as check_dt
+            if end_dt.date() == check_dt.date():
+                segment_end_str = end_dt.strftime("%H:%M")
+            else:
+                segment_end_str = "23:59" # End of day
+
+            # Check if THIS segment is covered by any window on THIS day
+            segment_covered = False
+            for slot in day_slots:
+                if segment_start_str >= slot['startTime'] and segment_end_str <= slot['endTime']:
+                    segment_covered = True
+                    break
+            
+            if not segment_covered:
+                return True # This specific day segment isn't shared
+            
+            # Move to the start of the next day
+            check_dt = datetime.strptime(f"{check_dt.strftime('%Y-%m-%d')} 00:00", "%Y-%m-%d %H:%M") + timedelta(days=1)
+            
+        return False
+    except Exception:
+        return True
 
 
 @router.get("", response_model=List[schemas.ParkingRequestOut])
@@ -114,6 +191,7 @@ def create_request(
         requester_name=current_user.name,
         date=payload.date,
         start_time=payload.start_time,
+        end_date=payload.end_date,
         end_time=payload.end_time,
         duration=payload.duration,
         submitted_at=datetime.now(timezone.utc).isoformat(),
@@ -137,13 +215,21 @@ def approve_request(
         raise HTTPException(status_code=404, detail="Request not found")
     if req.status != "pending":
         raise HTTPException(status_code=400, detail="Only pending requests can be approved")
-
     if payload.lot_id and _has_conflict(
-        db, payload.lot_id, req.date, req.start_time, req.end_time, exclude_id=request_id
+        db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=request_id
     ):
         raise HTTPException(
             status_code=409,
-            detail=f"Time slot conflict: lot {payload.lot_id} is already approved for this time on {req.date}",
+            detail=f"Time slot conflict: lot {payload.lot_id} is already approved for this period",
+        )
+
+    # NEW: Check availability slots
+    if payload.lot_id and _is_outside_availability(
+        db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Outside availability windows: This lot is blocked for sharing at this time."
         )
 
     now = datetime.now(timezone.utc).isoformat()
@@ -197,28 +283,22 @@ def update_request(
     if req.status != "pending":
         raise HTTPException(status_code=400, detail="Only pending requests can be edited")
 
+    effective_date  = payload.date       if payload.date       is not None else req.date
     effective_start = payload.start_time if payload.start_time is not None else req.start_time
-    effective_end   = payload.end_time   if payload.end_time   is not None else req.end_time
     effective_dur   = payload.duration   if payload.duration   is not None else req.duration
 
-    if effective_start >= effective_end:
-        raise HTTPException(status_code=400, detail="start_time must be before end_time")
-    if effective_start < '07:00':
-        raise HTTPException(status_code=400, detail="start_time must be 07:00 or later")
-    if effective_end > '20:00':
-        raise HTTPException(status_code=400, detail="end_time cannot be later than 20:00")
-    expected_dur = int(effective_end.split(':')[0]) - int(effective_start.split(':')[0])
-    if effective_dur != expected_dur:
-        raise HTTPException(status_code=400, detail=f"duration must be {expected_dur} hour(s) to match start and end times")
+    from datetime import datetime, timedelta
+    try:
+        start_dt = datetime.strptime(f"{effective_date} {effective_start}", "%Y-%m-%d %H:%M")
+        end_dt = start_dt + timedelta(hours=effective_dur)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid date or start time")
 
-    if payload.date is not None:
-        req.date = payload.date
-    if payload.start_time is not None:
-        req.start_time = payload.start_time
-    if payload.end_time is not None:
-        req.end_time = payload.end_time
-    if payload.duration is not None:
-        req.duration = payload.duration
+    req.date = effective_date
+    req.start_time = effective_start
+    req.end_date = end_dt.strftime("%Y-%m-%d")
+    req.end_time = end_dt.strftime("%H:%M")
+    req.duration = effective_dur
     req.updated_at = datetime.now(timezone.utc).isoformat()
 
     db.commit()
@@ -245,3 +325,17 @@ def delete_request(
         .update({"request_id": None})
     db.delete(req)
     db.commit()
+
+
+@router.post("/run-auto-approve")
+def trigger_auto_approve(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Manually trigger the background auto-approval scheduler."""
+    if current_user.role != "manager":
+        raise HTTPException(status_code=403, detail="Only managers can run auto-approve")
+
+    from scheduler import run_auto_approval
+    run_auto_approval(db)
+    return {"status": "ok"}

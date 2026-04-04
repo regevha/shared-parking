@@ -28,6 +28,7 @@ class UserPreferences(Base):
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     dark_mode = Column(Boolean, nullable=False, default=True)
     # JSON-encoded dict: { "Monday": [{"id":"..","startTime":"..","endTime":".."}], … }
+    availability_windows = Column(String, nullable=True, default='{}')
     notification_windows = Column(String, nullable=True, default='{}')
     language = Column(String, nullable=False, default='en')
     # ── add new preference columns here ────────────────────────────────────────
@@ -43,6 +44,7 @@ class ParkingRequest(Base):
     requester_name = Column(String, nullable=False)
     date = Column(String, nullable=False)                  # YYYY-MM-DD
     start_time = Column(String, nullable=False)            # HH:MM
+    end_date = Column(String, nullable=True)               # YYYY-MM-DD
     end_time = Column(String, nullable=False)              # HH:MM
     duration = Column(Integer, nullable=False)             # hours
     submitted_at = Column(String, nullable=False)          # ISO string

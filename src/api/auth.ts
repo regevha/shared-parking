@@ -1,5 +1,11 @@
 const BASE_URL = process.env.REACT_APP_API_URL || `http://${window.location.hostname}:8000`;
 
+export interface AvailabilityWindow {
+  id: string;
+  startTime: string;
+  endTime: string;
+}
+
 export interface NotificationWindow {
   id: string;
   startTime: string;
@@ -8,17 +14,27 @@ export interface NotificationWindow {
 
 export interface UserPreferences {
   darkMode: boolean;
+  availabilityWindows: Record<string, AvailabilityWindow[]>;
   notificationWindows: Record<string, NotificationWindow[]>;
   language: string;
   // add new preference fields here
 }
 
 function mapPreferences(raw: any): UserPreferences {
+  let availabilityWindows: Record<string, AvailabilityWindow[]> = {};
+  if (raw?.availability_windows) {
+    try { availabilityWindows = JSON.parse(raw.availability_windows); } catch { /* ignore */ }
+  }
   let notificationWindows: Record<string, NotificationWindow[]> = {};
   if (raw?.notification_windows) {
     try { notificationWindows = JSON.parse(raw.notification_windows); } catch { /* ignore */ }
   }
-  return { darkMode: raw?.dark_mode ?? true, notificationWindows, language: raw?.language ?? 'en' };
+  return {
+    darkMode: raw?.dark_mode ?? true,
+    availabilityWindows,
+    notificationWindows,
+    language: raw?.language ?? 'en'
+  };
 }
 
 export interface AuthUser {

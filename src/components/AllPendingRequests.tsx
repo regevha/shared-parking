@@ -15,6 +15,7 @@ interface PendingRequest {
   requesterName: string;
   date: string;
   startTime: string;
+  endDate: string;
   endTime: string;
   duration: number;
   submittedAt: string;
@@ -122,7 +123,16 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       title: t('pendingRequests.columns.timeSlot'),
       key: 'timeSlot',
       width: '18%',
-      render: (_, record: PendingRequest) => `${record.startTime} - ${record.endTime}`,
+      render: (_, record: PendingRequest) => (
+        <>
+          {record.startTime} - {record.endTime}
+          {record.endDate && record.endDate !== record.date && (
+            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
+              ({dayjs(record.endDate).format('DD/MM')})
+            </div>
+          )}
+        </>
+      ),
     },
     {
       title: t('pendingRequests.columns.duration'),

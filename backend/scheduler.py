@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 from database import SessionLocal
 import models
-from routers.requests import _has_conflict
+from routers.requests import _has_conflict, _is_outside_availability
 
 scheduler = BackgroundScheduler()
 
@@ -34,10 +34,17 @@ def run_auto_approval(db=None):
             .all()
         )
         for req in pending:
+            # Multi-day support: pass end_date and end_time
             if _has_conflict(
-                db, req.lot_id, req.date, req.start_time, req.end_time, exclude_id=req.id
+                db, req.lot_id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=req.id
             ):
                 continue  # conflicted — leave for manual owner review
+
+            # NEW: Respect availability slots across multiple days
+            if req.lot_id and _is_outside_availability(
+                db, req.lot_id, req.date, req.start_time, req.end_date, req.end_time
+            ):
+                continue  # outside — leave for manual review
             now = datetime.now(timezone.utc).isoformat()
             req.status = "approved"
             req.approved_by = "auto"

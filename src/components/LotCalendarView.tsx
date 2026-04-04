@@ -79,8 +79,8 @@ const LotCalendarView: React.FC = () => {
   const [selectedLot, setSelectedLot] = useState<string>('all');
 
   const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
-  const minTime    = useMemo(() => { const d = new Date(); d.setHours(7, 0, 0, 0); return d; }, []);
-  const maxTime    = useMemo(() => { const d = new Date(); d.setHours(20, 0, 0, 0); return d; }, []);
+  const minTime    = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
+  const maxTime    = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
@@ -104,7 +104,7 @@ const LotCalendarView: React.FC = () => {
         id: a.id,
         title: `${a.requesterName.split(' ')[0]} · ${a.lotId}`,
         start: new Date(`${a.date}T${a.startTime}:00`),
-        end: new Date(`${a.date}T${a.endTime}:00`),
+        end: new Date(`${a.endDate || a.date}T${a.endTime}:00`),
         type: 'booked' as EventType,
         resource: a as ParkingRequest,
       })),
@@ -119,7 +119,7 @@ const LotCalendarView: React.FC = () => {
         id: `pending-${r.id}`,
         title: `⏳ ${r.requesterName.split(' ')[0]}`,
         start: new Date(`${r.date}T${r.startTime}:00`),
-        end: new Date(`${r.date}T${r.endTime}:00`),
+        end: new Date(`${r.endDate || r.date}T${r.endTime}:00`),
         type: 'pending' as EventType,
         resource: r as ParkingRequest,
       })),
@@ -285,7 +285,14 @@ const LotCalendarView: React.FC = () => {
         <Descriptions column={1} size="small" bordered>
           <Descriptions.Item label={t('lotCalendarView.modal.requester')}>{a.requesterName}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.date')}>{dayjs(a.date).format('DD/MM/YYYY')}</Descriptions.Item>
-          <Descriptions.Item label={t('lotCalendarView.modal.time')}>{a.startTime} – {a.endTime}</Descriptions.Item>
+          <Descriptions.Item label={t('lotCalendarView.modal.time')}>
+            {a.startTime} – {a.endTime}
+            {a.endDate && a.endDate !== a.date && (
+              <span style={{ fontSize: '11px', color: 'var(--label-color)', marginLeft: '8px' }}>
+                ({dayjs(a.endDate).format('DD/MM')})
+              </span>
+            )}
+          </Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.duration')}>{a.duration}h</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.lot')}>{a.lotId}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.floor')}>{a.floor}</Descriptions.Item>
@@ -302,7 +309,14 @@ const LotCalendarView: React.FC = () => {
           <Descriptions column={1} size="small" bordered>
             <Descriptions.Item label={t('lotCalendarView.modal.requester')}>{r.requesterName}</Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.date')}>{dayjs(r.date).format('DD/MM/YYYY')}</Descriptions.Item>
-            <Descriptions.Item label={t('lotCalendarView.modal.time')}>{r.startTime} – {r.endTime}</Descriptions.Item>
+            <Descriptions.Item label={t('lotCalendarView.modal.time')}>
+              {r.startTime} – {r.endTime}
+              {r.endDate && r.endDate !== r.date && (
+                <span style={{ fontSize: '11px', color: 'var(--label-color)', marginLeft: '8px' }}>
+                  ({dayjs(r.endDate).format('DD/MM')})
+                </span>
+              )}
+            </Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.duration')}>{r.duration}h</Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.status')}><Tag color={getRequestStatusColor('pending')}>{getRequestStatusLabel('pending')}</Tag></Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.submitted')}>{dayjs(r.submittedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
@@ -365,6 +379,7 @@ const LotCalendarView: React.FC = () => {
             slotPropGetter={currentHourSlotPropGetter}
             components={view === 'week' ? mobileWeekComponents : mobileComponents}
             formats={view === 'week' ? mobileWeekFormats : undefined}
+            dayLayoutAlgorithm="no-overlap"
           />
           {!hasVisibleEvents && (
             <div className="calendar-empty-state">{t('lotCalendarView.emptyState')}</div>
@@ -391,6 +406,7 @@ const LotCalendarView: React.FC = () => {
             max={maxTime}
             slotPropGetter={currentHourSlotPropGetter}
             components={desktopComponents}
+            dayLayoutAlgorithm="no-overlap"
           />
           {!hasVisibleEvents && (
             <div className="calendar-empty-state">{t('lotCalendarView.emptyState')}</div>

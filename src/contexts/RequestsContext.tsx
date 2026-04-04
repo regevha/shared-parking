@@ -9,6 +9,7 @@ export interface ParkingRequest {
   requesterName: string;
   date: string;
   startTime: string;
+  endDate: string;
   endTime: string;
   duration: number;
   submittedAt: string;
@@ -34,7 +35,7 @@ interface RequestsContextType {
   approveRequest: (requestId: string, lotInfo?: { lotId: string; floor: string; lotOwner: string }) => Promise<void>;
   rejectRequest: (requestId: string) => Promise<void>;
   cancelUserRequest: (requestId: string) => Promise<void>;
-  updateUserRequest: (requestId: string, updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>) => Promise<void>;
+  updateUserRequest: (requestId: string, updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endDate' | 'endTime' | 'duration'>) => Promise<void>;
 }
 
 export const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
@@ -112,6 +113,7 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
       requester_name: requestData.requesterName,
       date:           requestData.date,
       start_time:     requestData.startTime,
+      end_date:       requestData.endDate,
       end_time:       requestData.endTime,
       duration:       requestData.duration,
     });
@@ -147,11 +149,12 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
 
   const updateUserRequest = async (
     requestId: string,
-    updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endTime' | 'duration'>
+    updates: Pick<ParkingRequest, 'date' | 'startTime' | 'endDate' | 'endTime' | 'duration'>
   ) => {
     const updated = await requestsApi.update(requestId, {
       date:       updates.date,
       start_time: updates.startTime,
+      end_date:   updates.endDate,
       end_time:   updates.endTime,
       duration:   updates.duration,
     });
