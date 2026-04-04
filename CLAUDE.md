@@ -1,4 +1,4 @@
-# CLAUDE.md — Parking Mockup Project
+# CLAUDE.md — Shared Parking Project
 
 ## Project Overview
 A React + FastAPI parking management system. Users request parking slots; owners approve/reject; managers administer. Data is persisted in SQLite via SQLAlchemy. Authentication uses JWT (bcrypt passwords, 8-hour tokens).

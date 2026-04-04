@@ -120,6 +120,6 @@ describe('ParkingRequestForm — info banner', () => {
       authValue: { user: alice },
       requestsValue: { userRequests: [] },
     });
-    expect(screen.getByText(/New Request:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Submit Parking Request:/i)).toBeInTheDocument();
   });
 });

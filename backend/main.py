@@ -44,16 +44,17 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Parking Management API",
-    description="REST API for the parking management mockup",
+    description="REST API for the shared parking management app",
     version="2.0.0",
     lifespan=lifespan,
 )
 
-# Allow the React dev server to call the API.
-# Set CORS_ORIGINS env var to a comma-separated list to add LAN IPs, e.g.:
-#   CORS_ORIGINS=http://localhost:3000,http://192.168.1.42:3000
-_raw_origins = os.environ.get("CORS_ORIGINS", "http://localhost:3000")
-cors_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()]
+# Allow the React dev server (and LAN devices) to call the API.
+# In development, all origins are allowed so mobile/LAN access works out of the box.
+# Set CORS_ORIGINS env var to restrict in production, e.g.:
+#   CORS_ORIGINS=https://parking.example.com
+_raw_origins = os.environ.get("CORS_ORIGINS", "")
+cors_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()] if _raw_origins else ["*"]
 
 app.add_middleware(
     CORSMiddleware,

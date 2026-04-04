@@ -43,3 +43,6 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: () => false,
   }),
 });
+
+// Initialize i18n for tests so components render real English strings instead of translation keys
+import './i18n';

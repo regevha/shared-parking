@@ -20,6 +20,16 @@ function mapConfig(raw: any): SystemConfig {
   };
 }
 
+export interface AutoApprovalResult {
+  approved: number;
+  remainingPending: number;
+}
+
 export const configApi = {
   get: () => api.get<any>('/api/config').then(mapConfig),
+  triggerAutoApproval: () =>
+    api.post<any>('/api/config/run-auto-approval', {}).then((raw) => ({
+      approved: raw.approved,
+      remainingPending: raw.remaining_pending,
+    } as AutoApprovalResult)),
 };

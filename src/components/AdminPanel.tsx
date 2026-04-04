@@ -12,6 +12,7 @@ import {
   BarChartOutlined,
   SendOutlined,
   UserAddOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadProps } from 'antd';
@@ -74,6 +75,7 @@ const AdminPanel: React.FC = () => {
   // ── System config ───────────────────────────────────────────────────────────
   const [systemConfig,  setSystemConfig]  = useState<SystemConfig | null>(null);
   const [configLoading, setConfigLoading] = useState(false);
+  const [autoApprovalLoading, setAutoApprovalLoading] = useState(false);
 
   useEffect(() => {
     setConfigLoading(true);
@@ -575,6 +577,42 @@ const AdminPanel: React.FC = () => {
                         <strong>{t('adminPanel.config.bookingWindow')}</strong>{' '}
                         {systemConfig ? `${systemConfig.bookingWindowStart} – ${systemConfig.bookingWindowEnd}` : '—'}
                       </div>
+                    </Space>
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card title={t('adminPanel.config.schedulerTitle')}>
+                    <Space direction="vertical" style={{ width: '100%' }}>
+                      <div>{t('adminPanel.config.schedulerDesc')}</div>
+                      <Button
+                        type="primary"
+                        icon={<ThunderboltOutlined />}
+                        loading={autoApprovalLoading}
+                        onClick={async () => {
+                          setAutoApprovalLoading(true);
+                          try {
+                            const result = await configApi.triggerAutoApproval();
+                            notification.success({
+                              message: t('adminPanel.config.autoApprovalSuccess'),
+                              description: t('adminPanel.config.autoApprovalSuccessDesc', {
+                                approved: result.approved,
+                                remaining: result.remainingPending,
+                              }),
+                            });
+                          } catch (err: any) {
+                            notification.error({
+                              message: t('adminPanel.config.autoApprovalFailed'),
+                              description: err.message,
+                            });
+                          } finally {
+                            setAutoApprovalLoading(false);
+                          }
+                        }}
+                        size="large"
+                        block
+                      >
+                        {t('adminPanel.config.runAutoApproval')}
+                      </Button>
                     </Space>
                   </Card>
                 </Col>

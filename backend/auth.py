@@ -9,7 +9,7 @@ from database import get_db
 import models
 
 # ── Config ────────────────────────────────────────────────────────────────────
-SECRET_KEY = "parking-mockup-dev-secret-key-change-in-production"
+SECRET_KEY = "shared-parking-dev-secret-key-change-in-production"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8  # 8 hours
 

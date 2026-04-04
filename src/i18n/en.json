@@ -531,7 +531,13 @@
       "blackoutPeriod": "Blackout Period:",
       "maxRequests": "Max Active Requests per User:",
       "bookingWindow": "Booking Window:",
-      "info": "Read-only view of global system constants enforced by the backend."
+      "info": "Read-only view of global system constants enforced by the backend.",
+      "schedulerTitle": "Auto-Approval Scheduler",
+      "schedulerDesc": "The scheduler runs every 15 minutes and auto-approves conflict-free pending requests. Click below to trigger it manually.",
+      "runAutoApproval": "Run Auto-Approval Now",
+      "autoApprovalSuccess": "Auto-Approval Complete",
+      "autoApprovalSuccessDesc": "{{approved}} request(s) approved. {{remaining}} still pending.",
+      "autoApprovalFailed": "Auto-Approval Failed"
     },
     "reports": {
       "title": "Reports",
