@@ -78,8 +78,8 @@ def update_lot(
     if not lot:
         raise HTTPException(status_code=404, detail="Lot not found")
 
-    is_manager = current_user.role == "manager"
-    is_lot_owner = current_user.role == "owner" and lot.owner_id == current_user.id
+    is_manager = current_user.role == models.UserRole.MANAGER.value
+    is_lot_owner = current_user.role == models.UserRole.OWNER.value and lot.owner_id == current_user.id
 
     if not is_manager and not is_lot_owner:
         raise HTTPException(status_code=403, detail="Not authorised to update this lot")

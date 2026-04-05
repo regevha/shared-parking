@@ -1,4 +1,6 @@
-export type LotStatus = 'available' | 'blocked' | 'unowned' | 'unowned-blocked';
+import { UserRole, LotStatus, RequestStatus } from './enums';
+
+export { UserRole, LotStatus, RequestStatus };
 
 export interface Lot {
   id: string;
@@ -13,4 +15,4 @@ export interface FloorData {
   lots: Lot[];
 }
 
-export type Role = 'User' | 'Owner' | 'Manager';
+export type Role = UserRole;

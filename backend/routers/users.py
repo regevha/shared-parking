@@ -34,7 +34,7 @@ def get_user(
     current_user: models.User = Depends(get_current_user),
 ):
     """Get a user by ID. Manager sees any user; others can only see themselves."""
-    if current_user.role != "manager" and current_user.id != user_id:
+    if current_user.role != models.UserRole.MANAGER.value and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="Not authorised to view this user")
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
@@ -54,7 +54,7 @@ def update_user(
     - Manager: can change name, email, role, password of any user.
     - Self: can change own name, email, password only (not role).
     """
-    is_manager = current_user.role == "manager"
+    is_manager = current_user.role == models.UserRole.MANAGER.value
     is_self = current_user.id == user_id
 
     if not is_manager and not is_self:
@@ -98,7 +98,7 @@ def get_preferences(
     current_user: models.User = Depends(get_current_user),
 ):
     """Return a user's preferences. Manager sees any user; others can only see themselves."""
-    if current_user.role != "manager" and current_user.id != user_id:
+    if current_user.role != models.UserRole.MANAGER.value and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="Not authorised to view these preferences")
     prefs = db.query(models.UserPreferences).filter(models.UserPreferences.user_id == user_id).first()
     if not prefs:
@@ -114,7 +114,7 @@ def update_preferences(
     current_user: models.User = Depends(get_current_user),
 ):
     """Update a user's preferences. Manager can update any user; others can only update themselves."""
-    if current_user.role != "manager" and current_user.id != user_id:
+    if current_user.role != models.UserRole.MANAGER.value and current_user.id != user_id:
         raise HTTPException(status_code=403, detail="Not authorised to update these preferences")
     prefs = db.query(models.UserPreferences).filter(models.UserPreferences.user_id == user_id).first()
     if not prefs:

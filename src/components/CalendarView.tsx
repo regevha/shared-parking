@@ -5,6 +5,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { UserRole, RequestStatus } from '../types/enums';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
@@ -16,7 +17,7 @@ const DnDCalendar = withDragAndDrop(Calendar as any) as any;
 const localizer = dayjsLocalizer(dayjs);
 
 interface CalendarViewProps {
-  role?: string;
+  role?: UserRole;
 }
 
 interface CalendarEvent {
@@ -28,10 +29,10 @@ interface CalendarEvent {
   isMine: boolean;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: '#1890ff',
-  approved: '#52c41a',
-  rejected: '#f5222d',
+const STATUS_COLORS: Record<RequestStatus, string> = {
+  [RequestStatus.PENDING]: '#1890ff',
+  [RequestStatus.APPROVED]: '#52c41a',
+  [RequestStatus.REJECTED]: '#f5222d',
 };
 
 // Defined outside component for stable reference (no closure needed)
@@ -102,7 +103,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
     pendingRequests.forEach((r) => map.set(r.id, r));
     approvedRequests.forEach((r) => map.set(r.id, r));
     userRequests
-      .filter((r) => r.status !== 'rejected')
+      .filter((r) => r.status !== RequestStatus.REJECTED)
       .forEach((r) => map.set(r.id, r));
     return Array.from(map.values());
   }, [pendingRequests, approvedRequests, userRequests]);
@@ -113,7 +114,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   };
 
   const getStatusLabel = (req: ParkingRequest) => {
-    if (req.rejectedByOwner) return t('calendarView.statusRejected');
+    if (req.rejectedByOwner) return 'calendarView.legend.rejected';
     return getRequestStatusLabel(req.status);
   };
 
@@ -270,8 +271,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
 
   // Stats
   const totalRequests = allRequests.length;
-  const pendingCount = allRequests.filter((r) => r.status === 'pending' && !r.rejectedByOwner).length;
-  const approvedCount = allRequests.filter((r) => r.status === 'approved').length;
+  const pendingCount = allRequests.filter((r) => r.status === RequestStatus.PENDING && !r.rejectedByOwner).length;
+  const approvedCount = allRequests.filter((r) => r.status === RequestStatus.APPROVED).length;
   const rejectedCount = allRequests.filter((r) => r.rejectedByOwner).length;
 
   const mobileCalendarHeight = view === 'month' ? 620 : 500;
@@ -420,7 +421,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             </Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.duration')}>{selectedRequest.duration}h</Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.status')}>
-              <Tag color={getStatusTagColor(selectedRequest)}>{getStatusLabel(selectedRequest)}</Tag>
+              <Tag color={getStatusTagColor(selectedRequest)}>{t(getStatusLabel(selectedRequest))}</Tag>
             </Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.submitted')}>{dayjs(selectedRequest.submittedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
             {selectedRequest.lotId && <Descriptions.Item label={t('calendarView.modal.lot')}>{selectedRequest.lotId}</Descriptions.Item>}

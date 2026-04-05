@@ -23,9 +23,12 @@ import { usersApi, UserData } from '../api/users';
 import { lotsApi, LotData } from '../api/lots';
 import { requestsApi } from '../api/requests';
 import type { ParkingRequest } from '../contexts/RequestsContext';
+import { UserRole, RequestStatus, LotStatus } from '../types/enums';
 import { useAuth } from '../contexts/AuthContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import { configApi, SystemConfig } from '../api/config';
+import { notificationsApi } from '../api/notifications';
+import { adminApi } from '../api/admin';
 import './AdminPanel.css';
 
 const { Sider, Content } = Layout;
@@ -147,17 +150,18 @@ const AdminPanel: React.FC = () => {
           disabled={record.role === 'manager'}
           loading={!!actionLoading[record.id]}
           options={[
-            { value: 'user',    label: t('adminPanel.users.roles.user') },
-            { value: 'owner',   label: t('adminPanel.users.roles.owner') },
-            { value: 'manager', label: t('adminPanel.users.roles.manager') },
+            { value: UserRole.USER,    label: t('adminPanel.users.roles.user') },
+            { value: UserRole.OWNER,   label: t('adminPanel.users.roles.owner') },
+            { value: UserRole.MANAGER, label: t('adminPanel.users.roles.manager') },
           ]}
           onChange={async (newRole: string) => {
             setActionLoading(prev => ({ ...prev, [record.id]: true }));
             try {
+              const translatedRole = t(`adminPanel.users.roles.${newRole}`);
               await usersApi.update(record.id, { role: newRole });
               notification.success({
                 message: t('adminPanel.users.notifications.roleUpdated'),
-                description: t('adminPanel.users.notifications.roleUpdatedDesc', { name: record.name, role: newRole }),
+                description: t('adminPanel.users.notifications.roleUpdatedDesc', { name: record.name, role: translatedRole }),
               });
               await refreshUsers();
             } catch (err: any) {
@@ -185,7 +189,7 @@ const AdminPanel: React.FC = () => {
           description={t('adminPanel.users.deleteWarning')}
           okText={t('adminPanel.users.deleteOk')}
           okButtonProps={{ danger: true }}
-          disabled={record.role === 'manager'}
+          disabled={record.role === UserRole.MANAGER}
           onConfirm={async () => {
             setActionLoading(prev => ({ ...prev, [record.id]: true }));
             try {
@@ -202,7 +206,7 @@ const AdminPanel: React.FC = () => {
           <Button
             danger
             size="small"
-            disabled={record.role === 'manager'}
+            disabled={record.role === UserRole.MANAGER}
             loading={!!actionLoading[record.id]}
           >
             {t('adminPanel.users.deleteButton')}
@@ -215,15 +219,15 @@ const AdminPanel: React.FC = () => {
   // ── Lot Management helpers ──────────────────────────────────────────────────
   const filteredLots = lots.filter(lot => {
     switch (lotFilter) {
-      case 'Available': return lot.status === 'available';
-      case 'Blocked':   return lot.status === 'blocked';
-      case 'Unowned':   return lot.status === 'unowned' || lot.status === 'unowned-blocked';
+      case 'Available': return lot.status === LotStatus.AVAILABLE;
+      case 'Blocked':   return lot.status === LotStatus.BLOCKED;
+      case 'Unowned':   return lot.status === LotStatus.UNOWNED || lot.status === LotStatus.UNOWNED_BLOCKED;
       default:          return true;
     }
   });
 
   const unownedCount = lots.filter(
-    l => l.status === 'unowned' || l.status === 'unowned-blocked'
+    l => l.status === LotStatus.UNOWNED || l.status === LotStatus.UNOWNED_BLOCKED
   ).length;
 
   const lotColumns: ColumnsType<LotData> = [
@@ -235,7 +239,9 @@ const AdminPanel: React.FC = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => (
-        <Tag color={LOT_STATUS_COLOR[status] ?? 'default'}>{status}</Tag>
+        <Tag color={LOT_STATUS_COLOR[status] ?? 'default'}>
+          {t(`adminPanel.lots.filters.${status.replace('-', '_')}`) || status}
+        </Tag>
       ),
     },
     {
@@ -321,7 +327,7 @@ const AdminPanel: React.FC = () => {
       Requester:   r.requesterName,
       'Time Slot': `${r.startTime} – ${r.endTime}`,
       'Duration':  `${r.duration}h`,
-      Status:      getRequestStatusLabel(r.status),
+      Status:      t(getRequestStatusLabel(r.status)),
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -354,7 +360,7 @@ const AdminPanel: React.FC = () => {
       width: 100,
       render: (status: string) => (
         <Tag color={getRequestStatusColor(status)}>
-          {getRequestStatusLabel(status)}
+          {t(getRequestStatusLabel(status))}
         </Tag>
       ),
     },
@@ -368,28 +374,92 @@ const AdminPanel: React.FC = () => {
   ];
 
   // ── Broadcast ───────────────────────────────────────────────────────────────
-  const handleBroadcastSend = () => {
+  const [broadcastLoading, setBroadcastLoading] = useState(false);
+  const handleBroadcastSend = async () => {
     if (isBlackoutSimulated) {
       notification.error({
-        message: t('adminPanel.broadcast.notifications.blocked'),
+        message: t('adminPanel.broadcast.notifications.sent'),
         description: t('adminPanel.broadcast.notifications.blockedDesc'),
       });
       return;
     }
-    notification.success({
-      message: t('adminPanel.broadcast.notifications.sent'),
-      description: t('adminPanel.broadcast.notifications.sentDesc', { audience: broadcastAudience }),
-    });
-    setBroadcastMessage('');
+
+    if (!broadcastMessage.trim()) return;
+
+    setBroadcastLoading(true);
+    try {
+      const result = await notificationsApi.broadcast(broadcastAudience, broadcastMessage);
+      notification.success({
+        message: t('adminPanel.broadcast.notifications.sent'),
+        description: t('adminPanel.broadcast.notifications.sentDesc', { 
+          audience: broadcastAudience,
+          count: result.delivered_to 
+        }),
+      });
+      setBroadcastMessage('');
+    } catch (err: any) {
+      notification.error({
+        message: t('adminPanel.broadcast.notifications.blocked'),
+        description: err.message,
+      });
+    } finally {
+      setBroadcastLoading(false);
+    }
   };
 
   // ── Import / Export ─────────────────────────────────────────────────────────
+  const [importLoading, setImportLoading] = useState(false);
+
+  const handleDownloadTemplate = (type: 'users' | 'lots') => {
+    const csv = type === 'users' 
+      ? 'name,email,role,password\nJohn Doe,john@parking.dev,user,pass123\nJane Smith,jane@parking.dev,owner,pass123'
+      : 'id,floor,floor_label,owner_email\nA-101,1,Floor 1,owner@parking.dev\nB-202,2,Floor 2,';
+      
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `template-${type}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   const uploadProps: UploadProps = {
-    beforeUpload: (file) => {
-      notification.success({ message: t('adminPanel.import.notifications.uploadSuccess', { filename: file.name }) });
-      setHasImportedData(true);
-      return false;
+    beforeUpload: async (file) => {
+      setImportLoading(true);
+      try {
+        const isLots = file.name.toLowerCase().includes('lot');
+        const res = isLots ? await adminApi.importLots(file) : await adminApi.importUsers(file);
+        
+        if (res.errors && res.errors.length > 0) {
+          notification.warning({
+            message: t('adminPanel.import.notifications.uploadSuccess', { filename: file.name, count: res.imported }),
+            description: t('adminPanel.import.notifications.partialSuccess', { count: res.imported }),
+          });
+        } else {
+          notification.success({ 
+            message: t('adminPanel.import.notifications.uploadSuccess', { filename: file.name, count: res.imported }),
+            description: t('adminPanel.import.notifications.uploadSuccess', { filename: file.name, count: res.imported }) 
+          });
+        }
+        setHasImportedData(true);
+        // Refresh data tables
+        if (isLots) {
+           lotsApi.getAll().then(setLots);
+        } else {
+           usersApi.getAll().then(setUsers);
+        }
+      } catch (err: any) {
+        notification.error({
+          message: t('adminPanel.import.notifications.uploadFailed'),
+          description: err.message,
+        });
+      } finally {
+        setImportLoading(false);
+      }
+      return false; // Prevent auto-upload
     },
+    showUploadList: false,
   };
 
   // ── Section renderer ────────────────────────────────────────────────────────
@@ -520,8 +590,8 @@ const AdminPanel: React.FC = () => {
             <Row gutter={16}>
               <Col span={12}>
                 <Card title={t('adminPanel.import.importCardTitle')}>
-                  <Upload {...uploadProps} accept=".xlsx,.xls">
-                    <Button icon={<UploadOutlined />} size="large" block>
+                  <Upload {...uploadProps} accept=".csv">
+                    <Button icon={<UploadOutlined />} size="large" block loading={importLoading}>
                       {t('adminPanel.import.uploadButton')}
                     </Button>
                   </Upload>
@@ -536,10 +606,18 @@ const AdminPanel: React.FC = () => {
                     icon={<DownloadOutlined />}
                     size="large"
                     block
-                    disabled={!hasImportedData}
-                    onClick={() => notification.success({ message: t('adminPanel.import.notifications.downloadSuccess') })}
+                    onClick={() => handleDownloadTemplate('users')}
                   >
-                    {t('adminPanel.import.downloadButton')}
+                    {t('adminPanel.import.downloadButton')} (Users Template)
+                  </Button>
+                  <Button
+                    icon={<DownloadOutlined />}
+                    size="large"
+                    block
+                    style={{ marginTop: '12px' }}
+                    onClick={() => handleDownloadTemplate('lots')}
+                  >
+                    {t('adminPanel.import.downloadButton')} (Lots Template)
                   </Button>
                   {!hasImportedData && (
                     <div style={{ marginTop: '8px', fontSize: '12px', color: '#ff4d4f' }}>
@@ -655,7 +733,7 @@ const AdminPanel: React.FC = () => {
                 />
               </Tabs.TabPane>
               <Tabs.TabPane
-                tab={t('adminPanel.reports.tabs.pending', { count: filteredRequests.filter(r => r.status === 'pending').length })}
+                tab={t('adminPanel.reports.tabs.pending', { count: filteredRequests.filter(r => r.status === RequestStatus.PENDING).length })}
                 key="pending"
               >
                 <div style={{ overflowX: 'auto' }}>
@@ -670,13 +748,13 @@ const AdminPanel: React.FC = () => {
                 </div>
               </Tabs.TabPane>
               <Tabs.TabPane
-                tab={t('adminPanel.reports.tabs.approved', { count: filteredRequests.filter(r => r.status === 'approved').length })}
+                tab={t('adminPanel.reports.tabs.approved', { count: filteredRequests.filter(r => r.status === RequestStatus.APPROVED).length })}
                 key="approved"
               >
                 <div style={{ overflowX: 'auto' }}>
                   <Table
                     columns={reportColumns}
-                    dataSource={filteredRequests.filter(r => r.status === 'approved')}
+                    dataSource={filteredRequests.filter(r => r.status === RequestStatus.APPROVED)}
                     rowKey="id"
                     loading={loading}
                     pagination={{ pageSize: 10, hideOnSinglePage: true }}
@@ -685,13 +763,13 @@ const AdminPanel: React.FC = () => {
                 </div>
               </Tabs.TabPane>
               <Tabs.TabPane
-                tab={t('adminPanel.reports.tabs.rejected', { count: filteredRequests.filter(r => r.status === 'rejected').length })}
+                tab={t('adminPanel.reports.tabs.rejected', { count: filteredRequests.filter(r => r.status === RequestStatus.REJECTED).length })}
                 key="rejected"
               >
                 <div style={{ overflowX: 'auto' }}>
                   <Table
                     columns={reportColumns}
-                    dataSource={filteredRequests.filter(r => r.status === 'rejected')}
+                    dataSource={filteredRequests.filter(r => r.status === RequestStatus.REJECTED)}
                     rowKey="id"
                     loading={loading}
                     pagination={{ pageSize: 10, hideOnSinglePage: true }}
@@ -765,6 +843,7 @@ const AdminPanel: React.FC = () => {
                   type="primary"
                   icon={<SendOutlined />}
                   disabled={isBlackoutSimulated || !broadcastMessage.trim()}
+                  loading={broadcastLoading}
                   onClick={handleBroadcastSend}
                   size="large"
                 >

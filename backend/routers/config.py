@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import models
 from auth import get_current_user
-from database import SessionLocal
+from database import SessionLocal, get_db
 
 router = APIRouter(prefix="/api/config", tags=["config"])
 
@@ -22,14 +22,16 @@ def get_config(current_user: models.User = Depends(get_current_user)):
 
 
 @router.post("/run-auto-approval")
-def trigger_auto_approval(current_user: models.User = Depends(get_current_user)):
+def trigger_auto_approval(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Manually trigger the auto-approval scheduler job. Manager only."""
     if current_user.role != "manager":
         raise HTTPException(status_code=403, detail="Manager role required")
 
     from scheduler import run_auto_approval
 
-    db: Session = SessionLocal()
     try:
         # Count pending before
         before = db.query(models.ParkingRequest).filter(

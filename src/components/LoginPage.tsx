@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Typography, Card, Alert, Divider, Tag, Space, theme } from 'antd';
+import { Form, Input, Button, Typography, Card, Alert, Divider, Tag, Space, theme, Modal } from 'antd';
 import { UserOutlined, LockOutlined, CrownOutlined, TeamOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,8 +12,11 @@ interface LoginForm {
 }
 
 const DEMO_ACCOUNTS = [
-  { labelKey: 'login.demoRoles.owner',   email: 'o1@parking.dev',  icon: <CrownOutlined />, color: 'gold'   },
-  { labelKey: 'login.demoRoles.manager', email: 'a1@parking.dev',  icon: <TeamOutlined />,  color: 'purple' },
+  { name: 'Owner One',   email: 'o1@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
+  { name: 'Owner Two',   email: 'o2@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
+  { name: 'Owner Three', email: 'o3@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
+  { name: 'Admin One',   email: 'a1@parking.dev', icon: <TeamOutlined />,  color: 'purple' },
+  { name: 'Admin Two',   email: 'a2@parking.dev', icon: <TeamOutlined />,  color: 'purple' },
 ];
 
 const LoginPage: React.FC = () => {
@@ -23,6 +26,19 @@ const LoginPage: React.FC = () => {
   const [form] = Form.useForm<LoginForm>();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const showForgotModal = () => {
+    Modal.info({
+      title: t('login.forgotPasswordModal.title'),
+      content: (
+        <div>
+          <p>{t('login.forgotPasswordModal.content')}</p>
+        </div>
+      ),
+      okText: t('login.forgotPasswordModal.ok'),
+      maskClosable: true,
+    });
+  };
 
   const handleSubmit = async (values: LoginForm) => {
     setLoading(true);
@@ -100,6 +116,12 @@ const LoginPage: React.FC = () => {
             />
           </Form.Item>
 
+          <div style={{ textAlign: 'right', marginBottom: 24, marginTop: -12 }}>
+            <Button type="link" onClick={showForgotModal} style={{ padding: 0, fontSize: 13, height: 'auto' }}>
+              {t('login.forgotPassword')}
+            </Button>
+          </div>
+
           <Form.Item style={{ marginBottom: 0 }}>
             <Button
               type="primary"
@@ -126,7 +148,7 @@ const LoginPage: React.FC = () => {
               style={{ cursor: 'pointer', padding: '4px 10px', fontSize: 13 }}
               onClick={() => fillDemo(acct.email)}
             >
-              {t(acct.labelKey)}
+              {acct.name}
             </Tag>
           ))}
         </Space>

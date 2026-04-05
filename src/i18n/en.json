@@ -24,6 +24,12 @@
     "passwordRequired": "Please enter your password",
     "signIn": "Sign In",
     "loginFailed": "Login failed",
+    "forgotPassword": "Forgot your password?",
+    "forgotPasswordModal": {
+      "title": "Password Recovery Instructions",
+      "content": "Please contact your Parking Manager (admin@parking.dev) to reset your account password.",
+      "ok": "Got it"
+    },
     "demoAccounts": "Demo accounts — password: password123",
     "demoRoles": {
       "user": "User",
@@ -89,6 +95,7 @@
       "updateFailedDesc": "Failed to update the request. Please try again.",
       "cancelled": "Request Cancelled",
       "cancelledDesc": "Request {{id}} has been cancelled.",
+      "passwordRecoveryDesc": "Please contact your Parking Manager (admin@parking.dev) to reset your account password.",
       "cancelFailed": "Cancellation Failed",
       "cancelFailedDesc": "Failed to cancel the request. Please try again."
     },
@@ -316,7 +323,8 @@
       "blockedUntil": "Blocked Until",
       "approve": "Approve",
       "reject": "Reject",
-      "unowned": "Unowned"
+      "unowned": "Unowned",
+      "history": "View History"
     },
     "notifications": {
       "approved": "Request approved successfully",
@@ -397,92 +405,92 @@
       "sendFailed": "Failed to send message"
     }
   },
-    "availabilityWindows": {
-      "title": "Lot Availability Settings",
-      "blackoutAlert": {
-        "message": "Lot sharing is restricted between 22:00 and 06:00",
-        "description": "System-wide security policy prevents parking sharing during late-night hours."
-      },
-      "saving": "Saving availability...",
-      "days": {
-        "monday": "Monday",
-        "tuesday": "Tuesday",
-        "wednesday": "Wednesday",
-        "thursday": "Thursday",
-        "friday": "Friday",
-        "saturday": "Saturday",
-        "sunday": "Sunday"
-      },
-      "noWindows": "Closed for sharing — no windows set",
-      "addWindow": "Add Availability Window",
-      "maxWindows": "Maximum {{max}} slots per day",
-      "modal": {
-        "title": "Add Availability Slot — {{day}}",
-        "okText": "Add Slot",
-        "timeRangeLabel": "Time Range",
-        "timeRangeRequired": "Please select a time range",
-        "endAfterStart": "End time must be after start time",
-        "startPlaceholder": "Start time",
-        "endPlaceholder": "End time"
-      },
-      "blackoutWarning": {
-        "title": "Late Night Restriction",
-        "content": "This slot overlaps with the overnight restriction (22:00–06:00). Sharing is not permitted during this time.",
-        "ok": "Trim & Save",
-        "cancel": "Cancel"
-      },
-      "notifications": {
-        "loadFailed": "Failed to load availability settings",
-        "saveFailed": "Failed to save availability settings",
-        "removed": "Availability slot removed",
-        "overlap": "This time range overlaps with an existing slot",
-        "added": "Availability slot added"
-      },
-      "info": "Define the time slots when your lot is available for others to request. Your lot is blocked by default outside of these windows. Up to {{max}} slots per day."
+  "availabilityWindows": {
+    "title": "Lot Availability Settings",
+    "blackoutAlert": {
+      "message": "Lot sharing is restricted between 22:00 and 06:00",
+      "description": "System-wide security policy prevents parking sharing during late-night hours."
     },
-    "notificationWindows": {
-      "title": "Notification Preferences",
-      "blackoutAlert": {
-        "message": "No notifications are delivered between 22:00 and 06:00",
-        "description": "This blackout period applies system-wide to prevent disturbances during nighttime hours."
-      },
-      "saving": "Saving…",
-      "days": {
-        "monday": "Monday",
-        "tuesday": "Tuesday",
-        "wednesday": "Wednesday",
-        "thursday": "Thursday",
-        "friday": "Friday",
-        "saturday": "Saturday",
-        "sunday": "Sunday"
-      },
-      "noWindows": "No windows set — system default applies",
-      "addWindow": "Add Window",
-      "maxWindows": "Maximum {{max}} windows per day",
-      "modal": {
-        "title": "Add Notification Window — {{day}}",
-        "okText": "Add Window",
-        "timeRangeLabel": "Time Range",
-        "timeRangeRequired": "Please select a time range",
-        "endAfterStart": "End time must be after start time",
-        "startPlaceholder": "Start time",
-        "endPlaceholder": "End time"
-      },
-      "blackoutWarning": {
-        "title": "Blackout Period Warning",
-        "content": "This notification window overlaps with the blackout period (22:00–06:00). Notifications will not be delivered during this time.",
-        "ok": "Save Anyway",
-        "cancel": "Cancel"
-      },
-      "notifications": {
-        "loadFailed": "Failed to load notification preferences",
-        "saveFailed": "Failed to save notification preferences",
-        "removed": "Notification window removed",
-        "overlap": "This time range overlaps with an existing notification window",
-        "added": "Notification window added"
-      },
-      "info": "Set the time slots when you are willing to receive parking notifications. Up to {{max}} windows per day. Changes are saved immediately."
+    "saving": "Saving availability...",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
     },
+    "noWindows": "Closed for sharing — no windows set",
+    "addWindow": "Add Availability Window",
+    "maxWindows": "Maximum {{max}} slots per day",
+    "modal": {
+      "title": "Add Availability Slot — {{day}}",
+      "okText": "Add Slot",
+      "timeRangeLabel": "Time Range",
+      "timeRangeRequired": "Please select a time range",
+      "endAfterStart": "End time must be after start time",
+      "startPlaceholder": "Start time",
+      "endPlaceholder": "End time"
+    },
+    "blackoutWarning": {
+      "title": "Late Night Restriction",
+      "content": "This slot overlaps with the overnight restriction (22:00–06:00). Sharing is not permitted during this time.",
+      "ok": "Trim & Save",
+      "cancel": "Cancel"
+    },
+    "notifications": {
+      "loadFailed": "Failed to load availability settings",
+      "saveFailed": "Failed to save availability settings",
+      "removed": "Availability slot removed",
+      "overlap": "This time range overlaps with an existing slot",
+      "added": "Availability slot added"
+    },
+    "info": "Define the time slots when your lot is available for others to request. Your lot is blocked by default outside of these windows. Up to {{max}} slots per day."
+  },
+  "notificationWindows": {
+    "title": "Notification Preferences",
+    "blackoutAlert": {
+      "message": "No notifications are delivered between 22:00 and 06:00",
+      "description": "This blackout period applies system-wide to prevent disturbances during nighttime hours."
+    },
+    "saving": "Saving…",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "noWindows": "No windows set — system default applies",
+    "addWindow": "Add Window",
+    "maxWindows": "Maximum {{max}} windows per day",
+    "modal": {
+      "title": "Add Notification Window — {{day}}",
+      "okText": "Add Window",
+      "timeRangeLabel": "Time Range",
+      "timeRangeRequired": "Please select a time range",
+      "endAfterStart": "End time must be after start time",
+      "startPlaceholder": "Start time",
+      "endPlaceholder": "End time"
+    },
+    "blackoutWarning": {
+      "title": "Blackout Period Warning",
+      "content": "This notification window overlaps with the blackout period (22:00–06:00). Notifications will not be delivered during this time.",
+      "ok": "Save Anyway",
+      "cancel": "Cancel"
+    },
+    "notifications": {
+      "loadFailed": "Failed to load notification preferences",
+      "saveFailed": "Failed to save notification preferences",
+      "removed": "Notification window removed",
+      "overlap": "This time range overlaps with an existing notification window",
+      "added": "Notification window added"
+    },
+    "info": "Set the time slots when you are willing to receive parking notifications. Up to {{max}} windows per day. Changes are saved immediately."
+  },
   "adminPanel": {
     "sidebarTitle": "Admin Panel",
     "loadingTip": "Loading admin data...",
@@ -498,76 +506,83 @@
     "loadFailedDesc": "Could not reach the server.",
     "defaultContent": "Select a menu item",
     "users": {
-      "title": "User Management",
-      "columns": {
-        "name": "Name",
-        "email": "Email",
-        "role": "Role",
-        "joined": "Joined",
-        "actions": "Actions"
-      },
-      "roles": { "user": "User", "owner": "Owner", "manager": "Manager" },
-      "deleteConfirm": "Delete this user?",
-      "deleteWarning": "This cannot be undone.",
-      "deleteOk": "Delete",
-      "deleteButton": "Delete",
-      "notifications": {
-        "roleUpdated": "Role updated",
-        "roleUpdatedDesc": "{{name}} is now {{role}}.",
-        "roleUpdateFailed": "Role update failed",
-        "userDeleted": "User deleted",
-        "deleteFailed": "Delete failed"
-      },
-      "info": "View all registered users and manage their roles. Manager accounts cannot be deleted or have their role changed here."
+        "title": "User Management",
+        "columns": {
+          "name": "Name",
+          "email": "Email",
+          "role": "Role",
+          "joined": "Joined",
+          "actions": "Actions"
+        },
+        "roles": { "user": "User", "owner": "Owner", "manager": "Manager" },
+        "deleteConfirm": "Delete this user?",
+        "deleteWarning": "This cannot be undone.",
+        "deleteOk": "Delete",
+        "deleteButton": "Delete",
+        "notifications": {
+          "roleUpdated": "Role updated",
+          "roleUpdatedDesc": "{{name}} is now {{role}}.",
+          "roleUpdateFailed": "Role update failed",
+          "userDeleted": "User deleted",
+          "deleteFailed": "Delete failed"
+        },
+        "info": "View all registered users and manage their roles. Manager accounts cannot be deleted or have their role changed here."
     },
     "lots": {
-      "title": "Lot Management",
-      "unownedAlert_one": "{{count}} lot without an owner",
-      "unownedAlert_other": "{{count}} lots without an owner",
-      "unownedAlertDesc": "Assign owners to ensure proper management of these lots.",
-      "filterLabel": "Filter:",
-      "filters": { "all": "All", "available": "Available", "blocked": "Blocked", "unowned": "Unowned" },
-      "columns": {
-        "lotId": "Lot ID",
-        "floorLabel": "Floor Label",
-        "floor": "Floor",
-        "status": "Status",
-        "owner": "Owner",
-        "lastModified": "Last Modified",
-        "actions": "Actions"
-      },
-      "unowned": "Unowned",
-      "assignOwnerButton": "Assign Owner",
-      "removeOwnerConfirm": "Remove owner from this lot?",
-      "removeOwnerOk": "Remove",
-      "removeOwnerButton": "Remove Owner",
-      "assignModal": {
-        "title": "Assign Owner to Lot",
-        "okText": "Assign",
-        "placeholder": "Select an owner"
-      },
-      "notifications": {
-        "ownerRemoved": "Owner removed",
-        "ownerRemoveFailed": "Failed to remove owner",
-        "ownerAssigned": "Owner assigned",
-        "ownerAssignedDesc": "{{name}} → {{lotId}}",
-        "ownerAssignFailed": "Failed to assign owner"
-      },
-      "info": "View all parking lots, filter by status, and assign or remove ownership."
+        "title": "Lot Management",
+        "unownedAlert_one": "{{count}} lot without an owner",
+        "unownedAlert_other": "{{count}} lots without an owner",
+        "unownedAlertDesc": "Assign owners to ensure proper management of these lots.",
+        "filterLabel": "Filter:",
+        "filters": { 
+          "all": "All", 
+          "available": "Available", 
+          "blocked": "Blocked", 
+          "unowned": "Unowned",
+          "unowned_blocked": "Unowned (Blocked)"
+        },
+        "columns": {
+          "lotId": "Lot ID",
+          "floorLabel": "Floor Label",
+          "floor": "Floor",
+          "status": "Status",
+          "owner": "Owner",
+          "lastModified": "Last Modified",
+          "actions": "Actions"
+        },
+        "unowned": "Unowned",
+        "assignOwnerButton": "Assign Owner",
+        "removeOwnerConfirm": "Remove owner from this lot?",
+        "removeOwnerOk": "Remove",
+        "removeOwnerButton": "Remove Owner",
+        "assignModal": {
+          "title": "Assign Owner to Lot",
+          "okText": "Assign",
+          "placeholder": "Select an owner"
+        },
+        "notifications": {
+          "ownerRemoved": "Owner removed",
+          "ownerRemoveFailed": "Failed to remove owner",
+          "ownerAssigned": "Owner assigned",
+          "ownerAssignedDesc": "{{name}} → {{lotId}}",
+          "ownerAssignFailed": "Failed to assign owner"
+        },
+        "info": "View all parking lots, filter by status, and assign or remove ownership."
     },
     "import": {
       "title": "Import / Export",
-      "importCardTitle": "Import Data",
-      "exportCardTitle": "Export Data",
-      "uploadButton": "Upload Excel File",
-      "uploadHint": "Drag and drop or click to upload Excel files",
-      "downloadButton": "Download Master File",
-      "downloadHint": "Import data first to enable download",
+      "importCardTitle": "Bulk Import (CSV)",
+      "exportCardTitle": "Templates",
+      "uploadButton": "Upload CSV File",
+      "uploadHint": "Drag and drop or click to upload CSV (detects Users/Lots)",
+      "downloadButton": "Download CSV Template",
       "notifications": {
-        "uploadSuccess": "{{filename}} uploaded successfully",
-        "downloadSuccess": "Master file downloaded"
+        "uploadSuccess": "{{filename}} uploaded successfully: {{count}} records",
+        "partialSuccess": "Partial success: {{count}} records imported",
+        "uploadFailed": "Import failed",
+        "downloadSuccess": "CSV template downloaded"
       },
-      "info": "Upload an Excel file to bulk-import parking data, or download the current master file for offline use."
+      "info": "Upload a CSV file to bulk-import users or lots. Use templates to ensure correct formatting."
     },
     "config": {
       "title": "System Configuration",
@@ -608,28 +623,53 @@
       "info": "View a complete history of all parking requests filtered by date range and status."
     },
     "broadcast": {
-      "title": "Broadcast Messages",
-      "simulateBlackout": "Simulate blackout period:",
-      "blackoutOn": "22:00–06:00",
-      "blackoutOff": "Normal hours",
-      "blackoutAlert": "Broadcast disabled during blackout period",
-      "blackoutAlertDesc": "Messages cannot be sent between 22:00 and 06:00 to prevent disturbances.",
+      "title": "Broadcast Notification",
+      "simulateBlackout": "Simulate System Blackout",
+      "blackoutOn": "Blackout Active",
+      "blackoutOff": "Normal Operations",
+      "blackoutAlert": "System Blackout Active",
+      "blackoutAlertDesc": "The system is currently in a blackout period (22:00–06:00). Broadcasts are restricted to emergency use only and manual triggering is disabled.",
       "audienceLabel": "Target Audience:",
       "audiences": {
         "owners": "All Owners",
         "users": "All Users",
-        "both": "Both Owners and Users"
+        "both": "All Users & Owners"
       },
-      "messageLabel": "Message:",
-      "messagePlaceholder": "Enter your broadcast message...",
-      "sendButton": "Send Broadcast",
+      "messageLabel": "Broadcast Message:",
+      "messagePlaceholder": "Type your system-wide message here...",
+      "sendButton": "Send Global Alert",
       "notifications": {
-        "blocked": "Broadcast blocked",
-        "blockedDesc": "Cannot send messages during the blackout period (22:00–06:00).",
-        "sent": "Broadcast sent",
-        "sentDesc": "Message sent to: {{audience}}"
+        "blocked": "Action Restricted",
+        "blockedDesc": "Broadcast actions are temporarily restricted during maintenance or blackout periods.",
+        "sent": "Alert Disseminated",
+        "sentDesc": "Message successfully delivered to {{count}} active sessions for {{audience}}."
       },
-      "info": "Send a system-wide message to all owners, all users, or both audiences at once."
+      "info": "Use this tool to send critical system updates or emergency notifications to all connected users."
+    }
+  },
+  "notificationCenter": {
+    "title": "Notifications",
+    "unread": "Unread",
+    "markAllRead": "Mark all as read",
+    "markAsRead": "Mark as read",
+    "noNotifications": "No notifications yet",
+    "emptyStatus": "You're all caught up!",
+    "errorLoading": "Failed to load notifications",
+    "viewAll": "View All"
+  },
+  "auditTrail": {
+    "title": "Request History: {{id}}",
+    "loading": "Loading history...",
+    "noHistory": "No history found for this request.",
+    "byLabel": "By: {{name}}",
+    "close": "Close",
+    "actions": {
+      "submitted": "Request Submitted",
+      "approved": "Approved Manually",
+      "auto-assigned": "Auto-Approved",
+      "rejected": "Request Rejected",
+      "cancelled": "Request Cancelled",
+      "unknown": "Unknown Action: {{action}}"
     }
   }
 }

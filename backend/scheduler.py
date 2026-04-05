@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 from database import SessionLocal
 import models
-from routers.requests import _has_conflict, _is_outside_availability, _add_audit_log
+from routers.requests import _has_conflict, _is_outside_availability, _add_audit_log, _create_notification
 
 scheduler = BackgroundScheduler()
 
@@ -71,9 +71,15 @@ def run_auto_approval(db=None):
                 
                 _add_audit_log(
                     db, req.id, "system", "Auto Scheduler", "auto-assigned",
-                    details=f"Assigned lot {target_lot.id} (Floor {target_lot.floor_label})"
+                    details=f"Assigned lot {target_lot.id} (Floor {target_lot.floor_label})",
+                    requester_id=req.requester_id
                 )
-                
+
+                _create_notification(
+                    db, req.requester_id,
+                    f"Your parking request {req.id} for {req.date} has been APPROVED (System Auto-Approval). Assigned Lot: {target_lot.id}."
+                )
+
                 db.commit()
     finally:
         if close_db:

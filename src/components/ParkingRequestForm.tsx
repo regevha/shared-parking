@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Form, DatePicker, Select, Button, Card, Alert, notification, Row, Col, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useRequests } from '../contexts/RequestsContext';
+import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
+import { RequestStatus } from '../types/enums';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
@@ -32,7 +33,7 @@ const ParkingRequestForm: React.FC = () => {
 
   const activeRequests = useMemo(() => {
     return userRequests
-      .filter(r => r.status === 'pending')
+      .filter(r => r.status === RequestStatus.PENDING)
       .sort((a, b) => {
         const d = a.date.localeCompare(b.date);
         return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
@@ -138,7 +139,7 @@ const ParkingRequestForm: React.FC = () => {
                   <Col xs={24} sm={9}>
                     <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>{t('requestForm.labels.status')}</div>
                     <Tag color={getRequestStatusColor(req.status)}>
-                      {getRequestStatusLabel(req.status)}
+                      {t(getRequestStatusLabel(req.status))}
                     </Tag>
                   </Col>
                 </Row>

@@ -6,8 +6,8 @@ import type { ColumnsType } from 'antd/es/table';
 import { useRequests } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { LotData } from '../api/lots';
-import { getLotStatusTagColor } from '../utils/statusUtils';
-import { LotStatus } from '../types';
+import { getLotStatusTagColor, getStatusLabel } from '../utils/statusUtils';
+import { LotStatus } from '../types/enums';
 import './MyLots.css';
 
 const MyLots: React.FC = () => {
@@ -24,7 +24,7 @@ const MyLots: React.FC = () => {
       key: 'status',
       width: '20%',
       render: (status: LotStatus) => {
-        return <Tag color={getLotStatusTagColor(status)}>{status}</Tag>;
+        return <Tag color={getLotStatusTagColor(status)}>{t(getStatusLabel(status))}</Tag>;
       },
     },
     {

@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import 'dayjs/locale/he';
 import { useTranslation } from 'react-i18next';
-import { Role } from './types';
+import { UserRole } from './types/enums';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { RequestsProvider } from './contexts/RequestsContext';
 import { usersApi } from './api/users';
@@ -27,15 +27,11 @@ import MyLots from './components/MyLots';
 import CalendarView from './components/CalendarView';
 import LotCalendarView from './components/LotCalendarView';
 import LoginPage from './components/LoginPage';
+import NotificationBell from './components/NotificationBell';
 import './App.css';
 
 const { Header, Content } = Layout;
 
-/** Map backend role string → frontend Role type */
-function toAppRole(backendRole: string): Role {
-  const map: Record<string, Role> = { user: 'User', owner: 'Owner', manager: 'Manager' };
-  return map[backendRole] ?? 'User';
-}
 
 // ── Inner app (rendered after auth) ──────────────────────────────────────────
 interface AppShellProps {
@@ -48,14 +44,14 @@ interface AppShellProps {
 const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language, setLanguage }) => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
-  const role: Role = toAppRole(user?.role ?? 'user');
+  const role = (user?.role ?? UserRole.USER) as UserRole;
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
 
   const getMenuItems = () => {
     const items: { key: string; label: React.ReactNode }[] = [];
 
-    if (role === 'User' || role === 'Owner') {
+    if (role === UserRole.USER || role === UserRole.OWNER) {
       items.push({ key: 'my-requests', label: <Link to="/my-requests">{t('nav.myRequests')}</Link> });
     }
 
@@ -64,12 +60,12 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
     items.push({ key: 'approvals',  label: <Link to="/approvals">{t('nav.approvals')}</Link> });
     items.push({ key: 'lot-status', label: <Link to="/lot-status">{t('nav.parkingStatus')}</Link> });
 
-    if (role === 'Owner') {
+    if (role === UserRole.OWNER) {
       items.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">{t('nav.lotCalendar')}</Link> });
       items.push({ key: 'my-lots',      label: <Link to="/my-lots">{t('nav.myLots')}</Link> });
     }
 
-    if (role === 'Manager') {
+    if (role === UserRole.MANAGER) {
       items.push({ key: 'admin', label: <Link to="/admin">{t('nav.adminPanel')}</Link> });
     }
 
@@ -92,7 +88,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
     selectedKeys: [language],
   };
 
-  const roleIcon = role === 'Owner' ? <CrownOutlined /> : role === 'Manager' ? <TeamOutlined /> : <UserOutlined />;
+  const roleIcon = role === UserRole.OWNER ? <CrownOutlined /> : role === UserRole.MANAGER ? <TeamOutlined /> : <UserOutlined />;
 
   const headerBg       = darkMode ? '#141414' : '#ffffff';
   const headerBtnStyle = { color: darkMode ? 'white' : 'rgba(0,0,0,0.88)' };
@@ -135,6 +131,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                   style={headerBtnStyle}
                   title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
                 />
+                <NotificationBell />
                 <Dropdown menu={settingsMenu} trigger={['click']}>
                   <Button type="text" icon={<SettingOutlined />} style={headerBtnStyle} />
                 </Dropdown>

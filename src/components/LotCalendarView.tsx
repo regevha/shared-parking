@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { LotData } from '../api/lots';
+import { LotStatus, RequestStatus } from '../types/enums';
 import { getRequestStatusColor, getRequestStatusLabel, getLotStatusTagColor } from '../utils/statusUtils';
 import './CalendarView.css';
 import './LotCalendarView.css';
@@ -298,7 +299,7 @@ const LotCalendarView: React.FC = () => {
           <Descriptions.Item label={t('lotCalendarView.modal.duration')}>{a.duration}h</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.lot')}>{a.lotId}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.floor')}>{a.floor}</Descriptions.Item>
-          <Descriptions.Item label={t('lotCalendarView.modal.status')}><Tag color={getRequestStatusColor('approved')}>{getRequestStatusLabel('approved')}</Tag></Descriptions.Item>
+          <Descriptions.Item label={t('lotCalendarView.modal.status')}><Tag color={getRequestStatusColor(RequestStatus.APPROVED)}>{t(getRequestStatusLabel(RequestStatus.APPROVED))}</Tag></Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.approvedAt')}>{dayjs(a.approvedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
         </Descriptions>
       );
@@ -320,7 +321,7 @@ const LotCalendarView: React.FC = () => {
               )}
             </Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.duration')}>{r.duration}h</Descriptions.Item>
-            <Descriptions.Item label={t('lotCalendarView.modal.status')}><Tag color={getRequestStatusColor('pending')}>{getRequestStatusLabel('pending')}</Tag></Descriptions.Item>
+            <Descriptions.Item label={t('lotCalendarView.modal.status')}><Tag color={getRequestStatusColor(RequestStatus.PENDING)}>{t(getRequestStatusLabel(RequestStatus.PENDING))}</Tag></Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.submitted')}>{dayjs(r.submittedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
           </Descriptions>
           <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
@@ -338,7 +339,7 @@ const LotCalendarView: React.FC = () => {
         <Descriptions.Item label={t('lotCalendarView.modal.lotId')}>{l.id}</Descriptions.Item>
         <Descriptions.Item label={t('lotCalendarView.modal.floor')}>{l.floor}</Descriptions.Item>
         <Descriptions.Item label={t('lotCalendarView.modal.owner')}>{l.owner ?? t('lotCalendarView.modal.unowned')}</Descriptions.Item>
-        <Descriptions.Item label={t('lotCalendarView.modal.status')}><Tag color={getLotStatusTagColor('blocked')}>{t('lotCalendarView.legend.blocked')}</Tag></Descriptions.Item>
+        <Descriptions.Item label={t('lotCalendarView.modal.status')}><Tag color={getLotStatusTagColor(LotStatus.BLOCKED)}>{t('lotCalendarView.legend.blocked')}</Tag></Descriptions.Item>
         <Descriptions.Item label={t('lotCalendarView.modal.blockedUntil')}>{dayjs(l.blockedUntil).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
       </Descriptions>
     );

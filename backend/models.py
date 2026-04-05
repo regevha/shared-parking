@@ -1,6 +1,19 @@
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
+from enum import Enum
+
+
+class UserRole(str, Enum):
+    USER = "user"
+    OWNER = "owner"
+    MANAGER = "manager"
+
+
+class RequestStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
 
 class User(Base):
@@ -98,3 +111,13 @@ class AuditLog(Base):
     action = Column(String, nullable=False)  # submitted | approved | rejected | cancelled | auto-assigned | updated
     details = Column(String, nullable=True)  # additional info like lot ID
     timestamp = Column(String, nullable=False) # ISO timestamp
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    message = Column(String, nullable=False)
+    is_read = Column(Boolean, default=False)
+    created_at = Column(String, nullable=False) # ISO timestamp
