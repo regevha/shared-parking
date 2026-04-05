@@ -37,3 +37,6 @@ The following test suites and refinements are recommended to further harden the 
 ## 🛠️ Refactor Ideas
 - [ ] **Native Date Handling**: Migrate all ISO strings to native `DateTime` objects in the Database layer if we move away from SQLite.
 - [ ] **Real-time Notifications**: Replace polling with WebSockets for immediate approval/rejection alerts.
+
+## 🏗️ Infrastructure
+- [ ] **Dev Containers**: Define `.devcontainer` configuration to standardize the development environment across the team.
