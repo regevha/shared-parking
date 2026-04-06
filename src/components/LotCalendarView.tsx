@@ -45,7 +45,9 @@ const CustomEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => {
         )}
       </div>
       {isRequest && (
-        <div className="custom-event-time">{resource.startTime}–{resource.endTime}</div>
+        <div className="custom-event-time">
+          {dayjs(event.start).format('h:mm A')} – {dayjs(event.end).format('h:mm A')}
+        </div>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { api } from './client';
-import { LotStatus } from '../types/enums';
+import { LotStatus } from '../types';
 
 export interface LotData {
   id: string;

@@ -38,13 +38,18 @@ const STATUS_COLORS: Record<RequestStatus, string> = {
 const CustomEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => {
   const name = event.resource.requesterName ? event.resource.requesterName.split(' ')[0] : 'Unknown';
   const role = event.resource.requesterRole;
+  const isRequest = !!event.resource.id;
   return (
     <div className="custom-event">
       <div className="custom-event-title">
         {name} 
         {role && <span className="event-role-tag"> ({role})</span>}
       </div>
-      <div className="custom-event-time">{event.resource.startTime}–{event.resource.endTime}</div>
+      {isRequest && (
+        <div className="custom-event-time">
+          {dayjs(event.start).format('h:mm A')} – {dayjs(event.end).format('h:mm A')}
+        </div>
+      )}
     </div>
   );
 };

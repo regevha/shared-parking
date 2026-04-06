@@ -141,7 +141,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
               )}
               <Button
                 type="text"
-                icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
+                icon={darkMode ? <SunOutlined style={{ fontSize: 20 }} /> : <MoonOutlined style={{ fontSize: 20 }} />}
                 onClick={toggleDarkMode}
                 style={headerBtnStyle}
               />

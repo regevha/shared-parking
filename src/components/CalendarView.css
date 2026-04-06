@@ -8,9 +8,8 @@
 }
 
 .rbc-toolbar {
-  order: 1;
-  margin-top: 12px;
-  margin-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 12px;
 }
 
 /* Hide default RBC event time label — our custom event component renders it */
@@ -41,7 +40,7 @@
 
 .custom-event-title {
   font-weight: 600;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -49,26 +48,25 @@
 }
 
 .event-role-tag {
-  font-size: 10px;
+  font-size: 11px;
   opacity: 0.85;
   font-weight: normal;
 }
 
 .custom-event-time {
-  font-size: 10px;
-  opacity: 0.85;
+  font-size: 12px;
+  opacity: 0.9;
   white-space: nowrap;
 }
 
 /* Desktop toolbar */
 .desktop-toolbar {
-  order: 1;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 0;
-  margin-top: 8px;
-  border-top: 1px solid var(--toolbar-border);
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--toolbar-border);
   flex-wrap: wrap;
 }
 
@@ -277,16 +275,15 @@
   }
 
   /* Custom mobile toolbar */
-  .mobile-toolbar {
-    order: 1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 0;
-    margin-top: 8px;
-    border-top: 1px solid var(--toolbar-border);
-  }
+.mobile-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--toolbar-border);
+}
 
   .mobile-toolbar-nav {
     display: flex;

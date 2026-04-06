@@ -40,30 +40,30 @@ LOTS = [
 # We define them with duration and let seed() compute end_date/end_time.
 REQUESTS = [
     dict(
-        id="REQ-001", requester_id="A1", requester_name="Admin One",
+        id="REQ-001", requester_id="A1", requester_name="Admin One", requester_role="manager",
         date=_fd(1), start_time="09:00", duration=4, status="approved",
         lot_id="LOT-101-A", floor="Floor 1 (A)", lot_owner="Owner One",
         approved_by="Owner One"
     ),
     dict(
-        id="REQ-002", requester_id="O1", requester_name="Owner One",
+        id="REQ-002", requester_id="O1", requester_name="Owner One", requester_role="owner",
         date=_fd(2), start_time="18:00", duration=30, status="pending"
     ),
     dict(
-        id="REQ-003", requester_id="O2", requester_name="Owner Two",
+        id="REQ-003", requester_id="O2", requester_name="Owner Two", requester_role="owner",
         date=_fd(1), start_time="10:00", duration=2, status="pending"
     ),
     # 10 More Pending Requests
-    dict(id="REQ-P01", requester_id="A1", requester_name="Admin One",   date=_fd(0), start_time="14:00", duration=2,  status="pending"),
-    dict(id="REQ-P02", requester_id="A2", requester_name="Admin Two",   date=_fd(0), start_time="16:00", duration=4,  status="pending"),
-    dict(id="REQ-P03", requester_id="O3", requester_name="Owner Three", date=_fd(1), start_time="08:00", duration=12, status="pending"),
-    dict(id="REQ-P04", requester_id="O1", requester_name="Owner One",   date=_fd(1), start_time="20:00", duration=24, status="pending"), # Multi-day
-    dict(id="REQ-P05", requester_id="O2", requester_name="Owner Two",   date=_fd(1), start_time="13:00", duration=8,  status="pending"),
-    dict(id="REQ-P06", requester_id="A1", requester_name="Admin One",   date=_fd(2), start_time="09:00", duration=3,  status="pending"),
-    dict(id="REQ-P07", requester_id="A2", requester_name="Admin Two",   date=_fd(2), start_time="10:00", duration=36, status="pending"), # Max multi-day
-    dict(id="REQ-P08", requester_id="O3", requester_name="Owner Three", date=_fd(2), start_time="18:00", duration=4,  status="pending"),
-    dict(id="REQ-P09", requester_id="O1", requester_name="Owner One",   date=_fd(3), start_time="07:00", duration=5,  status="pending"),
-    dict(id="REQ-P10", requester_id="O2", requester_name="Owner Two",   date=_fd(3), start_time="12:00", duration=6,  status="pending"),
+    dict(id="REQ-P01", requester_id="A1", requester_name="Admin One",   requester_role="manager", date=_fd(0), start_time="14:00", duration=2,  status="pending"),
+    dict(id="REQ-P02", requester_id="A2", requester_name="Admin Two",   requester_role="manager", date=_fd(0), start_time="16:00", duration=4,  status="pending"),
+    dict(id="REQ-P03", requester_id="O3", requester_name="Owner Three", requester_role="owner",   date=_fd(1), start_time="08:00", duration=12, status="pending"),
+    dict(id="REQ-P04", requester_id="O1", requester_name="Owner One",   requester_role="owner",   date=_fd(1), start_time="20:00", duration=24, status="pending"), # Multi-day
+    dict(id="REQ-P05", requester_id="O2", requester_name="Owner Two",   requester_role="owner",   date=_fd(1), start_time="13:00", duration=8,  status="pending"),
+    dict(id="REQ-P06", requester_id="A1", requester_name="Admin One",   requester_role="manager", date=_fd(2), start_time="09:00", duration=3,  status="pending"),
+    dict(id="REQ-P07", requester_id="A2", requester_name="Admin Two",   requester_role="manager", date=_fd(2), start_time="10:00", duration=36, status="pending"), # Max multi-day
+    dict(id="REQ-P08", requester_id="O3", requester_name="Owner Three", requester_role="owner",   date=_fd(2), start_time="18:00", duration=4,  status="pending"),
+    dict(id="REQ-P09", requester_id="O1", requester_name="Owner One",   requester_role="owner",   date=_fd(3), start_time="07:00", duration=5,  status="pending"),
+    dict(id="REQ-P10", requester_id="O2", requester_name="Owner Two",   requester_role="owner",   date=_fd(3), start_time="12:00", duration=6,  status="pending"),
 ]
 
 def seed():
