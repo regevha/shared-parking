@@ -264,13 +264,9 @@ const AppRoot: React.FC = () => {
 
 // ── Top-level export ──────────────────────────────────────────────────────────
 const App: React.FC = () => (
-  <AuthProvider>
-    <AppRoot />
-  </AuthProvider>
-);
-
-export default App;
-<AppRoot />
+    <AuthProvider>
+      <AppRoot />
+    </AuthProvider>
 );
 
 export default App;
