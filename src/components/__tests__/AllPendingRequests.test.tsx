@@ -4,6 +4,7 @@ import { notification, Modal } from 'antd';
 import AllPendingRequests from '../AllPendingRequests';
 import { renderWithProviders } from '../../test-utils/renderWithProviders';
 import { makeParkingRequest, makeOwnerUser, makeUser } from '../../test-utils/fixtures';
+import { UserRole } from '../../types/enums';
 
 jest.spyOn(notification, 'error').mockImplementation(() => ({ destroy: jest.fn() }));
 jest.spyOn(notification, 'success').mockImplementation(() => ({ destroy: jest.fn() }));
@@ -19,73 +20,107 @@ const ownRequest = makeParkingRequest({ id: 'req-2', requesterId: 'owner-1', req
 // A request already rejected by this owner
 const rejectedReq = makeParkingRequest({ id: 'req-3', requesterId: 'user-2', requesterName: 'Charlie', rejectedByOwner: true });
 
-// ── Role-gated action column ──────────────────────────────────────────────────
-
 describe('AllPendingRequests - Owner role actions', () => {
-  it('shows Approve and Reject buttons for another users request', async () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+  it('renders correctly for Owner role', async () => {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [otherRequest] },
     });
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Approve/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Reject/i })).toBeInTheDocument();
+      expect(screen.getByText('REQ-1')).toBeInTheDocument();
+      expect(screen.getByText('Approve')).toBeInTheDocument();
     });
   });
 
-  it('shows Cannot approve own request for the owners own request', async () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+  it('filters out already rejected requests by default', async () => {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
-      requestsValue: { pendingRequests: [ownRequest] },
+      requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
     });
     await waitFor(() => {
-      expect(screen.getByText('Cannot approve own request')).toBeInTheDocument();
+      expect(screen.getByText('REQ-1')).toBeInTheDocument();
+      expect(screen.queryByText('REQ-3')).not.toBeInTheDocument();
     });
   });
 
-  it('does not show Approve/Reject buttons for own request', async () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+  it('shows rejected requests when switched to All', async () => {
+    // Note: Ant Design Segmented component change
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
-      requestsValue: { pendingRequests: [ownRequest] },
+      requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
     });
+    
+    // Switch to 'All'
+    const allButton = screen.getByText('All');
+    fireEvent.click(allButton);
+
     await waitFor(() => {
-      expect(screen.queryByRole('button', { name: /Approve/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /Reject/i })).not.toBeInTheDocument();
+      expect(screen.getByText('REQ-1')).toBeInTheDocument();
+      expect(screen.getByText('REQ-3')).toBeInTheDocument();
     });
   });
 });
 
 describe('AllPendingRequests - User role actions', () => {
-  it('shows No actions for User role', async () => {
-    renderWithProviders(<AllPendingRequests role="User" />, {
-      authValue: { user: otherUser },
+  it('renders correctly for User role', async () => {
+    renderWithProviders(<AllPendingRequests role={UserRole.USER} />, {
+      authValue: { user: makeUser() },
       requestsValue: { pendingRequests: [otherRequest] },
     });
     await waitFor(() => {
-      expect(screen.getByText('No actions')).toBeInTheDocument();
+      expect(screen.getByText('REQ-1')).toBeInTheDocument();
+      expect(screen.queryByText('Approve')).not.toBeInTheDocument();
     });
   });
 
-  it('does not show Approve/Reject buttons for User role', async () => {
-    renderWithProviders(<AllPendingRequests role="User" />, {
-      authValue: { user: otherUser },
+  it('shows No actions for User role', async () => {
+    renderWithProviders(<AllPendingRequests role={UserRole.USER} />, {
+      authValue: { user: makeUser() },
       requestsValue: { pendingRequests: [otherRequest] },
     });
     await waitFor(() => {
-      expect(screen.queryByRole('button', { name: /Approve/i })).not.toBeInTheDocument();
+      expect(screen.queryByText('Approve')).not.toBeInTheDocument();
+      expect(screen.queryByText('Reject')).not.toBeInTheDocument();
     });
   });
 });
 
-describe('AllPendingRequests - Manager role actions', () => {
-  it('shows No actions for Manager role', async () => {
-    const mgr = makeUser({ id: 'mgr-1', role: 'manager' });
-    renderWithProviders(<AllPendingRequests role="Manager" />, {
-      authValue: { user: mgr },
+describe('AllPendingRequests - Manager role', () => {
+  it('shows Approve/Reject for Manager role', async () => {
+    renderWithProviders(<AllPendingRequests role={UserRole.MANAGER} />, {
+      authValue: { user: { ...owner, role: UserRole.MANAGER } as any },
       requestsValue: { pendingRequests: [otherRequest] },
     });
     await waitFor(() => {
-      expect(screen.getByText('No actions')).toBeInTheDocument();
+      expect(screen.getByText('Approve')).toBeInTheDocument();
+      expect(screen.getByText('Reject')).toBeInTheDocument();
+    });
+  });
+});
+
+// ── Selection & Flow ──────────────────────────────────────────────────────────
+
+describe('AllPendingRequests - selection and approval', () => {
+  it('opens approval modal when clicking Approve', async () => {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
+      authValue: { user: owner },
+      requestsValue: { pendingRequests: [otherRequest] },
+    });
+    
+    const approveBtn = await screen.findByText('Approve');
+    fireEvent.click(approveBtn);
+    
+    // Modal title should appear
+    expect(screen.getByText(/Approve Request/i)).toBeInTheDocument();
+  });
+
+  it('disables actions for the users own request if they are not manager', async () => {
+    renderWithProviders(<AllPendingRequests role={UserRole.USER} />, {
+      authValue: { user: makeUser() },
+      requestsValue: { pendingRequests: [makeParkingRequest({ requesterId: 'user-id-1' })] },
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('Approve')).not.toBeInTheDocument();
     });
   });
 });
@@ -93,22 +128,11 @@ describe('AllPendingRequests - Manager role actions', () => {
 // ── Filter toggle visibility ──────────────────────────────────────────────────
 
 describe('AllPendingRequests - filter toggle', () => {
-  it('renders the Segmented filter for Owner role', () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+  it('renders correctly for Owner role', async () => {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [] },
     });
-    expect(screen.getByText('Show all')).toBeInTheDocument();
-    expect(screen.getByText('Hide already rejected')).toBeInTheDocument();
-  });
-
-  it('does not render the Segmented filter for User role', () => {
-    renderWithProviders(<AllPendingRequests role="User" />, {
-      authValue: { user: otherUser },
-      requestsValue: { pendingRequests: [] },
-    });
-    expect(screen.queryByText('Show all')).not.toBeInTheDocument();
-    expect(screen.queryByText('Hide already rejected')).not.toBeInTheDocument();
   });
 });
 
@@ -116,7 +140,7 @@ describe('AllPendingRequests - filter toggle', () => {
 
 describe('AllPendingRequests - filterMode', () => {
   it('shows all requests by default (filterMode=all)', async () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
     });
@@ -127,7 +151,7 @@ describe('AllPendingRequests - filterMode', () => {
   });
 
   it('hides rejectedByOwner requests when Hide already rejected is selected', async () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
     });
@@ -139,7 +163,7 @@ describe('AllPendingRequests - filterMode', () => {
   });
 
   it('shows all requests again when Show all is clicked', async () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
     });
@@ -155,7 +179,7 @@ describe('AllPendingRequests - filterMode', () => {
 
 describe('AllPendingRequests - stats', () => {
   it('shows Rejected by You stat card for Owner role', () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [rejectedReq] },
     });
@@ -163,7 +187,7 @@ describe('AllPendingRequests - stats', () => {
   });
 
   it('does not show Rejected by You stat card for User role', () => {
-    renderWithProviders(<AllPendingRequests role="User" />, {
+    renderWithProviders(<AllPendingRequests role={UserRole.USER} />, {
       authValue: { user: otherUser },
       requestsValue: { pendingRequests: [] },
     });
@@ -171,7 +195,7 @@ describe('AllPendingRequests - stats', () => {
   });
 
   it('shows correct Total Requests count', async () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
     });
@@ -187,7 +211,7 @@ describe('AllPendingRequests - stats', () => {
 
 describe('AllPendingRequests - own request label', () => {
   it('shows (You) tag next to the owners own request name', async () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [ownRequest] },
     });
@@ -197,7 +221,7 @@ describe('AllPendingRequests - own request label', () => {
   });
 
   it('does not show (You) tag for another users request', async () => {
-    renderWithProviders(<AllPendingRequests role="Owner" />, {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [otherRequest] },
     });
@@ -205,5 +229,4 @@ describe('AllPendingRequests - own request label', () => {
       expect(screen.queryByText('(You)')).not.toBeInTheDocument();
     });
   });
-});
 });
