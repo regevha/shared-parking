@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
+import { RequestStatus } from '../types/enums';
 import './MyRequests.css';
 
 interface EditFormValues {
@@ -188,7 +189,7 @@ const MyRequests: React.FC = () => {
       render: (_: any, record: ParkingRequest) => (
         <>
           <Tag color={getRequestStatusColor(record.status)}>
-            {getRequestStatusLabel(record.status)}
+            {t(getRequestStatusLabel(record.status))}
           </Tag>
           {record.approvedBy === 'auto' && (
             <Tag color="purple" style={{ fontSize: '11px' }}>Auto</Tag>
@@ -210,7 +211,7 @@ const MyRequests: React.FC = () => {
       width: 70,
       render: (_, record: ParkingRequest) => (
         <Space size={2}>
-          {record.status === 'pending' && (
+          {record.status === RequestStatus.PENDING && (
             <Button
               type="link"
               icon={<EditOutlined />}
@@ -241,10 +242,10 @@ const MyRequests: React.FC = () => {
   ];
 
   const stats = {
-    total: userRequests.filter(r => r.status !== 'rejected').length,
-    pending: userRequests.filter(r => r.status === 'pending').length,
-    approved: userRequests.filter(r => r.status === 'approved').length,
-    rejected: userRequests.filter(r => r.status === 'rejected').length,
+    total: userRequests.filter(r => r.status !== RequestStatus.REJECTED).length,
+    pending: userRequests.filter(r => r.status === RequestStatus.PENDING).length,
+    approved: userRequests.filter(r => r.status === RequestStatus.APPROVED).length,
+    rejected: userRequests.filter(r => r.status === RequestStatus.REJECTED).length,
   };
 
   return (

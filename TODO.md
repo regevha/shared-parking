@@ -5,7 +5,7 @@ The following test suites and refinements are recommended to further harden the 
 ## 🧪 Upcoming Test Suites
 
 ### 1. 🕒 Stress-Testing 24/7 Conflict Logic
-- [ ] **DST (Daylight Saving Time)**: Verify no segments are lost or double-booked during the "spring forward" (loss of 1h) or "fall back" (gain of 1h) transitions.
+- [x] **DST (Daylight Saving Time)**: Partially Verified. Demonstrated with `test_dst.py` that current naive math incorrectly handles the "spring forward" jump (02:00 -> 03:00), leading to 1h duration error. Higher priority for refactor.
 - [ ] **The "36-Hour Wall"**: Add strict negative tests for 36h 1m payloads to ensure rejection (already handled in Pydantic, but need deeper integration test).
 - [ ] **Tight Segment Transitions**: Verify a request ending at 12:00:00 and another starting at 12:00:00 on the same lot do not conflict.
 
@@ -17,6 +17,7 @@ The following test suites and refinements are recommended to further harden the 
 ### 3. 🌐 Internationalization & UX
 - [ ] **Visual RTL Audit**: Automated screenshot tests for the mobile layout in Hebrew (specifically the `MyRequests` stats alignment).
 - [ ] **I18n Translation Completeness**: Integrate `scripts/check_i18n.py` into the CI/CD pipeline to block PRs with missing keys.
+- [ ] **Rest of Screens UX Review**: Perform detailed UX audits and proposal reports for the remaining 11 screens (MyRequests, RequestDetail, CalendarView, etc.).
 
 ### 4. 📜 Audit Trail Extensions
 - [ ] **Detailed Diffs**: In `AuditLog`, store the specific fields that were updated (e.g., "Duration changed from 2h to 4h").
@@ -34,6 +35,28 @@ The following test suites and refinements are recommended to further harden the 
 - [ ] **Bulk Approval/Rejection**: Add checkboxes and batch actions ("Approve All Selected").
 - [ ] **Mobile Swipe Actions**: Implement intuitive swipe-to-approve/reject on mobile card views.
 
-## 🛠️ Refactor Ideas
+### 7. 🔐 Security & Hardening
+- [ ] **Full Security Review**: Perform a dedicated audit of JWT handling, RBAC decorators, and SQL injection prevention.
+- [ ] **Rate Limiting**: Implement API rate limiting to protect against brute-force and DDoS.
+- [ ] **Vulnerability Scanning**: Set up automated dependency scanning (e.g., Snyk or GitHub Dependabot).
+
+## 🧹 Technical Debt & Clean Up (v2.1)
+- [ ] **Deep Hardcoding Scan**: Perform a recursive scan of the entire codebase (frontend/backend) to identify remaining hardcoded business rules (limits, timeouts, URLs) and move them to `.env` or shared constant files.
+- [x] **API Logic Clean Up**: Use Enums consistently across all backend routers (e.g., `UserRole`, `RequestStatus`, `LotStatus`).
+- [ ] **DST-Aware Refactor**: Complete the migration of the backend to timezone-aware `datetime` objects to resolve the failing `test_dst.py` test cases.
+
+## 🏗️ Refactor Ideas
+- [ ] **Lot-Specific Availability**: Migrate `notificationWindows` and `availabilityWindows` from `User` to `Lot` objects to allow granular control.
 - [ ] **Native Date Handling**: Migrate all ISO strings to native `DateTime` objects in the Database layer if we move away from SQLite.
 - [ ] **Real-time Notifications**: Replace polling with WebSockets for immediate approval/rejection alerts.
+
+## 🏗️ Infrastructure & Hardening (Final MVP Sprint) — COMPLETED ✅
+- [x] **Secret Management (.env)**: Move `SECRET_KEY` and other hardcoded constants to a protected `.env` file.
+- [x] **Backend Logging**: Implement standardized Python logging for better debuggability.
+- [x] **Cancellation Policy**: Implement business rule logic (e.g., "Cannot cancel within 2h of start").
+- [x] **Notification Hub**: Add a simple UI notification bell/counter for status changes.
+- [x] **Hardcoding Audit**: Scan the entire codebase and generate a report of all hardcoded strings and constants that should be externalized.
+- [x] **Critical Hardcoding Fixes**: Refactored major backend/frontend components to use shared Enums and Envs.
+- [x] **Dev Containers**: Defined `.devcontainer` configuration to standardize the development environment.
+- [x] **RBAC & Session Lifecycle**: Migrated to centralized AuthProvider, implemented robust route guards in App.tsx and AdminPanel.tsx, and fixed the logout URL state leak.
+- [x] **Test Suite Hardening**: Added matchMedia mocks for Ant Design and refactored tests to use `renderWithProviders` for consistent state injection.

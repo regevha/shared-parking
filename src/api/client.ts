@@ -15,14 +15,14 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = localStorage.getItem(TOKEN_KEY);
   const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
+  const headers: Record<string, string> = {
+    ...authHeader,
+    ...(options?.headers as Record<string, string> | undefined),
+  };
+
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader,
-      // caller-supplied headers take highest precedence
-      ...(options?.headers as Record<string, string> | undefined),
-    },
+    headers,
   });
 
   if (!res.ok) {
@@ -37,8 +37,30 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  get:    <T>(path: string)                => request<T>(path),
-  post:   <T>(path: string, body: unknown) => request<T>(path, { method: 'POST',  body: JSON.stringify(body) }),
-  patch:  <T>(path: string, body?: unknown)=> request<T>(path, { method: 'PATCH', body: body ? JSON.stringify(body) : undefined }),
-  delete: <T>(path: string)               => request<T>(path, { method: 'DELETE' }),
+  get: <T>(path: string) => request<T>(path),
+  post: <T>(path: string, body: unknown, options?: RequestInit) => {
+    const isFormData = body instanceof FormData;
+    return request<T>(path, {
+      method: 'POST',
+      ...options,
+      body: isFormData ? body : JSON.stringify(body),
+      headers: {
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+        ...(options?.headers as Record<string, string>),
+      }
+    });
+  },
+  patch: <T>(path: string, body?: unknown, options?: RequestInit) => request<T>(path, { 
+    method: 'PATCH', 
+    ...options,
+    body: body ? JSON.stringify(body) : undefined,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers as Record<string, string>,
+    }
+  }),
+  delete: <T>(path: string, options?: RequestInit) => request<T>(path, { 
+    method: 'DELETE',
+    ...options,
+  }),
 };

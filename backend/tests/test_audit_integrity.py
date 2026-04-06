@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-def test_audit_trail_privacy(client: TestClient, user_headers: dict, owner_headers: dict):
+def test_audit_trail_privacy(client: TestClient, user_headers: dict, owner_headers: dict, manager_headers: dict):
     """Verify User B cannot see User A's audit log."""
     # 1. Create a request as User A
     payload = {
@@ -13,7 +13,15 @@ def test_audit_trail_privacy(client: TestClient, user_headers: dict, owner_heade
     assert resp.status_code == 201
     req_id = resp.json()["id"]
 
-    # 2. Try to view audit log as Owner (User B)
+    # 1a. (Wait, let's test that Owners CAN see pending)
+    resp = client.get(f"/api/requests/{req_id}/audit", headers=owner_headers)
+    assert resp.status_code == 200 # Allowed for evaluation
+
+    # 1b. Manager rejects it or assigns to ANOTHER lot
+    # Actually, if we reject it, it's no longer pending.
+    client.patch(f"/api/requests/{req_id}/reject", headers=manager_headers)
+
+    # 2. Try to view audit log as Owner (User B) who is NOT the requester or lottery
     resp = client.get(f"/api/requests/{req_id}/audit", headers=owner_headers)
     assert resp.status_code == 403
 

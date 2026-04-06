@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+import os
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 import datetime as dt_mod
@@ -14,16 +15,26 @@ router = APIRouter(prefix="/api/requests", tags=["requests"])
 
 
 def _generate_id(db: Session) -> str:
-    from sqlalchemy import func
+    """Generate a sequential REQ-XXX ID or fallback to a short UUID on error/collision."""
     last = db.query(models.ParkingRequest.id).order_by(models.ParkingRequest.id.desc()).first()
     if not last:
         return "REQ-001"
-    try:
-        last_num = int(last[0].split("-")[1])
-        return f"REQ-{last_num + 1:03d}"
-    except (IndexError, ValueError):
-        import uuid
-        return f"REQ-{uuid.uuid4().hex[:6].upper()}"
+    
+    id_str = last[0]
+    if "-" in id_str:
+        try:
+            prefix, num_str = id_str.split("-", 1)
+            if prefix == "REQ":
+                last_num = int(num_str)
+                # Keep padding but allow growth beyond 999
+                padding = max(3, len(num_str))
+                return f"REQ-{last_num + 1:0{padding}d}"
+        except (ValueError, IndexError):
+            pass
+    
+    # Fallback for non-standard IDs to avoid collisions
+    import uuid
+    return f"REQ-{uuid.uuid4().hex[:6].upper()}"
 
 
 def _add_audit_log(
@@ -40,6 +51,16 @@ def _add_audit_log(
         timestamp=datetime.now(timezone.utc).isoformat()
     )
     db.add(log)
+
+
+def _create_notification(db: Session, user_id: str, message: str):
+    notif = models.Notification(
+        user_id=user_id,
+        message=message,
+        created_at=datetime.now(timezone.utc).isoformat()
+    )
+    db.add(notif)
+    db.commit()
 
 
 def _has_conflict(
@@ -146,6 +167,8 @@ def get_all_requests(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    if str(current_user.role) != models.UserRole.MANAGER.value:
+        raise HTTPException(status_code=403, detail="Only managers can view all requests")
     return db.query(models.ParkingRequest).all()
 
 
@@ -156,7 +179,7 @@ def get_pending(
 ):
     return (
         db.query(models.ParkingRequest)
-        .filter(models.ParkingRequest.status == "pending")
+        .filter(models.ParkingRequest.status == models.RequestStatus.PENDING.value)
         .all()
     )
 
@@ -168,7 +191,7 @@ def get_approved(
 ):
     return (
         db.query(models.ParkingRequest)
-        .filter(models.ParkingRequest.status == "approved")
+        .filter(models.ParkingRequest.status == models.RequestStatus.APPROVED.value)
         .all()
     )
 
@@ -197,27 +220,29 @@ def create_request(
         db.query(models.ParkingRequest)
         .filter(
             models.ParkingRequest.requester_id == current_user.id,
-            models.ParkingRequest.status == "pending"
+            models.ParkingRequest.status == models.RequestStatus.PENDING.value
         )
         .count()
     )
-    if pending_count >= 5:
+    max_pending = int(os.environ.get("MAX_PENDING_REQUESTS", 5))
+    if pending_count >= max_pending:
         raise HTTPException(
             status_code=400,
-            detail="Maximum limit of 5 pending requests reached. Please wait for an existing request to be approved or rejected."
+            detail=f"Maximum limit of {max_pending} pending requests reached. Please wait for an existing request to be approved or rejected."
         )
 
     req = models.ParkingRequest(
         id=_generate_id(db),
         requester_id=current_user.id,
         requester_name=current_user.name,
+        requester_role=current_user.role,
         date=payload.date,
         start_time=payload.start_time,
         end_date=payload.end_date,
         end_time=payload.end_time,
         duration=payload.duration,
         submitted_at=datetime.now(timezone.utc).isoformat(),
-        status="pending",
+        status=models.RequestStatus.PENDING.value,
     )
     db.add(req)
     _add_audit_log(db, req.id, current_user.id, current_user.name, "submitted", requester_id=current_user.id)
@@ -236,7 +261,7 @@ def approve_request(
     req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
     if not req:
         raise HTTPException(status_code=404, detail="Request not found")
-    if req.status != "pending":
+    if req.status != models.RequestStatus.PENDING.value:
         raise HTTPException(status_code=400, detail="Only pending requests can be approved")
     if payload.lot_id:
         conflict_id = _has_conflict(
@@ -253,7 +278,7 @@ def approve_request(
     # The user is experiencing a hard error here, let's remove it for manual approval.
 
     now = datetime.now(timezone.utc).isoformat()
-    req.status = "approved"
+    req.status = models.RequestStatus.APPROVED.value
     req.approved_at = now
     req.approved_by = current_user.name
     req.updated_at = now
@@ -272,6 +297,11 @@ def approve_request(
     if payload.lot_owner:
         req.lot_owner = payload.lot_owner
 
+    _create_notification(
+        db, req.requester_id, 
+        f"Your parking request {req.id} for {req.date} has been APPROVED. Assigned Lot: {req.lot_id}."
+    )
+
     db.commit()
     db.refresh(req)
     return req
@@ -287,10 +317,11 @@ def reject_request(
     if not req:
         raise HTTPException(status_code=404, detail="Request not found")
 
-    req.status = "rejected"
+    req.status = models.RequestStatus.REJECTED.value
     req.rejected_by_owner = True
     req.updated_at = datetime.now(timezone.utc).isoformat()
     _add_audit_log(db, req.id, current_user.id, current_user.name, "rejected", requester_id=req.requester_id)
+    _create_notification(db, req.requester_id, f"Your parking request {req.id} for {req.date} has been rejected.")
     db.commit()
     db.refresh(req)
     return req
@@ -308,7 +339,7 @@ def update_request(
         raise HTTPException(status_code=404, detail="Request not found")
     if req.requester_id != current_user.id:
         raise HTTPException(status_code=403, detail="You can only edit your own requests")
-    if req.status != "pending":
+    if req.status != models.RequestStatus.PENDING.value:
         raise HTTPException(status_code=400, detail="Only pending requests can be edited")
 
     effective_date  = payload.date       if payload.date       is not None else req.date
@@ -344,6 +375,23 @@ def delete_request(
         raise HTTPException(status_code=404, detail="Request not found")
     if req.requester_id != current_user.id:
         raise HTTPException(status_code=403, detail="You can only cancel your own requests")
+
+    # ── Cancellation Window Check (MVP Sprint) ────────────────────────────────────
+    # Prevent cancelling approved requests too close to the start time
+    if req.status == models.RequestStatus.APPROVED.value and current_user.role != models.UserRole.MANAGER.value:
+        import os
+        try:
+            window_hours = int(os.getenv("CANCELLATION_WINDOW_HOURS", 2))
+            start_dt = datetime.strptime(f"{req.date} {req.start_time}", "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+            now = datetime.now(timezone.utc)
+            
+            if (start_dt - now) < dt_mod.timedelta(hours=window_hours):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Approved requests cannot be cancelled within {window_hours} hours of the start time. Please contact a manager if you need an emergency cancellation."
+                )
+        except (ValueError, TypeError):
+            pass # Use default behavior if env is missing or malformed
     # Audit retention: null out request_id on related messages so they survive the
     # delete.  Done explicitly here because SQLite ignores FK ON DELETE actions
     # unless PRAGMA foreign_keys=ON is set for every connection.
@@ -363,7 +411,7 @@ def trigger_auto_approve(
     current_user: models.User = Depends(get_current_user),
 ):
     """Manually trigger the background auto-approval scheduler."""
-    if current_user.role != "manager":
+    if current_user.role != models.UserRole.MANAGER.value:
         raise HTTPException(status_code=403, detail="Only managers can run auto-approve")
 
     from scheduler import run_auto_approval
@@ -390,10 +438,31 @@ def get_request_audit(
             requester_id = log.requester_id
             break
             
-    # Check access (Manager or original Requester)
-    if current_user.role != "manager" and current_user.id != requester_id:
-         # Double check if request STILL exists, maybe current_user is the owner?
-         # But owners can't see the full audit trail (privacy requirement #2)
+    # Check access
+    # 1. Manager (full access)
+    # 2. Original requester (full access)
+    # 3. Lot owner (involved party)
+    # 4. Any owner if request is PENDING (evaluation period)
+    
+    is_manager = str(current_user.role) == models.UserRole.MANAGER.value
+    is_requester = current_user.id == requester_id
+    
+    # Check lot ownership or status if needed
+    req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
+    is_involved_owner = False
+    is_pending = False
+    if req:
+        is_pending = (req.status == models.RequestStatus.PENDING.value)
+        # In our system, lot_owner is stored as a name string in the request
+        if req.lot_owner == current_user.name:
+            is_involved_owner = True
+    
+    import logging
+    logger = logging.getLogger("parking-api")
+    logger.info(f"AUDIT_DEBUG: id={request_id} user={current_user.id} role={current_user.role} is_manager={is_manager} is_req={is_requester} is_pending={is_pending} involved={is_involved_owner}")
+
+    if not (is_manager or is_requester or is_involved_owner or (str(current_user.role) == models.UserRole.OWNER.value and is_pending)):
+         logger.warning(f"AUDIT_DENIED: User {current_user.id} ({current_user.role}) attempted access to history for {request_id}")
          raise HTTPException(status_code=403, detail="Permission denied")
 
     return logs

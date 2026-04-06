@@ -2,18 +2,20 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { requestsApi } from '../api/requests';
 import { lotsApi, LotData } from '../api/lots';
 import { useAuth } from './AuthContext';
+import { RequestStatus } from '../types/enums';
 
 export interface ParkingRequest {
   id: string;
   requesterId: string;
   requesterName: string;
+  requesterRole?: string;
   date: string;
   startTime: string;
   endDate: string;
   endTime: string;
   duration: number;
   submittedAt: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: RequestStatus;
   rejectedByOwner?: boolean;
   lotId?: string;
   floor?: string;

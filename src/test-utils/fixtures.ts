@@ -1,6 +1,7 @@
 import { ParkingRequest } from '../contexts/RequestsContext';
 import { LotData } from '../api/lots';
 import { AuthUser } from '../api/auth';
+import { RequestStatus, LotStatus } from '../types/enums';
 
 let _reqCounter = 1;
 
@@ -16,7 +17,7 @@ export function makeParkingRequest(overrides: Partial<ParkingRequest> = {}): Par
     endTime: '10:00',
     duration: 1,
     submittedAt: '2026-03-28T08:00:00Z',
-    status: 'pending',
+    status: RequestStatus.PENDING,
     rejectedByOwner: false,
     ...overrides,
   };
@@ -29,7 +30,7 @@ export function makeLot(overrides: Partial<LotData> = {}): LotData {
     floorLabel: 'Floor A',
     owner: 'Sarah',
     ownerId: 'owner-1',
-    status: 'available',
+    status: LotStatus.AVAILABLE,
     ...overrides,
   };
 }

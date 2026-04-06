@@ -5,25 +5,25 @@ import {
   getRequestStatusColor,
   getRequestStatusLabel,
 } from '../statusUtils';
-import { LotStatus } from '../../types';
+import { LotStatus, RequestStatus } from '../../types/enums';
 
 // ── getStatusColor ───────────────────────────────────────────────────────────
 
 describe('getStatusColor', () => {
   it('returns green hex for available', () => {
-    expect(getStatusColor('available')).toBe('#52c41a');
+    expect(getStatusColor(LotStatus.AVAILABLE)).toBe('#52c41a');
   });
 
   it('returns red hex for blocked', () => {
-    expect(getStatusColor('blocked')).toBe('#ff4d4f');
+    expect(getStatusColor(LotStatus.BLOCKED)).toBe('#ff4d4f');
   });
 
   it('returns grey hex for unowned', () => {
-    expect(getStatusColor('unowned')).toBe('#d9d9d9');
+    expect(getStatusColor(LotStatus.UNOWNED)).toBe('#d9d9d9');
   });
 
   it('returns amber hex for unowned-blocked', () => {
-    expect(getStatusColor('unowned-blocked')).toBe('#faad14');
+    expect(getStatusColor(LotStatus.UNOWNED_BLOCKED)).toBe('#faad14');
   });
 
   it('returns grey hex for unknown value', () => {
@@ -35,16 +35,16 @@ describe('getStatusColor', () => {
 
 describe('getStatusLabel', () => {
   it.each<[LotStatus, string]>([
-    ['available',       'Available'],
-    ['blocked',         'Blocked'],
-    ['unowned',         'Unowned'],
-    ['unowned-blocked', 'Unowned-Blocked'],
+    [LotStatus.AVAILABLE,       'lotStatusBoard.legend.available'],
+    [LotStatus.BLOCKED,         'lotStatusBoard.legend.blocked'],
+    [LotStatus.UNOWNED,         'lotStatusBoard.legend.unowned'],
+    [LotStatus.UNOWNED_BLOCKED, 'lotStatusBoard.legend.unownedBlocked'],
   ])('returns %s label for %s status', (status, expected) => {
     expect(getStatusLabel(status)).toBe(expected);
   });
 
-  it('returns "Unknown" for unrecognised status', () => {
-    expect(getStatusLabel('future-status' as LotStatus)).toBe('Unknown');
+  it('returns "status.unknown" for unrecognised status', () => {
+    expect(getStatusLabel('future-status' as LotStatus)).toBe('status.unknown');
   });
 });
 
@@ -52,19 +52,19 @@ describe('getStatusLabel', () => {
 
 describe('getLotStatusTagColor', () => {
   it('returns green tag for available', () => {
-    expect(getLotStatusTagColor('available')).toBe('green');
+    expect(getLotStatusTagColor(LotStatus.AVAILABLE)).toBe('green');
   });
 
   it('returns red tag for blocked', () => {
-    expect(getLotStatusTagColor('blocked')).toBe('red');
+    expect(getLotStatusTagColor(LotStatus.BLOCKED)).toBe('red');
   });
 
   it('returns default tag for unowned', () => {
-    expect(getLotStatusTagColor('unowned')).toBe('default');
+    expect(getLotStatusTagColor(LotStatus.UNOWNED)).toBe('default');
   });
 
   it('returns orange tag for unowned-blocked', () => {
-    expect(getLotStatusTagColor('unowned-blocked')).toBe('orange');
+    expect(getLotStatusTagColor(LotStatus.UNOWNED_BLOCKED)).toBe('orange');
   });
 
   it('returns default tag for unknown status', () => {
@@ -76,9 +76,9 @@ describe('getLotStatusTagColor', () => {
 
 describe('getRequestStatusColor', () => {
   it.each([
-    ['approved',  'green'],
-    ['pending',   'blue'],
-    ['rejected',  'red'],
+    [RequestStatus.APPROVED,  'green'],
+    [RequestStatus.PENDING,   'blue'],
+    [RequestStatus.REJECTED,  'red'],
     ['expired',   'orange'],
     ['cancelled', 'default'],
   ])('returns %s for %s status', (status, expected) => {
@@ -91,7 +91,7 @@ describe('getRequestStatusColor', () => {
 
   // Guard: pending must be blue, NOT orange — this was a real bug in LotCalendarView
   it('pending is blue (not orange)', () => {
-    expect(getRequestStatusColor('pending')).toBe('blue');
+    expect(getRequestStatusColor(RequestStatus.PENDING)).toBe('blue');
   });
 });
 
@@ -99,11 +99,11 @@ describe('getRequestStatusColor', () => {
 
 describe('getRequestStatusLabel', () => {
   it.each([
-    ['approved',  'Approved'],
-    ['pending',   'Pending'],
-    ['rejected',  'Rejected'],
-    ['expired',   'Expired'],
-    ['cancelled', 'Cancelled'],
+    [RequestStatus.APPROVED,  'calendarView.legend.approved'],
+    [RequestStatus.PENDING,   'calendarView.legend.pending'],
+    [RequestStatus.REJECTED,  'calendarView.legend.rejected'],
+    ['expired',   'calendarView.legend.expired'],
+    ['cancelled', 'calendarView.legend.cancelled'],
   ])('returns %s label for %s status', (status, expected) => {
     expect(getRequestStatusLabel(status)).toBe(expected);
   });

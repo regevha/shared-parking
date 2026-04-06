@@ -1,60 +1,60 @@
-import { LotStatus } from '../types';
+import { LotStatus, RequestStatus } from '../types/enums';
 
 // ── Lot status ─────────────────────────────────────────────────────────────
 
 /** Hex background colours — used for lot-grid cells in LotStatusBoard. */
 export const getStatusColor = (status: LotStatus): string => {
   switch (status) {
-    case 'available':       return '#52c41a';
-    case 'blocked':         return '#ff4d4f';
-    case 'unowned':         return '#d9d9d9';
-    case 'unowned-blocked': return '#faad14';
-    default:                return '#d9d9d9';
+    case LotStatus.AVAILABLE:       return '#52c41a';
+    case LotStatus.BLOCKED:         return '#ff4d4f';
+    case LotStatus.UNOWNED:         return '#d9d9d9';
+    case LotStatus.UNOWNED_BLOCKED: return '#faad14';
+    default:                        return '#d9d9d9';
   }
 };
 
 export const getStatusLabel = (status: LotStatus): string => {
   switch (status) {
-    case 'available':       return 'Available';
-    case 'blocked':         return 'Blocked';
-    case 'unowned':         return 'Unowned';
-    case 'unowned-blocked': return 'Unowned-Blocked';
-    default:                return 'Unknown';
+    case LotStatus.AVAILABLE:       return 'lotStatusBoard.legend.available';
+    case LotStatus.BLOCKED:         return 'lotStatusBoard.legend.blocked';
+    case LotStatus.UNOWNED:         return 'lotStatusBoard.legend.unowned';
+    case LotStatus.UNOWNED_BLOCKED: return 'lotStatusBoard.legend.unownedBlocked';
+    default:                        return 'status.unknown';
   }
 };
 
 /** Antd Tag colour names — used for <Tag> components in MyLots. */
 export const getLotStatusTagColor = (status: LotStatus): string => {
   switch (status) {
-    case 'available':       return 'green';
-    case 'blocked':         return 'red';
-    case 'unowned':         return 'default';
-    case 'unowned-blocked': return 'orange';
-    default:                return 'default';
+    case LotStatus.AVAILABLE:       return 'green';
+    case LotStatus.BLOCKED:         return 'red';
+    case LotStatus.UNOWNED:         return 'default';
+    case LotStatus.UNOWNED_BLOCKED: return 'orange';
+    default:                        return 'default';
   }
 };
 
 // ── Request status ──────────────────────────────────────────────────────────
 
 /** Antd Tag colour names for parking-request status badges. */
-export const getRequestStatusColor = (status: string): string => {
+export const getRequestStatusColor = (status: RequestStatus | string): string => {
   switch (status) {
-    case 'approved':  return 'green';
-    case 'pending':   return 'blue';
-    case 'rejected':  return 'red';
+    case RequestStatus.APPROVED: return 'green';
+    case RequestStatus.PENDING:  return 'blue';
+    case RequestStatus.REJECTED: return 'red';
     case 'expired':   return 'orange';
     case 'cancelled': return 'default';
     default:          return 'default';
   }
 };
 
-export const getRequestStatusLabel = (status: string): string => {
+export const getRequestStatusLabel = (status: RequestStatus | string): string => {
   switch (status) {
-    case 'approved':  return 'Approved';
-    case 'pending':   return 'Pending';
-    case 'rejected':  return 'Rejected';
-    case 'expired':   return 'Expired';
-    case 'cancelled': return 'Cancelled';
-    default:          return status;
+    case RequestStatus.APPROVED: return 'calendarView.legend.approved';
+    case RequestStatus.PENDING:  return 'calendarView.legend.pending';
+    case RequestStatus.REJECTED: return 'calendarView.legend.rejected';
+    case 'expired':   return 'calendarView.legend.expired'; // If we have it in i18n
+    case 'cancelled': return 'calendarView.legend.cancelled'; // If we have it in i18n
+    default:          return typeof status === 'string' ? status : String(status);
   }
 };

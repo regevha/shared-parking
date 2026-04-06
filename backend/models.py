@@ -1,6 +1,26 @@
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
+from enum import Enum
+
+
+class UserRole(str, Enum):
+    USER = "user"
+    OWNER = "owner"
+    MANAGER = "manager"
+
+
+class RequestStatus(str, Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
+class LotStatus(str, Enum):
+    AVAILABLE = "available"
+    BLOCKED = "blocked"
+    UNOWNED = "unowned"
+    UNOWNED_BLOCKED = "unowned-blocked"
 
 
 class User(Base):
@@ -42,13 +62,14 @@ class ParkingRequest(Base):
     id = Column(String, primary_key=True, index=True)
     requester_id = Column(String, nullable=False)          # → users.id
     requester_name = Column(String, nullable=False)
+    requester_role = Column(String, nullable=True)          # user | owner | manager
     date = Column(String, nullable=False)                  # YYYY-MM-DD
     start_time = Column(String, nullable=False)            # HH:MM
     end_date = Column(String, nullable=True)               # YYYY-MM-DD
     end_time = Column(String, nullable=False)              # HH:MM
     duration = Column(Integer, nullable=False)             # hours
     submitted_at = Column(String, nullable=False)          # ISO string
-    status = Column(String, nullable=False, default="pending")  # pending | approved | rejected
+    status = Column(String, nullable=False, default=RequestStatus.PENDING.value)  # pending | approved | rejected
     rejected_by_owner = Column(Boolean, default=False)
     lot_id = Column(String, nullable=True)
     floor = Column(String, nullable=True)
@@ -98,3 +119,13 @@ class AuditLog(Base):
     action = Column(String, nullable=False)  # submitted | approved | rejected | cancelled | auto-assigned | updated
     details = Column(String, nullable=True)  # additional info like lot ID
     timestamp = Column(String, nullable=False) # ISO timestamp
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    message = Column(String, nullable=False)
+    is_read = Column(Boolean, default=False)
+    created_at = Column(String, nullable=False) # ISO timestamp

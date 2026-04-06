@@ -8,10 +8,11 @@ requests. If clear → auto-approves. If conflicted → skips (leaves for manual
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timezone
+import os
 
 from database import SessionLocal
 import models
-from routers.requests import _has_conflict, _is_outside_availability, _add_audit_log
+from routers.requests import _has_conflict, _is_outside_availability, _add_audit_log, _create_notification
 
 scheduler = BackgroundScheduler()
 
@@ -29,12 +30,12 @@ def run_auto_approval(db=None):
     try:
         pending = (
             db.query(models.ParkingRequest)
-            .filter(models.ParkingRequest.status == "pending")
+            .filter(models.ParkingRequest.status == models.RequestStatus.PENDING.value)
             .order_by(models.ParkingRequest.submitted_at)
             .all()
         )
         
-        all_lots = db.query(models.Lot).filter(models.Lot.status != "unowned").all()
+        all_lots = db.query(models.Lot).filter(models.Lot.status != models.LotStatus.UNOWNED.value).all()
 
         for req in pending:
             target_lot = None
@@ -42,14 +43,14 @@ def run_auto_approval(db=None):
             # If request already has a lot specified, check only that one
             if req.lot_id:
                 lot = next((l for l in all_lots if l.id == req.lot_id), None)
-                if lot and lot.status == "available":
+                if lot and lot.status == models.LotStatus.AVAILABLE.value:
                     if not _has_conflict(db, lot.id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=req.id) and \
                        not _is_outside_availability(db, lot.id, req.date, req.start_time, req.end_date, req.end_time):
                         target_lot = lot
             else:
                 # Try to find ANY available lot
                 for lot in all_lots:
-                    if lot.status != "available":
+                    if lot.status != models.LotStatus.AVAILABLE.value:
                         continue
                     
                     # Check for conflicts and availability for THIS lot
@@ -60,7 +61,7 @@ def run_auto_approval(db=None):
             
             if target_lot:
                 now = datetime.now(timezone.utc).isoformat()
-                req.status = "approved"
+                req.status = models.RequestStatus.APPROVED.value
                 req.approved_by = "auto"
                 req.approved_at = now
                 req.updated_at = now
@@ -71,13 +72,19 @@ def run_auto_approval(db=None):
                 
                 _add_audit_log(
                     db, req.id, "system", "Auto Scheduler", "auto-assigned",
-                    details=f"Assigned lot {target_lot.id} (Floor {target_lot.floor_label})"
+                    details=f"Assigned lot {target_lot.id} (Floor {target_lot.floor_label})",
+                    requester_id=req.requester_id
                 )
-                
+
+                _create_notification(
+                    db, req.requester_id,
+                    f"Your parking request {req.id} for {req.date} has been APPROVED (System Auto-Approval). Assigned Lot: {target_lot.id}."
+                )
+
                 db.commit()
     finally:
         if close_db:
             db.close()
 
 
-scheduler.add_job(run_auto_approval, "interval", minutes=15)
+scheduler.add_job(run_auto_approval, "interval", minutes=int(os.getenv("AUTO_APPROVE_INTERVAL_MINUTES", 15)))

@@ -4,26 +4,13 @@ import { Table, Button, Tag, Space, Row, Col, Card, Segmented, Modal, notificati
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
-import { Role } from '../types';
+import { UserRole } from '../types/enums';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import './AllPendingRequests.css';
 
-interface PendingRequest {
-  id: string;
-  requesterId: string;
-  requesterName: string;
-  date: string;
-  startTime: string;
-  endDate: string;
-  endTime: string;
-  duration: number;
-  submittedAt: string;
-  rejectedByOwner?: boolean;
-}
-
 interface AllPendingRequestsProps {
-  role: Role;
+  role: UserRole;
 }
 
 const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
@@ -33,7 +20,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const { user } = useAuth();
   const { t } = useTranslation();
 
-  const isOwner = role === 'Owner';
+  const isOwner = role === UserRole.OWNER;
 
   // Filter requests
   const filteredRequests = useMemo(() => {
@@ -103,13 +90,13 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
     });
   };
 
-  const columns: ColumnsType<PendingRequest> = [
+  const columns: ColumnsType<ParkingRequest> = [
     {
       title: t('pendingRequests.columns.requesterName'),
       dataIndex: 'requesterName',
       key: 'requesterName',
       width: '20%',
-      render: (text: string, record: PendingRequest) => {
+      render: (text: string, record: ParkingRequest) => {
         const isOwnRequest = record.requesterId === user?.id;
         return (
           <div>
@@ -123,7 +110,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       title: t('pendingRequests.columns.timeSlot'),
       key: 'timeSlot',
       width: '18%',
-      render: (_, record: PendingRequest) => (
+      render: (_, record: ParkingRequest) => (
         <>
           {record.startTime} - {record.endTime}
           {record.endDate && record.endDate !== record.date && (
@@ -159,15 +146,15 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       title: t('pendingRequests.columns.actions'),
       key: 'actions',
       width: '20%',
-      render: (_, record: PendingRequest) => {
+      render: (_, record: ParkingRequest) => {
         const isOwnRequest = record.requesterId === user?.id;
 
         if (!isOwner) {
-          return <span style={{ color: '#999' }}>{t('pendingRequests.noActions')}</span>;
+          return <span style={{ color: '#999', fontSize: '12px' }}>{t('pendingRequests.noActions')}</span>;
         }
 
         if (isOwnRequest) {
-          return <span style={{ color: '#999' }}>{t('pendingRequests.cannotApproveOwn')}</span>;
+          return <Tag>{t('pendingRequests.cannotApproveOwn')}</Tag>;
         }
 
         return (
@@ -176,8 +163,8 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
               type="primary"
               size="small"
               icon={<CheckOutlined />}
-              loading={approvalInProgress === record.id}
               onClick={() => handleApprove(record.id, record.requesterName)}
+              loading={approvalInProgress === record.id}
             >
               {t('pendingRequests.actions.approve')}
             </Button>
@@ -185,8 +172,8 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
               danger
               size="small"
               icon={<CloseOutlined />}
-              loading={approvalInProgress === record.id}
               onClick={() => handleReject(record.id, record.requesterName)}
+              loading={approvalInProgress === record.id}
             >
               {t('pendingRequests.actions.reject')}
             </Button>
@@ -196,103 +183,83 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
     },
   ];
 
-  const getRowClassName = (record: PendingRequest) => {
+  const getRowClassName = (record: ParkingRequest) => {
     if (isOwner && record.rejectedByOwner) {
       return 'rejected-row';
     }
     return '';
   };
 
-  const stats = {
-    total: pendingRequests.length,
-    pending: pendingRequests.filter((r: ParkingRequest) => r.status === 'pending').length,
-    rejected: pendingRequests.filter((r: ParkingRequest) => r.status === 'rejected' || r.rejectedByOwner).length,
-  };
-
   return (
-    <div className="all-pending-requests">
-      <h1>{t('pendingRequests.title')}</h1>
+    <div className="pending-requests">
+      <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+        <Col>
+          <h1>{t('pendingRequests.title')}</h1>
+        </Col>
+        {isOwner && (
+          <Col>
+            <Space>
+              <span>{t('pendingRequests.filterLabel')}</span>
+              <Segmented
+                options={[
+                  { label: t('pendingRequests.filterAll'), value: 'all' },
+                  { label: t('pendingRequests.filterHideRejected'), value: 'active' },
+                ]}
+                value={filterMode}
+                onChange={(v) => setFilterMode(v as any)}
+              />
+            </Space>
+          </Col>
+        )}
+      </Row>
 
-      {/* Filter Toggle (Owner only) */}
-      {isOwner && (
-        <Card style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>
-              <strong>{t('pendingRequests.filterLabel')}</strong>
-            </span>
-            <Segmented
-              value={filterMode}
-              onChange={(value) => setFilterMode(value as 'all' | 'active')}
-              options={[
-                { label: t('pendingRequests.filterAll'), value: 'all' },
-                { label: t('pendingRequests.filterHideRejected'), value: 'active' },
-              ]}
-            />
-          </div>
-        </Card>
-      )}
-
-      {/* Table */}
       <Table
         columns={columns}
         dataSource={filteredRequests}
         rowKey="id"
         pagination={{ pageSize: 10, hideOnSinglePage: true }}
-        scroll={{ x: 800 }}
-        rowClassName={getRowClassName}
         size="middle"
+        rowClassName={getRowClassName}
       />
 
-      {/* Legend for rejected requests (Owner only) */}
-      {isOwner && stats.rejected > 0 && (
-        <Card style={{ marginTop: '24px' }} size="small">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '20px',
-                height: '20px',
-                backgroundColor: '#f5f5f5',
-                borderRadius: '2px',
-                border: '1px solid #d9d9d9',
-              }}
-            />
-            <span>{t('pendingRequests.rejectedLegend')}</span>
-          </div>
-        </Card>
-      )}
-
-      {/* Stats */}
-      <Card size="small" style={{ marginTop: '24px' }}>
-        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
-          <div>
-            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.total}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('pendingRequests.stats.total')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.pending}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('pendingRequests.stats.pending')}</span>
-          </div>
-          {isOwner && (
-            <div>
-              <strong style={{ fontSize: '18px', color: '#999', marginRight: '8px' }}>{stats.rejected}</strong>
-              <span style={{ color: 'var(--label-color)' }}>{t('pendingRequests.stats.rejectedByYou')}</span>
-            </div>
-          )}
-        </Space>
-      </Card>
-
-      {/* Role-specific Info */}
-      <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        {isOwner ? (
-          <div>
-            <strong>{t('pendingRequests.title')}:</strong> {t('pendingRequests.infoOwner')}
-          </div>
-        ) : (
-          <div>
-            <strong>{t('pendingRequests.title')}:</strong> {t('pendingRequests.infoManager')}
+      <div className="legend-and-info" style={{ marginTop: '24px' }}>
+        {isOwner && (
+          <div className="legend" style={{ marginBottom: '16px' }}>
+            <span className="rejected-sample"></span>
+            <span style={{ fontSize: '13px', color: '#666' }}>
+              {t('pendingRequests.rejectedLegend')}
+            </span>
           </div>
         )}
-      </Card>
+        
+        <Row gutter={16}>
+          <Col xs={24} md={8}>
+             <Card size="small" title={t('pendingRequests.stats.total')} style={{ height: '100%' }}>
+                <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{pendingRequests.length}</div>
+             </Card>
+          </Col>
+          <Col xs={24} md={8}>
+             <Card size="small" title={t('pendingRequests.stats.pending')} style={{ height: '100%' }}>
+                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>
+                  {pendingRequests.filter(r => !r.rejectedByOwner).length}
+                </div>
+             </Card>
+          </Col>
+          {isOwner && (
+            <Col xs={24} md={8}>
+              <Card size="small" title={t('pendingRequests.stats.rejectedByYou')} style={{ height: '100%' }}>
+                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff4d4f' }}>
+                    {pendingRequests.filter(r => r.rejectedByOwner).length}
+                  </div>
+              </Card>
+            </Col>
+          )}
+        </Row>
+
+        <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
+          <strong>{t('pendingRequests.title')}:</strong> {isOwner ? t('pendingRequests.infoOwner') : t('pendingRequests.infoManager')}
+        </Card>
+      </div>
     </div>
   );
 };

@@ -1,22 +1,43 @@
 import os
+import logging
 from contextlib import asynccontextmanager
-
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
+# ── Load Env & Logging ────────────────────────────────────────────────────────
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
+# Ensure logs directory exists
+_log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
+if not os.path.exists(_log_dir):
+    os.makedirs(_log_dir)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(os.path.join(_log_dir, "parking.log"))
+    ]
+)
+logger = logging.getLogger("parking-api")
+logger.info("API Starting Up...")
+
 from database import engine, Base
-from routers import requests, lots, auth, users, messages, config
+from routers import auth, requests, lots, messages, users, config, notifications, admin
 from scheduler import scheduler
 
 # Create all tables on startup
 Base.metadata.create_all(bind=engine)
 
-# ── Lightweight startup migrations (idempotent ALTER TABLE statements) ────────
+# ── Lightweight startup migrations (idempotent ALTER TABLE/CREATE statements) ─
 def _run_migrations() -> None:
-    """Add new columns to existing tables without requiring a full reseed."""
+    """Add new columns/tables to existing databases without requiring a full reseed."""
     with engine.connect() as conn:
         migrations = [
+            "CREATE TABLE IF NOT EXISTS notifications (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL, message TEXT NOT NULL, is_read BOOLEAN DEFAULT 0, created_at TEXT NOT NULL)",
             "ALTER TABLE user_preferences ADD COLUMN notification_windows TEXT DEFAULT '{}'",
             "ALTER TABLE user_preferences ADD COLUMN availability_windows TEXT DEFAULT '{}'",
             "ALTER TABLE parking_requests ADD COLUMN updated_at TEXT",
@@ -25,6 +46,7 @@ def _run_migrations() -> None:
             "ALTER TABLE lots ADD COLUMN created_at TEXT",
             "ALTER TABLE lots ADD COLUMN updated_at TEXT",
             "ALTER TABLE user_preferences ADD COLUMN language TEXT DEFAULT 'en'",
+            "ALTER TABLE parking_requests ADD COLUMN requester_role TEXT",
         ]
         for sql in migrations:
             try:
@@ -71,6 +93,8 @@ app.include_router(messages.router)
 app.include_router(lots.router)
 app.include_router(users.router)
 app.include_router(config.router)
+app.include_router(notifications.router)
+app.include_router(admin.router)
 
 
 @app.get("/")

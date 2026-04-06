@@ -68,28 +68,75 @@ All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the ful
 | `pytest-cov` | Enables `--cov` flag for line-level coverage reports |
 
 ## Startup
-```bash
-# Backend
-cd backend
-pip install -r requirements.txt
-python seed.py        # first time only — data persists in parking.db
-uvicorn main:app --reload
 
-# Frontend (separate terminal)
+### 1 — Backend (Port 8000)
+```bash
+cd backend
+python -m pip install -r requirements.txt
+python seed.py        # first time only — creates/resets parking.db
+
+# To allow access from other devices (mobile) on the same network:
+python -m uvicorn main:app --host 0.0.0.0 --reload
+```
+
+### 2 — Frontend (Port 3000)
+```bash
+# In a separate terminal
 npm install
 npm start
 ```
 
+## Mobile Access & CORS
+- **Binding**: Running with `--host 0.0.0.0` makes the backend available on your machine's local IP (e.g., `192.168.x.x`).
+- **CORS**: The backend is configured with `allow_origins=["*"]` in `main.py` to facilitate local network testing.
+- **Client Configuration**: Ensure `src/api/client.ts` uses the correct local IP if testing from a physical mobile device.
+
+## Shutdown
+- **Graceful**: Press `Ctrl+C` in the respective terminal windows.
+- **Force (Windows)**:
+  - Stop Backend: `taskkill /F /IM python.exe`
+  - Stop Frontend: `taskkill /F /IM node.exe`
+
+## Logging
+- **Directory**: `logs/` at the project root (created automatically on startup if missing).
+- **Files**:
+  - `logs/parking.log`: Centralised backend application logs (API startup, requests, errors, scheduler actions).
+- **Git**: The entire `logs/` directory is ignored by Git to keep the repository clean.
+- **Testing**: `backend/tests/test_infra_hardening.py` verifies that the logging system is active and writing to the correct path.
+
 ## Running Tests
+
+### Backend
 ```bash
 cd backend
-pip install -r requirements-test.txt   # first time only
+python -m pip install -r requirements-test.txt   # first time only
 pytest tests/ -v
 pytest tests/ --cov=. --cov-report=term-missing  # with coverage
 ```
-- 119 tests, always green
-- Uses in-memory SQLite (StaticPool) — never touches parking.db
-- Isolation mechanism: `conftest.py` uses FastAPI's `app.dependency_overrides[get_db] = override_get_db` to replace the real `get_db` (which opens `parking.db`) with a version that yields an in-memory session instead. Every endpoint uses `Depends(get_db)`, so the swap is transparent — the app code runs unchanged but all DB operations go to the throwaway in-memory database.
+
+### Frontend
+```bash
+# Run all tests in CI mode (desktop viewport)
+$env:CI='true'; npm test -- --ci --no-cache
+```
+
+## Test Coverage Summary
+
+### Frontend Tests
+- `src/App.test.tsx` — Basic app rendering, navigation, and provider initialization.
+- `src/RBAC.test.tsx` — **Critical**: Role-Based Access Control, session isolation, and logout URL state cleanup (verified by title-based lookups).
+- `src/components/__tests__/AdminPanel.test.tsx` — Admin functionalities: User/Lot management and defensive UI rendering.
+- `src/components/__tests__/AllPendingRequests.test.tsx` — Real-world simulation of approval/rejection workflows across roles.
+- `src/components/__tests__/AdminPanelCharades.test.tsx` — Specialized logic for user preference synchronization and Edge-cases.
+
+### Backend Tests
+- 119 tests, always green. Uses in-memory SQLite (StaticPool) — never touches `parking.db`.
+- `conftest.py` — Fixtures: in-memory DB, TestClient with overrides, headers, and pwd hashing patches.
+- `test_auth.py` — 9 tests: register, login, `/auth/me`.
+- `test_requests.py` — 41 tests: Full CRUD, approve/reject, RBAC, and status guards.
+- `test_lots.py` — 23 tests: Full CRUD, owner-scoping, and specialized role updates.
+- `test_users.py` — 30 tests: Role restrictions, password changes, and self-delete prevention.
+- `test_messages.py` — 16 tests: Communication RBAC and audit retention after request deletion.
 
 ## Key Files
 

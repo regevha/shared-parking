@@ -1,4 +1,5 @@
 import { api } from './client';
+import { LotStatus } from '../types/enums';
 
 export interface LotData {
   id: string;
@@ -6,7 +7,7 @@ export interface LotData {
   floorLabel: string;
   owner: string | null;
   ownerId: string | null;
-  status: 'available' | 'blocked' | 'unowned' | 'unowned-blocked';
+  status: LotStatus;
   blockedUntil?: string;
   createdAt?: string;
   updatedAt?: string;

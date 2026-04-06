@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { requestsApi } from '../api/requests';
 import './AuditTrailModal.css';
 
@@ -17,6 +18,7 @@ interface AuditTrailModalProps {
 }
 
 const AuditTrailModal: React.FC<AuditTrailModalProps> = ({ requestId, onClose }) => {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,29 +34,25 @@ const AuditTrailModal: React.FC<AuditTrailModalProps> = ({ requestId, onClose })
   };
 
   const getActionLabel = (action: string) => {
-    switch (action) {
-      case 'submitted': return 'Request Submitted';
-      case 'approved': return 'Approved Manually';
-      case 'auto-assigned': return 'Auto-Approved';
-      case 'rejected': return 'Request Rejected';
-      case 'cancelled': return 'Request Cancelled';
-      default: return action;
-    }
+    const key = `auditTrail.actions.${action}`;
+    const translated = t(key);
+    // If translation is the same as the key, it means it's missing
+    return translated === key ? t('auditTrail.actions.unknown', { action }) : translated;
   };
 
   return (
     <div className="audit-modal-overlay" onClick={onClose}>
       <div className="audit-modal-content" onClick={e => e.stopPropagation()}>
         <div className="audit-modal-header">
-          <h3>Request History: {requestId}</h3>
+          <h3>{t('auditTrail.title', { id: requestId })}</h3>
           <button className="close-btn" onClick={onClose}>&times;</button>
         </div>
         
         <div className="audit-modal-body">
           {loading ? (
-            <div className="loading">Loading history...</div>
+            <div className="loading">{t('auditTrail.loading')}</div>
           ) : logs.length === 0 ? (
-            <div className="no-history">No history found for this request.</div>
+            <div className="no-history">{t('auditTrail.noHistory')}</div>
           ) : (
             <div className="timeline">
               {logs.map((log) => (
@@ -65,7 +63,7 @@ const AuditTrailModal: React.FC<AuditTrailModalProps> = ({ requestId, onClose })
                       <span className="action-label">{getActionLabel(log.action)}</span>
                       <span className="timestamp">{formatTimestamp(log.timestamp)}</span>
                     </div>
-                    <div className="user-info">By: {log.user_name}</div>
+                    <div className="user-info">{t('auditTrail.byLabel', { name: log.user_name })}</div>
                     {log.details && <div className="details">{log.details}</div>}
                   </div>
                 </div>
@@ -75,7 +73,7 @@ const AuditTrailModal: React.FC<AuditTrailModalProps> = ({ requestId, onClose })
         </div>
         
         <div className="audit-modal-footer">
-          <button className="btn-secondary" onClick={onClose}>Close</button>
+          <button className="btn-secondary" onClick={onClose}>{t('auditTrail.close')}</button>
         </div>
       </div>
     </div>

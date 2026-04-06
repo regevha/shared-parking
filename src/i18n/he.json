@@ -4,31 +4,40 @@
     "requestsView": "תצוגת בקשות",
     "pendingRequests": "בקשות ממתינות",
     "approvals": "אישורים",
-    "parkingStatus": "סטטוס חניה",
-    "lotCalendar": "לוח שנה לחניות",
+    "parkingStatus": "מצב החניה",
+    "lotCalendar": "יומן חניות",
     "myLots": "החניות שלי",
     "availabilityWindows": "הגדרות זמינות",
     "notificationWindows": "העדפות התראה",
-    "adminPanel": "לוח ניהול",
-    "signOut": "התנתקות"
+    "adminPanel": "פאנל ניהול",
+    "signOut": "התנתק",
+    "menu": "תפריט",
+    "language": "שפה",
+    "settings": "הגדרות"
   },
   "login": {
     "title": "ניהול חניה",
-    "subtitle": "היכנס לחשבונך",
-    "emailLabel": "דוא\"ל",
-    "emailPlaceholder": "אתה@parking.dev",
-    "emailRequired": "נא להזין את כתובת הדוא\"ל שלך",
-    "emailInvalid": "הזן כתובת דוא\"ל תקינה",
+    "subtitle": "התחברות לחשבון",
+    "emailLabel": "אימייל",
+    "emailPlaceholder": "you@parking.dev",
+    "emailRequired": "נא להזין כתובת אימייל",
+    "emailInvalid": "כתובת אימייל לא תקינה",
     "passwordLabel": "סיסמה",
     "passwordPlaceholder": "סיסמה",
-    "passwordRequired": "נא להזין את הסיסמה שלך",
-    "signIn": "כניסה",
-    "loginFailed": "Login failed",
-    "demoAccounts": "חשבונות הדגמה — סיסמה: password123",
+    "passwordRequired": "נא להזין סיסמה",
+    "signIn": "התחבר",
+    "loginFailed": "התחברות נכשלה",
+    "forgotPassword": "שכחת סיסמה?",
+    "forgotPasswordModal": {
+      "title": "הוראות לשחזור סיסמה",
+      "content": "נא ליצור קשר עם מנהל החניה (admin@parking.dev) כדי לאפס את סיסמת החשבון שלך.",
+      "ok": "הבנתי"
+    },
+    "demoAccounts": "חשבונות דמו — סיסמה: password123",
     "demoRoles": {
-      "user": "User",
-      "owner": "Owner",
-      "manager": "Manager"
+      "user": "משתמש",
+      "owner": "בעלים",
+      "manager": "מנהל"
     }
   },
   "myRequests": {
@@ -37,34 +46,34 @@
     "noActiveRequests": "אין בקשות פעילות",
     "columns": {
       "id": "מזהה",
-      "timeSlot": "חלון זמן",
-      "duration": "Dur.",
+      "timeSlot": "זמן חניה",
+      "duration": "משך",
       "status": "סטטוס",
-      "submitted": "הוגש"
+      "submitted": "שלח ב"
     },
     "actions": {
-      "edit": "Edit",
-      "cancel": "Cancel"
+      "edit": "ערוך",
+      "cancel": "בטל"
     },
     "mobile": {
-      "date": "Date",
-      "time": "Time",
-      "submitted": "Submitted"
+      "date": "תאריך",
+      "time": "שעה",
+      "submitted": "נשלח"
     },
     "stats": {
-      "totalActive": "סה\"כ פעיל",
-      "pending": "ממתין",
-      "approved": "מאושר",
-      "rejected": "נדחה"
+      "totalActive": "סה״כ פעילות",
+      "pending": "ממתינות",
+      "approved": "מאושרות",
+      "rejected": "נדחו"
     },
-    "info": "הבקשות שלי: נהל את בקשות החניה הפעילות שלך. ניתן לערוך בקשות ממתינות; כל בקשה פעילה ניתנת לביטול. בקשות שנדחו אינן מוצגות.",
+    "info": "נהל את בקשות החניה הפעילות שלך. ניתן לערוך בקשות ממתינות; ניתן לבטל כל בקשה פעילה. בקשות שנדחו אינן מוצגות.",
     "cancelConfirm": {
-      "title": "Cancel Request",
-      "description": "Are you sure you want to cancel request {{id}}?",
-      "descriptionMobile": "Cancel request {{id}}?",
-      "ok": "Yes, Cancel",
-      "okMobile": "Yes",
-      "no": "No"
+      "title": "ביטול בקשה",
+      "description": "האם אתה בטוח שברצונך לבטל את הבקשה {{id}}?",
+      "descriptionMobile": "לבטל את בקשה {{id}}?",
+      "ok": "כן, בטל",
+      "okMobile": "כן",
+      "no": "לא"
     },
     "editModal": {
       "title": "עריכת בקשה {{id}}",
@@ -72,79 +81,80 @@
       "startTime": "שעת התחלה",
       "duration": "משך זמן",
       "selectDate": "בחר תאריך",
-      "selectStartTime": "בחר שעת התחלה (גבולות שעתיים)",
+      "selectStartTime": "בחר שעת התחלה (בשעות עגולות)",
       "selectDuration": "בחר משך זמן",
-      "dateRequired": "Please select a date",
-      "startTimeRequired": "Please select start time",
-      "durationRequired": "Please select duration",
+      "dateRequired": "חובה לבחור תאריך",
+      "startTimeRequired": "חובה לבחור שעת התחלה",
+      "durationRequired": "חובה לבחור משך זמן",
       "cancel": "ביטול",
       "saveChanges": "שמור שינויים"
     },
     "notifications": {
-      "invalidTime": "שעה לא חוקית",
-      "invalidTimeDesc": "שעת הסיום {{time}}:00 חורגת מהשעה המרבית המותרת 20:00.",
+      "invalidTime": "שעה לא תקינה",
+      "invalidTimeDesc": "שעת הסיום {{endHour}}:00 חורגת מהחריגה המקסימלית של 20:00.",
       "updated": "הבקשה עודכנה",
-      "updatedDesc": "הבקשה {{id}} עודכנה בהצלחה.",
+      "updatedDesc": "בקשה {{id}} עודכנה בהצלחה.",
       "updateFailed": "עדכון נכשל",
-      "updateFailedDesc": "לא ניתן לעדכן את הבקשה. נסה שוב.",
+      "updateFailedDesc": "נכשל עדכון הבקשה. נא לנסות שוב.",
       "cancelled": "הבקשה בוטלה",
-      "cancelledDesc": "הבקשה {{id}} בוטלה.",
-      "cancelFailed": "הביטול נכשל",
-      "cancelFailedDesc": "לא ניתן לבטל את הבקשה. נסה שוב."
+      "cancelledDesc": "בקשה {{id}} בוטלה בהצלחה.",
+      "passwordRecoveryDesc": "נא ליצור קשר עם מנהל החניה (admin@parking.dev) כדי לאפס את סיסמת החשבון שלך.",
+      "cancelFailed": "ביטול נכשל",
+      "cancelFailedDesc": "נכשל ביטול הבקשה. נא לנסות שוב."
     },
-    "durationOption_one": "{{count}} hour",
-    "durationOption_other": "{{count}} hours"
+    "durationOption_one": "שעה {{count}}",
+    "durationOption_other": "{{count}} שעות"
   },
   "pendingRequests": {
     "title": "בקשות ממתינות",
-    "filterLabel": "Show Requests:",
+    "filterLabel": "הצג בקשות:",
     "filterAll": "הצג הכל",
-    "filterHideRejected": "הסתר שנדחו כבר",
+    "filterHideRejected": "הסתר שנדחו",
     "columns": {
       "requesterName": "שם המבקש",
-      "timeSlot": "חלון זמן",
+      "timeSlot": "זמן חניה",
       "duration": "משך",
       "date": "תאריך",
-      "submitted": "הוגש",
+      "submitted": "נשלח",
       "actions": "פעולות"
     },
-    "youTag": "(אתה)",
+    "youTag": "אתה",
     "noActions": "אין פעולות",
     "cannotApproveOwn": "לא ניתן לאשר בקשה של עצמך",
     "actions": {
-      "approve": "Approve",
-      "reject": "Reject"
+      "approve": "אשר",
+      "reject": "דחה"
     },
     "approveModal": {
-      "title": "Approve Request",
-      "content": "Approve parking request from {{name}}?",
-      "ok": "Approve",
-      "cancel": "Cancel"
+      "title": "אישור בקשה",
+      "content": "האם לאשר את בקשת החניה של {{name}}?",
+      "ok": "אשר",
+      "cancel": "ביטול"
     },
     "rejectModal": {
-      "title": "Reject Request",
-      "content": "Reject parking request from {{name}}?",
-      "ok": "Reject",
-      "cancel": "Cancel"
+      "title": "דחיית בקשה",
+      "content": "האם לדחות את בקשת החניה של {{name}}?",
+      "ok": "דחה",
+      "cancel": "ביטול"
     },
     "notifications": {
-      "approved": "הבקשה אושרה",
-      "approvedDesc": "בקשת החניה של {{name}} אושרה.",
-      "approvalFailed": "האישור נכשל",
-      "approvalFailedDesc": "לא ניתן לאשר את הבקשה. נסה שוב.",
-      "rejected": "הבקשה נדחתה",
+      "approved": "בקשה אושרה",
+      "approvedDesc": "בקשת החניה של {{name}} אושרה בהצלחה.",
+      "approvalFailed": "אישור נכשל",
+      "approvalFailedDesc": "נכשל אישור הבקשה. נא לנסות שוב.",
+      "rejected": "בקשה נדחתה",
       "rejectedDesc": "בקשת החניה של {{name}} נדחתה.",
-      "rejectionFailed": "הדחייה נכשלה",
-      "rejectionFailedDesc": "לא ניתן לדחות את הבקשה. נסה שוב."
+      "rejectionFailed": "דחייה נכשלה",
+      "rejectionFailedDesc": "נכשל דחיית הבקשה. נא לנסות שוב."
     },
-    "rejectedLegend": "= Rejected by you (can reapprove by clicking Approve)",
+    "rejectedLegend": "= נדחה על ידך (ניתן לאשר מחדש על ידי לחיצה על 'אשר')",
     "stats": {
-      "total": "Total Requests",
-      "pending": "ממתין",
-      "rejectedByYou": "נדחה על ידך"
+      "total": "סה״כ בקשות",
+      "pending": "ממתינות",
+      "rejectedByYou": "נדחו על ידך"
     },
-    "infoOwner": "בקשות ממתינות: מציג את כל בקשות החניה הממתינות לאישורך. בקשות שכבר דחית מוצגות באפור.",
-    "infoManager": "Lists all parking requests currently awaiting owner approval."
+    "infoOwner": "מציג את כל בקשות החניה הממתינות לאישורך. בקשות שכבר דחית מופיעות באפור.",
+    "infoManager": "מציג את כל בקשות החניה הממתינות לאישור בעלי חניה."
   },
   "approvals": {
     "title": "אישורים",
@@ -152,100 +162,100 @@
       "requestId": "מזהה בקשה",
       "requester": "מבקש",
       "date": "תאריך",
-      "timeSlot": "חלון זמן",
+      "timeSlot": "זמן חניה",
       "duration": "משך",
       "assignedLot": "חניה שהוקצתה",
-      "lotOwner": "בעל החניה",
-      "approvedAt": "אושר בתאריך",
+      "lotOwner": "בעלים",
+      "approvedAt": "אושר ב-",
       "actions": "פעולות"
     },
     "actions": {
-      "viewDetails": "View Details",
-      "viewMessages": "View Messages"
+      "viewDetails": "פרטים",
+      "viewMessages": "הודעות"
     },
     "messagesModal": {
-      "title": "Messages for {{id}}",
-      "requester": "מבקש:",
+      "title": "הודעות עבור {{id}}",
+      "requester": "המבקש:",
       "lotOwner": "בעל החניה:",
-      "hint": "Click \"View Details\" to see the full message thread."
+      "hint": "לחץ על 'פרטים' כדי לראות את כל שיחת ההודעות."
     },
     "stats": {
-      "total": "Total Approvals",
-      "today": "Approved Today",
+      "total": "סה״כ אישורים",
+      "today": "אושר היום",
       "thisWeek": "השבוע"
     },
-    "info": "אישורים: היסטוריה מלאה של כל בקשות החניה שאושרו במערכת."
+    "info": "היסטוריה מלאה של כל בקשות החניה שאושרו במערכת."
   },
   "requestForm": {
     "title": "הגשת בקשת חניה",
     "limitAlert": {
-      "title": "Request Limit Reached",
-      "description": "You currently have the maximum number of pending parking requests (5). You cannot submit new requests until one of your existing requests is approved or cancelled."
+      "title": "הגעת למכסת הבקשות",
+      "description": "יש לך כרגע את המקסימום המותר של 5 בקשות ממתינות. עליך לבטל בקשה קיימת כדי להגיש חדשה."
     },
-    "activeRequestsCard": "Your Pending Requests ({{count}} / {{max}})",
+    "activeRequestsCard": "הבקשות שלך ({{count}} / {{max}})",
     "labels": {
-      "date": "Date",
-      "timeSlot": "Time Slot",
-      "status": "Status",
-      "parkingDate": "Parking Date",
-      "startTime": "Start Time",
-      "duration": "Duration",
-      "endTime": "End Time"
+      "date": "תאריך",
+      "timeSlot": "חלון זמן",
+      "status": "סטטוס",
+      "parkingDate": "תאריך חניה",
+      "startTime": "שעת התחלה",
+      "duration": "משך זמן",
+      "endTime": "שעת סיום"
     },
     "placeholders": {
-      "selectDate": "Select date",
-      "selectStartTime": "Select start time (hourly boundaries)",
-      "selectDuration": "Select duration"
+      "selectDate": "בחר תאריך",
+      "selectStartTime": "בחר שעה (שעה עגולה)",
+      "selectDuration": "משך זמן"
     },
     "validation": {
-      "dateRequired": "נא לבחור תאריך",
-      "startTimeRequired": "נא לבחור שעת התחלה",
-      "durationRequired": "נא לבחור משך זמן"
+      "dateRequired": "חובה לבחור תאריך",
+      "startTimeRequired": "חובה לבחור שעה",
+      "durationRequired": "חובה לבחור משך זמן"
     },
-    "endTimeInvalid": "⚠️ Invalid: End time would exceed 20:00",
-    "submitButton": "הגש בקשה",
-    "submitButtonDisabled": "לא ניתן להגיש (הגעת למגבלה)",
+    "endTimeInvalid": "⚠️ שעת הסיום חורגת מ-20:00",
+    "submitButton": "שלח בקשה",
+    "submitButtonDisabled": "לא ניתן לשלוח (הגעת למקסימום)",
     "businessRules": {
-      "title": "כללי עסק",
-      "rule1start": "You can have a maximum of ",
-      "rule1bold": "5 concurrent pending requests",
-      "rule2": "Select any date from today onwards",
-      "rule3": "Start time must be on hourly boundaries (08:00 – 19:00)",
-      "rule4": "Duration is 1–6 hours, automatically limited so end time never exceeds 20:00",
-      "rule5": "End time is auto-calculated and cannot exceed 20:00"
+      "title": "כללים עסקיים",
+      "rule1start": "ניתן להחזיק עד ",
+      "rule1bold": "5 בקשות ממתינות בו-זמנית",
+      "rule2": "ניתן לבחור כל תאריך מהיום והלאה",
+      "rule3": "שעת התחלה חייבת להיות עגולה (08:00 – 19:00)",
+      "rule4": "משך זמן 1–6 שעות, מוגבל אוטומטית ל-20:00",
+      "rule5": "שעת הסיום מחושבת אוטומטית ואינה עולה על 20:00"
     },
-    "info": "בקשה חדשה: הגש בקשת חניה לתאריך וחלון זמן ספציפיים; בעלים יבחן ויאשר או ידחה אותה.",
+    "info": "שלח בקשת חנייה; בעל חנייה יבדוק ויאשר אותה.",
     "notifications": {
-      "limitExceeded": "חרגת ממגבלת הבקשות",
-      "limitExceededDesc": "כבר יש לך את המספר המרבי של בקשות ממתינות (5). המתן לפקיעת בקשה קיימת.",
-      "submitted": "הבקשה הוגשה",
-      "submittedDesc": "בקשת חניה הוגשה לתאריך {{date}} מ-{{start}} עד {{end}}",
-      "failed": "ההגשה נכשלה",
-      "failedDesc": "לא ניתן להגיש את הבקשה. נסה שוב."
+      "limitExceeded": "מכסת בקשות חורגת",
+      "limitExceededDesc": "יש לך כבר 5 בקשות ממתינות. נא להמתין לאישור/ביטול קודמים.",
+      "submitted": "נשלח בהצלחה",
+      "submittedDesc": "בקשת חניה הוגשה עבור {{date}} מ-{{startTime}} עד {{endTime}}",
+      "failed": "הגשה נכשלה",
+      "failedDesc": "נא לנסות שוב מאוחר יותר."
     },
-    "durationOption_one": "{{count}} hour",
-    "durationOption_other": "{{count}} hours"
+    "durationOption_one": "שעה {{count}}",
+    "durationOption_other": "{{count}} שעות"
   },
   "calendarView": {
     "toolbar": {
       "today": "היום",
-      "weekShort": "Wk"
+      "weekShort": "שבוע"
     },
     "viewNames": {
-      "day": "Day",
-      "week": "Week",
-      "month": "Month"
+      "day": "יום",
+      "week": "שבוע",
+      "month": "חודש"
     },
-    "emptyState": "No requests this period",
+    "emptyState": "אין אירועים בתקופה זו",
     "stats": {
-      "total": "Total Requests",
-      "pending": "ממתין",
-      "approved": "מאושר",
-      "rejected": "נדחה"
+      "total": "סה״כ בקשות",
+      "pending": "ממתינות",
+      "approved": "מאושרות",
+      "rejected": "נדחו"
     },
-    "infoTitle": "Requests View",
-    "info": "תצוגת בקשות: סקירת לוח שנה של כל בקשות החניה — ממתינות, מאושרות ונדחות.",
-    "legendTitle": "Legend",
+    "infoTitle": "תצוגת בקשות",
+    "info": "לוח שנה המציג את כל בקשות החניה — ממתינות, מאושרות ונדחו.",
+    "legendTitle": "מקרא",
     "legend": {
       "pending": "ממתין",
       "approved": "מאושר",
@@ -255,53 +265,55 @@
     "modal": {
       "title": "בקשה — {{name}}",
       "close": "סגור",
+      "history": "היסטוריה",
+      "requestId": "מזהה בקשה",
       "requester": "מבקש",
       "date": "תאריך",
       "time": "שעה",
       "duration": "משך",
       "status": "סטטוס",
-      "submitted": "הוגש",
+      "submitted": "נשלח",
       "lot": "חניה",
       "floor": "קומה",
-      "lotOwner": "בעל החניה"
+      "lotOwner": "בעלים"
     },
     "notifications": {
-      "rescheduled": "הבקשה תוזמנה מחדש",
-      "rescheduledDesc": "הבקשה {{id}} הועברה ל-{{start}} – {{end}}"
+      "rescheduled": "הבקשה הוזזה",
+      "rescheduledDesc": "בקשה {{id}} הועברה ל-{{from}} – {{to}}"
     },
-    "statusRejected": "Rejected"
+    "statusRejected": "נדחה"
   },
   "lotCalendarView": {
     "allMyLots": "כל החניות שלי",
     "toolbar": {
       "today": "היום",
-      "weekShort": "Wk"
+      "weekShort": "שבוע"
     },
     "viewNames": {
-      "day": "Day",
-      "week": "Week",
-      "month": "Month"
+      "day": "יום",
+      "week": "שבוע",
+      "month": "חודש"
     },
-    "emptyState": "No events this period",
+    "emptyState": "אין אירועים",
     "stats": {
-      "total": "Total Events",
-      "booked": "מוזמן",
+      "total": "סה״כ",
+      "booked": "תפוס",
       "pending": "ממתין",
       "blocked": "חסום"
     },
-    "infoTitle": "Lot Calendar",
-    "info": "לוח שנה לחניות: תצוגת לוח שנה של החניות שלך המציגה הזמנות, בקשות ממתינות ותקופות חסימה.",
-    "legendTitle": "Legend",
+    "infoTitle": "יומן חניות",
+    "info": "תצוגת יומן עבור החניות שבבעלותך.",
+    "legendTitle": "מקרא",
     "legend": {
-      "booked": "מוזמן",
+      "booked": "תפוס",
       "pending": "ממתין",
       "blocked": "חסום"
     },
     "modal": {
       "close": "סגור",
-      "bookedTitle": "Booked — {{name}}",
-      "pendingTitle": "Pending — {{name}}",
-      "blockedTitle": "Blocked — {{id}}",
+      "bookedTitle": "תפוס — {{name}}",
+      "pendingTitle": "ממתין — {{name}}",
+      "blockedTitle": "חסום — {{id}}",
       "requester": "מבקש",
       "date": "תאריך",
       "time": "שעה",
@@ -309,99 +321,100 @@
       "lot": "חניה",
       "floor": "קומה",
       "status": "סטטוס",
-      "approvedAt": "אושר בתאריך",
-      "submitted": "הוגש",
+      "approvedAt": "אושר ב-",
+      "submitted": "נשלח",
       "lotId": "מזהה חניה",
       "owner": "בעלים",
       "blockedUntil": "חסום עד",
       "approve": "אשר",
       "reject": "דחה",
-      "unowned": "ללא בעלים"
+      "unowned": "ללא בעלים",
+      "history": "היסטוריה"
     },
     "notifications": {
-      "approved": "הבקשה אושרה בהצלחה",
+      "approved": "אושר בהצלחה",
       "rejected": "הבקשה נדחתה"
     }
   },
   "lotStatusBoard": {
-    "title": "סטטוס חניה",
-    "legendTitle": "מקרא סטטוסים",
+    "title": "מצב החניה",
+    "legendTitle": "מקרא סטטוס",
     "legend": {
-      "available": "זמין - בעלים, ללא חסימה",
-      "blocked": "חסום - חסימה פעילה",
-      "unowned": "ללא בעלים - אין בעלים",
-      "unownedBlocked": "ללא בעלים וחסום - חסימה ישנה"
+      "available": "זמין",
+      "blocked": "חסום",
+      "unowned": "ללא בעלים",
+      "unownedBlocked": "ללא בעלים חסום"
     },
-    "lotsCount_one": "{{count}} lot",
-    "lotsCount_other": "{{count}} lots",
+    "lotsCount_one": "חניה {{count}}",
+    "lotsCount_other": "{{count}} חניות",
     "columns": {
-      "lotId": "מזהה חניה",
+      "lotId": "מזהה",
       "owner": "בעלים",
       "status": "סטטוס",
       "blockedUntil": "חסום עד"
     },
-    "unassigned": "לא מוקצה",
+    "unassigned": "לא משויך",
     "stats": {
       "available": "זמין",
       "blocked": "חסום",
       "unowned": "ללא בעלים",
-      "unownedBlocked": "חסום ללא בעלים"
+      "unownedBlocked": "ללא בעלים חסום"
     },
-    "infoTitle": "Parking Status",
-    "infoDesc": "Displays the current status of all parking lots across all floors."
+    "infoTitle": "מצב חניה",
+    "infoDesc": "מציג את הסטטוס הנוכחי של כל מקומות החניה בכל הקומות."
   },
   "myLots": {
     "title": "החניות שלי",
     "ownerLabel": "בעלים:",
-    "totalLotsLabel": "Total Lots:",
+    "totalLotsLabel": "סה״כ חניות:",
     "columns": {
-      "lotId": "מזהה חניה",
+      "lotId": "מזהה",
       "floor": "קומה",
       "status": "סטטוס",
       "blockedUntil": "חסום עד",
       "actions": "פעולות"
     },
-    "viewUsage": "צפה בשימוש",
-    "noLots": "אין לך חניות כרגע.",
-    "info": "החניות שלי: מציג את כל חניות החניה שהוקצו לך ואת סטטוס הזמינות הנוכחי שלהן."
+    "viewUsage": "שימוש",
+    "noLots": "אין לך חניות משויכות.",
+    "info": "מציג את החניות המשויכות אליך ואת מצב הזמינות שלהן."
   },
   "requestDetail": {
-    "title": "פרטי הבקשה",
-    "notFoundPrefix": "Request ",
-    "notFoundSuffix": " was not found.",
-    "goBack": "חזור",
+    "title": "פרטי בקשה",
+    "notFoundPrefix": "בקשה ",
+    "notFoundSuffix": " לא נמצאה.",
+    "goBack": "חזרה",
     "requestInfo": {
-      "cardTitle": "Request Information",
-      "id": "Request ID",
-      "status": "Status",
-      "requester": "Requester",
-      "date": "Date",
-      "timeSlot": "Time Slot",
-      "duration": "Duration",
-      "submitted": "Submitted",
-      "lastUpdated": "Last Updated",
-      "durationValue_one": "{{count}} hour",
-      "durationValue_other": "{{count}} hours"
+      "cardTitle": "מידע על הבקשה",
+      "id": "מזהה",
+      "status": "סטטוס",
+      "requester": "מבקש",
+      "date": "תאריך",
+      "timeSlot": "זמן חניה",
+      "duration": "משך",
+      "submitted": "נשלח",
+      "lastUpdated": "עודכן לאחרונה",
+      "durationValue_one": "שעה {{count}}",
+      "durationValue_other": "{{count}} שעות"
     },
     "approvedInfo": {
-      "assignedLot": "Assigned Lot",
-      "floor": "Floor",
-      "lotOwner": "Lot Owner",
-      "approvedAt": "Approved At"
+      "assignedLot": "חניה שהוקצתה",
+      "floor": "קומה",
+      "lotOwner": "בעל החניה",
+      "approvedAt": "אושר ב-"
     },
     "messages": {
-      "cardTitle": "Message Thread",
-      "placeholder": "Type your message...",
-      "send": "Send",
-      "loadFailed": "Failed to load messages",
-      "sendFailed": "Failed to send message"
+      "cardTitle": "צ׳אט הודעות",
+      "placeholder": "כתוב הודעה...",
+      "send": "שלח",
+      "loadFailed": "טעינת הודעות נכשלה",
+      "sendFailed": "שליחת הודעה נכשלה"
     }
   },
   "availabilityWindows": {
     "title": "הגדרות זמינות חניה",
     "blackoutAlert": {
-      "message": "שיתוף חניה מוגבל בין השעות 22:00 ל-06:00",
-      "description": "מדיניות אבטחה כלל-מערכתית מונעת שיתוף חניה בשעות הלילה המאוחרות."
+      "message": "שיתוף חניה מוגבל בין 22:00 ל-06:00",
+      "description": "מדיניות אבטחה מערכתית מונעת שיתוף חניה בשעות הלילה המאוחרות."
     },
     "saving": "שומר זמינות...",
     "days": {
@@ -413,40 +426,40 @@
       "saturday": "שבת",
       "sunday": "ראשון"
     },
-    "noWindows": "סגור לשיתוף — לא הוגדרו חלונות זמן",
+    "noWindows": "סגור לשיתוף — לא הוגדרו חלונות",
     "addWindow": "הוסף חלון זמינות",
-    "maxWindows": "מקסימום {{max}} חלונות ביום",
+    "maxWindows": "מקסימום {{max}} חלונות ליום",
     "modal": {
-      "title": "הוסף חלון זמינות — {{day}}",
+      "title": "הוספת חלון — {{day}}",
       "okText": "הוסף חלון",
-      "timeRangeLabel": "טווח זמן",
-      "timeRangeRequired": "אנא בחר טווח זמן",
-      "endAfterStart": "שעת הסיום חייבת להיות אחרי שעת ההתחלה",
+      "timeRangeLabel": "טווח זמנים",
+      "timeRangeRequired": "נא לבחור טווח זמנים",
+      "endAfterStart": "שעת סיום חייבת להיות אחרי שעת התחלה",
       "startPlaceholder": "שעת התחלה",
       "endPlaceholder": "שעת סיום"
     },
     "blackoutWarning": {
-      "title": "הגבלת שעות לילה",
-      "content": "חלון זה חופף להגבלת הלילה (22:00–06:00). שיתוף אינו מותר בזמן זה.",
+      "title": "מגבלת שעות לילה",
+      "content": "חלון זה חופף עם מגבלת הלילה (22:00–06:00). השיתוף אינו מותר בשעות אלו.",
       "ok": "חתוך ושמור",
       "cancel": "ביטול"
     },
     "notifications": {
-      "loadFailed": "טעינת הגדרות זמינות נכשלה",
-      "saveFailed": "שמירת הגדרות זמינות נכשלה",
+      "loadFailed": "טעינת הגדרות נכשלה",
+      "saveFailed": "שמירת הגדרות נכשלה",
       "removed": "חלון זמינות הוסר",
-      "overlap": "טווח זמן זה חופף לחלון זמינות קיים",
+      "overlap": "קיים חלון זמן חופף",
       "added": "חלון זמינות נוסף"
     },
-    "info": "הגדר את חלונות הזמן בהם החניה שלך זמינה לבקשות של אחרים. החניה שלך חסומה כברירת מחדל מחוץ לחלונות אלה. עד {{max}} חלונות ביום."
+    "info": "קבע את חלונות הזמן בהם החניה שלך זמינה לבקשות. כברירת מחדל החניה חסומה."
   },
   "notificationWindows": {
     "title": "העדפות התראה",
     "blackoutAlert": {
-      "message": "התראות אינן נשלחות בין השעות 22:00 ל-06:00",
-      "description": "תקופת שקט זו חלה על כל המערכת כדי למנוע הפרעות בשעות הלילה."
+      "message": "לא נשלחות התראות בין 22:00 ל-06:00",
+      "description": "תקופה זו חלה על כל המערכת כדי למנוע הפרעות בלילה."
     },
-    "saving": "שומר...",
+    "saving": "שומר…",
     "days": {
       "monday": "שני",
       "tuesday": "שלישי",
@@ -456,142 +469,140 @@
       "saturday": "שבת",
       "sunday": "ראשון"
     },
-    "noWindows": "לא הוגדרו חלונות — ברירת המחדל חלה",
-    "addWindow": "הוסף חלון התראה",
-    "maxWindows": "מקסימום {{max}} חלונות ביום",
+    "noWindows": "אין חלונות מוגדרים — ברירת מחדל חלה",
+    "addWindow": "הוסף חלון",
+    "maxWindows": "מקסימום {{max}} חלונות ליום",
     "modal": {
-      "title": "הוסף חלון התראה — {{day}}",
+      "title": "הוספת חלון התראה — {{day}}",
       "okText": "הוסף חלון",
-      "timeRangeLabel": "טווח זמן",
-      "timeRangeRequired": "אנא בחר טווח זמן",
-      "endAfterStart": "שעת הסיום חייבת להיות אחרי שעת ההתחלה",
-      "startPlaceholder": "שעת התחלה",
-      "endPlaceholder": "שעת סיום"
+      "timeRangeLabel": "טווח זמנים",
+      "timeRangeRequired": "נא לבחור טווח",
+      "endAfterStart": "שעת סיום צריכה להיות אחרי שעת התחלה",
+      "startPlaceholder": "התחלה",
+      "endPlaceholder": "סיום"
     },
     "blackoutWarning": {
       "title": "אזהרת תקופת שקט",
-      "content": "חלון התראה זה חופף לתקופת השקט (22:00–06:00). התראות לא יישלחו בזמן זה.",
+      "content": "חלון התראה זה חופף עם תקופת השקט (22:00–06:00). התראות לא יתקבלו בשעות אלו.",
       "ok": "שמור בכל זאת",
       "cancel": "ביטול"
     },
     "notifications": {
-      "loadFailed": "טעינת העדפות התראה נכשלה",
-      "saveFailed": "שמירת העדפות התראה נכשלה",
-      "removed": "חלון התראה הוסר",
-      "overlap": "טווח זמן זה חופף לחלון התראה קיים",
-      "added": "חלון התראה נוסף"
+      "loadFailed": "טעינה נכשלה",
+      "saveFailed": "שמירה נכשלה",
+      "removed": "חלון הוסר",
+      "overlap": "טווח חופף קיים",
+      "added": "חלון נוסף"
     },
-    "info": "הגדר את חלונות הזמן בהם אתה מוכן לקבל התראות על חניה. עד {{max}} חלונות ביום. השינויים נשמרים באופן מיידי."
+    "info": "בחר מתי אתה מעוניין לקבל התראות לטלפון שלך."
   },
   "adminPanel": {
-    "sidebarTitle": "לוח ניהול",
-    "loadingTip": "טוען נתוני ניהול...",
+    "sidebarTitle": "פאנל ניהול",
+    "loadingTip": "טוען נתונים...",
     "menu": {
       "users": "ניהול משתמשים",
       "lots": "ניהול חניות",
       "import": "ייבוא / ייצוא",
       "config": "הגדרות מערכת",
       "reports": "דוחות",
-      "broadcast": "שידור"
+      "broadcast": "הודעת מערכת"
     },
-    "loadFailed": "טעינת נתוני הניהול נכשלה",
-    "loadFailedDesc": "לא ניתן להגיע לשרת.",
+    "loadFailed": "טעינה נכשלה",
+    "loadFailedDesc": "לא ניתן ליצור קשר עם השרת.",
     "defaultContent": "בחר פריט מהתפריט",
     "users": {
-      "title": "ניהול משתמשים",
-      "columns": {
-        "name": "שם",
-        "email": "דוא\"ל",
-        "role": "תפקיד",
-        "joined": "הצטרף",
-        "actions": "פעולות"
-      },
-      "roles": {
-        "user": "משתמש",
-        "owner": "בעלים",
-        "manager": "מנהל"
-      },
-      "deleteConfirm": "למחוק משתמש זה?",
-      "deleteWarning": "פעולה זו אינה הפיכה.",
-      "deleteOk": "מחק",
-      "deleteButton": "מחק",
-      "notifications": {
-        "roleUpdated": "התפקיד עודכן",
-        "roleUpdatedDesc": "{{name}} הוא כעת {{role}}.",
-        "roleUpdateFailed": "עדכון התפקיד נכשל",
-        "userDeleted": "המשתמש נמחק",
-        "deleteFailed": "המחיקה נכשלה"
-      },
-      "info": "ניהול משתמשים: צפה בכל המשתמשים הרשומים ונהל את תפקידיהם. לא ניתן למחוק חשבונות מנהל או לשנות את תפקידם כאן."
+        "title": "ניהול משתמשים",
+        "columns": {
+          "name": "שם",
+          "email": "אימייל",
+          "role": "תפקיד",
+          "joined": "הצטרף ב",
+          "actions": "פעולות"
+        },
+        "roles": { "user": "משתמש", "owner": "בעלים", "manager": "מנהל" },
+        "deleteConfirm": "למחוק משתמש זה?",
+        "deleteWarning": "לא ניתן לבטל פעולה זו.",
+        "deleteOk": "מחק",
+        "deleteButton": "מחק",
+        "notifications": {
+          "roleUpdated": "תפקיד עודכן",
+          "roleUpdatedDesc": "{{name}} הוא כעת {{role}}.",
+          "roleUpdateFailed": "עדכון נכשל",
+          "userDeleted": "משתמש נמחק",
+          "deleteFailed": "מחיקה נכשלה"
+        },
+        "info": "נהל את כל המשתמשים ותפקידיהם. לא ניתן למחוק מנהלים."
     },
     "lots": {
-      "title": "ניהול חניות",
-      "unownedAlert_one": "חניה אחת ללא בעלים",
-      "unownedAlert_other": "{{count}} חניות ללא בעלים",
-      "unownedAlertDesc": "הקצה בעלים כדי להבטיח ניהול תקין של חניות אלו.",
-      "filterLabel": "סינון:",
-      "filters": {
-        "all": "הכל",
-        "available": "זמין",
-        "blocked": "חסום",
-        "unowned": "ללא בעלים"
-      },
-      "columns": {
-        "lotId": "מזהה חניה",
-        "floorLabel": "תווית קומה",
-        "floor": "קומה",
-        "status": "סטטוס",
-        "owner": "בעלים",
-        "lastModified": "עדכון אחרון",
-        "actions": "פעולות"
-      },
-      "unowned": "ללא בעלים",
-      "assignOwnerButton": "הקצה בעלים",
-      "removeOwnerConfirm": "להסיר את הבעלים מחניה זו?",
-      "removeOwnerOk": "הסר",
-      "removeOwnerButton": "הסר בעלים",
-      "assignModal": {
-        "title": "הקצה בעלים לחניה",
-        "okText": "הקצה",
-        "placeholder": "בחר בעלים"
-      },
-      "notifications": {
-        "ownerRemoved": "הבעלים הוסר",
-        "ownerRemoveFailed": "הסרת הבעלים נכשלה",
-        "ownerAssigned": "הבעלים הוקצה",
-        "ownerAssignedDesc": "{{name}} ← {{lotId}}",
-        "ownerAssignFailed": "הקצאת הבעלים נכשלה"
-      },
-      "info": "ניהול חניות: צפה בכל חניות החניה, סנן לפי סטטוס, והקצה או הסר בעלות."
+        "title": "ניהול חניות",
+        "unownedAlert_one": "חניה אחת ללא בעלים",
+        "unownedAlert_other": "{{count}} חניות ללא בעלים",
+        "unownedAlertDesc": "שייך בעלים כדי להבטיח ניהול תקין.",
+        "filterLabel": "סינון:",
+        "filters": { 
+          "all": "הכל", 
+          "available": "זמין", 
+          "blocked": "חסום", 
+          "unowned": "ללא בעלים",
+          "unowned_blocked": "ללא בעלים (חסום)"
+        },
+        "columns": {
+          "lotId": "מזהה",
+          "floorLabel": "תווית קומה",
+          "floor": "קומה",
+          "status": "סטטוס",
+          "owner": "בעלים",
+          "lastModified": "עודכן ב",
+          "actions": "פעולות"
+        },
+        "unowned": "ללא בעלים",
+        "assignOwnerButton": "שייך בעלים",
+        "removeOwnerConfirm": "להסיר בעלות מחניה זו?",
+        "removeOwnerOk": "הסר",
+        "removeOwnerButton": "הסר בעלים",
+        "assignModal": {
+          "title": "שיוך בעלים לחניה",
+          "okText": "שייך",
+          "placeholder": "בחר בעלים"
+        },
+        "notifications": {
+          "ownerRemoved": "בעלות הוסרה",
+          "ownerRemoveFailed": "הסרה נכשלה",
+          "ownerAssigned": "בעלות שויכה",
+          "ownerAssignedDesc": "{{name}} ← {{lotId}}",
+          "ownerAssignFailed": "שיוך נכשל"
+        },
+        "info": "נהל את כל מקומות החניה והבעלות עליהם."
     },
     "import": {
       "title": "ייבוא / ייצוא",
-      "importCardTitle": "ייבוא נתונים",
-      "exportCardTitle": "ייצוא נתונים",
-      "uploadButton": "העלה קובץ Excel",
-      "uploadHint": "גרור ושחרר או לחץ להעלאת קבצי Excel",
-      "downloadButton": "הורד קובץ ראשי",
-      "downloadHint": "ייבא נתונים תחילה כדי לאפשר הורדה",
+      "importCardTitle": "ייבוא המוני (CSV)",
+      "exportCardTitle": "תבניות",
+      "uploadButton": "העלאת קובץ CSV",
+      "uploadHint": "גרור ושחרר או לחץ להעלאת CSV (מזהה משתמשים/חניות)",
+      "downloadButton": "הורדת תבנית CSV",
       "notifications": {
-        "uploadSuccess": "{{filename}} הועלה בהצלחה",
-        "downloadSuccess": "הקובץ הראשי הורד"
+        "uploadSuccess": "{{filename}} הועלה בהצלחה: {{count}} רשומות",
+        "partialSuccess": "הצלחה חלקית: ייובאו {{count}} רשומות",
+        "uploadFailed": "הייבוא נכשל",
+        "downloadSuccess": "תבנית CSV הורדה"
       },
-      "info": "ייבוא / ייצוא: העלה קובץ Excel לייבוא בנפח גדול של נתוני חניה, או הורד את הקובץ הראשי הנוכחי לשימוש לא מקוון."
+      "info": "העלו קובץ CSV לייבוא המוני של משתמשים או חניות. השתמשו בתבניות כדי להבטיח פורמט תקין."
     },
     "config": {
       "title": "הגדרות מערכת",
-      "cardTitle": "הגדרות המערכת",
+      "cardTitle": "הגדרות",
       "timezone": "אזור זמן:",
       "blackoutPeriod": "תקופת שקט:",
-      "maxRequests": "מקסימום בקשות ממתינות למשתמש:",
-      "bookingWindow": "חלון הזמנות:",
-      "info": "תצוגת קריאה בלבד של קבועי המערכת הגלובליים הנאכפים על ידי ה-backend.",
-      "schedulerTitle": "מתזמן אישור אוטומטי",
-      "schedulerDesc": "המתזמן פועל כל 15 דקות ומאשר אוטומטית בקשות ממתינות ללא כפילויות. לחץ למטה כדי להפעילו ידנית.",
+      "maxRequests": "מקסימום בקשות למשתמש:",
+      "bookingWindow": "חלון הזמנה:",
+      "info": "קבועי מערכת (לקריאה בלבד).",
+      "schedulerTitle": "תזמון אישור אוטומטי",
+      "schedulerDesc": "רץ כל 15 דקות ומאשר בקשות ללא קונפליקטים.",
       "runAutoApproval": "הפעל אישור אוטומטי עכשיו",
-      "autoApprovalSuccess": "האישור האוטומטי הושלם",
-      "autoApprovalSuccessDesc": "{{approved}} בקשות אושרו. {{remaining}} עדיין ממתינות.",
-      "autoApprovalFailed": "האישור האוטומטי נכשל"
+      "autoApprovalSuccess": "הסתיים בהצלחה",
+      "autoApprovalSuccessDesc": "אושרו {{approved}} בקשות.",
+      "autoApprovalFailed": "נכשל"
     },
     "reports": {
       "title": "דוחות",
@@ -600,45 +611,70 @@
       "tabs": {
         "all": "הכל ({{count}})",
         "pending": "ממתין ({{count}})",
-        "approved": "מאושר ({{count}})",
+        "approved": "אושר ({{count}})",
         "rejected": "נדחה ({{count}})"
       },
       "columns": {
         "id": "מזהה",
         "date": "תאריך",
         "requester": "מבקש",
-        "timeSlot": "חלון זמן",
+        "timeSlot": "זמן חניה",
         "status": "סטטוס",
         "duration": "משך"
       },
       "notifications": {
-        "exportSuccess": "יוצאו {{count}} שורות אל {{filename}}"
+        "exportSuccess": "ייצוא של {{count}} שורות הסתיים"
       },
-      "info": "דוחות: צפה בהיסטוריה מלאה של כל בקשות החניה מסוננות לפי טווח תאריכים וסטטוס."
+      "info": "היסטוריה מלאה של כל הבקשות."
     },
     "broadcast": {
-      "title": "הודעות שידור",
-      "simulateBlackout": "סמלץ תקופת שקט:",
-      "blackoutOn": "22:00–06:00",
-      "blackoutOff": "שעות רגילות",
-      "blackoutAlert": "השידור מושבת בתקופת השקט",
-      "blackoutAlertDesc": "לא ניתן לשלוח הודעות בין 22:00 ל-06:00 כדי למנוע הפרעות.",
+      "title": "הודעת מערכת גורפת",
+      "simulateBlackout": "סימולציית עוצר לילה",
+      "blackoutOn": "עוצר פעיל",
+      "blackoutOff": "פעילות רגילה",
+      "blackoutAlert": "עוצר לילה פעיל",
+      "blackoutAlertDesc": "המערכת נמצאת כרגע בזמן עוצר לילה (22:00–06:00). השידורים מוגבלים לחירום בלבד והפעלה ידנית מושבתת.",
       "audienceLabel": "קהל יעד:",
       "audiences": {
-        "owners": "כל הבעלים",
+        "owners": "כל בעלי החניות",
         "users": "כל המשתמשים",
-        "both": "בעלים ומשתמשים"
+        "both": "כולם (משתמשים ובעלים)"
       },
-      "messageLabel": "הודעה:",
-      "messagePlaceholder": "הזן את הודעת השידור שלך...",
-      "sendButton": "שלח שידור",
+      "messageLabel": "תוכן ההודעה:",
+      "messagePlaceholder": "הקלד כאן את הודעת המערכת...",
+      "sendButton": "שלח התראה גלובלית",
       "notifications": {
-        "blocked": "השידור חסום",
-        "blockedDesc": "לא ניתן לשלוח הודעות בתקופת השקט (22:00–06:00).",
-        "sent": "השידור נשלח",
-        "sentDesc": "הודעה נשלחה אל: {{audience}}"
+        "blocked": "פעולה מוגבלת",
+        "blockedDesc": "פעולות שידור מוגבלות זמנית במהלך תחזוקה או עוצר.",
+        "sent": "התראה הופצה",
+        "sentDesc": "ההודעה נשלחה בהצלחה ל-{{count}} סשנים פעילים עבור {{audience}}."
       },
-      "info": "הודעות שידור: שלח הודעה מערכתית לכל הבעלים, כל המשתמשים, או לשני הקהלים בו-זמנית."
+      "info": "השתמש בכלי זה לשליחת עדכוני מערכת קריטיים או הודעות חירום לכל המשתמשים המחוברים."
+    }
+  },
+  "notificationCenter": {
+    "title": "התראות",
+    "unread": "לא נקראו",
+    "markAllRead": "סמן הכל כנקרא",
+    "markAsRead": "סמן כנקרא",
+    "noNotifications": "אין התראות",
+    "emptyStatus": "הכל מעודכן!",
+    "errorLoading": "טעינה נכשלה",
+    "viewAll": "צפה בהכל"
+  },
+  "auditTrail": {
+    "title": "היסטוריית בקשה: {{id}}",
+    "loading": "טוען היסטוריה...",
+    "noHistory": "לא נמצאה היסטוריה לבקשה זו.",
+    "byLabel": "על ידי: {{name}}",
+    "close": "סגור",
+    "actions": {
+      "submitted": "בקשה הוגשה",
+      "approved": "אושר ידנית",
+      "auto-assigned": "אושר אוטומטי",
+      "rejected": "בקשה נדחתה",
+      "cancelled": "בקשה בוטלה",
+      "unknown": "פעולה לא ידועה: {{action}}"
     }
   }
 }
