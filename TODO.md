@@ -5,7 +5,7 @@ The following test suites and refinements are recommended to further harden the 
 ## 🧪 Upcoming Test Suites
 
 ### 1. 🕒 Stress-Testing 24/7 Conflict Logic
-- [ ] **DST (Daylight Saving Time)**: Verify no segments are lost or double-booked during the "spring forward" (loss of 1h) or "fall back" (gain of 1h) transitions.
+- [x] **DST (Daylight Saving Time)**: Partially Verified. Demonstrated with `test_dst.py` that current naive math incorrectly handles the "spring forward" jump (02:00 -> 03:00), leading to 1h duration error. Higher priority for refactor.
 - [ ] **The "36-Hour Wall"**: Add strict negative tests for 36h 1m payloads to ensure rejection (already handled in Pydantic, but need deeper integration test).
 - [ ] **Tight Segment Transitions**: Verify a request ending at 12:00:00 and another starting at 12:00:00 on the same lot do not conflict.
 
@@ -53,3 +53,5 @@ The following test suites and refinements are recommended to further harden the 
 - [x] **Hardcoding Audit**: Scan the entire codebase and generate a report of all hardcoded strings and constants that should be externalized.
 - [x] **Critical Hardcoding Fixes**: Refactored major backend/frontend components to use shared Enums and Envs.
 - [x] **Dev Containers**: Defined `.devcontainer` configuration to standardize the development environment.
+- [x] **RBAC & Session Lifecycle**: Migrated to centralized AuthProvider, implemented robust route guards in App.tsx and AdminPanel.tsx, and fixed the logout URL state leak.
+- [x] **Test Suite Hardening**: Added matchMedia mocks for Ant Design and refactored tests to use `renderWithProviders` for consistent state injection.
