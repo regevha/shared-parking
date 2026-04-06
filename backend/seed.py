@@ -70,6 +70,9 @@ def seed():
     db = SessionLocal()
     try:
         # Clear existing data
+        db.query(models.AuditLog).delete()
+        db.query(models.Notification).delete()
+        db.query(models.RequestMessage).delete()
         db.query(models.UserPreferences).delete()
         db.query(models.ParkingRequest).delete()
         db.query(models.Lot).delete()
@@ -125,6 +128,7 @@ def seed():
             # Add Audit Logs for seed data
             log_sub = models.AuditLog(
                 request_id=req_data["id"],
+                requester_id=req_data["requester_id"],
                 user_id=req_data["requester_id"],
                 user_name=req_data["requester_name"],
                 action="submitted",
@@ -135,6 +139,7 @@ def seed():
             if req_data.get("status") == "approved":
                 log_app = models.AuditLog(
                     request_id=req_data["id"],
+                    requester_id=req_data["requester_id"],
                     user_id="seed",
                     user_name=approved_by or "System",
                     action="approved",

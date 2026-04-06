@@ -6234,3 +6234,76 @@
 2026-04-06 09:19:52,302 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:34:52 IDT)" executed successfully
 2026-04-06 09:34:52,218 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:49:52 IDT)" (scheduled at 2026-04-06 09:34:52.203128+03:00)
 2026-04-06 09:34:52,269 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:49:52 IDT)" executed successfully
+2026-04-06 09:44:30,340 [INFO] parking-api: API Starting Up...
+2026-04-06 09:44:30,706 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:44:30,752 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:44:30,752 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:47:05,823 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:47:07,132 [INFO] parking-api: API Starting Up...
+2026-04-06 09:47:07,424 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:47:07,463 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:47:07,463 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:48:02,694 [INFO] parking-api: API Starting Up...
+2026-04-06 09:48:02,889 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:48:18,070 [INFO] parking-api: API Starting Up...
+2026-04-06 09:48:18,259 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:49:26,991 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:49:28,106 [INFO] parking-api: API Starting Up...
+2026-04-06 09:49:28,573 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:49:28,637 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:49:28,637 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:49:52,234 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 10:04:52 IDT)" (scheduled at 2026-04-06 09:49:52.203128+03:00)
+2026-04-06 09:49:52,307 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 10:04:52 IDT)" executed successfully
+2026-04-06 09:49:52,377 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:49:54,250 [INFO] parking-api: API Starting Up...
+2026-04-06 09:49:54,536 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:49:54,586 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:49:54,586 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:49:55,765 [INFO] parking-api: API Starting Up...
+2026-04-06 09:49:56,038 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:49:56,074 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:49:56,074 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:50:21,523 [INFO] parking-api: API Starting Up...
+2026-04-06 09:50:21,671 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:50:23,373 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:50:24,422 [INFO] parking-api: API Starting Up...
+2026-04-06 09:50:24,697 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:50:24,732 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:50:24,733 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:50:29,987 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:50:31,051 [INFO] parking-api: API Starting Up...
+2026-04-06 09:50:31,312 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:50:31,352 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:50:31,353 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:51:11,560 [INFO] parking-api: API Starting Up...
+2026-04-06 09:51:11,722 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:53:25,988 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:53:27,667 [INFO] parking-api: API Starting Up...
+2026-04-06 09:53:27,948 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:53:27,985 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:53:27,985 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:53:33,493 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:53:35,601 [INFO] parking-api: API Starting Up...
+2026-04-06 09:53:35,901 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:53:35,936 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:53:35,938 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:55:53,938 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:55:56,204 [INFO] parking-api: API Starting Up...
+2026-04-06 09:55:56,616 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:55:56,658 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:55:56,658 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:56:36,072 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:56:37,979 [INFO] parking-api: API Starting Up...
+2026-04-06 09:56:38,339 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:56:38,376 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:56:38,377 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:58:22,214 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:58:23,443 [INFO] parking-api: API Starting Up...
+2026-04-06 09:58:23,791 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:58:23,842 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:58:23,842 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-06 09:59:46,114 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-06 09:59:47,183 [INFO] parking-api: API Starting Up...
+2026-04-06 09:59:47,591 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-06 09:59:47,641 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-06 09:59:47,648 [INFO] apscheduler.scheduler: Scheduler started

@@ -27,7 +27,8 @@ describe('AllPendingRequests - Owner role actions', () => {
       requestsValue: { pendingRequests: [otherRequest] },
     });
     await waitFor(() => {
-      expect(screen.getByText('REQ-1')).toBeInTheDocument();
+      // Check for Requester Name instead of ID, as ID is not in columns
+      expect(screen.getByText('Bob')).toBeInTheDocument();
       expect(screen.getByText('Approve')).toBeInTheDocument();
     });
   });
@@ -38,8 +39,8 @@ describe('AllPendingRequests - Owner role actions', () => {
       requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
     });
     await waitFor(() => {
-      expect(screen.getByText('REQ-1')).toBeInTheDocument();
-      expect(screen.queryByText('REQ-3')).not.toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
+      expect(screen.queryByText('Charlie')).not.toBeInTheDocument();
     });
   });
 
@@ -55,8 +56,8 @@ describe('AllPendingRequests - Owner role actions', () => {
     fireEvent.click(allButton);
 
     await waitFor(() => {
-      expect(screen.getByText('REQ-1')).toBeInTheDocument();
-      expect(screen.getByText('REQ-3')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
+      expect(screen.getByText('Charlie')).toBeInTheDocument();
     });
   });
 });
@@ -68,7 +69,7 @@ describe('AllPendingRequests - User role actions', () => {
       requestsValue: { pendingRequests: [otherRequest] },
     });
     await waitFor(() => {
-      expect(screen.getByText('REQ-1')).toBeInTheDocument();
+      expect(screen.getByText('Bob')).toBeInTheDocument();
       expect(screen.queryByText('Approve')).not.toBeInTheDocument();
     });
   });
@@ -110,8 +111,13 @@ describe('AllPendingRequests - selection and approval', () => {
     const approveBtn = await screen.findByText('Approve');
     fireEvent.click(approveBtn);
     
-    // Modal title should appear
-    expect(screen.getByText(/Approve Request/i)).toBeInTheDocument();
+    // Antd Modal.confirm is mocked in this test file (line 10), so it won't render to DOM.
+    // We check if it was called instead.
+    expect(Modal.confirm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Approve Request',
+      })
+    );
   });
 
   it('disables actions for the users own request if they are not manager', async () => {
