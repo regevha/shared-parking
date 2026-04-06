@@ -10,7 +10,10 @@
     "availabilityWindows": "הגדרות זמינות",
     "notificationWindows": "העדפות התראה",
     "adminPanel": "פאנל ניהול",
-    "signOut": "התנתק"
+    "signOut": "התנתק",
+    "menu": "תפריט",
+    "language": "שפה",
+    "settings": "הגדרות"
   },
   "login": {
     "title": "ניהול חניה",
@@ -263,6 +266,7 @@
       "title": "בקשה — {{name}}",
       "close": "סגור",
       "history": "היסטוריה",
+      "requestId": "מזהה בקשה",
       "requester": "מבקש",
       "date": "תאריך",
       "time": "שעה",

@@ -39,3 +39,7 @@ parking.db
 docs/node_modules/
 docs/package.json
 docs/package-lock.json
+
+# Logs
+logs/
+backend/parking.log

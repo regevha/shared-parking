@@ -4,9 +4,9 @@ from auth import SECRET_KEY
 
 def test_logging_file_exists():
     """Verify that the API has initialized its logging system and created the log file."""
-    # We look for parking.log in the backend directory
-    log_path = "parking.log"
-    assert os.path.exists(log_path), "parking.log not found. Logging system might not be initialized."
+    # We look for parking.log in the logs directory at the root
+    log_path = os.path.join(os.path.dirname(__file__), "..", "..", "logs", "parking.log")
+    assert os.path.exists(log_path), f"parking.log not found at {log_path}. Logging system might not be initialized."
     
     # Optional: check if it has content
     with open(log_path, "r") as f:

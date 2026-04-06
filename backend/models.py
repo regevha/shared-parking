@@ -16,6 +16,13 @@ class RequestStatus(str, Enum):
     REJECTED = "rejected"
 
 
+class LotStatus(str, Enum):
+    AVAILABLE = "available"
+    BLOCKED = "blocked"
+    UNOWNED = "unowned"
+    UNOWNED_BLOCKED = "unowned-blocked"
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -55,13 +62,14 @@ class ParkingRequest(Base):
     id = Column(String, primary_key=True, index=True)
     requester_id = Column(String, nullable=False)          # → users.id
     requester_name = Column(String, nullable=False)
+    requester_role = Column(String, nullable=True)          # user | owner | manager
     date = Column(String, nullable=False)                  # YYYY-MM-DD
     start_time = Column(String, nullable=False)            # HH:MM
     end_date = Column(String, nullable=True)               # YYYY-MM-DD
     end_time = Column(String, nullable=False)              # HH:MM
     duration = Column(Integer, nullable=False)             # hours
     submitted_at = Column(String, nullable=False)          # ISO string
-    status = Column(String, nullable=False, default="pending")  # pending | approved | rejected
+    status = Column(String, nullable=False, default=RequestStatus.PENDING.value)  # pending | approved | rejected
     rejected_by_owner = Column(Boolean, default=False)
     lot_id = Column(String, nullable=True)
     floor = Column(String, nullable=True)

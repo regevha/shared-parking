@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+import os
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 import datetime as dt_mod
@@ -59,6 +60,7 @@ def _create_notification(db: Session, user_id: str, message: str):
         created_at=datetime.now(timezone.utc).isoformat()
     )
     db.add(notif)
+    db.commit()
 
 
 def _has_conflict(
@@ -165,6 +167,8 @@ def get_all_requests(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    if str(current_user.role) != models.UserRole.MANAGER.value:
+        raise HTTPException(status_code=403, detail="Only managers can view all requests")
     return db.query(models.ParkingRequest).all()
 
 
@@ -220,16 +224,18 @@ def create_request(
         )
         .count()
     )
-    if pending_count >= 5:
+    max_pending = int(os.environ.get("MAX_PENDING_REQUESTS", 5))
+    if pending_count >= max_pending:
         raise HTTPException(
             status_code=400,
-            detail="Maximum limit of 5 pending requests reached. Please wait for an existing request to be approved or rejected."
+            detail=f"Maximum limit of {max_pending} pending requests reached. Please wait for an existing request to be approved or rejected."
         )
 
     req = models.ParkingRequest(
         id=_generate_id(db),
         requester_id=current_user.id,
         requester_name=current_user.name,
+        requester_role=current_user.role,
         date=payload.date,
         start_time=payload.start_time,
         end_date=payload.end_date,
@@ -432,10 +438,31 @@ def get_request_audit(
             requester_id = log.requester_id
             break
             
-    # Check access (Manager or original Requester)
-    if current_user.role != models.UserRole.MANAGER.value and current_user.id != requester_id:
-         # Double check if request STILL exists, maybe current_user is the owner?
-         # But owners can't see the full audit trail (privacy requirement #2)
+    # Check access
+    # 1. Manager (full access)
+    # 2. Original requester (full access)
+    # 3. Lot owner (involved party)
+    # 4. Any owner if request is PENDING (evaluation period)
+    
+    is_manager = str(current_user.role) == models.UserRole.MANAGER.value
+    is_requester = current_user.id == requester_id
+    
+    # Check lot ownership or status if needed
+    req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
+    is_involved_owner = False
+    is_pending = False
+    if req:
+        is_pending = (req.status == models.RequestStatus.PENDING.value)
+        # In our system, lot_owner is stored as a name string in the request
+        if req.lot_owner == current_user.name:
+            is_involved_owner = True
+    
+    import logging
+    logger = logging.getLogger("parking-api")
+    logger.info(f"AUDIT_DEBUG: id={request_id} user={current_user.id} role={current_user.role} is_manager={is_manager} is_req={is_requester} is_pending={is_pending} involved={is_involved_owner}")
+
+    if not (is_manager or is_requester or is_involved_owner or (str(current_user.role) == models.UserRole.OWNER.value and is_pending)):
+         logger.warning(f"AUDIT_DENIED: User {current_user.id} ({current_user.role}) attempted access to history for {request_id}")
          raise HTTPException(status_code=403, detail="Permission denied")
 
     return logs

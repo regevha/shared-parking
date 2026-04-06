@@ -10,7 +10,10 @@
     "availabilityWindows": "Paramètres de Disponibilité",
     "notificationWindows": "Préférences de Notification",
     "adminPanel": "Panneau d'Administration",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "menu": "Menu",
+    "language": "Langue",
+    "settings": "Paramètres"
   },
   "login": {
     "title": "Gestion du Parking",
@@ -263,6 +266,7 @@
       "title": "Demande — {{name}}",
       "close": "Fermer",
       "history": "Historique",
+      "requestId": "ID Demande",
       "requester": "Demandeur",
       "date": "Date",
       "time": "Heure",

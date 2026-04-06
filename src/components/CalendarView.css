@@ -48,6 +48,12 @@
   text-overflow: ellipsis;
 }
 
+.event-role-tag {
+  font-size: 10px;
+  opacity: 0.85;
+  font-weight: normal;
+}
+
 .custom-event-time {
   font-size: 10px;
   opacity: 0.85;

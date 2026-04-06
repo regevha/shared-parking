@@ -35,13 +35,19 @@ const STATUS_COLORS: Record<RequestStatus, string> = {
   [RequestStatus.REJECTED]: '#f5222d',
 };
 
-// Defined outside component for stable reference (no closure needed)
-const CustomEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => (
-  <div className="custom-event">
-    <div className="custom-event-title">{event.title}</div>
-    <div className="custom-event-time">{event.resource.startTime}–{event.resource.endTime}</div>
-  </div>
-);
+const CustomEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => {
+  const name = event.resource.requesterName ? event.resource.requesterName.split(' ')[0] : 'Unknown';
+  const role = event.resource.requesterRole;
+  return (
+    <div className="custom-event">
+      <div className="custom-event-title">
+        {name} 
+        {role && <span className="event-role-tag"> ({role})</span>}
+      </div>
+      <div className="custom-event-time">{event.resource.startTime}–{event.resource.endTime}</div>
+    </div>
+  );
+};
 
 const CustomMobileHeader: React.FC<{ date: Date }> = ({ date: headerDate }) => {
   const isToday = dayjs(headerDate).isSame(dayjs(), 'day');
@@ -58,7 +64,9 @@ const CustomMobileHeader: React.FC<{ date: Date }> = ({ date: headerDate }) => {
 // Compact event for mobile week view — single line, no time sub-label
 const CustomMobileWeekEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => (
   <div className="custom-event-week-mobile">
-    <span className="custom-event-week-mobile-title">{event.title}</span>
+    <span className="custom-event-week-mobile-title">
+      {event.resource.requesterName.split(' ')[0]} ({event.resource.requesterRole?.charAt(0).toUpperCase()})
+    </span>
   </div>
 );
 
@@ -409,6 +417,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       >
         {selectedRequest && (
           <Descriptions column={1} size="small" bordered>
+            <Descriptions.Item label={t('calendarView.modal.requestId')}>{selectedRequest.id}</Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.requester')}>{selectedRequest.requesterName}</Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.date')}>{dayjs(selectedRequest.date).format('DD/MM/YYYY')}</Descriptions.Item>
             <Descriptions.Item label={t('calendarView.modal.time')}>

@@ -33,11 +33,23 @@ const EVENT_COLORS: Record<EventType, string> = {
 };
 
 // Defined outside component for stable reference
-const CustomEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => (
-  <div className="custom-event">
-    <div className="custom-event-title">{event.title}</div>
-  </div>
-);
+const CustomEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => {
+  const isRequest = event.type === 'booked' || event.type === 'pending';
+  const resource = event.resource as ParkingRequest;
+  return (
+    <div className="custom-event">
+      <div className="custom-event-title">
+        {event.title}
+        {isRequest && resource.requesterRole && (
+          <span className="event-role-tag"> ({resource.requesterRole})</span>
+        )}
+      </div>
+      {isRequest && (
+        <div className="custom-event-time">{resource.startTime}–{resource.endTime}</div>
+      )}
+    </div>
+  );
+};
 
 const CustomMobileHeader: React.FC<{ date: Date }> = ({ date: headerDate }) => {
   const isToday = dayjs(headerDate).isSame(dayjs(), 'day');
@@ -51,11 +63,20 @@ const CustomMobileHeader: React.FC<{ date: Date }> = ({ date: headerDate }) => {
   );
 };
 
-const CustomMobileWeekEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => (
-  <div className="custom-event-week-mobile">
-    <span className="custom-event-week-mobile-title">{event.title}</span>
-  </div>
-);
+const CustomMobileWeekEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => {
+  const isRequest = event.type === 'booked' || event.type === 'pending';
+  const resource = event.resource as ParkingRequest;
+  return (
+    <div className="custom-event-week-mobile">
+      <span className="custom-event-week-mobile-title">
+        {event.title}
+        {isRequest && resource.requesterRole && (
+          ` (${resource.requesterRole.charAt(0).toUpperCase()})`
+        )}
+      </span>
+    </div>
+  );
+};
 
 const currentHourSlotPropGetter = (date: Date) => {
   const now = new Date();
@@ -286,6 +307,7 @@ const LotCalendarView: React.FC = () => {
       const a = selectedEvent.resource as ParkingRequest;
       return (
         <Descriptions column={1} size="small" bordered>
+          <Descriptions.Item label={t('lotCalendarView.modal.requestId')}>{a.id}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.requester')}>{a.requesterName}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.date')}>{dayjs(a.date).format('DD/MM/YYYY')}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.time')}>
@@ -310,6 +332,7 @@ const LotCalendarView: React.FC = () => {
       return (
         <>
           <Descriptions column={1} size="small" bordered>
+            <Descriptions.Item label={t('lotCalendarView.modal.requestId')}>{r.id}</Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.requester')}>{r.requesterName}</Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.date')}>{dayjs(r.date).format('DD/MM/YYYY')}</Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.time')}>

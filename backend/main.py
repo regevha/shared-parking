@@ -9,12 +9,17 @@ from sqlalchemy import text
 # ── Load Env & Logging ────────────────────────────────────────────────────────
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
+# Ensure logs directory exists
+_log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
+if not os.path.exists(_log_dir):
+    os.makedirs(_log_dir)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler("parking.log")
+        logging.FileHandler(os.path.join(_log_dir, "parking.log"))
     ]
 )
 logger = logging.getLogger("parking-api")
@@ -41,6 +46,7 @@ def _run_migrations() -> None:
             "ALTER TABLE lots ADD COLUMN created_at TEXT",
             "ALTER TABLE lots ADD COLUMN updated_at TEXT",
             "ALTER TABLE user_preferences ADD COLUMN language TEXT DEFAULT 'en'",
+            "ALTER TABLE parking_requests ADD COLUMN requester_role TEXT",
         ]
         for sql in migrations:
             try:

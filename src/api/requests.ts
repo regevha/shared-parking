@@ -31,6 +31,7 @@ function mapRequest(r: any): ParkingRequest {
     id: r.id,
     requesterId: r.requester_id,
     requesterName: r.requester_name,
+    requesterRole: r.requester_role,
     date: r.date,
     startTime: r.start_time,
     endDate: r.end_date,

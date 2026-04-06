@@ -97,6 +97,13 @@ npm start
   - Stop Backend: `taskkill /F /IM python.exe`
   - Stop Frontend: `taskkill /F /IM node.exe`
 
+## Logging
+- **Directory**: `logs/` at the project root (created automatically on startup if missing).
+- **Files**:
+  - `logs/parking.log`: Centralised backend application logs (API startup, requests, errors, scheduler actions).
+- **Git**: The entire `logs/` directory is ignored by Git to keep the repository clean.
+- **Testing**: `backend/tests/test_infra_hardening.py` verifies that the logging system is active and writing to the correct path.
+
 ## Running Tests
 
 ### Backend

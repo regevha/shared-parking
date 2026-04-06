@@ -40,6 +40,11 @@ The following test suites and refinements are recommended to further harden the 
 - [ ] **Rate Limiting**: Implement API rate limiting to protect against brute-force and DDoS.
 - [ ] **Vulnerability Scanning**: Set up automated dependency scanning (e.g., Snyk or GitHub Dependabot).
 
+## 🧹 Technical Debt & Clean Up (v2.1)
+- [ ] **Deep Hardcoding Scan**: Perform a recursive scan of the entire codebase (frontend/backend) to identify remaining hardcoded business rules (limits, timeouts, URLs) and move them to `.env` or shared constant files.
+- [x] **API Logic Clean Up**: Use Enums consistently across all backend routers (e.g., `UserRole`, `RequestStatus`, `LotStatus`).
+- [ ] **DST-Aware Refactor**: Complete the migration of the backend to timezone-aware `datetime` objects to resolve the failing `test_dst.py` test cases.
+
 ## 🏗️ Refactor Ideas
 - [ ] **Lot-Specific Availability**: Migrate `notificationWindows` and `availabilityWindows` from `User` to `Lot` objects to allow granular control.
 - [ ] **Native Date Handling**: Migrate all ISO strings to native `DateTime` objects in the Database layer if we move away from SQLite.

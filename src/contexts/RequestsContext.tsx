@@ -8,6 +8,7 @@ export interface ParkingRequest {
   id: string;
   requesterId: string;
   requesterName: string;
+  requesterRole?: string;
   date: string;
   startTime: string;
   endDate: string;

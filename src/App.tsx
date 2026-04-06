@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Layout, Menu, Dropdown, Button, ConfigProvider, theme, Spin, Grid } from 'antd';
-import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined, SunOutlined, MoonOutlined, LogoutOutlined, GlobalOutlined } from '@ant-design/icons';
+import { Layout, Menu, Dropdown, Button, ConfigProvider, theme, Spin, Grid, Drawer } from 'antd';
+import { SettingOutlined, UserOutlined, CrownOutlined, TeamOutlined, SunOutlined, MoonOutlined, LogoutOutlined, GlobalOutlined, MenuOutlined } from '@ant-design/icons';
 import enUS from 'antd/locale/en_US';
 import frFR from 'antd/locale/fr_FR';
 import heIL from 'antd/locale/he_IL';
@@ -102,40 +102,55 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
 
   const currentLangLabel = SUPPORTED_LANGUAGES.find(l => l.code === language)?.nativeLabel ?? 'EN';
 
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const showDrawer = () => setDrawerVisible(true);
+  const onClose = () => setDrawerVisible(false);
+
   return (
     <RequestsProvider>
       <Router>
         <Layout>
           <Header style={headerStyle}>
-            <Menu
-              theme={darkMode ? 'dark' : 'light'}
-              mode="horizontal"
-              items={getMenuItems()}
-              style={{ flex: 1, minWidth: 0, background: 'transparent' }}
-            />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, direction: 'ltr' }}>
-              <Dropdown menu={languageMenu} trigger={['click']}>
-                <Button
-                  type="text"
-                  icon={<GlobalOutlined />}
-                  style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13 }}
-                  title="Change language"
-                >
-                  {currentLangLabel}
-                </Button>
-              </Dropdown>
+            {isMobile && (
+              <Button
+                type="text"
+                icon={<MenuOutlined />}
+                onClick={showDrawer}
+                style={{ ...headerBtnStyle, fontSize: 18 }}
+              />
+            )}
+            {!isMobile && (
+              <Menu
+                theme={darkMode ? 'dark' : 'light'}
+                mode="horizontal"
+                items={getMenuItems()}
+                style={{ flex: 1, minWidth: 0, background: 'transparent' }}
+              />
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 4, direction: 'ltr' }}>
+              {!isMobile && (
+                <Dropdown menu={languageMenu} trigger={['click']}>
+                  <Button
+                    type="text"
+                    icon={<GlobalOutlined />}
+                    style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13 }}
+                  >
+                    {currentLangLabel}
+                  </Button>
+                </Dropdown>
+              )}
               <Button
                 type="text"
                 icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
                 onClick={toggleDarkMode}
                 style={headerBtnStyle}
-                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
               />
               <NotificationBell />
-              <Dropdown menu={settingsMenu} trigger={['click']}>
-                <Button type="text" icon={<SettingOutlined />} style={headerBtnStyle} />
-              </Dropdown>
-              {/* User menu — name + logout */}
+              {!isMobile && (
+                <Dropdown menu={settingsMenu} trigger={['click']}>
+                  <Button type="text" icon={<SettingOutlined />} style={headerBtnStyle} />
+                </Dropdown>
+              )}
               <Dropdown
                 menu={{
                   items: [
@@ -150,11 +165,40 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                 }}
                 trigger={['click']}
               >
-                <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8 }}>
+                <Button type="text" style={{ ...headerBtnStyle, marginLeft: isMobile ? 0 : 8 }}>
                   {roleIcon}{!isMobile && ` ${user?.name ?? role}`}
                 </Button>
               </Dropdown>
             </div>
+            <Drawer
+              title={t('nav.menu')}
+              placement={isRTL(language) ? 'right' : 'left'}
+              onClose={onClose}
+              open={drawerVisible}
+              width={250}
+              bodyStyle={{ padding: 0 }}
+            >
+              <Menu
+                mode="inline"
+                items={getMenuItems()}
+                onClick={onClose}
+                style={{ borderRight: 'none' }}
+              />
+              <div style={{ padding: '16px', borderTop: '1px solid #f0f0f0' }}>
+                 <Dropdown menu={languageMenu} trigger={['click']}>
+                    <Button type="text" icon={<GlobalOutlined />} style={{ width: '100%', textAlign: 'left' }}>
+                      {t('nav.language')}: {currentLangLabel}
+                    </Button>
+                 </Dropdown>
+                 <div style={{ marginTop: 16 }}>
+                    <Dropdown menu={settingsMenu} trigger={['click']}>
+                      <Button type="text" icon={<SettingOutlined />} style={{ width: '100%', textAlign: 'left' }}>
+                        {t('nav.settings')}
+                      </Button>
+                    </Dropdown>
+                 </div>
+              </div>
+            </Drawer>
           </Header>
           <Content style={{ padding: isMobile ? '0 8px' : '0 50px' }}>
             <div style={{ padding: isMobile ? 12 : 24, minHeight: 380 }}>

@@ -10,7 +10,10 @@
     "availabilityWindows": "Availability Settings",
     "notificationWindows": "Notification Preferences",
     "adminPanel": "Admin Panel",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "menu": "Menu",
+    "language": "Language",
+    "settings": "Settings"
   },
   "login": {
     "title": "Parking Management",
@@ -263,6 +266,7 @@
       "title": "Request — {{name}}",
       "close": "Close",
       "history": "History",
+      "requestId": "Request ID",
       "requester": "Requester",
       "date": "Date",
       "time": "Time",
@@ -310,6 +314,7 @@
       "bookedTitle": "Booked — {{name}}",
       "pendingTitle": "Pending — {{name}}",
       "blockedTitle": "Blocked — {{id}}",
+      "requestId": "Request ID",
       "requester": "Requester",
       "date": "Date",
       "time": "Time",

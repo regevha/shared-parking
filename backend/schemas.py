@@ -1,7 +1,9 @@
 import re
+import os
 from datetime import date as DateType
 from pydantic import BaseModel, field_validator, model_validator
 from typing import Optional
+from models import RequestStatus
 
 _TIME_RE = re.compile(r'^([01]\d|2[0-3]):[0-5]\d$')
 _DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
@@ -12,13 +14,14 @@ _DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 class ParkingRequestBase(BaseModel):
     requester_id: str
     requester_name: str
+    requester_role: Optional[str] = None
     date: str
     start_time: str
     end_date: Optional[str] = None
     end_time: str
     duration: int
     submitted_at: str
-    status: str = "pending"
+    status: str = RequestStatus.PENDING.value
     rejected_by_owner: bool = False
     lot_id: Optional[str] = None
     floor: Optional[str] = None
@@ -31,6 +34,7 @@ class ParkingRequestBase(BaseModel):
 class ParkingRequestCreate(BaseModel):
     requester_id: Optional[str] = None
     requester_name: Optional[str] = None
+    requester_role: Optional[str] = None
     date: str
     start_time: str
     end_date: Optional[str] = None
@@ -63,8 +67,11 @@ class ParkingRequestCreate(BaseModel):
     def validate_time_range(self) -> 'ParkingRequestCreate':
         from datetime import datetime, timedelta
         
-        if self.duration < 1 or self.duration > 36:
-            raise ValueError('duration must be between 1 and 36 hours')
+        min_dur = int(os.environ.get("MIN_REQUEST_DURATION_HOURS", 1))
+        max_dur = int(os.environ.get("MAX_REQUEST_DURATION_HOURS", 36))
+        
+        if self.duration < min_dur or self.duration > max_dur:
+            raise ValueError(f'duration must be between {min_dur} and {max_dur} hours')
 
         try:
             start_dt = datetime.strptime(f"{self.date} {self.start_time}", "%Y-%m-%d %H:%M")
