@@ -68,17 +68,34 @@ All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the ful
 | `pytest-cov` | Enables `--cov` flag for line-level coverage reports |
 
 ## Startup
+
+### 1 — Backend (Port 8000)
 ```bash
-# Backend
 cd backend
 python -m pip install -r requirements.txt
 python seed.py        # first time only — creates/resets parking.db
-python -m uvicorn main:app --reload
 
-# Frontend (separate terminal)
+# To allow access from other devices (mobile) on the same network:
+python -m uvicorn main:app --host 0.0.0.0 --reload
+```
+
+### 2 — Frontend (Port 3000)
+```bash
+# In a separate terminal
 npm install
 npm start
 ```
+
+## Mobile Access & CORS
+- **Binding**: Running with `--host 0.0.0.0` makes the backend available on your machine's local IP (e.g., `192.168.x.x`).
+- **CORS**: The backend is configured with `allow_origins=["*"]` in `main.py` to facilitate local network testing.
+- **Client Configuration**: Ensure `src/api/client.ts` uses the correct local IP if testing from a physical mobile device.
+
+## Shutdown
+- **Graceful**: Press `Ctrl+C` in the respective terminal windows.
+- **Force (Windows)**:
+  - Stop Backend: `taskkill /F /IM python.exe`
+  - Stop Frontend: `taskkill /F /IM node.exe`
 
 ## Running Tests
 
