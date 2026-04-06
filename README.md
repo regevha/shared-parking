@@ -13,8 +13,22 @@ A prototype application for managing corporate parking resources. Users request 
 | i18n | i18next v23 + react-i18next v14 — English, French and Hebrew |
 | Tests | pytest, FastAPI TestClient, in-memory SQLite |
 | **Audit Trail** | SQLite-backed `audit_log` with timeline UI |
+| **RBAC Security** | Centralized route guards & session cleanup |
 
 ---
+
+## Security & Authorization Lifecycle
+
+The application implements a robust security model to protect administrative features and ensure session isolation:
+
+### Role-Based Access Control (RBAC)
+- **Automatic Guards**: Sensitive routes (e.g., `/admin`) are protected at the routing level in `App.tsx`. Unauthorized users are immediately redirected to the home page.
+- **Fail-safe Component Logic**: Components like `AdminPanel.tsx` include internal permission checks to prevent unauthorized rendering, providing defense-in-depth even if navigation logic is bypassed.
+
+### Session Isolation & Cleanup (Verified Fix)
+Previously, a "URL leakage" issue existed where the `/admin` path would persist in the browser address bar after an administrator logged out. This could lead to a newly logged-in non-admin user briefly seeing the administrative interface.
+- **Centralized Router**: The `BrowserRouter` was moved to the top-level `index.tsx` to ensure it survives the entire session lifecycle.
+- **Explicit Logout Navigation**: The `logout` process now explicitly clears the session state and navigates back to the root (`/`), ensuring every new login starts from a clean URL state.
 
 ## Key Features (v2.0)
 

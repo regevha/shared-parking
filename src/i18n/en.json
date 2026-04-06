@@ -262,6 +262,7 @@
     "modal": {
       "title": "Request — {{name}}",
       "close": "Close",
+      "history": "History",
       "requester": "Requester",
       "date": "Date",
       "time": "Time",

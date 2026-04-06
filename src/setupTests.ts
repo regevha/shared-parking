@@ -21,9 +21,9 @@ if (typeof (global as any).MessageChannel === 'undefined') {
 // jsdom does not implement it; stub with a no-op class.
 if (typeof (global as any).ResizeObserver === 'undefined') {
   (global as any).ResizeObserver = class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
+    observe() { }
+    unobserve() { }
+    disconnect() { }
   };
 }
 
@@ -36,10 +36,10 @@ Object.defineProperty(window, 'matchMedia', {
     matches: false,
     media: query,
     onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
+    addListener: () => { },
+    removeListener: () => { },
+    addEventListener: () => { },
+    removeEventListener: () => { },
     dispatchEvent: () => false,
   }),
 });

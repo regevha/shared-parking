@@ -6055,3 +6055,182 @@
 2026-04-05 12:55:56,681 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 13:10:56 IDT)" executed successfully
 2026-04-05 12:59:42,406 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 13:14:42 IDT)" (scheduled at 2026-04-05 12:59:42.379654+03:00)
 2026-04-05 12:59:42,486 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 13:14:42 IDT)" executed successfully
+2026-04-05 13:29:02,481 [INFO] parking-api: API Starting Up...
+2026-04-05 13:29:02,842 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-05 13:29:02,875 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-05 13:29:02,890 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-05 13:29:49,600 [INFO] apscheduler.scheduler: Scheduler has been shut down
+2026-04-05 13:29:56,732 [INFO] parking-api: API Starting Up...
+2026-04-05 13:29:57,083 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-05 13:29:57,141 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-05 13:29:57,141 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-05 13:44:57,096 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 13:44:57 IDT)" (scheduled at 2026-04-05 13:44:57.083080+03:00)
+2026-04-05 13:44:57,102 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 13:59:57 IDT)" executed successfully
+2026-04-05 13:59:57,101 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 14:14:57 IDT)" (scheduled at 2026-04-05 13:59:57.083080+03:00)
+2026-04-05 13:59:57,101 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 14:14:57 IDT)" executed successfully
+2026-04-05 14:14:57,103 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 14:29:57 IDT)" (scheduled at 2026-04-05 14:14:57.083080+03:00)
+2026-04-05 14:14:57,103 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 14:29:57 IDT)" executed successfully
+2026-04-05 14:29:57,095 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 14:44:57 IDT)" (scheduled at 2026-04-05 14:29:57.083080+03:00)
+2026-04-05 14:29:57,097 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 14:44:57 IDT)" executed successfully
+2026-04-05 14:44:57,103 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 14:59:57 IDT)" (scheduled at 2026-04-05 14:44:57.083080+03:00)
+2026-04-05 14:44:57,103 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 14:59:57 IDT)" executed successfully
+2026-04-05 14:59:57,100 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 15:14:57 IDT)" (scheduled at 2026-04-05 14:59:57.083080+03:00)
+2026-04-05 14:59:57,101 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 15:14:57 IDT)" executed successfully
+2026-04-05 15:14:57,091 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 15:29:57 IDT)" (scheduled at 2026-04-05 15:14:57.083080+03:00)
+2026-04-05 15:14:57,096 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 15:29:57 IDT)" executed successfully
+2026-04-05 15:29:57,091 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 15:44:57 IDT)" (scheduled at 2026-04-05 15:29:57.083080+03:00)
+2026-04-05 15:29:57,091 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 15:44:57 IDT)" executed successfully
+2026-04-05 15:44:57,106 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 15:59:57 IDT)" (scheduled at 2026-04-05 15:44:57.083080+03:00)
+2026-04-05 15:44:57,108 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 15:59:57 IDT)" executed successfully
+2026-04-05 15:59:57,105 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 16:14:57 IDT)" (scheduled at 2026-04-05 15:59:57.083080+03:00)
+2026-04-05 15:59:57,105 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 16:14:57 IDT)" executed successfully
+2026-04-05 16:14:57,094 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 16:29:57 IDT)" (scheduled at 2026-04-05 16:14:57.083080+03:00)
+2026-04-05 16:14:57,099 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 16:29:57 IDT)" executed successfully
+2026-04-05 16:29:57,103 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 16:44:57 IDT)" (scheduled at 2026-04-05 16:29:57.083080+03:00)
+2026-04-05 16:29:57,103 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 16:44:57 IDT)" executed successfully
+2026-04-05 16:44:57,093 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 16:59:57 IDT)" (scheduled at 2026-04-05 16:44:57.083080+03:00)
+2026-04-05 16:44:57,093 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 16:59:57 IDT)" executed successfully
+2026-04-05 16:59:57,091 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 17:14:57 IDT)" (scheduled at 2026-04-05 16:59:57.083080+03:00)
+2026-04-05 16:59:57,091 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 17:14:57 IDT)" executed successfully
+2026-04-05 17:14:57,106 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 17:29:57 IDT)" (scheduled at 2026-04-05 17:14:57.083080+03:00)
+2026-04-05 17:14:57,106 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 17:29:57 IDT)" executed successfully
+2026-04-05 17:29:57,103 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 17:44:57 IDT)" (scheduled at 2026-04-05 17:29:57.083080+03:00)
+2026-04-05 17:29:57,103 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 17:44:57 IDT)" executed successfully
+2026-04-05 17:44:57,104 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 17:59:57 IDT)" (scheduled at 2026-04-05 17:44:57.083080+03:00)
+2026-04-05 17:44:57,104 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 17:59:57 IDT)" executed successfully
+2026-04-05 17:59:57,092 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 18:14:57 IDT)" (scheduled at 2026-04-05 17:59:57.083080+03:00)
+2026-04-05 17:59:57,092 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 18:14:57 IDT)" executed successfully
+2026-04-05 18:14:57,100 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 18:29:57 IDT)" (scheduled at 2026-04-05 18:14:57.083080+03:00)
+2026-04-05 18:14:57,109 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 18:29:57 IDT)" executed successfully
+2026-04-05 18:29:57,104 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 18:44:57 IDT)" (scheduled at 2026-04-05 18:29:57.083080+03:00)
+2026-04-05 18:29:57,118 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 18:44:57 IDT)" executed successfully
+2026-04-05 18:44:57,099 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 18:59:57 IDT)" (scheduled at 2026-04-05 18:44:57.083080+03:00)
+2026-04-05 18:44:57,104 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 18:59:57 IDT)" executed successfully
+2026-04-05 18:50:59,414 [INFO] parking-api: API Starting Up...
+2026-04-05 18:50:59,826 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-05 18:50:59,866 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-05 18:50:59,867 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-05 18:58:40,461 [INFO] parking-api: API Starting Up...
+2026-04-05 18:58:40,806 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-05 18:58:40,846 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-05 18:58:40,846 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-05 19:13:40,831 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 19:28:40 IDT)" (scheduled at 2026-04-05 19:13:40.806798+03:00)
+2026-04-05 19:13:40,996 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 19:28:40 IDT)" executed successfully
+2026-04-05 19:28:41,127 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 19:43:40 IDT)" (scheduled at 2026-04-05 19:28:40.806798+03:00)
+2026-04-05 19:28:42,351 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 19:43:40 IDT)" executed successfully
+2026-04-05 19:34:51,708 [INFO] parking-api: API Starting Up...
+2026-04-05 19:34:52,203 [INFO] apscheduler.scheduler: Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-05 19:34:52,245 [INFO] apscheduler.scheduler: Added job "run_auto_approval" to job store "default"
+2026-04-05 19:34:52,247 [INFO] apscheduler.scheduler: Scheduler started
+2026-04-05 19:49:52,267 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 20:04:52 IDT)" (scheduled at 2026-04-05 19:49:52.203128+03:00)
+2026-04-05 19:49:52,417 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 20:04:52 IDT)" executed successfully
+2026-04-05 20:04:52,229 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 20:19:52 IDT)" (scheduled at 2026-04-05 20:04:52.203128+03:00)
+2026-04-05 20:04:52,289 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 20:19:52 IDT)" executed successfully
+2026-04-05 20:19:52,239 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 20:34:52 IDT)" (scheduled at 2026-04-05 20:19:52.203128+03:00)
+2026-04-05 20:19:52,334 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 20:34:52 IDT)" executed successfully
+2026-04-05 20:34:52,254 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 20:49:52 IDT)" (scheduled at 2026-04-05 20:34:52.203128+03:00)
+2026-04-05 20:34:52,350 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 20:49:52 IDT)" executed successfully
+2026-04-05 20:49:52,219 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 21:04:52 IDT)" (scheduled at 2026-04-05 20:49:52.203128+03:00)
+2026-04-05 20:49:52,278 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 21:04:52 IDT)" executed successfully
+2026-04-05 21:04:52,211 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 21:19:52 IDT)" (scheduled at 2026-04-05 21:04:52.203128+03:00)
+2026-04-05 21:04:52,291 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 21:19:52 IDT)" executed successfully
+2026-04-05 21:19:52,212 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 21:34:52 IDT)" (scheduled at 2026-04-05 21:19:52.203128+03:00)
+2026-04-05 21:19:52,297 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 21:34:52 IDT)" executed successfully
+2026-04-05 21:34:52,220 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 21:49:52 IDT)" (scheduled at 2026-04-05 21:34:52.203128+03:00)
+2026-04-05 21:34:52,286 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 21:49:52 IDT)" executed successfully
+2026-04-05 21:49:52,223 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 22:04:52 IDT)" (scheduled at 2026-04-05 21:49:52.203128+03:00)
+2026-04-05 21:49:52,280 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 22:04:52 IDT)" executed successfully
+2026-04-05 22:04:52,220 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 22:19:52 IDT)" (scheduled at 2026-04-05 22:04:52.203128+03:00)
+2026-04-05 22:04:52,291 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 22:19:52 IDT)" executed successfully
+2026-04-05 22:19:52,221 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 22:34:52 IDT)" (scheduled at 2026-04-05 22:19:52.203128+03:00)
+2026-04-05 22:19:52,286 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 22:34:52 IDT)" executed successfully
+2026-04-05 22:34:52,222 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 22:49:52 IDT)" (scheduled at 2026-04-05 22:34:52.203128+03:00)
+2026-04-05 22:34:52,277 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 22:49:52 IDT)" executed successfully
+2026-04-05 22:49:52,223 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 23:04:52 IDT)" (scheduled at 2026-04-05 22:49:52.203128+03:00)
+2026-04-05 22:49:52,278 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 23:04:52 IDT)" executed successfully
+2026-04-05 23:04:52,214 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 23:19:52 IDT)" (scheduled at 2026-04-05 23:04:52.203128+03:00)
+2026-04-05 23:04:52,266 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 23:19:52 IDT)" executed successfully
+2026-04-05 23:19:52,224 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 23:34:52 IDT)" (scheduled at 2026-04-05 23:19:52.203128+03:00)
+2026-04-05 23:19:52,287 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 23:34:52 IDT)" executed successfully
+2026-04-05 23:34:52,218 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 23:49:52 IDT)" (scheduled at 2026-04-05 23:34:52.203128+03:00)
+2026-04-05 23:34:52,286 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-05 23:49:52 IDT)" executed successfully
+2026-04-05 23:49:52,213 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 00:04:52 IDT)" (scheduled at 2026-04-05 23:49:52.203128+03:00)
+2026-04-05 23:49:52,282 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 00:04:52 IDT)" executed successfully
+2026-04-06 00:04:52,222 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 00:19:52 IDT)" (scheduled at 2026-04-06 00:04:52.203128+03:00)
+2026-04-06 00:04:52,286 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 00:19:52 IDT)" executed successfully
+2026-04-06 00:19:52,222 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 00:34:52 IDT)" (scheduled at 2026-04-06 00:19:52.203128+03:00)
+2026-04-06 00:19:52,297 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 00:34:52 IDT)" executed successfully
+2026-04-06 00:34:52,214 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 00:49:52 IDT)" (scheduled at 2026-04-06 00:34:52.203128+03:00)
+2026-04-06 00:34:52,294 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 00:49:52 IDT)" executed successfully
+2026-04-06 00:49:52,218 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 01:04:52 IDT)" (scheduled at 2026-04-06 00:49:52.203128+03:00)
+2026-04-06 00:49:52,292 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 01:04:52 IDT)" executed successfully
+2026-04-06 01:04:52,219 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 01:19:52 IDT)" (scheduled at 2026-04-06 01:04:52.203128+03:00)
+2026-04-06 01:04:52,271 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 01:19:52 IDT)" executed successfully
+2026-04-06 01:19:52,219 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 01:34:52 IDT)" (scheduled at 2026-04-06 01:19:52.203128+03:00)
+2026-04-06 01:19:52,290 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 01:34:52 IDT)" executed successfully
+2026-04-06 01:34:52,221 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 01:49:52 IDT)" (scheduled at 2026-04-06 01:34:52.203128+03:00)
+2026-04-06 01:34:52,282 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 01:49:52 IDT)" executed successfully
+2026-04-06 01:49:52,221 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 02:04:52 IDT)" (scheduled at 2026-04-06 01:49:52.203128+03:00)
+2026-04-06 01:49:52,279 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 02:04:52 IDT)" executed successfully
+2026-04-06 02:04:52,226 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 02:19:52 IDT)" (scheduled at 2026-04-06 02:04:52.203128+03:00)
+2026-04-06 02:04:52,304 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 02:19:52 IDT)" executed successfully
+2026-04-06 02:19:52,222 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 02:34:52 IDT)" (scheduled at 2026-04-06 02:19:52.203128+03:00)
+2026-04-06 02:19:52,288 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 02:34:52 IDT)" executed successfully
+2026-04-06 02:34:52,216 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 02:49:52 IDT)" (scheduled at 2026-04-06 02:34:52.203128+03:00)
+2026-04-06 02:34:52,281 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 02:49:52 IDT)" executed successfully
+2026-04-06 02:49:52,226 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 03:04:52 IDT)" (scheduled at 2026-04-06 02:49:52.203128+03:00)
+2026-04-06 02:49:52,280 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 03:04:52 IDT)" executed successfully
+2026-04-06 03:04:52,216 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 03:19:52 IDT)" (scheduled at 2026-04-06 03:04:52.203128+03:00)
+2026-04-06 03:04:52,279 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 03:19:52 IDT)" executed successfully
+2026-04-06 03:19:52,225 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 03:34:52 IDT)" (scheduled at 2026-04-06 03:19:52.203128+03:00)
+2026-04-06 03:19:52,327 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 03:34:52 IDT)" executed successfully
+2026-04-06 03:34:52,217 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 03:49:52 IDT)" (scheduled at 2026-04-06 03:34:52.203128+03:00)
+2026-04-06 03:34:52,272 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 03:49:52 IDT)" executed successfully
+2026-04-06 03:49:52,215 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 04:04:52 IDT)" (scheduled at 2026-04-06 03:49:52.203128+03:00)
+2026-04-06 03:49:52,283 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 04:04:52 IDT)" executed successfully
+2026-04-06 04:04:52,219 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 04:19:52 IDT)" (scheduled at 2026-04-06 04:04:52.203128+03:00)
+2026-04-06 04:04:52,280 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 04:19:52 IDT)" executed successfully
+2026-04-06 04:19:52,213 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 04:34:52 IDT)" (scheduled at 2026-04-06 04:19:52.203128+03:00)
+2026-04-06 04:19:52,274 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 04:34:52 IDT)" executed successfully
+2026-04-06 04:34:52,223 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 04:49:52 IDT)" (scheduled at 2026-04-06 04:34:52.203128+03:00)
+2026-04-06 04:34:52,287 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 04:49:52 IDT)" executed successfully
+2026-04-06 04:49:52,230 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 05:04:52 IDT)" (scheduled at 2026-04-06 04:49:52.203128+03:00)
+2026-04-06 04:49:52,317 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 05:04:52 IDT)" executed successfully
+2026-04-06 05:04:52,214 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 05:19:52 IDT)" (scheduled at 2026-04-06 05:04:52.203128+03:00)
+2026-04-06 05:04:52,269 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 05:19:52 IDT)" executed successfully
+2026-04-06 05:19:52,223 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 05:34:52 IDT)" (scheduled at 2026-04-06 05:19:52.203128+03:00)
+2026-04-06 05:19:52,276 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 05:34:52 IDT)" executed successfully
+2026-04-06 05:34:52,215 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 05:49:52 IDT)" (scheduled at 2026-04-06 05:34:52.203128+03:00)
+2026-04-06 05:34:52,277 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 05:49:52 IDT)" executed successfully
+2026-04-06 05:49:52,222 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 06:04:52 IDT)" (scheduled at 2026-04-06 05:49:52.203128+03:00)
+2026-04-06 05:49:52,282 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 06:04:52 IDT)" executed successfully
+2026-04-06 06:04:52,218 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 06:19:52 IDT)" (scheduled at 2026-04-06 06:04:52.203128+03:00)
+2026-04-06 06:04:52,274 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 06:19:52 IDT)" executed successfully
+2026-04-06 06:19:52,217 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 06:34:52 IDT)" (scheduled at 2026-04-06 06:19:52.203128+03:00)
+2026-04-06 06:19:52,283 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 06:34:52 IDT)" executed successfully
+2026-04-06 06:34:52,217 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 06:49:52 IDT)" (scheduled at 2026-04-06 06:34:52.203128+03:00)
+2026-04-06 06:34:52,274 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 06:49:52 IDT)" executed successfully
+2026-04-06 06:49:52,223 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 07:04:52 IDT)" (scheduled at 2026-04-06 06:49:52.203128+03:00)
+2026-04-06 06:49:52,283 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 07:04:52 IDT)" executed successfully
+2026-04-06 07:04:52,213 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 07:19:52 IDT)" (scheduled at 2026-04-06 07:04:52.203128+03:00)
+2026-04-06 07:04:52,275 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 07:19:52 IDT)" executed successfully
+2026-04-06 07:19:52,223 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 07:34:52 IDT)" (scheduled at 2026-04-06 07:19:52.203128+03:00)
+2026-04-06 07:19:52,274 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 07:34:52 IDT)" executed successfully
+2026-04-06 07:34:52,219 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 07:49:52 IDT)" (scheduled at 2026-04-06 07:34:52.203128+03:00)
+2026-04-06 07:34:52,264 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 07:49:52 IDT)" executed successfully
+2026-04-06 07:49:52,217 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 08:04:52 IDT)" (scheduled at 2026-04-06 07:49:52.203128+03:00)
+2026-04-06 07:49:52,281 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 08:04:52 IDT)" executed successfully
+2026-04-06 08:04:52,216 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 08:19:52 IDT)" (scheduled at 2026-04-06 08:04:52.203128+03:00)
+2026-04-06 08:04:52,287 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 08:19:52 IDT)" executed successfully
+2026-04-06 08:19:52,224 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 08:34:52 IDT)" (scheduled at 2026-04-06 08:19:52.203128+03:00)
+2026-04-06 08:19:52,290 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 08:34:52 IDT)" executed successfully
+2026-04-06 08:34:52,226 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 08:49:52 IDT)" (scheduled at 2026-04-06 08:34:52.203128+03:00)
+2026-04-06 08:34:52,287 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 08:49:52 IDT)" executed successfully
+2026-04-06 08:49:52,224 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:04:52 IDT)" (scheduled at 2026-04-06 08:49:52.203128+03:00)
+2026-04-06 08:49:52,287 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:04:52 IDT)" executed successfully
+2026-04-06 09:04:52,228 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:19:52 IDT)" (scheduled at 2026-04-06 09:04:52.203128+03:00)
+2026-04-06 09:04:52,283 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:19:52 IDT)" executed successfully
+2026-04-06 09:19:52,228 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:34:52 IDT)" (scheduled at 2026-04-06 09:19:52.203128+03:00)
+2026-04-06 09:19:52,302 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:34:52 IDT)" executed successfully
+2026-04-06 09:34:52,218 [INFO] apscheduler.executors.default: Running job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:49:52 IDT)" (scheduled at 2026-04-06 09:34:52.203128+03:00)
+2026-04-06 09:34:52,269 [INFO] apscheduler.executors.default: Job "run_auto_approval (trigger: interval[0:15:00], next run at: 2026-04-06 09:49:52 IDT)" executed successfully

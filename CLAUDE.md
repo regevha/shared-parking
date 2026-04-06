@@ -71,9 +71,9 @@ All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the ful
 ```bash
 # Backend
 cd backend
-pip install -r requirements.txt
-python seed.py        # first time only — data persists in parking.db
-uvicorn main:app --reload
+python -m pip install -r requirements.txt
+python seed.py        # first time only — creates/resets parking.db
+python -m uvicorn main:app --reload
 
 # Frontend (separate terminal)
 npm install
@@ -81,15 +81,38 @@ npm start
 ```
 
 ## Running Tests
+
+### Backend
 ```bash
 cd backend
-pip install -r requirements-test.txt   # first time only
+python -m pip install -r requirements-test.txt   # first time only
 pytest tests/ -v
 pytest tests/ --cov=. --cov-report=term-missing  # with coverage
 ```
-- 119 tests, always green
-- Uses in-memory SQLite (StaticPool) — never touches parking.db
-- Isolation mechanism: `conftest.py` uses FastAPI's `app.dependency_overrides[get_db] = override_get_db` to replace the real `get_db` (which opens `parking.db`) with a version that yields an in-memory session instead. Every endpoint uses `Depends(get_db)`, so the swap is transparent — the app code runs unchanged but all DB operations go to the throwaway in-memory database.
+
+### Frontend
+```bash
+# Run all tests in CI mode (desktop viewport)
+$env:CI='true'; npm test -- --ci --no-cache
+```
+
+## Test Coverage Summary
+
+### Frontend Tests
+- `src/App.test.tsx` — Basic app rendering, navigation, and provider initialization.
+- `src/RBAC.test.tsx` — **Critical**: Role-Based Access Control, session isolation, and logout URL state cleanup (verified by title-based lookups).
+- `src/components/__tests__/AdminPanel.test.tsx` — Admin functionalities: User/Lot management and defensive UI rendering.
+- `src/components/__tests__/AllPendingRequests.test.tsx` — Real-world simulation of approval/rejection workflows across roles.
+- `src/components/__tests__/AdminPanelCharades.test.tsx` — Specialized logic for user preference synchronization and Edge-cases.
+
+### Backend Tests
+- 119 tests, always green. Uses in-memory SQLite (StaticPool) — never touches `parking.db`.
+- `conftest.py` — Fixtures: in-memory DB, TestClient with overrides, headers, and pwd hashing patches.
+- `test_auth.py` — 9 tests: register, login, `/auth/me`.
+- `test_requests.py` — 41 tests: Full CRUD, approve/reject, RBAC, and status guards.
+- `test_lots.py` — 23 tests: Full CRUD, owner-scoping, and specialized role updates.
+- `test_users.py` — 30 tests: Role restrictions, password changes, and self-delete prevention.
+- `test_messages.py` — 16 tests: Communication RBAC and audit retention after request deletion.
 
 ## Key Files
 

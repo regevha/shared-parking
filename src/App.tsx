@@ -55,14 +55,14 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
       items.push({ key: 'my-requests', label: <Link to="/my-requests">{t('nav.myRequests')}</Link> });
     }
 
-    items.push({ key: 'calendar',   label: <Link to="/calendar">{t('nav.requestsView')}</Link> });
-    items.push({ key: 'pending',    label: <Link to="/pending">{t('nav.pendingRequests')}</Link> });
-    items.push({ key: 'approvals',  label: <Link to="/approvals">{t('nav.approvals')}</Link> });
+    items.push({ key: 'calendar', label: <Link to="/calendar">{t('nav.requestsView')}</Link> });
+    items.push({ key: 'pending', label: <Link to="/pending">{t('nav.pendingRequests')}</Link> });
+    items.push({ key: 'approvals', label: <Link to="/approvals">{t('nav.approvals')}</Link> });
     items.push({ key: 'lot-status', label: <Link to="/lot-status">{t('nav.parkingStatus')}</Link> });
 
     if (role === UserRole.OWNER) {
       items.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">{t('nav.lotCalendar')}</Link> });
-      items.push({ key: 'my-lots',      label: <Link to="/my-lots">{t('nav.myLots')}</Link> });
+      items.push({ key: 'my-lots', label: <Link to="/my-lots">{t('nav.myLots')}</Link> });
     }
 
     if (role === UserRole.MANAGER) {
@@ -90,9 +90,9 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
 
   const roleIcon = role === UserRole.OWNER ? <CrownOutlined /> : role === UserRole.MANAGER ? <TeamOutlined /> : <UserOutlined />;
 
-  const headerBg       = darkMode ? '#141414' : '#ffffff';
+  const headerBg = darkMode ? '#141414' : '#ffffff';
   const headerBtnStyle = { color: darkMode ? 'white' : 'rgba(0,0,0,0.88)' };
-  const headerStyle    = {
+  const headerStyle = {
     display: 'flex' as const,
     alignItems: 'center' as const,
     justifyContent: 'space-between' as const,
@@ -105,79 +105,79 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
   return (
     <RequestsProvider>
       <Router>
-          <Layout>
-            <Header style={headerStyle}>
-              <Menu
-                theme={darkMode ? 'dark' : 'light'}
-                mode="horizontal"
-                items={getMenuItems()}
-                style={{ flex: 1, minWidth: 0, background: 'transparent' }}
-              />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, direction: 'ltr' }}>
-                <Dropdown menu={languageMenu} trigger={['click']}>
-                  <Button
-                    type="text"
-                    icon={<GlobalOutlined />}
-                    style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13 }}
-                    title="Change language"
-                  >
-                    {currentLangLabel}
-                  </Button>
-                </Dropdown>
+        <Layout>
+          <Header style={headerStyle}>
+            <Menu
+              theme={darkMode ? 'dark' : 'light'}
+              mode="horizontal"
+              items={getMenuItems()}
+              style={{ flex: 1, minWidth: 0, background: 'transparent' }}
+            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, direction: 'ltr' }}>
+              <Dropdown menu={languageMenu} trigger={['click']}>
                 <Button
                   type="text"
-                  icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
-                  onClick={toggleDarkMode}
-                  style={headerBtnStyle}
-                  title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-                />
-                <NotificationBell />
-                <Dropdown menu={settingsMenu} trigger={['click']}>
-                  <Button type="text" icon={<SettingOutlined />} style={headerBtnStyle} />
-                </Dropdown>
-                {/* User menu — name + logout */}
-                <Dropdown
-                  menu={{
-                    items: [
-                      {
-                        key: 'logout',
-                        label: t('nav.signOut'),
-                        icon: <LogoutOutlined />,
-                        danger: true,
-                        onClick: logout,
-                      },
-                    ],
-                  }}
-                  trigger={['click']}
+                  icon={<GlobalOutlined />}
+                  style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13 }}
+                  title="Change language"
                 >
-                  <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8 }}>
-                    {roleIcon}{!isMobile && ` ${user?.name ?? role}`}
-                  </Button>
-                </Dropdown>
-              </div>
-            </Header>
-            <Content style={{ padding: isMobile ? '0 8px' : '0 50px' }}>
-              <div style={{ padding: isMobile ? 12 : 24, minHeight: 380 }}>
-                <Routes>
-                  <Route path="/lot-status"   element={<LotStatusBoard />} />
-                  <Route path="/pending"      element={<AllPendingRequests role={role} />} />
-                  <Route path="/calendar"     element={<CalendarView role={role} />} />
-                  <Route path="/approvals"    element={<AllApprovals />} />
-                  <Route path="/submit-request" element={<ParkingRequestForm />} />
-                  <Route path="/my-requests"  element={<MyRequests />} />
-                  <Route path="/my-lots"      element={<MyLots />} />
-                  <Route path="/lot-calendar" element={<LotCalendarView />} />
-                  <Route path="/admin"        element={<AdminPanel />} />
-                   <Route path="/availability" element={<AvailabilityWindows />} />
-                  <Route path="/notifications" element={<NotificationWindows />} />
-                  <Route path="/request/:id"  element={<RequestDetail />} />
-                  <Route path="/"             element={<LotStatusBoard />} />
-                </Routes>
-              </div>
-            </Content>
-          </Layout>
-        </Router>
-      </RequestsProvider>
+                  {currentLangLabel}
+                </Button>
+              </Dropdown>
+              <Button
+                type="text"
+                icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
+                onClick={toggleDarkMode}
+                style={headerBtnStyle}
+                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              />
+              <NotificationBell />
+              <Dropdown menu={settingsMenu} trigger={['click']}>
+                <Button type="text" icon={<SettingOutlined />} style={headerBtnStyle} />
+              </Dropdown>
+              {/* User menu — name + logout */}
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'logout',
+                      label: t('nav.signOut'),
+                      icon: <LogoutOutlined />,
+                      danger: true,
+                      onClick: logout,
+                    },
+                  ],
+                }}
+                trigger={['click']}
+              >
+                <Button type="text" style={{ ...headerBtnStyle, marginLeft: 8 }}>
+                  {roleIcon}{!isMobile && ` ${user?.name ?? role}`}
+                </Button>
+              </Dropdown>
+            </div>
+          </Header>
+          <Content style={{ padding: isMobile ? '0 8px' : '0 50px' }}>
+            <div style={{ padding: isMobile ? 12 : 24, minHeight: 380 }}>
+              <Routes>
+                <Route path="/lot-status" element={<LotStatusBoard />} />
+                <Route path="/pending" element={<AllPendingRequests role={role} />} />
+                <Route path="/calendar" element={<CalendarView role={role} />} />
+                <Route path="/approvals" element={<AllApprovals />} />
+                <Route path="/submit-request" element={<ParkingRequestForm />} />
+                <Route path="/my-requests" element={<MyRequests />} />
+                <Route path="/my-lots" element={<MyLots />} />
+                <Route path="/lot-calendar" element={<LotCalendarView />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/availability" element={<AvailabilityWindows />} />
+                <Route path="/notifications" element={<NotificationWindows />} />
+                <Route path="/request/:id" element={<RequestDetail />} />
+                <Route path="/" element={<LotStatusBoard />} />
+              </Routes>
+            </div>
+          </Content>
+        </Layout>
+      </Router>
+    </RequestsProvider>
   );
 };
 
@@ -216,7 +216,7 @@ const AppRoot: React.FC = () => {
     if (user) {
       updateUser({ preferences: { ...user.preferences, darkMode: next } });
       // Fire-and-forget — don't block the UI on the network call
-      usersApi.updatePreferences(user.id, { dark_mode: next }).catch(() => {});
+      usersApi.updatePreferences(user.id, { dark_mode: next }).catch(() => { });
     }
   };
 
@@ -228,12 +228,12 @@ const AppRoot: React.FC = () => {
     dayjs.locale(next);
     if (user) {
       updateUser({ preferences: { ...user.preferences, language: next } });
-      usersApi.updatePreferences(user.id, { language: next }).catch(() => {});
+      usersApi.updatePreferences(user.id, { language: next }).catch(() => { });
     }
   };
 
   const antdLocale = language === 'fr' ? frFR : language === 'he' ? heIL : enUS;
-  const direction  = isRTL(language) ? 'rtl' : 'ltr';
+  const direction = isRTL(language) ? 'rtl' : 'ltr';
 
   if (authLoading) {
     return (
@@ -267,6 +267,10 @@ const App: React.FC = () => (
   <AuthProvider>
     <AppRoot />
   </AuthProvider>
+);
+
+export default App;
+<AppRoot />
 );
 
 export default App;

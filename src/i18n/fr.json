@@ -262,6 +262,7 @@
     "modal": {
       "title": "Demande — {{name}}",
       "close": "Fermer",
+      "history": "Historique",
       "requester": "Demandeur",
       "date": "Date",
       "time": "Heure",
@@ -623,24 +624,28 @@
       "info": "Historique complet."
     },
     "broadcast": {
-      "title": "Diffusion d'Alertes",
-      "description": "Envoyez une alerte immédiate.",
-      "audienceLabel": "Cible",
-      "audienceOptions": {
-        "all": "Tout le monde",
-        "users": "Utilisateurs",
-        "owners": "Propriétaires"
+      "title": "Diffusion d'Alerte Globale",
+      "simulateBlackout": "Simuler une Période Noire",
+      "blackoutOn": "Blackout Actif",
+      "blackoutOff": "Opérations Normales",
+      "blackoutAlert": "Période Noire Active",
+      "blackoutAlertDesc": "Le système est actuellement en période d'interdiction (22:00–06:00). Les diffusions sont limitées aux urgences et le déclenchement manuel est désactivé.",
+      "audienceLabel": "Public Cible :",
+      "audiences": {
+        "owners": "Tous les Propriétaires",
+        "users": "Tous les Utilisateurs",
+        "both": "Tous (Utilisateurs & Propriétaires)"
       },
-      "messageLabel": "Message",
-      "messagePlaceholder": "Votre texte...",
-      "sendButton": "Diffuser",
+      "messageLabel": "Message de Diffusion :",
+      "messagePlaceholder": "Tapez votre message système ici...",
+      "sendButton": "Envoyer l'Alerte Globale",
       "notifications": {
-        "blocked": "Diffusion bloquée",
-        "blockedDesc": "Impossible d'envoyer des messages pendant la période d'interdiction (22:00–06:00).",
-        "sent": "Diffusion envoyée",
-        "sentDesc": "Message envoyé à : {{audience}} ({{count}} utilisateurs)"
+        "blocked": "Action Restreinte",
+        "blockedDesc": "Les actions de diffusion sont temporairement restreintes pendant la maintenance ou les périodes noires.",
+        "sent": "Alerte Diffusée",
+        "sentDesc": "Message délivré avec succès à {{count}} sessions actives pour {{audience}}."
       },
-      "info": "Message flash."
+      "info": "Utilisez cet outil pour envoyer des mises à jour système critiques ou des notifications d'urgence à tous les utilisateurs connectés."
     }
   },
   "notificationCenter": {
@@ -652,5 +657,20 @@
     "emptyStatus": "Rien à signaler !",
     "errorLoading": "Erreur",
     "viewAll": "Tout voir"
+  },
+  "auditTrail": {
+    "title": "Historique de la Demande : {{id}}",
+    "loading": "Chargement de l'historique...",
+    "noHistory": "Aucun historique trouvé pour cette demande.",
+    "byLabel": "Par : {{name}}",
+    "close": "Fermer",
+    "actions": {
+      "submitted": "Demande Soumise",
+      "approved": "Approuvée Manuellement",
+      "auto-assigned": "Auto-Approuvée",
+      "rejected": "Demande Rejetée",
+      "cancelled": "Demande Annulée",
+      "unknown": "Action Inconnue : {{action}}"
+    }
   }
 }

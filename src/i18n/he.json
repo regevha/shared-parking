@@ -262,6 +262,7 @@
     "modal": {
       "title": "בקשה — {{name}}",
       "close": "סגור",
+      "history": "היסטוריה",
       "requester": "מבקש",
       "date": "תאריך",
       "time": "שעה",

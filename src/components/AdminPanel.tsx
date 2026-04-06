@@ -37,9 +37,9 @@ const { RangePicker } = DatePicker;
 
 // Colour map for the four real lot-status values from the backend
 const LOT_STATUS_COLOR: Record<string, string> = {
-  available:         'green',
-  blocked:           'red',
-  unowned:           'orange',
+  available: 'green',
+  blocked: 'red',
+  unowned: 'orange',
   'unowned-blocked': 'volcano',
 };
 
@@ -54,29 +54,29 @@ const AdminPanel: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState('users');
 
   // ── Server data ────────────────────────────────────────────────────────────
-  const [users,    setUsers]    = useState<UserData[]>([]);
-  const [lots,     setLots]     = useState<LotData[]>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [lots, setLots] = useState<LotData[]>([]);
   const [requests, setRequests] = useState<ParkingRequest[]>([]);
-  const [loading,  setLoading]  = useState(true);
+  const [loading, setLoading] = useState(true);
 
   // Per-row action spinner (keyed by record id)
   const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
 
   // ── Assign-owner modal state ────────────────────────────────────────────────
-  const [assignOwnerLotId,   setAssignOwnerLotId]   = useState<string | null>(null);
-  const [assignOwnerValue,   setAssignOwnerValue]   = useState<string | null>(null);
+  const [assignOwnerLotId, setAssignOwnerLotId] = useState<string | null>(null);
+  const [assignOwnerValue, setAssignOwnerValue] = useState<string | null>(null);
   const [assignOwnerLoading, setAssignOwnerLoading] = useState(false);
 
   // ── UI-only state (sections with no backend) ────────────────────────────────
-  const [lotFilter,           setLotFilter]           = useState<'All' | 'Available' | 'Blocked' | 'Unowned'>('All');
-  const [reportDateRange,     setReportDateRange]     = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
-  const [broadcastMessage,    setBroadcastMessage]    = useState('');
-  const [broadcastAudience,   setBroadcastAudience]   = useState<'owners' | 'users' | 'both'>('both');
+  const [lotFilter, setLotFilter] = useState<'All' | 'Available' | 'Blocked' | 'Unowned'>('All');
+  const [reportDateRange, setReportDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
+  const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [broadcastAudience, setBroadcastAudience] = useState<'owners' | 'users' | 'both'>('both');
   const [isBlackoutSimulated, setIsBlackoutSimulated] = useState(false);
-  const [hasImportedData,     setHasImportedData]     = useState(false);
+  const [hasImportedData, setHasImportedData] = useState(false);
 
   // ── System config ───────────────────────────────────────────────────────────
-  const [systemConfig,  setSystemConfig]  = useState<SystemConfig | null>(null);
+  const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null);
   const [configLoading, setConfigLoading] = useState(false);
   const [autoApprovalLoading, setAutoApprovalLoading] = useState(false);
 
@@ -84,7 +84,7 @@ const AdminPanel: React.FC = () => {
     setConfigLoading(true);
     configApi.get()
       .then(setSystemConfig)
-      .catch(() => {/* non-critical — fallback text shown */})
+      .catch(() => {/* non-critical — fallback text shown */ })
       .finally(() => setConfigLoading(false));
   }, []);
 
@@ -113,17 +113,17 @@ const AdminPanel: React.FC = () => {
     load();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const refreshUsers = () => usersApi.getAll().then(setUsers).catch(() => {});
-  const refreshLots  = () => lotsApi.getAll().then(setLots).catch(() => {});
+  const refreshUsers = () => usersApi.getAll().then(setUsers).catch(() => { });
+  const refreshLots = () => lotsApi.getAll().then(setLots).catch(() => { });
 
   // ── Menu items ──────────────────────────────────────────────────────────────
   const menuItems = [
-    { key: 'users',     icon: <UserOutlined />,    label: t('adminPanel.menu.users') },
-    { key: 'lots',      icon: <CarOutlined />,      label: t('adminPanel.menu.lots') },
-    { key: 'import',    icon: <UploadOutlined />,   label: t('adminPanel.menu.import') },
-    { key: 'config',    icon: <SettingOutlined />,  label: t('adminPanel.menu.config') },
-    { key: 'reports',   icon: <BarChartOutlined />, label: t('adminPanel.menu.reports') },
-    { key: 'broadcast', icon: <SendOutlined />,     label: t('adminPanel.menu.broadcast') },
+    { key: 'users', icon: <UserOutlined />, label: t('adminPanel.menu.users') },
+    { key: 'lots', icon: <CarOutlined />, label: t('adminPanel.menu.lots') },
+    { key: 'import', icon: <UploadOutlined />, label: t('adminPanel.menu.import') },
+    { key: 'config', icon: <SettingOutlined />, label: t('adminPanel.menu.config') },
+    { key: 'reports', icon: <BarChartOutlined />, label: t('adminPanel.menu.reports') },
+    { key: 'broadcast', icon: <SendOutlined />, label: t('adminPanel.menu.broadcast') },
   ];
 
   // ── User Management columns ─────────────────────────────────────────────────
@@ -150,8 +150,8 @@ const AdminPanel: React.FC = () => {
           disabled={record.role === 'manager'}
           loading={!!actionLoading[record.id]}
           options={[
-            { value: UserRole.USER,    label: t('adminPanel.users.roles.user') },
-            { value: UserRole.OWNER,   label: t('adminPanel.users.roles.owner') },
+            { value: UserRole.USER, label: t('adminPanel.users.roles.user') },
+            { value: UserRole.OWNER, label: t('adminPanel.users.roles.owner') },
             { value: UserRole.MANAGER, label: t('adminPanel.users.roles.manager') },
           ]}
           onChange={async (newRole: string) => {
@@ -220,9 +220,9 @@ const AdminPanel: React.FC = () => {
   const filteredLots = lots.filter(lot => {
     switch (lotFilter) {
       case 'Available': return lot.status === LotStatus.AVAILABLE;
-      case 'Blocked':   return lot.status === LotStatus.BLOCKED;
-      case 'Unowned':   return lot.status === LotStatus.UNOWNED || lot.status === LotStatus.UNOWNED_BLOCKED;
-      default:          return true;
+      case 'Blocked': return lot.status === LotStatus.BLOCKED;
+      case 'Unowned': return lot.status === LotStatus.UNOWNED || lot.status === LotStatus.UNOWNED_BLOCKED;
+      default: return true;
     }
   });
 
@@ -231,9 +231,9 @@ const AdminPanel: React.FC = () => {
   ).length;
 
   const lotColumns: ColumnsType<LotData> = [
-    { title: t('adminPanel.lots.columns.lotId'),      dataIndex: 'id',         key: 'id',         width: 90  },
-    { title: t('adminPanel.lots.columns.floorLabel'), dataIndex: 'floorLabel',  key: 'floorLabel'             },
-    { title: t('adminPanel.lots.columns.floor'),      dataIndex: 'floor',       key: 'floor',      width: 70  },
+    { title: t('adminPanel.lots.columns.lotId'), dataIndex: 'id', key: 'id', width: 90 },
+    { title: t('adminPanel.lots.columns.floorLabel'), dataIndex: 'floorLabel', key: 'floorLabel' },
+    { title: t('adminPanel.lots.columns.floor'), dataIndex: 'floor', key: 'floor', width: 70 },
     {
       title: t('adminPanel.lots.columns.status'),
       dataIndex: 'status',
@@ -322,12 +322,12 @@ const AdminPanel: React.FC = () => {
   const handleExport = () => {
     const activeTab = document.querySelector('.ant-tabs-tab-active')?.textContent ?? 'All';
     const rows = filteredRequests.map(r => ({
-      ID:          r.id,
-      Date:        dayjs(r.date).format('DD/MM/YYYY'),
-      Requester:   r.requesterName,
+      ID: r.id,
+      Date: dayjs(r.date).format('DD/MM/YYYY'),
+      Requester: r.requesterName,
       'Time Slot': `${r.startTime} – ${r.endTime}`,
-      'Duration':  `${r.duration}h`,
-      Status:      t(getRequestStatusLabel(r.status)),
+      'Duration': `${r.duration}h`,
+      Status: t(getRequestStatusLabel(r.status)),
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -338,7 +338,7 @@ const AdminPanel: React.FC = () => {
   };
 
   const reportColumns: ColumnsType<ParkingRequest> = [
-    { title: t('adminPanel.reports.columns.id'),        dataIndex: 'id',            key: 'id',            width: 100 },
+    { title: t('adminPanel.reports.columns.id'), dataIndex: 'id', key: 'id', width: 100 },
     {
       title: t('adminPanel.reports.columns.date'),
       dataIndex: 'date',
@@ -346,7 +346,7 @@ const AdminPanel: React.FC = () => {
       width: 110,
       render: (v: string) => dayjs(v).format('DD/MM/YYYY'),
     },
-    { title: t('adminPanel.reports.columns.requester'), dataIndex: 'requesterName', key: 'requesterName'            },
+    { title: t('adminPanel.reports.columns.requester'), dataIndex: 'requesterName', key: 'requesterName' },
     {
       title: t('adminPanel.reports.columns.timeSlot'),
       key: 'timeSlot',
@@ -391,9 +391,9 @@ const AdminPanel: React.FC = () => {
       const result = await notificationsApi.broadcast(broadcastAudience, broadcastMessage);
       notification.success({
         message: t('adminPanel.broadcast.notifications.sent'),
-        description: t('adminPanel.broadcast.notifications.sentDesc', { 
+        description: t('adminPanel.broadcast.notifications.sentDesc', {
           audience: broadcastAudience,
-          count: result.delivered_to 
+          count: result.delivered_to
         }),
       });
       setBroadcastMessage('');
@@ -411,10 +411,10 @@ const AdminPanel: React.FC = () => {
   const [importLoading, setImportLoading] = useState(false);
 
   const handleDownloadTemplate = (type: 'users' | 'lots') => {
-    const csv = type === 'users' 
+    const csv = type === 'users'
       ? 'name,email,role,password\nJohn Doe,john@parking.dev,user,pass123\nJane Smith,jane@parking.dev,owner,pass123'
       : 'id,floor,floor_label,owner_email\nA-101,1,Floor 1,owner@parking.dev\nB-202,2,Floor 2,';
-      
+
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -430,24 +430,24 @@ const AdminPanel: React.FC = () => {
       try {
         const isLots = file.name.toLowerCase().includes('lot');
         const res = isLots ? await adminApi.importLots(file) : await adminApi.importUsers(file);
-        
+
         if (res.errors && res.errors.length > 0) {
           notification.warning({
             message: t('adminPanel.import.notifications.uploadSuccess', { filename: file.name, count: res.imported }),
             description: t('adminPanel.import.notifications.partialSuccess', { count: res.imported }),
           });
         } else {
-          notification.success({ 
+          notification.success({
             message: t('adminPanel.import.notifications.uploadSuccess', { filename: file.name, count: res.imported }),
-            description: t('adminPanel.import.notifications.uploadSuccess', { filename: file.name, count: res.imported }) 
+            description: t('adminPanel.import.notifications.uploadSuccess', { filename: file.name, count: res.imported })
           });
         }
         setHasImportedData(true);
         // Refresh data tables
         if (isLots) {
-           lotsApi.getAll().then(setLots);
+          lotsApi.getAll().then(setLots);
         } else {
-           usersApi.getAll().then(setUsers);
+          usersApi.getAll().then(setUsers);
         }
       } catch (err: any) {
         notification.error({
@@ -503,10 +503,10 @@ const AdminPanel: React.FC = () => {
                 <span>{t('adminPanel.lots.filterLabel')}</span>
                 {(['All', 'Available', 'Blocked', 'Unowned'] as const).map(filter => {
                   const count =
-                    filter === 'All'       ? lots.length :
-                    filter === 'Available' ? lots.filter(l => l.status === 'available').length :
-                    filter === 'Blocked'   ? lots.filter(l => l.status === 'blocked').length :
-                    lots.filter(l => l.status === 'unowned' || l.status === 'unowned-blocked').length;
+                    filter === 'All' ? lots.length :
+                      filter === 'Available' ? lots.filter(l => l.status === 'available').length :
+                        filter === 'Blocked' ? lots.filter(l => l.status === 'blocked').length :
+                          lots.filter(l => l.status === 'unowned' || l.status === 'unowned-blocked').length;
                   const filterKey = filter.toLowerCase() as 'all' | 'available' | 'blocked' | 'unowned';
                   return (
                     <Button
@@ -546,7 +546,7 @@ const AdminPanel: React.FC = () => {
                 setAssignOwnerLoading(true);
                 try {
                   await lotsApi.update(assignOwnerLotId, {
-                    owner:    ownerUser.name,
+                    owner: ownerUser.name,
                     owner_id: ownerUser.id,
                   });
                   notification.success({
@@ -822,8 +822,8 @@ const AdminPanel: React.FC = () => {
                     style={{ width: '220px', marginLeft: '8px' }}
                     options={[
                       { value: 'owners', label: t('adminPanel.broadcast.audiences.owners') },
-                      { value: 'users',  label: t('adminPanel.broadcast.audiences.users') },
-                      { value: 'both',   label: t('adminPanel.broadcast.audiences.both') },
+                      { value: 'users', label: t('adminPanel.broadcast.audiences.users') },
+                      { value: 'both', label: t('adminPanel.broadcast.audiences.both') },
                     ]}
                   />
                 </div>
