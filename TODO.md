@@ -45,6 +45,12 @@ The following test suites and refinements are recommended to further harden the 
 - [x] **API Logic Clean Up**: Use Enums consistently across all backend routers (e.g., `UserRole`, `RequestStatus`, `LotStatus`).
 - [ ] **DST-Aware Refactor**: Complete the migration of the backend to timezone-aware `datetime` objects to resolve the failing `test_dst.py` test cases.
 
+## 🌐 Pending i18n Work
+- [ ] **Notification message i18n**: Backend approval/rejection notification messages are currently English-only hardcoded strings. Migrate to i18n-aware messages (e.g. store a message key + params, render translated in the frontend).
+
+## 🗓️ New Features
+- [x] **Available Timeslots View**: Implemented as "Available Slots" filter in the Lot Calendar screen.
+
 ## 🏗️ Refactor Ideas
 - [ ] **Lot-Specific Availability**: Migrate `notificationWindows` and `availabilityWindows` from `User` to `Lot` objects to allow granular control.
 - [ ] **Native Date Handling**: Migrate all ISO strings to native `DateTime` objects in the Database layer if we move away from SQLite.

@@ -167,6 +167,7 @@
       "assignedLot": "Place Attribuée",
       "lotOwner": "Propriétaire",
       "approvedAt": "Approuvé le",
+      "approvedBy": "Approuvé par",
       "actions": "Actions"
     },
     "actions": {
@@ -285,6 +286,8 @@
   },
   "lotCalendarView": {
     "allMyLots": "Toutes Mes Places",
+    "allLots": "Toutes les Places",
+    "availableSlots": "Créneaux Disponibles",
     "toolbar": {
       "today": "Aujourd'hui",
       "weekShort": "Sem"
@@ -299,7 +302,8 @@
       "total": "Total",
       "booked": "Réservé",
       "pending": "En Attente",
-      "blocked": "Bloqué"
+      "blocked": "Bloqué",
+      "availableWindows": "Fenêtres Disponibles"
     },
     "infoTitle": "Calendrier des Places",
     "info": "Suivi des réservations et blocages de vos places.",
@@ -307,13 +311,18 @@
     "legend": {
       "booked": "Réservé",
       "pending": "En Attente",
-      "blocked": "Bloqué"
+      "blocked": "Bloqué",
+      "available": "Disponible"
     },
     "modal": {
       "close": "Fermer",
       "bookedTitle": "Réservé — {{name}}",
       "pendingTitle": "En Attente — {{name}}",
       "blockedTitle": "Bloqué — {{id}}",
+      "availableTitle": "Créneau Disponible",
+      "availableDesc": "Au moins une place est disponible pendant cette période.",
+      "availableLotsLabel": "places disponibles",
+      "requestId": "ID Demande",
       "requester": "Demandeur",
       "date": "Date",
       "time": "Heure",
@@ -328,6 +337,7 @@
       "blockedUntil": "Bloqué jusqu'au",
       "approve": "Approuver",
       "reject": "Rejeter",
+      "selfRequestGuard": "Vous ne pouvez pas approuver ou rejeter votre propre demande",
       "unowned": "Libre",
       "history": "Historique"
     },
@@ -340,6 +350,7 @@
     "title": "État du Parking",
     "legendTitle": "Légende",
     "legend": {
+      "occupied": "Occupé - Réservation Active",
       "available": "Disponible",
       "blocked": "Bloqué",
       "unowned": "Sans Propriétaire",
@@ -349,19 +360,26 @@
     "lotsCount_other": "{{count}} places",
     "columns": {
       "lotId": "ID",
+      "requestId": "ID Demande",
       "owner": "Propriétaire",
       "status": "Statut",
-      "blockedUntil": "Bloqué jusqu'au"
+      "blockedUntil": "Bloqué jusqu'au",
+      "occupiedBy": "Occupé par",
+      "occupiedFrom": "De",
+      "occupiedUntil": "Jusqu'à"
     },
     "unassigned": "Non attribué",
+    "now": "Maintenant",
     "stats": {
+      "occupied": "Occupé",
       "available": "Disponible",
       "blocked": "Bloqué",
       "unowned": "Libre",
       "unownedBlocked": "Libre Bloqué"
     },
     "infoTitle": "État",
-    "infoDesc": "État actuel de toutes les places."
+    "infoDesc": "État actuel de toutes les places.",
+    "infoDescAt": "Statut des places au {{time}}."
   },
   "myLots": {
     "title": "Mes Places",

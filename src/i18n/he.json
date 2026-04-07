@@ -167,6 +167,7 @@
       "assignedLot": "חניה שהוקצתה",
       "lotOwner": "בעלים",
       "approvedAt": "אושר ב-",
+      "approvedBy": "אושר על ידי",
       "actions": "פעולות"
     },
     "actions": {
@@ -285,6 +286,8 @@
   },
   "lotCalendarView": {
     "allMyLots": "כל החניות שלי",
+    "allLots": "כל החניות",
+    "availableSlots": "חלונות זמינים",
     "toolbar": {
       "today": "היום",
       "weekShort": "שבוע"
@@ -299,7 +302,8 @@
       "total": "סה״כ",
       "booked": "תפוס",
       "pending": "ממתין",
-      "blocked": "חסום"
+      "blocked": "חסום",
+      "availableWindows": "חלונות זמינים"
     },
     "infoTitle": "יומן חניות",
     "info": "תצוגת יומן עבור החניות שבבעלותך.",
@@ -307,13 +311,18 @@
     "legend": {
       "booked": "תפוס",
       "pending": "ממתין",
-      "blocked": "חסום"
+      "blocked": "חסום",
+      "available": "זמין"
     },
     "modal": {
       "close": "סגור",
       "bookedTitle": "תפוס — {{name}}",
       "pendingTitle": "ממתין — {{name}}",
       "blockedTitle": "חסום — {{id}}",
+      "availableTitle": "חלון זמין",
+      "availableDesc": "לפחות חניה אחת פנויה בפרק זמן זה.",
+      "availableLotsLabel": "חניות פנויות",
+      "requestId": "מזהה בקשה",
       "requester": "מבקש",
       "date": "תאריך",
       "time": "שעה",
@@ -328,6 +337,7 @@
       "blockedUntil": "חסום עד",
       "approve": "אשר",
       "reject": "דחה",
+      "selfRequestGuard": "אינך יכול לאשר או לדחות בקשה של עצמך",
       "unowned": "ללא בעלים",
       "history": "היסטוריה"
     },
@@ -340,6 +350,7 @@
     "title": "מצב החניה",
     "legendTitle": "מקרא סטטוס",
     "legend": {
+      "occupied": "תפוס - הזמנה פעילה",
       "available": "זמין",
       "blocked": "חסום",
       "unowned": "ללא בעלים",
@@ -349,19 +360,26 @@
     "lotsCount_other": "{{count}} חניות",
     "columns": {
       "lotId": "מזהה",
+      "requestId": "מזהה בקשה",
       "owner": "בעלים",
       "status": "סטטוס",
-      "blockedUntil": "חסום עד"
+      "blockedUntil": "חסום עד",
+      "occupiedBy": "בשימוש",
+      "occupiedFrom": "מ-",
+      "occupiedUntil": "עד"
     },
     "unassigned": "לא משויך",
+    "now": "עכשיו",
     "stats": {
+      "occupied": "תפוס",
       "available": "זמין",
       "blocked": "חסום",
       "unowned": "ללא בעלים",
       "unownedBlocked": "ללא בעלים חסום"
     },
     "infoTitle": "מצב חניה",
-    "infoDesc": "מציג את הסטטוס הנוכחי של כל מקומות החניה בכל הקומות."
+    "infoDesc": "מציג את הסטטוס הנוכחי של כל מקומות החניה בכל הקומות.",
+    "infoDescAt": "מצב חניות נכון ל-{{time}}."
   },
   "myLots": {
     "title": "החניות שלי",

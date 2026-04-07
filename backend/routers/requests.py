@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 import os
 from sqlalchemy.orm import Session
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import datetime as dt_mod
 import json
 from typing import List
@@ -158,7 +158,7 @@ def _is_outside_availability(
             check_dt = datetime.combine(next_day, datetime.min.time())
         
         return False
-    except Exception:
+    except (ValueError, json.JSONDecodeError, KeyError):
         return True
 
 
@@ -298,8 +298,8 @@ def approve_request(
         req.lot_owner = payload.lot_owner
 
     _create_notification(
-        db, req.requester_id, 
-        f"Your parking request {req.id} for {req.date} has been APPROVED. Assigned Lot: {req.lot_id}."
+        db, req.requester_id,
+        f"Your parking request {req.id} for {req.date} {req.start_time}–{req.end_time} has been APPROVED. Assigned Lot: {req.lot_id}."
     )
 
     db.commit()
@@ -321,7 +321,7 @@ def reject_request(
     req.rejected_by_owner = True
     req.updated_at = datetime.now(timezone.utc).isoformat()
     _add_audit_log(db, req.id, current_user.id, current_user.name, "rejected", requester_id=req.requester_id)
-    _create_notification(db, req.requester_id, f"Your parking request {req.id} for {req.date} has been rejected.")
+    _create_notification(db, req.requester_id, f"Your parking request {req.id} for {req.date} {req.start_time}–{req.end_time} has been rejected.")
     db.commit()
     db.refresh(req)
     return req

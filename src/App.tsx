@@ -60,8 +60,10 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
     items.push({ key: 'approvals', label: <Link to="/approvals">{t('nav.approvals')}</Link> });
     items.push({ key: 'lot-status', label: <Link to="/lot-status">{t('nav.parkingStatus')}</Link> });
 
-    if (role === UserRole.OWNER) {
+    if (role === UserRole.OWNER || role === UserRole.MANAGER) {
       items.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">{t('nav.lotCalendar')}</Link> });
+    }
+    if (role === UserRole.OWNER) {
       items.push({ key: 'my-lots', label: <Link to="/my-lots">{t('nav.myLots')}</Link> });
     }
 
@@ -166,7 +168,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                 trigger={['click']}
               >
                 <Button type="text" style={{ ...headerBtnStyle, marginLeft: isMobile ? 0 : 8 }}>
-                  {roleIcon}{!isMobile && ` ${user?.name ?? role}`}
+                  {roleIcon} {user?.name ?? role}
                 </Button>
               </Dropdown>
             </div>

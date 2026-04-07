@@ -25,3 +25,88 @@
     margin-bottom: 16px;
   }
 }
+
+/* Mobile stats chips */
+.approvals-stats-chips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.approvals-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  background: var(--info-card-bg);
+  border: 1px solid var(--border-color, #e8e8e8);
+  color: var(--label-color);
+}
+
+.approvals-stat-chip strong {
+  color: inherit;
+  font-size: 15px;
+}
+
+.approvals-stat-chip--blue strong {
+  color: #1890ff;
+}
+
+.approvals-stat-chip--purple strong {
+  color: #722ed1;
+}
+
+/* Mobile card list */
+.approvals-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.approvals-card-empty {
+  text-align: center;
+  padding: 32px;
+  color: var(--label-color);
+}
+
+.approval-card {
+  border-radius: 8px;
+}
+
+.approval-card--owner {
+  border-left: 3px solid rgba(22, 119, 255, 0.6);
+  background-color: rgba(22, 119, 255, 0.04);
+}
+
+.approval-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.approval-card-requester {
+  font-size: 15px;
+}
+
+.approval-card-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 2px 0;
+}
+
+.approval-card-label {
+  color: var(--label-color);
+  min-width: 80px;
+}
+
+.approval-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}

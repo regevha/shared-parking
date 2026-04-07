@@ -12,11 +12,11 @@ interface LoginForm {
 }
 
 const DEMO_ACCOUNTS = [
-  { name: 'Owner One',   email: 'o1@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
-  { name: 'Owner Two',   email: 'o2@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
-  { name: 'Owner Three', email: 'o3@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
-  { name: 'Admin One',   email: 'a1@parking.dev', icon: <TeamOutlined />,  color: 'purple' },
-  { name: 'Admin Two',   email: 'a2@parking.dev', icon: <TeamOutlined />,  color: 'purple' },
+  { name: 'Sarah', email: 'o1@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
+  { name: 'Mike',  email: 'o2@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
+  { name: 'Lisa',  email: 'o3@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
+  { name: 'David', email: 'a1@parking.dev', icon: <TeamOutlined />,  color: 'purple' },
+  { name: 'Emma',  email: 'a2@parking.dev', icon: <TeamOutlined />,  color: 'purple' },
 ];
 
 const LoginPage: React.FC = () => {
