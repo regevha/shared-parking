@@ -193,6 +193,10 @@ const LotStatusBoard: React.FC = () => {
                     {activeReq.requesterName}
                   </div>
                   <div>
+                    <strong>{t('lotStatusBoard.columns.occupiedFrom')}: </strong>
+                    {activeReq.date} {activeReq.startTime}
+                  </div>
+                  <div>
                     <strong>{t('lotStatusBoard.columns.occupiedUntil')}: </strong>
                     {activeReq.endDate || activeReq.date} {activeReq.endTime}
                   </div>

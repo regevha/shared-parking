@@ -362,6 +362,7 @@
       "status": "Status",
       "blockedUntil": "Blocked Until",
       "occupiedBy": "Occupied By",
+      "occupiedFrom": "From",
       "occupiedUntil": "Until"
     },
     "unassigned": "Unassigned",

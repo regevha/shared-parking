@@ -362,6 +362,7 @@
       "status": "סטטוס",
       "blockedUntil": "חסום עד",
       "occupiedBy": "בשימוש",
+      "occupiedFrom": "מ-",
       "occupiedUntil": "עד"
     },
     "unassigned": "לא משויך",
