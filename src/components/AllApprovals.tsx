@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { Table, Space, Card, Row, Col, Button, Modal, Tag } from 'antd';
+import { Table, Space, Card, Row, Col, Statistic, Button, Modal, Tag } from 'antd';
 import { EyeOutlined, MessageOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
@@ -13,6 +13,14 @@ const AllApprovals: React.FC = () => {
   const { approvedRequests, loading } = useRequests();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const [isMobile, setIsMobile] = useState(window.matchMedia('(max-width: 768px)').matches);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const handleViewMessages = (record: ParkingRequest) => {
     Modal.info({
@@ -145,6 +153,51 @@ const AllApprovals: React.FC = () => {
     <div className="all-approvals">
       <h1>{t('approvals.title')}</h1>
 
+      {/* Stats — desktop: 3 visual cards; mobile: compact chips */}
+      {isMobile ? (
+        <Space wrap size="small" style={{ marginBottom: '16px' }}>
+          <Tag style={{ fontSize: '13px', padding: '2px 10px' }}>
+            <strong>{stats.total}</strong> {t('approvals.stats.total')}
+          </Tag>
+          <Tag color="blue" style={{ fontSize: '13px', padding: '2px 10px' }}>
+            <strong>{stats.today}</strong> {t('approvals.stats.today')}
+          </Tag>
+          <Tag color="purple" style={{ fontSize: '13px', padding: '2px 10px' }}>
+            <strong>{stats.thisWeek}</strong> {t('approvals.stats.thisWeek')}
+          </Tag>
+        </Space>
+      ) : (
+        <Row gutter={16} style={{ marginBottom: '24px' }}>
+          <Col span={8}>
+            <Card size="small">
+              <Statistic
+                title={t('approvals.stats.total')}
+                value={stats.total}
+                valueStyle={{ fontSize: '32px', fontWeight: 'bold' }}
+              />
+            </Card>
+          </Col>
+          <Col span={8}>
+            <Card size="small">
+              <Statistic
+                title={t('approvals.stats.today')}
+                value={stats.today}
+                valueStyle={{ fontSize: '32px', fontWeight: 'bold', color: '#1890ff' }}
+              />
+            </Card>
+          </Col>
+          <Col span={8}>
+            <Card size="small">
+              <Statistic
+                title={t('approvals.stats.thisWeek')}
+                value={stats.thisWeek}
+                valueStyle={{ fontSize: '32px', fontWeight: 'bold', color: '#722ed1' }}
+              />
+            </Card>
+          </Col>
+        </Row>
+      )}
+
       {/* Table */}
       <Table
         columns={columns}
@@ -161,24 +214,6 @@ const AllApprovals: React.FC = () => {
           record.lotOwner === user?.name ? 'owner-approval-row' : ''
         }
       />
-
-      {/* Stats */}
-      <Card size="small" style={{ marginTop: '24px' }}>
-        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
-          <div>
-            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.total}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('approvals.stats.total')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.today}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('approvals.stats.today')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: '#722ed1', marginRight: '8px' }}>{stats.thisWeek}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('approvals.stats.thisWeek')}</span>
-          </div>
-        </Space>
-      </Card>
 
       {/* Info */}
       <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
