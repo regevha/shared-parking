@@ -358,6 +358,7 @@
     "lotsCount_other": "{{count}} lots",
     "columns": {
       "lotId": "Lot ID",
+      "requestId": "Request ID",
       "owner": "Owner",
       "status": "Status",
       "blockedUntil": "Blocked Until",

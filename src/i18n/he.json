@@ -358,6 +358,7 @@
     "lotsCount_other": "{{count}} חניות",
     "columns": {
       "lotId": "מזהה",
+      "requestId": "מזהה בקשה",
       "owner": "בעלים",
       "status": "סטטוס",
       "blockedUntil": "חסום עד",

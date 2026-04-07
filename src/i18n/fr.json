@@ -358,6 +358,7 @@
     "lotsCount_other": "{{count}} places",
     "columns": {
       "lotId": "ID",
+      "requestId": "ID Demande",
       "owner": "Propriétaire",
       "status": "Statut",
       "blockedUntil": "Bloqué jusqu'au",

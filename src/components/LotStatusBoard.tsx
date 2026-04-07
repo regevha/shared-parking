@@ -189,6 +189,10 @@ const LotStatusBoard: React.FC = () => {
               {activeReq && (
                 <>
                   <div>
+                    <strong>{t('lotStatusBoard.columns.requestId')}: </strong>
+                    {activeReq.id}
+                  </div>
+                  <div>
                     <strong>{t('lotStatusBoard.columns.occupiedBy')}: </strong>
                     {activeReq.requesterName}
                   </div>
