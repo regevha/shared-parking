@@ -285,6 +285,7 @@
   },
   "lotCalendarView": {
     "allMyLots": "Toutes Mes Places",
+    "availableSlots": "Créneaux Disponibles",
     "toolbar": {
       "today": "Aujourd'hui",
       "weekShort": "Sem"
@@ -299,7 +300,8 @@
       "total": "Total",
       "booked": "Réservé",
       "pending": "En Attente",
-      "blocked": "Bloqué"
+      "blocked": "Bloqué",
+      "availableWindows": "Fenêtres Disponibles"
     },
     "infoTitle": "Calendrier des Places",
     "info": "Suivi des réservations et blocages de vos places.",
@@ -307,13 +309,17 @@
     "legend": {
       "booked": "Réservé",
       "pending": "En Attente",
-      "blocked": "Bloqué"
+      "blocked": "Bloqué",
+      "available": "Disponible"
     },
     "modal": {
       "close": "Fermer",
       "bookedTitle": "Réservé — {{name}}",
       "pendingTitle": "En Attente — {{name}}",
       "blockedTitle": "Bloqué — {{id}}",
+      "availableTitle": "Créneau Disponible",
+      "availableDesc": "Au moins une place est disponible pendant cette période.",
+      "requestId": "ID Demande",
       "requester": "Demandeur",
       "date": "Date",
       "time": "Heure",
@@ -328,6 +334,7 @@
       "blockedUntil": "Bloqué jusqu'au",
       "approve": "Approuver",
       "reject": "Rejeter",
+      "selfRequestGuard": "Vous ne pouvez pas approuver ou rejeter votre propre demande",
       "unowned": "Libre",
       "history": "Historique"
     },

@@ -285,6 +285,7 @@
   },
   "lotCalendarView": {
     "allMyLots": "All My Lots",
+    "availableSlots": "Available Slots",
     "toolbar": {
       "today": "Today",
       "weekShort": "Wk"
@@ -299,7 +300,8 @@
       "total": "Total Events",
       "booked": "Booked",
       "pending": "Pending",
-      "blocked": "Blocked"
+      "blocked": "Blocked",
+      "availableWindows": "Available Windows"
     },
     "infoTitle": "Lot Calendar",
     "info": "A calendar view of your lots showing bookings, pending requests, and blocked periods.",
@@ -307,13 +309,16 @@
     "legend": {
       "booked": "Booked",
       "pending": "Pending",
-      "blocked": "Blocked"
+      "blocked": "Blocked",
+      "available": "Available"
     },
     "modal": {
       "close": "Close",
       "bookedTitle": "Booked — {{name}}",
       "pendingTitle": "Pending — {{name}}",
       "blockedTitle": "Blocked — {{id}}",
+      "availableTitle": "Available Timeslot",
+      "availableDesc": "At least one lot is available during this period.",
       "requestId": "Request ID",
       "requester": "Requester",
       "date": "Date",
@@ -329,6 +334,7 @@
       "blockedUntil": "Blocked Until",
       "approve": "Approve",
       "reject": "Reject",
+      "selfRequestGuard": "You cannot approve or reject your own request",
       "unowned": "Unowned",
       "history": "View History"
     },

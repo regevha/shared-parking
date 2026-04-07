@@ -285,6 +285,7 @@
   },
   "lotCalendarView": {
     "allMyLots": "כל החניות שלי",
+    "availableSlots": "חלונות זמינים",
     "toolbar": {
       "today": "היום",
       "weekShort": "שבוע"
@@ -299,7 +300,8 @@
       "total": "סה״כ",
       "booked": "תפוס",
       "pending": "ממתין",
-      "blocked": "חסום"
+      "blocked": "חסום",
+      "availableWindows": "חלונות זמינים"
     },
     "infoTitle": "יומן חניות",
     "info": "תצוגת יומן עבור החניות שבבעלותך.",
@@ -307,13 +309,17 @@
     "legend": {
       "booked": "תפוס",
       "pending": "ממתין",
-      "blocked": "חסום"
+      "blocked": "חסום",
+      "available": "זמין"
     },
     "modal": {
       "close": "סגור",
       "bookedTitle": "תפוס — {{name}}",
       "pendingTitle": "ממתין — {{name}}",
       "blockedTitle": "חסום — {{id}}",
+      "availableTitle": "חלון זמין",
+      "availableDesc": "לפחות חניה אחת פנויה בפרק זמן זה.",
+      "requestId": "מזהה בקשה",
       "requester": "מבקש",
       "date": "תאריך",
       "time": "שעה",
@@ -328,6 +334,7 @@
       "blockedUntil": "חסום עד",
       "approve": "אשר",
       "reject": "דחה",
+      "selfRequestGuard": "אינך יכול לאשר או לדחות בקשה של עצמך",
       "unowned": "ללא בעלים",
       "history": "היסטוריה"
     },

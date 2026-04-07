@@ -6,8 +6,8 @@ from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE
 
 # ── GET /api/requests ──────────────────────────────────────────────────────
 
-def test_get_all_requests_empty_initially(client, user_headers):
-    resp = client.get("/api/requests", headers=user_headers)
+def test_get_all_requests_empty_initially(client, manager_headers):
+    resp = client.get("/api/requests", headers=manager_headers)
     assert resp.status_code == 200
     assert resp.json() == []
 
@@ -17,8 +17,13 @@ def test_get_all_requests_requires_auth(client):
     assert resp.status_code == 401
 
 
-def test_get_all_requests_includes_created_request(client, user_headers, created_request_id):
+def test_get_all_requests_requires_manager_role(client, user_headers):
     resp = client.get("/api/requests", headers=user_headers)
+    assert resp.status_code == 403
+
+
+def test_get_all_requests_includes_created_request(client, manager_headers, created_request_id):
+    resp = client.get("/api/requests", headers=manager_headers)
     assert resp.status_code == 200
     ids = [r["id"] for r in resp.json()]
     assert created_request_id in ids
