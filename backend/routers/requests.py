@@ -158,7 +158,7 @@ def _is_outside_availability(
             check_dt = datetime.combine(next_day, datetime.min.time())
         
         return False
-    except Exception:
+    except (ValueError, json.JSONDecodeError, KeyError):
         return True
 
 
