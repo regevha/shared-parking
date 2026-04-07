@@ -32,6 +32,8 @@ USERS = [
 LOTS = [
     dict(id="LOT-101-A", floor="F1", floor_label="Floor 1 (A)", owner="Sarah",   owner_id="O1", status="available"),
     dict(id="LOT-101-B", floor="F1", floor_label="Floor 1 (B)", owner="Sarah",   owner_id="O1", status="available"),
+    dict(id="LOT-101-C", floor="F1", floor_label="Floor 1 (C)", owner="Sarah",   owner_id="O1", status="available"),
+    dict(id="LOT-101-D", floor="F1", floor_label="Floor 1 (D)", owner="Sarah",   owner_id="O1", status="available"),
     dict(id="LOT-102", floor="F1", floor_label="Floor 1", owner="Mike",   owner_id="O2", status="available"),
     dict(id="LOT-201", floor="F2", floor_label="Floor 2", owner="Lisa", owner_id="O3", status="available"),
 ]
@@ -39,31 +41,102 @@ LOTS = [
 # ── Sample Requests ───────────────────────────────────────────────────────────
 # We define them with duration and let seed() compute end_date/end_time.
 REQUESTS = [
+    # ── Approved (past & present) ─────────────────────────────────────────────
     dict(
         id="REQ-001", requester_id="A1", requester_name="David",
-        date=_fd(1), start_time="09:00", duration=4, status="approved",
+        date=_fd(0), start_time="09:00", duration=4, status="approved",
         lot_id="LOT-101-A", floor="Floor 1 (A)", lot_owner="Sarah",
         approved_by="Sarah"
     ),
     dict(
-        id="REQ-002", requester_id="O1", requester_name="Sarah",
-        date=_fd(2), start_time="18:00", duration=30, status="pending"
+        id="REQ-A01", requester_id="A2", requester_name="Emma",
+        date=_fd(-3), start_time="08:00", duration=3, status="approved",
+        lot_id="LOT-102", floor="Floor 1", lot_owner="Mike",
+        approved_by="Mike"
     ),
     dict(
-        id="REQ-003", requester_id="O2", requester_name="Mike",
-        date=_fd(1), start_time="10:00", duration=2, status="pending"
+        id="REQ-A02", requester_id="O3", requester_name="Lisa",
+        date=_fd(-2), start_time="10:00", duration=5, status="approved",
+        lot_id="LOT-201", floor="Floor 2", lot_owner="Lisa",
+        approved_by="Lisa"
     ),
-    # 10 More Pending Requests
-    dict(id="REQ-P01", requester_id="A1", requester_name="David",   date=_fd(0), start_time="14:00", duration=2,  status="pending"),
-    dict(id="REQ-P02", requester_id="A2", requester_name="Emma",   date=_fd(0), start_time="16:00", duration=4,  status="pending"),
-    dict(id="REQ-P03", requester_id="O3", requester_name="Lisa", date=_fd(1), start_time="08:00", duration=12, status="pending"),
-    dict(id="REQ-P04", requester_id="O1", requester_name="Sarah",   date=_fd(1), start_time="20:00", duration=24, status="pending"), # Multi-day
-    dict(id="REQ-P05", requester_id="O2", requester_name="Mike",   date=_fd(1), start_time="13:00", duration=8,  status="pending"),
-    dict(id="REQ-P06", requester_id="A1", requester_name="David",   date=_fd(2), start_time="09:00", duration=3,  status="pending"),
-    dict(id="REQ-P07", requester_id="A2", requester_name="Emma",   date=_fd(2), start_time="10:00", duration=36, status="pending"), # Max multi-day
-    dict(id="REQ-P08", requester_id="O3", requester_name="Lisa", date=_fd(2), start_time="18:00", duration=4,  status="pending"),
-    dict(id="REQ-P09", requester_id="O1", requester_name="Sarah",   date=_fd(3), start_time="07:00", duration=5,  status="pending"),
-    dict(id="REQ-P10", requester_id="O2", requester_name="Mike",   date=_fd(3), start_time="12:00", duration=6,  status="pending"),
+    dict(
+        id="REQ-A03", requester_id="O1", requester_name="Sarah",
+        date=_fd(-1), start_time="14:00", duration=2, status="approved",
+        lot_id="LOT-101-B", floor="Floor 1 (B)", lot_owner="Sarah",
+        approved_by="Sarah"
+    ),
+    dict(
+        id="REQ-A04", requester_id="A1", requester_name="David",
+        date=_fd(1), start_time="11:00", duration=3, status="approved",
+        lot_id="LOT-102", floor="Floor 1", lot_owner="Mike",
+        approved_by="Mike"
+    ),
+    dict(
+        id="REQ-A05", requester_id="A2", requester_name="Emma",
+        date=_fd(1), start_time="14:00", duration=4, status="approved",
+        lot_id="LOT-201", floor="Floor 2", lot_owner="Lisa",
+        approved_by="Lisa"
+    ),
+    dict(
+        id="REQ-A06", requester_id="O2", requester_name="Mike",
+        date=_fd(2), start_time="09:00", duration=6, status="approved",
+        lot_id="LOT-101-B", floor="Floor 1 (B)", lot_owner="Sarah",
+        approved_by="Sarah"
+    ),
+    dict(
+        id="REQ-A07", requester_id="O3", requester_name="Lisa",
+        date=_fd(2), start_time="08:00", duration=8, status="approved",
+        lot_id="LOT-101-A", floor="Floor 1 (A)", lot_owner="Sarah",
+        approved_by="Sarah"
+    ),
+    dict(
+        id="REQ-A08", requester_id="A2", requester_name="Emma",
+        date=_fd(3), start_time="10:00", duration=3, status="approved",
+        lot_id="LOT-102", floor="Floor 1", lot_owner="Mike",
+        approved_by="Mike"
+    ),
+    dict(
+        id="REQ-A09", requester_id="O1", requester_name="Sarah",
+        date=_fd(3), start_time="13:00", duration=5, status="approved",
+        lot_id="LOT-201", floor="Floor 2", lot_owner="Lisa",
+        approved_by="Lisa"
+    ),
+    # ── Rejected ──────────────────────────────────────────────────────────────
+    dict(
+        id="REQ-R01", requester_id="O2", requester_name="Mike",
+        date=_fd(-1), start_time="09:00", duration=4, status="rejected"
+    ),
+    dict(
+        id="REQ-R02", requester_id="A1", requester_name="David",
+        date=_fd(-2), start_time="11:00", duration=2, status="rejected"
+    ),
+    dict(
+        id="REQ-R03", requester_id="O3", requester_name="Lisa",
+        date=_fd(1), start_time="16:00", duration=3, status="rejected"
+    ),
+    dict(
+        id="REQ-R04", requester_id="A2", requester_name="Emma",
+        date=_fd(2), start_time="07:00", duration=5, status="rejected"
+    ),
+    # ── Pending ───────────────────────────────────────────────────────────────
+    dict(id="REQ-002",  requester_id="O1", requester_name="Sarah", date=_fd(2), start_time="18:00", duration=30, status="pending"),  # multi-day
+    dict(id="REQ-003",  requester_id="O2", requester_name="Mike",  date=_fd(1), start_time="10:00", duration=2,  status="pending"),
+    dict(id="REQ-P01",  requester_id="A1", requester_name="David", date=_fd(0), start_time="14:00", duration=2,  status="pending"),
+    dict(id="REQ-P02",  requester_id="A2", requester_name="Emma",  date=_fd(0), start_time="16:00", duration=4,  status="pending"),
+    dict(id="REQ-P03",  requester_id="O3", requester_name="Lisa",  date=_fd(1), start_time="08:00", duration=12, status="pending"),
+    dict(id="REQ-P04",  requester_id="O1", requester_name="Sarah", date=_fd(1), start_time="20:00", duration=24, status="pending"),  # multi-day
+    dict(id="REQ-P05",  requester_id="O2", requester_name="Mike",  date=_fd(1), start_time="13:00", duration=8,  status="pending"),
+    dict(id="REQ-P06",  requester_id="A1", requester_name="David", date=_fd(2), start_time="09:00", duration=3,  status="pending"),
+    dict(id="REQ-P07",  requester_id="A2", requester_name="Emma",  date=_fd(2), start_time="10:00", duration=36, status="pending"),  # max multi-day
+    dict(id="REQ-P08",  requester_id="O3", requester_name="Lisa",  date=_fd(2), start_time="18:00", duration=4,  status="pending"),
+    dict(id="REQ-P09",  requester_id="O1", requester_name="Sarah", date=_fd(3), start_time="07:00", duration=5,  status="pending"),
+    dict(id="REQ-P10",  requester_id="O2", requester_name="Mike",  date=_fd(3), start_time="12:00", duration=6,  status="pending"),
+    dict(id="REQ-P11",  requester_id="A1", requester_name="David", date=_fd(4), start_time="09:00", duration=4,  status="pending"),
+    dict(id="REQ-P12",  requester_id="A2", requester_name="Emma",  date=_fd(4), start_time="11:00", duration=3,  status="pending"),
+    dict(id="REQ-P13",  requester_id="O3", requester_name="Lisa",  date=_fd(5), start_time="10:00", duration=2,  status="pending"),
+    dict(id="REQ-P14",  requester_id="O1", requester_name="Sarah", date=_fd(5), start_time="15:00", duration=8,  status="pending"),
+    dict(id="REQ-P15",  requester_id="O2", requester_name="Mike",  date=_fd(6), start_time="08:00", duration=4,  status="pending"),
 ]
 
 def seed():

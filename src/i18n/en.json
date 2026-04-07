@@ -348,6 +348,7 @@
     "title": "Parking Status",
     "legendTitle": "Status Legend",
     "legend": {
+      "occupied": "Occupied - Active Booking",
       "available": "Available - Owner, No Block",
       "blocked": "Blocked - Active Block",
       "unowned": "Unowned - No Owner",
@@ -359,17 +360,22 @@
       "lotId": "Lot ID",
       "owner": "Owner",
       "status": "Status",
-      "blockedUntil": "Blocked Until"
+      "blockedUntil": "Blocked Until",
+      "occupiedBy": "Occupied By",
+      "occupiedUntil": "Until"
     },
     "unassigned": "Unassigned",
+    "now": "Now",
     "stats": {
+      "occupied": "Occupied",
       "available": "Available",
       "blocked": "Blocked",
       "unowned": "Unowned",
       "unownedBlocked": "Unowned-Blocked"
     },
     "infoTitle": "Parking Status",
-    "infoDesc": "Displays the current status of all parking lots across all floors."
+    "infoDesc": "Displays the current status of all parking lots across all floors.",
+    "infoDescAt": "Showing lot status as of {{time}}."
   },
   "myLots": {
     "title": "My Lots",

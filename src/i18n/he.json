@@ -348,6 +348,7 @@
     "title": "מצב החניה",
     "legendTitle": "מקרא סטטוס",
     "legend": {
+      "occupied": "תפוס - הזמנה פעילה",
       "available": "זמין",
       "blocked": "חסום",
       "unowned": "ללא בעלים",
@@ -359,17 +360,22 @@
       "lotId": "מזהה",
       "owner": "בעלים",
       "status": "סטטוס",
-      "blockedUntil": "חסום עד"
+      "blockedUntil": "חסום עד",
+      "occupiedBy": "בשימוש",
+      "occupiedUntil": "עד"
     },
     "unassigned": "לא משויך",
+    "now": "עכשיו",
     "stats": {
+      "occupied": "תפוס",
       "available": "זמין",
       "blocked": "חסום",
       "unowned": "ללא בעלים",
       "unownedBlocked": "ללא בעלים חסום"
     },
     "infoTitle": "מצב חניה",
-    "infoDesc": "מציג את הסטטוס הנוכחי של כל מקומות החניה בכל הקומות."
+    "infoDesc": "מציג את הסטטוס הנוכחי של כל מקומות החניה בכל הקומות.",
+    "infoDescAt": "מצב חניות נכון ל-{{time}}."
   },
   "myLots": {
     "title": "החניות שלי",

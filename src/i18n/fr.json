@@ -348,6 +348,7 @@
     "title": "État du Parking",
     "legendTitle": "Légende",
     "legend": {
+      "occupied": "Occupé - Réservation Active",
       "available": "Disponible",
       "blocked": "Bloqué",
       "unowned": "Sans Propriétaire",
@@ -359,17 +360,22 @@
       "lotId": "ID",
       "owner": "Propriétaire",
       "status": "Statut",
-      "blockedUntil": "Bloqué jusqu'au"
+      "blockedUntil": "Bloqué jusqu'au",
+      "occupiedBy": "Occupé par",
+      "occupiedUntil": "Jusqu'à"
     },
     "unassigned": "Non attribué",
+    "now": "Maintenant",
     "stats": {
+      "occupied": "Occupé",
       "available": "Disponible",
       "blocked": "Bloqué",
       "unowned": "Libre",
       "unownedBlocked": "Libre Bloqué"
     },
     "infoTitle": "État",
-    "infoDesc": "État actuel de toutes les places."
+    "infoDesc": "État actuel de toutes les places.",
+    "infoDescAt": "Statut des places au {{time}}."
   },
   "myLots": {
     "title": "Mes Places",
