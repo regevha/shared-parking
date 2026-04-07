@@ -118,9 +118,10 @@ const LotCalendarView: React.FC = () => {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Lot selector options — current owner's lots only (ownerLots loaded server-side)
+  // Lot selector options
   const lotOptions = useMemo(() => [
     { value: 'all', label: t('lotCalendarView.allMyLots') },
+    { value: 'all-system', label: t('lotCalendarView.allLots') },
     { value: 'available', label: t('lotCalendarView.availableSlots') },
     ...visibleLots.map(l => ({ value: l.id, label: `${l.id} — ${l.floorLabel}` })),
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,7 +130,12 @@ const LotCalendarView: React.FC = () => {
   // Booked events — sourced from context so newly approved requests appear immediately
   const bookedEvents = useMemo(() =>
     approvedRequests
-      .filter(a => (isManager || a.lotOwner === user?.name) && (selectedLot === 'all' || selectedLot === 'available' || a.lotId === selectedLot))
+      .filter(a => {
+        if (selectedLot === 'all-system') return true;                          // all lots system-wide
+        if (selectedLot === 'all' || selectedLot === 'available')
+          return isManager || a.lotOwner === user?.name;                        // owner's lots only
+        return a.lotId === selectedLot;                                         // specific lot
+      })
       .map(a => ({
         id: a.id,
         title: `${a.requesterName.split(' ')[0]} · ${a.lotId}`,
@@ -138,11 +144,11 @@ const LotCalendarView: React.FC = () => {
         type: 'booked' as EventType,
         resource: a as ParkingRequest,
       })),
-  [approvedRequests, selectedLot, user?.name]);
+  [approvedRequests, selectedLot, isManager, user?.name]);
 
-  // Pending events — only shown in "All My Lots" view (not yet assigned to a specific lot)
+  // Pending events — shown in "All My Lots" and "All Lots" views
   const pendingEvents = useMemo(() =>
-    selectedLot !== 'all' ? [] :
+    (selectedLot !== 'all' && selectedLot !== 'all-system') ? [] :
     pendingRequests
       .filter(r => !r.rejectedByOwner && r.status !== 'rejected')
       .map(r => ({
@@ -155,10 +161,11 @@ const LotCalendarView: React.FC = () => {
       })),
   [pendingRequests, selectedLot]);
 
-  // Blocked events — current owner's lots only
-  const blockedEvents = useMemo(() =>
-    visibleLots
-      .filter(l => l.status === 'blocked' && l.blockedUntil && (selectedLot === 'all' || l.id === selectedLot))
+  // Blocked events
+  const blockedEvents = useMemo(() => {
+    const lotsToShow = selectedLot === 'all-system' ? allLots : visibleLots;
+    return lotsToShow
+      .filter(l => l.status === 'blocked' && l.blockedUntil && (selectedLot === 'all' || selectedLot === 'all-system' || l.id === selectedLot))
       .map(l => {
         const until = dayjs(l.blockedUntil);
         return {
@@ -169,8 +176,8 @@ const LotCalendarView: React.FC = () => {
           type: 'blocked' as EventType,
           resource: l as LotData,
         };
-      }),
-  [ownerLots, selectedLot]);
+      });
+  }, [allLots, visibleLots, selectedLot]);
 
   // All owner booked events regardless of lot filter — used for availability computation
   const allOwnerBookedEvents = useMemo(() =>

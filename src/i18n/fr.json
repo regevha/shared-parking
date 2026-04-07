@@ -285,6 +285,7 @@
   },
   "lotCalendarView": {
     "allMyLots": "Toutes Mes Places",
+    "allLots": "Toutes les Places",
     "availableSlots": "Créneaux Disponibles",
     "toolbar": {
       "today": "Aujourd'hui",
