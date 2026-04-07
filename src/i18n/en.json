@@ -319,6 +319,7 @@
       "blockedTitle": "Blocked — {{id}}",
       "availableTitle": "Available Timeslot",
       "availableDesc": "At least one lot is available during this period.",
+      "availableLotsLabel": "lots available",
       "requestId": "Request ID",
       "requester": "Requester",
       "date": "Date",

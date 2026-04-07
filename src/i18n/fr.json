@@ -319,6 +319,7 @@
       "blockedTitle": "Bloqué — {{id}}",
       "availableTitle": "Créneau Disponible",
       "availableDesc": "Au moins une place est disponible pendant cette période.",
+      "availableLotsLabel": "places disponibles",
       "requestId": "ID Demande",
       "requester": "Demandeur",
       "date": "Date",

@@ -319,6 +319,7 @@
       "blockedTitle": "חסום — {{id}}",
       "availableTitle": "חלון זמין",
       "availableDesc": "לפחות חניה אחת פנויה בפרק זמן זה.",
+      "availableLotsLabel": "חניות פנויות",
       "requestId": "מזהה בקשה",
       "requester": "מבקש",
       "date": "תאריך",

@@ -24,6 +24,8 @@ interface LotCalendarEvent {
   end: Date;
   type: EventType;
   resource: ParkingRequest | LotData;
+  availableCount?: number;
+  totalLots?: number;
 }
 
 const EVENT_COLORS: Record<EventType, string> = {
@@ -222,22 +224,20 @@ const LotCalendarView: React.FC = () => {
         }
       });
 
-      // For each hour, check if any lot is free; merge consecutive free hours
-      let segStart = -1;
-      for (let h = WORK_START; h <= WORK_END; h++) {
-        const anyFree = h < WORK_END && visibleLots.some(l => !lotBusy[l.id][h - WORK_START]);
-        if (anyFree) {
-          if (segStart === -1) segStart = h;
-        } else if (segStart !== -1) {
+      // For each hour, check free lot count and emit a per-hour event
+      for (let h = WORK_START; h < WORK_END; h++) {
+        const freeLots = visibleLots.filter(l => !lotBusy[l.id][h - WORK_START]);
+        if (freeLots.length > 0) {
           result.push({
-            id: `avail-${day.format('YYYY-MM-DD')}-${segStart}-${h}`,
-            title: `✓ ${t('lotCalendarView.legend.available')}`,
-            start: day.hour(segStart).minute(0).second(0).toDate(),
-            end:   day.hour(h).minute(0).second(0).toDate(),
+            id: `avail-${day.format('YYYY-MM-DD')}-${h}`,
+            title: `✓ ${freeLots.length}/${visibleLots.length}`,
+            start: day.hour(h).minute(0).second(0).toDate(),
+            end:   day.hour(h + 1).minute(0).second(0).toDate(),
             type: 'available' as EventType,
             resource: {} as ParkingRequest,
+            availableCount: freeLots.length,
+            totalLots: visibleLots.length,
           });
-          segStart = -1;
         }
       }
 
@@ -448,6 +448,9 @@ const LotCalendarView: React.FC = () => {
           <div style={{ fontWeight: 600, marginBottom: 4 }}>
             {dayjs(selectedEvent.start).format('DD/MM/YYYY')} &nbsp;
             {dayjs(selectedEvent.start).format('HH:mm')} – {dayjs(selectedEvent.end).format('HH:mm')}
+          </div>
+          <div style={{ fontSize: 20, color: EVENT_COLORS.available, fontWeight: 700, margin: '8px 0' }}>
+            {selectedEvent.availableCount}/{selectedEvent.totalLots} {t('lotCalendarView.modal.availableLotsLabel')}
           </div>
           <div style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.modal.availableDesc')}</div>
         </div>
