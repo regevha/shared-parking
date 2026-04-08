@@ -47,6 +47,7 @@
     "emptyDescription": "Submit a new parking request to get started.",
     "columns": {
       "id": "ID",
+      "date": "Date",
       "timeSlot": "Time Slot",
       "duration": "Dur.",
       "status": "Status",
@@ -108,6 +109,7 @@
   },
   "pendingRequests": {
     "title": "Pending Requests",
+    "searchPlaceholder": "Search by requester name...",
     "emptyTitle": "No pending requests",
     "emptyDescription": "All requests have been processed. New requests will appear here when submitted.",
     "filterLabel": "Show Requests:",
@@ -161,6 +163,8 @@
   },
   "approvals": {
     "title": "Approvals",
+    "searchPlaceholder": "Search by requester or lot owner...",
+    "myLotOnly": "My lot only",
     "emptyTitle": "No approved requests yet",
     "emptyDescription": "Approved parking requests will appear here.",
     "columns": {

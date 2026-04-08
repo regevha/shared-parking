@@ -163,7 +163,9 @@ describe('MyRequests — stats', () => {
 describe('MyRequests — navigation', () => {
   it('renders the "+ New Request" button', () => {
     renderWithProviders(<MyRequests />, { requestsValue: { userRequests: [] } });
-    expect(screen.getByRole('button', { name: /New Request/i })).toBeInTheDocument();
+    // Header button + empty-state CTA both render "New Request"
+    const buttons = screen.getAllByRole('button', { name: /New Request/i });
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
   });
 });
 

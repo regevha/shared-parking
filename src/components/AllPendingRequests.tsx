@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { Table, Button, Tag, Space, Row, Col, Card, Segmented, Modal, notification } from 'antd';
-import { CheckOutlined, CloseOutlined, InboxOutlined } from '@ant-design/icons';
+import { Table, Button, Tag, Space, Row, Col, Card, Segmented, Modal, notification, Input } from 'antd';
+import { CheckOutlined, CloseOutlined, InboxOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import { UserRole } from '../types/enums';
@@ -20,6 +20,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const canApprove = isOwner || isManager;
   const [filterMode, setFilterMode] = useState<'all' | 'active'>(isOwner ? 'active' : 'all');
   const [approvalInProgress, setApprovalInProgress] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState('');
   const { pendingRequests, approveRequest, rejectRequest } = useRequests();
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -40,12 +41,17 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       filtered = filtered.filter((req) => !req.rejectedByOwner);
     }
 
-    // Oldest date + time first (ascending)
+    if (searchText.trim()) {
+      const q = searchText.toLowerCase();
+      filtered = filtered.filter((req) => req.requesterName.toLowerCase().includes(q));
+    }
+
+    // Oldest date + time first (ascending) — default sort; Ant Design sorters override this
     return filtered.sort((a, b) => {
       const d = a.date.localeCompare(b.date);
       return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
     });
-  }, [filterMode, isOwner, pendingRequests]);
+  }, [filterMode, isOwner, pendingRequests, searchText]);
 
   const handleApprove = (requestId: string, requesterName: string) => {
     Modal.confirm({
@@ -106,6 +112,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       dataIndex: 'requesterName',
       key: 'requesterName',
       width: '20%',
+      sorter: (a: ParkingRequest, b: ParkingRequest) => a.requesterName.localeCompare(b.requesterName),
       render: (text: string, record: ParkingRequest) => {
         const isOwnRequest = record.requesterId === user?.id;
         return (
@@ -143,6 +150,8 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       dataIndex: 'date',
       key: 'date',
       width: '15%',
+      sorter: (a: ParkingRequest, b: ParkingRequest) => a.date.localeCompare(b.date),
+      defaultSortOrder: 'ascend' as const,
       render: (v: string) => dayjs(v).format('DD/MM/YYYY'),
     },
     {
@@ -150,6 +159,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       dataIndex: 'submittedAt',
       key: 'submittedAt',
       width: '15%',
+      sorter: (a: ParkingRequest, b: ParkingRequest) => (a.submittedAt || '').localeCompare(b.submittedAt || ''),
       render: (v: string) => dayjs(v).format('DD/MM/YYYY HH:mm'),
     },
     {
@@ -202,7 +212,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   return (
     <div className="pending-requests">
-      <Row justify="space-between" align="middle" style={{ marginBottom: '24px' }}>
+      <Row justify="space-between" align="middle" style={{ marginBottom: '16px' }}>
         <Col>
           <h1>{t('pendingRequests.title')}</h1>
         </Col>
@@ -222,6 +232,14 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
           </Col>
         )}
       </Row>
+      <Input
+        placeholder={t('pendingRequests.searchPlaceholder')}
+        prefix={<SearchOutlined style={{ color: 'var(--label-color)' }} />}
+        allowClear
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{ marginBottom: '16px', maxWidth: isMobile ? '100%' : 300 }}
+      />
 
       {isMobile ? (
         <>

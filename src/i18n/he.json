@@ -47,6 +47,7 @@
     "emptyDescription": "שלחו בקשת חניה חדשה כדי להתחיל.",
     "columns": {
       "id": "מזהה",
+      "date": "תאריך",
       "timeSlot": "זמן חניה",
       "duration": "משך",
       "status": "סטטוס",
@@ -108,6 +109,7 @@
   },
   "pendingRequests": {
     "title": "בקשות ממתינות",
+    "searchPlaceholder": "חיפוש לפי שם מבקש...",
     "emptyTitle": "אין בקשות ממתינות",
     "emptyDescription": "כל הבקשות טופלו. בקשות חדשות יופיעו כאן.",
     "filterLabel": "הצג בקשות:",
@@ -161,6 +163,8 @@
   },
   "approvals": {
     "title": "אישורים",
+    "searchPlaceholder": "חיפוש לפי מבקש או בעל חניה...",
+    "myLotOnly": "החניה שלי בלבד",
     "emptyTitle": "אין אישורים עדיין",
     "emptyDescription": "בקשות חניה שאושרו יופיעו כאן.",
     "columns": {
