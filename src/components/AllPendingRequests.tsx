@@ -238,7 +238,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
         allowClear
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
-        style={{ marginBottom: '16px', maxWidth: isMobile ? '100%' : 300 }}
+        style={{ marginBottom: '16px', width: isMobile ? '100%' : 300 }}
       />
 
       {isMobile ? (

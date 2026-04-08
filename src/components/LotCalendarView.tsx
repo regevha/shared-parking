@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
+import { Card, Collapse, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
@@ -402,7 +402,7 @@ const LotCalendarView: React.FC = () => {
     if (selectedEvent.type === 'booked') {
       const a = selectedEvent.resource as ParkingRequest;
       return (
-        <Descriptions column={2} size="small">
+        <Descriptions column={isMobile ? 1 : 2} size="small">
           <Descriptions.Item label={t('lotCalendarView.modal.requestId')}>{a.id}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.requester')}>{a.requesterName}</Descriptions.Item>
           <Descriptions.Item label={t('lotCalendarView.modal.date')}>{dayjs(a.date).format('DD/MM/YYYY')}</Descriptions.Item>
@@ -428,7 +428,7 @@ const LotCalendarView: React.FC = () => {
       const isSelfRequest = r.requesterName === user?.name;
       return (
         <>
-          <Descriptions column={2} size="small">
+          <Descriptions column={isMobile ? 1 : 2} size="small">
             <Descriptions.Item label={t('lotCalendarView.modal.requestId')}>{r.id}</Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.requester')}>{r.requesterName}</Descriptions.Item>
             <Descriptions.Item label={t('lotCalendarView.modal.date')}>{dayjs(r.date).format('DD/MM/YYYY')}</Descriptions.Item>
@@ -475,7 +475,7 @@ const LotCalendarView: React.FC = () => {
     // blocked
     const l = selectedEvent.resource as LotData;
     return (
-      <Descriptions column={2} size="small">
+      <Descriptions column={isMobile ? 1 : 2} size="small">
         <Descriptions.Item label={t('lotCalendarView.modal.lotId')}>{l.id}</Descriptions.Item>
         <Descriptions.Item label={t('lotCalendarView.modal.floor')}>{l.floor}</Descriptions.Item>
         <Descriptions.Item label={t('lotCalendarView.modal.owner')}>{l.owner ?? t('lotCalendarView.modal.unowned')}</Descriptions.Item>
@@ -596,21 +596,31 @@ const LotCalendarView: React.FC = () => {
       </Card>
 
       {/* Legend */}
-      <Card>
-        <h3 style={{ marginTop: 0 }}>{t('lotCalendarView.legendTitle')}</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '16px' }}>
-          {(['booked', 'pending', 'blocked', 'available'] as EventType[]).map(type => (
-            <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: 16, height: 16, backgroundColor: EVENT_COLORS[type], borderRadius: 2, flexShrink: 0 }} />
-              <span>{t(`lotCalendarView.legend.${type}`)}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
+      {(() => {
+        const legendGrid = (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '16px' }}>
+            {(['booked', 'pending', 'blocked', 'available'] as EventType[]).map(type => (
+              <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: 16, height: 16, backgroundColor: EVENT_COLORS[type], borderRadius: 2, flexShrink: 0 }} />
+                <span>{t(`lotCalendarView.legend.${type}`)}</span>
+              </div>
+            ))}
+          </div>
+        );
+        return isMobile ? (
+          <Collapse size="small" items={[{ key: 'legend', label: t('lotCalendarView.legendTitle'), children: legendGrid }]} />
+        ) : (
+          <Card>
+            <h3 style={{ marginTop: 0 }}>{t('lotCalendarView.legendTitle')}</h3>
+            {legendGrid}
+          </Card>
+        );
+      })()}
 
       {/* Event Detail Modal */}
       <Modal
         open={!!selectedEvent}
+        width={isMobile ? '95vw' : 520}
         onCancel={() => setSelectedEvent(null)}
         footer={
           <Space>

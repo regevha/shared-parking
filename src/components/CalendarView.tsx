@@ -3,7 +3,7 @@ import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Card, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
+import { Card, Collapse, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { UserRole, RequestStatus } from '../types/enums';
 import dayjs from 'dayjs';
@@ -381,27 +381,36 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       </Card>
 
       {/* Legend */}
-      <Card>
-        <h3>{t('calendarView.legendTitle')}</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.pending, borderRadius: 2 }} />
-            <span>{t('calendarView.legend.pending')}</span>
+      {(() => {
+        const legendGrid = (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.pending, borderRadius: 2 }} />
+              <span>{t('calendarView.legend.pending')}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.approved, borderRadius: 2 }} />
+              <span>{t('calendarView.legend.approved')}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.rejected, borderRadius: 2 }} />
+              <span>{t('calendarView.legend.rejected')}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.pending, borderRadius: 2, outline: '2px solid #fadb14' }} />
+              <span>{t('calendarView.legend.myRequest')}</span>
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.approved, borderRadius: 2 }} />
-            <span>{t('calendarView.legend.approved')}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.rejected, borderRadius: 2 }} />
-            <span>{t('calendarView.legend.rejected')}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.pending, borderRadius: 2, outline: '2px solid #fadb14' }} />
-            <span>{t('calendarView.legend.myRequest')}</span>
-          </div>
-        </div>
-      </Card>
+        );
+        return isMobile ? (
+          <Collapse size="small" items={[{ key: 'legend', label: t('calendarView.legendTitle'), children: legendGrid }]} />
+        ) : (
+          <Card>
+            <h3 style={{ marginTop: 0 }}>{t('calendarView.legendTitle')}</h3>
+            {legendGrid}
+          </Card>
+        );
+      })()}
 
       {/* Request Detail Modal */}
       <Modal
