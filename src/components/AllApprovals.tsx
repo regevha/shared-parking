@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { Table, Space, Card, Row, Col, Button, Modal, Tag } from 'antd';
+import { Table, Space, Card, Row, Col, Statistic, Button, Modal, Tag } from 'antd';
 import { EyeOutlined, MessageOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
@@ -232,7 +232,38 @@ const AllApprovals: React.FC = () => {
         </>
       ) : (
         <>
-          {/* Table (desktop) */}
+          {/* Stats — desktop: 3 visual cards at top */}
+          <Row gutter={16} style={{ marginBottom: '24px' }}>
+            <Col span={8}>
+              <Card size="small">
+                <Statistic
+                  title={t('approvals.stats.total')}
+                  value={stats.total}
+                  valueStyle={{ fontSize: '32px', fontWeight: 'bold' }}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card size="small">
+                <Statistic
+                  title={t('approvals.stats.today')}
+                  value={stats.today}
+                  valueStyle={{ fontSize: '32px', fontWeight: 'bold', color: '#1890ff' }}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card size="small">
+                <Statistic
+                  title={t('approvals.stats.thisWeek')}
+                  value={stats.thisWeek}
+                  valueStyle={{ fontSize: '32px', fontWeight: 'bold', color: '#722ed1' }}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Table */}
           <Table
             columns={columns}
             dataSource={sortedRequests}
@@ -245,24 +276,6 @@ const AllApprovals: React.FC = () => {
               record.lotOwner === user?.name ? 'owner-approval-row' : ''
             }
           />
-
-          {/* Stats */}
-          <Card size="small" style={{ marginTop: '24px' }}>
-            <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
-              <div>
-                <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{stats.total}</strong>
-                <span style={{ color: 'var(--label-color)' }}>{t('approvals.stats.total')}</span>
-              </div>
-              <div>
-                <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{stats.today}</strong>
-                <span style={{ color: 'var(--label-color)' }}>{t('approvals.stats.today')}</span>
-              </div>
-              <div>
-                <strong style={{ fontSize: '18px', color: '#722ed1', marginRight: '8px' }}>{stats.thisWeek}</strong>
-                <span style={{ color: 'var(--label-color)' }}>{t('approvals.stats.thisWeek')}</span>
-              </div>
-            </Space>
-          </Card>
         </>
       )}
 
