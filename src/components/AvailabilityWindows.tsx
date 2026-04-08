@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, TimePicker, Alert, Space, Row, Col, Tag, Modal, Form, notification, Spin } from 'antd';
+import { Card, Button, TimePicker, Alert, Space, Row, Col, Tag, Modal, Form, notification, Spin, Skeleton } from 'antd';
 import { PlusOutlined, DeleteOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -107,7 +107,7 @@ const AvailabilityWindows: React.FC = () => {
   };
 
   if (loading) {
-    return <div style={{ textAlign: 'center', paddingTop: '80px' }}><Spin size="large" /></div>;
+    return <div style={{ padding: '24px' }}><Skeleton active paragraph={{ rows: 8 }} /></div>;
   }
 
   return (

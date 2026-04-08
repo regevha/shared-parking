@@ -9,6 +9,7 @@ import { UserRole, RequestStatus } from '../types/enums';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
+import StatsBar from './StatsBar';
 import './CalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
 
@@ -354,26 +355,15 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       )}
 
       {/* Stats */}
-      <Card size="small" style={{ marginBottom: '24px' }}>
-        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
-          <div>
-            <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>{totalRequests}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.total')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }}>{pendingCount}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.pending')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: '#52c41a', marginRight: '8px' }}>{approvedCount}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.approved')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: '#f5222d', marginRight: '8px' }}>{rejectedCount}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('calendarView.stats.rejected')}</span>
-          </div>
-        </Space>
-      </Card>
+      <StatsBar
+        style={{ marginBottom: '24px' }}
+        items={[
+          { label: t('calendarView.stats.total'), value: totalRequests },
+          { label: t('calendarView.stats.pending'), value: pendingCount, color: '#1890ff' },
+          { label: t('calendarView.stats.approved'), value: approvedCount, color: '#52c41a' },
+          { label: t('calendarView.stats.rejected'), value: rejectedCount, color: '#f5222d' },
+        ]}
+      />
 
       {/* Info */}
       <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">

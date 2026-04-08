@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Tag, Space, Row, Col, Card, Alert, Spin, Modal, DatePicker, Button } from 'antd';
+import { Tag, Space, Row, Col, Card, Alert, Skeleton, Modal, DatePicker, Button } from 'antd';
 import { CarOutlined, ClockCircleOutlined, ReloadOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import dayjs, { Dayjs } from 'dayjs';
@@ -8,6 +8,7 @@ import { LotData } from '../api/lots';
 import { useRequests } from '../contexts/RequestsContext';
 import { getStatusColor, getStatusLabel } from '../utils/statusUtils';
 import EmptyState from './EmptyState';
+import StatsBar from './StatsBar';
 import './LotStatusBoard.css';
 
 const OCCUPIED_COLOR = '#1677ff';
@@ -89,10 +90,16 @@ const LotStatusBoard: React.FC = () => {
       </Card>
 
       {/* All Lots Grid */}
-      <Spin spinning={loading}>
-        <Card style={{ marginBottom: '24px' }}>
+      <Card style={{ marginBottom: '24px' }}>
+        {loading ? (
           <div className="parking-grid">
-            {allLots.length === 0 && !loading && (
+            {Array.from({ length: 10 }).map((_, i) => (
+              <Skeleton.Node key={i} active style={{ width: '100%', height: 70, borderRadius: 8 }} />
+            ))}
+          </div>
+        ) : (
+          <div className="parking-grid">
+            {allLots.length === 0 && (
               <EmptyState icon={<AppstoreOutlined />} title={t('lotStatusBoard.emptyTitle')} description={t('lotStatusBoard.emptyDescription')} />
             )}
             {allLots.map(lot => {
@@ -113,34 +120,20 @@ const LotStatusBoard: React.FC = () => {
               );
             })}
           </div>
-        </Card>
-      </Spin>
+        )}
+      </Card>
 
       {/* Summary Stats */}
-      <Card size="small" style={{ marginBottom: '24px' }}>
-        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
-          <div>
-            <strong style={{ fontSize: '18px', color: OCCUPIED_COLOR, marginRight: '8px' }}>{stats.occupied}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('lotStatusBoard.stats.occupied')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: getStatusColor(LotStatus.AVAILABLE), marginRight: '8px' }}>{stats.available}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('lotStatusBoard.stats.available')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: getStatusColor(LotStatus.BLOCKED), marginRight: '8px' }}>{stats.blocked}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('lotStatusBoard.stats.blocked')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: getStatusColor(LotStatus.UNOWNED), marginRight: '8px' }}>{stats.unowned}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('lotStatusBoard.stats.unowned')}</span>
-          </div>
-          <div>
-            <strong style={{ fontSize: '18px', color: getStatusColor(LotStatus.UNOWNED_BLOCKED), marginRight: '8px' }}>{stats.unownedBlocked}</strong>
-            <span style={{ color: 'var(--label-color)' }}>{t('lotStatusBoard.stats.unownedBlocked')}</span>
-          </div>
-        </Space>
-      </Card>
+      <StatsBar
+        style={{ marginBottom: '24px' }}
+        items={[
+          { label: t('lotStatusBoard.stats.occupied'), value: stats.occupied, color: OCCUPIED_COLOR },
+          { label: t('lotStatusBoard.stats.available'), value: stats.available, color: getStatusColor(LotStatus.AVAILABLE) },
+          { label: t('lotStatusBoard.stats.blocked'), value: stats.blocked, color: getStatusColor(LotStatus.BLOCKED) },
+          { label: t('lotStatusBoard.stats.unowned'), value: stats.unowned, color: getStatusColor(LotStatus.UNOWNED) },
+          { label: t('lotStatusBoard.stats.unownedBlocked'), value: stats.unownedBlocked, color: getStatusColor(LotStatus.UNOWNED_BLOCKED) },
+        ]}
+      />
 
       {/* Legend */}
       <Card style={{ marginBottom: '24px' }} title={t('lotStatusBoard.legendTitle')} size="small">

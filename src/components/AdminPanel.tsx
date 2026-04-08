@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Upload, Alert,
-  Input, DatePicker, Tabs, Select, notification, Switch, Spin, Modal, Popconfirm, Drawer,
+  Input, DatePicker, Tabs, Select, notification, Switch, Spin, Skeleton, Modal, Popconfirm, Drawer,
 } from 'antd';
 import {
   UserOutlined,
@@ -482,14 +482,63 @@ const AdminPanel: React.FC = () => {
         return (
           <div>
             <h2>{t('adminPanel.users.title')}</h2>
-            <Table
-              columns={userColumns}
-              dataSource={users}
-              rowKey="id"
-              loading={loading}
-              pagination={{ pageSize: 10, hideOnSinglePage: true }}
-              scroll={{ x: 'max-content' }}
-            />
+            {isMobile ? (
+              <div className="admin-card-list">
+                {users.map(u => (
+                  <Card key={u.id} size="small" className="admin-card">
+                    <div className="admin-card-header">
+                      <strong>{u.name}</strong>
+                      <Tag color={u.role === 'manager' ? 'purple' : u.role === 'owner' ? 'blue' : 'green'}>
+                        {t(`adminPanel.users.roles.${u.role}`)}
+                      </Tag>
+                    </div>
+                    <div className="admin-card-row">
+                      <span className="admin-card-label">{t('adminPanel.users.columns.email')}</span>
+                      <span>{u.email}</span>
+                    </div>
+                    <div className="admin-card-row">
+                      <span className="admin-card-label">{t('adminPanel.users.columns.joined')}</span>
+                      <span>{u.createdAt ? dayjs(u.createdAt).format('DD/MM/YYYY') : '—'}</span>
+                    </div>
+                    {u.role !== UserRole.MANAGER && (
+                      <div className="admin-card-actions">
+                        <Popconfirm
+                          title={t('adminPanel.users.deleteConfirm')}
+                          description={t('adminPanel.users.deleteWarning')}
+                          okText={t('adminPanel.users.deleteOk')}
+                          okButtonProps={{ danger: true }}
+                          onConfirm={async () => {
+                            setActionLoading(prev => ({ ...prev, [u.id]: true }));
+                            try {
+                              await usersApi.delete(u.id);
+                              notification.success({ message: t('adminPanel.users.notifications.userDeleted'), description: u.name });
+                              await refreshUsers();
+                            } catch (err: any) {
+                              notification.error({ message: t('adminPanel.users.notifications.deleteFailed'), description: err.message });
+                            } finally {
+                              setActionLoading(prev => ({ ...prev, [u.id]: false }));
+                            }
+                          }}
+                        >
+                          <Button danger size="small" loading={!!actionLoading[u.id]}>
+                            {t('adminPanel.users.deleteButton')}
+                          </Button>
+                        </Popconfirm>
+                      </div>
+                    )}
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Table
+                columns={userColumns}
+                dataSource={users}
+                rowKey="id"
+                loading={loading}
+                pagination={{ pageSize: 10, hideOnSinglePage: true }}
+                scroll={{ x: 'max-content' }}
+              />
+            )}
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
               <strong>{t('adminPanel.users.title')}:</strong> {t('adminPanel.users.info')}
             </Card>
@@ -534,16 +583,73 @@ const AdminPanel: React.FC = () => {
               </Space>
             </Card>
 
-            <div style={{ overflowX: 'auto' }}>
-              <Table
-                columns={lotColumns}
-                dataSource={filteredLots}
-                rowKey="id"
-                loading={loading}
-                pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                scroll={{ x: 'max-content' }}
-              />
-            </div>
+            {isMobile ? (
+              <div className="admin-card-list">
+                {filteredLots.map(lot => (
+                  <Card key={lot.id} size="small" className="admin-card">
+                    <div className="admin-card-header">
+                      <strong>{lot.id}</strong>
+                      <Tag color={LOT_STATUS_COLOR[lot.status] ?? 'default'}>
+                        {t(`adminPanel.lots.filters.${lot.status.replace('-', '_')}`) || lot.status}
+                      </Tag>
+                    </div>
+                    <div className="admin-card-row">
+                      <span className="admin-card-label">{t('adminPanel.lots.columns.floorLabel')}</span>
+                      <span>{lot.floorLabel}</span>
+                    </div>
+                    <div className="admin-card-row">
+                      <span className="admin-card-label">{t('adminPanel.lots.columns.owner')}</span>
+                      <span>{lot.owner ?? <em style={{ color: 'var(--label-color)' }}>{t('adminPanel.lots.unowned')}</em>}</span>
+                    </div>
+                    <div className="admin-card-actions">
+                      {!lot.ownerId ? (
+                        <Button
+                          type="primary"
+                          size="small"
+                          icon={<UserAddOutlined />}
+                          onClick={() => { setAssignOwnerLotId(lot.id); setAssignOwnerValue(null); }}
+                        >
+                          {t('adminPanel.lots.assignOwnerButton')}
+                        </Button>
+                      ) : (
+                        <Popconfirm
+                          title={t('adminPanel.lots.removeOwnerConfirm')}
+                          okText={t('adminPanel.lots.removeOwnerOk')}
+                          okButtonProps={{ danger: true }}
+                          onConfirm={async () => {
+                            setActionLoading(prev => ({ ...prev, [lot.id]: true }));
+                            try {
+                              await lotsApi.update(lot.id, { owner: null, owner_id: null, status: 'unowned' });
+                              notification.success({ message: t('adminPanel.lots.notifications.ownerRemoved'), description: lot.id });
+                              await refreshLots();
+                            } catch (err: any) {
+                              notification.error({ message: t('adminPanel.lots.notifications.ownerRemoveFailed'), description: err.message });
+                            } finally {
+                              setActionLoading(prev => ({ ...prev, [lot.id]: false }));
+                            }
+                          }}
+                        >
+                          <Button danger size="small" loading={!!actionLoading[lot.id]}>
+                            {t('adminPanel.lots.removeOwnerButton')}
+                          </Button>
+                        </Popconfirm>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <Table
+                  columns={lotColumns}
+                  dataSource={filteredLots}
+                  rowKey="id"
+                  loading={loading}
+                  pagination={{ pageSize: 10, hideOnSinglePage: true }}
+                  scroll={{ x: 'max-content' }}
+                />
+              </div>
+            )}
 
             {/* Assign Owner modal */}
             <Modal
@@ -650,8 +756,7 @@ const AdminPanel: React.FC = () => {
         return (
           <div>
             <h2>{t('adminPanel.config.title')}</h2>
-            <Spin spinning={configLoading}>
-              <Row gutter={[16, 16]}>
+            {configLoading ? <Skeleton active paragraph={{ rows: 4 }} /> : <Row gutter={[16, 16]}>
                 <Col xs={24} sm={12}>
                   <Card title={t('adminPanel.config.cardTitle')}>
                     <Space direction="vertical" style={{ width: '100%' }}>
@@ -703,8 +808,7 @@ const AdminPanel: React.FC = () => {
                     </Space>
                   </Card>
                 </Col>
-              </Row>
-            </Spin>
+              </Row>}
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
               <strong>{t('adminPanel.config.title')}:</strong> {t('adminPanel.config.info')}
             </Card>
@@ -737,60 +841,56 @@ const AdminPanel: React.FC = () => {
             </Card>
 
             <Tabs defaultActiveKey="all" destroyInactiveTabPane>
-              <Tabs.TabPane tab={t('adminPanel.reports.tabs.all', { count: filteredRequests.length })} key="all">
-                <Table
-                  columns={reportColumns}
-                  dataSource={filteredRequests}
-                  rowKey="id"
-                  loading={loading}
-                  pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                />
-              </Tabs.TabPane>
-              <Tabs.TabPane
-                tab={t('adminPanel.reports.tabs.pending', { count: filteredRequests.filter(r => r.status === RequestStatus.PENDING).length })}
-                key="pending"
-              >
-                <div style={{ overflowX: 'auto' }}>
-                  <Table
-                    columns={reportColumns}
-                    dataSource={filteredRequests.filter(r => r.status === 'pending')}
-                    rowKey="id"
-                    loading={loading}
-                    pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                    scroll={{ x: 'max-content' }}
-                  />
-                </div>
-              </Tabs.TabPane>
-              <Tabs.TabPane
-                tab={t('adminPanel.reports.tabs.approved', { count: filteredRequests.filter(r => r.status === RequestStatus.APPROVED).length })}
-                key="approved"
-              >
-                <div style={{ overflowX: 'auto' }}>
-                  <Table
-                    columns={reportColumns}
-                    dataSource={filteredRequests.filter(r => r.status === RequestStatus.APPROVED)}
-                    rowKey="id"
-                    loading={loading}
-                    pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                    scroll={{ x: 'max-content' }}
-                  />
-                </div>
-              </Tabs.TabPane>
-              <Tabs.TabPane
-                tab={t('adminPanel.reports.tabs.rejected', { count: filteredRequests.filter(r => r.status === RequestStatus.REJECTED).length })}
-                key="rejected"
-              >
-                <div style={{ overflowX: 'auto' }}>
-                  <Table
-                    columns={reportColumns}
-                    dataSource={filteredRequests.filter(r => r.status === RequestStatus.REJECTED)}
-                    rowKey="id"
-                    loading={loading}
-                    pagination={{ pageSize: 10, hideOnSinglePage: true }}
-                    scroll={{ x: 'max-content' }}
-                  />
-                </div>
-              </Tabs.TabPane>
+              {[
+                { key: 'all', data: filteredRequests },
+                { key: 'pending', data: filteredRequests.filter(r => r.status === RequestStatus.PENDING) },
+                { key: 'approved', data: filteredRequests.filter(r => r.status === RequestStatus.APPROVED) },
+                { key: 'rejected', data: filteredRequests.filter(r => r.status === RequestStatus.REJECTED) },
+              ].map(({ key, data }) => (
+                <Tabs.TabPane tab={t(`adminPanel.reports.tabs.${key}`, { count: data.length })} key={key}>
+                  {isMobile ? (
+                    <div className="admin-card-list">
+                      {data.map(r => (
+                        <Card key={r.id} size="small" className="admin-card">
+                          <div className="admin-card-header">
+                            <strong>{r.requesterName}</strong>
+                            <Tag color={getRequestStatusColor(r.status)}>
+                              {t(getRequestStatusLabel(r.status))}
+                            </Tag>
+                          </div>
+                          <div className="admin-card-row">
+                            <span className="admin-card-label">{t('adminPanel.reports.columns.id')}</span>
+                            <span>{r.id}</span>
+                          </div>
+                          <div className="admin-card-row">
+                            <span className="admin-card-label">{t('adminPanel.reports.columns.date')}</span>
+                            <span>{dayjs(r.date).format('DD/MM/YYYY')}</span>
+                          </div>
+                          <div className="admin-card-row">
+                            <span className="admin-card-label">{t('adminPanel.reports.columns.timeSlot')}</span>
+                            <span>{r.startTime} – {r.endTime}</span>
+                          </div>
+                          <div className="admin-card-row">
+                            <span className="admin-card-label">{t('adminPanel.reports.columns.duration')}</span>
+                            <span>{r.duration}h</span>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <Table
+                        columns={reportColumns}
+                        dataSource={data}
+                        rowKey="id"
+                        loading={loading}
+                        pagination={{ pageSize: 10, hideOnSinglePage: true }}
+                        scroll={{ x: 'max-content' }}
+                      />
+                    </div>
+                  )}
+                </Tabs.TabPane>
+              ))}
             </Tabs>
 
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
@@ -926,9 +1026,11 @@ const AdminPanel: React.FC = () => {
               {menuItems.find(m => m.key === selectedMenu)?.label}
             </Button>
           )}
-          <Spin spinning={loading} tip={t('adminPanel.loadingTip')}>
-            {renderContent()}
-          </Spin>
+          {loading ? (
+            <Skeleton active paragraph={{ rows: 8 }} />
+          ) : (
+            renderContent()
+          )}
         </Content>
       </Layout>
     </Layout>

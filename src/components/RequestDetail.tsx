@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Tag, Button, Input, Avatar, Divider, Row, Col, Spin, notification } from 'antd';
+import { Card, Tag, Button, Input, Avatar, Divider, Row, Col, Skeleton, notification } from 'antd';
 import { SendOutlined, UserOutlined, CrownOutlined, MessageOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -184,16 +184,24 @@ const RequestDetail: React.FC = () => {
         style={{ marginBottom: '24px' }}
         bodyStyle={{ padding: '16px' }}
       >
-        <Spin spinning={loadingMessages}>
-          <div className="message-thread">
-            {messages.length === 0 && !loadingMessages && (
-              <EmptyState
-                icon={<MessageOutlined />}
-                title={t('requestDetail.messages.emptyTitle')}
-                description={t('requestDetail.messages.emptyDescription')}
-              />
-            )}
-            {messages.map((message) => {
+        <div className="message-thread">
+          {loadingMessages ? (
+            <>
+              {[1, 2, 3].map(i => (
+                <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                  <Skeleton.Avatar size="small" active />
+                  <Skeleton active paragraph={{ rows: 1, width: ['60%'] }} title={{ width: '30%' }} style={{ flex: 1 }} />
+                </div>
+              ))}
+            </>
+          ) : messages.length === 0 ? (
+            <EmptyState
+              icon={<MessageOutlined />}
+              title={t('requestDetail.messages.emptyTitle')}
+              description={t('requestDetail.messages.emptyDescription')}
+            />
+          ) : (
+            messages.map((message) => {
               const isFromMe = message.senderId === user?.id;
               return (
                 <div
@@ -214,9 +222,9 @@ const RequestDetail: React.FC = () => {
                   </div>
                 </div>
               );
-            })}
-          </div>
-        </Spin>
+            })
+          )}
+        </div>
 
         {/* Message Input */}
         <div className="message-input-container">
