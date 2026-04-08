@@ -273,13 +273,21 @@ const LotCalendarView: React.FC = () => {
   };
 
   const handleApprove = (requestId: string) => {
+    if (!user?.name) {
+      notification.error({
+        message: t('lotCalendarView.notifications.error'),
+        description: 'User not authenticated. Please log in again.',
+      });
+      return;
+    }
+
     const targetLot = selectedLot !== 'all'
       ? visibleLots.find(l => l.id === selectedLot)
       : visibleLots.find(l => l.status === 'available');
     approveRequest(requestId, targetLot ? {
       lotId: targetLot.id,
       floor: targetLot.floorLabel,
-      lotOwner: user?.name ?? '',
+      lotOwner: user.name,
     } : undefined);
     setSelectedEvent(null);
     notification.success({ message: t('lotCalendarView.notifications.approved') });

@@ -33,7 +33,7 @@ const ParkingRequestForm: React.FC = () => {
 
   const activeRequests = useMemo(() => {
     return userRequests
-      .filter(r => r.status === RequestStatus.PENDING)
+      .filter(r => r.status === RequestStatus.PENDING || r.status === RequestStatus.APPROVED)
       .sort((a, b) => {
         const d = a.date.localeCompare(b.date);
         return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
@@ -71,11 +71,19 @@ const ParkingRequestForm: React.FC = () => {
       return;
     }
 
+    if (!user?.id || !user?.name) {
+      notification.error({
+        message: t('requestForm.notifications.failed'),
+        description: 'User not authenticated. Please log in again.',
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       await addPendingRequest({
-        requesterId:   user?.id   ?? '',
-        requesterName: user?.name ?? '',
+        requesterId:   user.id,
+        requesterName: user.name,
         date: values.date?.format('YYYY-MM-DD') || '',
         startTime: values.startTime,
         endDate: endDate || '',
@@ -109,7 +117,7 @@ const ParkingRequestForm: React.FC = () => {
       {/* Warning Banner */}
       {hasMaxRequests && (
         <Alert
-          title={t('requestForm.limitAlert.title')}
+          message={t('requestForm.limitAlert.title')}
           description={t('requestForm.limitAlert.description')}
           type="warning"
           showIcon

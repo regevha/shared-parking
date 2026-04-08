@@ -14,13 +14,14 @@ interface AllPendingRequestsProps {
 }
 
 const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
-  const [filterMode, setFilterMode] = useState<'all' | 'active'>('all');
+  const isOwner = role === UserRole.OWNER;
+  const isManager = role === UserRole.MANAGER;
+  const canApprove = isOwner || isManager;
+  const [filterMode, setFilterMode] = useState<'all' | 'active'>(isOwner ? 'active' : 'all');
   const [approvalInProgress, setApprovalInProgress] = useState<string | null>(null);
   const { pendingRequests, approveRequest, rejectRequest } = useRequests();
   const { user } = useAuth();
   const { t } = useTranslation();
-
-  const isOwner = role === UserRole.OWNER;
 
   // Filter requests
   const filteredRequests = useMemo(() => {
@@ -149,7 +150,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       render: (_, record: ParkingRequest) => {
         const isOwnRequest = record.requesterId === user?.id;
 
-        if (!isOwner) {
+        if (!canApprove) {
           return <span style={{ color: '#999', fontSize: '12px' }}>{t('pendingRequests.noActions')}</span>;
         }
 

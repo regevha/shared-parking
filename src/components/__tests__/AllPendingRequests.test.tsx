@@ -51,8 +51,8 @@ describe('AllPendingRequests - Owner role actions', () => {
       requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
     });
     
-    // Switch to 'All'
-    const allButton = screen.getByText('All');
+    // Switch to 'Show all' (translated from filterAll i18n key)
+    const allButton = screen.getByText('Show all');
     fireEvent.click(allButton);
 
     await waitFor(() => {
@@ -145,26 +145,26 @@ describe('AllPendingRequests - filter toggle', () => {
 // ── Filter mode behaviour ─────────────────────────────────────────────────────
 
 describe('AllPendingRequests - filterMode', () => {
-  it('shows all requests by default (filterMode=all)', async () => {
+  it('hides rejected requests by default for owners (filterMode=active)', async () => {
     renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: owner },
       requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
     });
-    await waitFor(() => {
-      expect(screen.getByText('Bob')).toBeInTheDocument();
-      expect(screen.getByText('Charlie')).toBeInTheDocument();
-    });
-  });
-
-  it('hides rejectedByOwner requests when Hide already rejected is selected', async () => {
-    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
-      authValue: { user: owner },
-      requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
-    });
-    fireEvent.click(screen.getByText('Hide already rejected'));
     await waitFor(() => {
       expect(screen.getByText('Bob')).toBeInTheDocument();
       expect(screen.queryByText('Charlie')).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows all requests including rejected when Show all is selected', async () => {
+    renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
+      authValue: { user: owner },
+      requestsValue: { pendingRequests: [otherRequest, rejectedReq] },
+    });
+    fireEvent.click(screen.getByText('Show all'));
+    await waitFor(() => {
+      expect(screen.getByText('Bob')).toBeInTheDocument();
+      expect(screen.getByText('Charlie')).toBeInTheDocument();
     });
   });
 
