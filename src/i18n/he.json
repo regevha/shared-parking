@@ -167,6 +167,7 @@
       "assignedLot": "חניה שהוקצתה",
       "lotOwner": "בעלים",
       "approvedAt": "אושר ב-",
+      "approvedBy": "אושר על ידי",
       "actions": "פעולות"
     },
     "actions": {

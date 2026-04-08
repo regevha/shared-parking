@@ -13,7 +13,7 @@ const AllApprovals: React.FC = () => {
   const { approvedRequests, loading } = useRequests();
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [isMobile, setIsMobile] = useState(window.matchMedia('(max-width: 768px)').matches);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
@@ -149,71 +149,135 @@ const AllApprovals: React.FC = () => {
     }).length,
   };
 
+  const sortedRequests = [...approvedRequests].sort((a, b) => {
+    const d = a.date.localeCompare(b.date);
+    return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
+  });
+
   return (
     <div className="all-approvals">
       <h1>{t('approvals.title')}</h1>
 
-      {/* Stats — desktop: 3 visual cards; mobile: compact chips */}
       {isMobile ? (
-        <Space wrap size="small" style={{ marginBottom: '16px' }}>
-          <Tag style={{ fontSize: '13px', padding: '2px 10px' }}>
-            <strong>{stats.total}</strong> {t('approvals.stats.total')}
-          </Tag>
-          <Tag color="blue" style={{ fontSize: '13px', padding: '2px 10px' }}>
-            <strong>{stats.today}</strong> {t('approvals.stats.today')}
-          </Tag>
-          <Tag color="purple" style={{ fontSize: '13px', padding: '2px 10px' }}>
-            <strong>{stats.thisWeek}</strong> {t('approvals.stats.thisWeek')}
-          </Tag>
-        </Space>
-      ) : (
-        <Row gutter={16} style={{ marginBottom: '24px' }}>
-          <Col span={8}>
-            <Card size="small">
-              <Statistic
-                title={t('approvals.stats.total')}
-                value={stats.total}
-                valueStyle={{ fontSize: '32px', fontWeight: 'bold' }}
-              />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card size="small">
-              <Statistic
-                title={t('approvals.stats.today')}
-                value={stats.today}
-                valueStyle={{ fontSize: '32px', fontWeight: 'bold', color: '#1890ff' }}
-              />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card size="small">
-              <Statistic
-                title={t('approvals.stats.thisWeek')}
-                value={stats.thisWeek}
-                valueStyle={{ fontSize: '32px', fontWeight: 'bold', color: '#722ed1' }}
-              />
-            </Card>
-          </Col>
-        </Row>
-      )}
+        <>
+          {/* Stats chips — top on mobile */}
+          <div className="approvals-stats-chips">
+            <span className="approvals-stat-chip">
+              <strong>{stats.total}</strong> {t('approvals.stats.total')}
+            </span>
+            <span className="approvals-stat-chip approvals-stat-chip--blue">
+              <strong>{stats.today}</strong> {t('approvals.stats.today')}
+            </span>
+            <span className="approvals-stat-chip approvals-stat-chip--purple">
+              <strong>{stats.thisWeek}</strong> {t('approvals.stats.thisWeek')}
+            </span>
+          </div>
 
-      {/* Table */}
-      <Table
-        columns={columns}
-        dataSource={[...approvedRequests].sort((a, b) => {
-          const d = a.date.localeCompare(b.date);
-          return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
-        })}
-        rowKey="id"
-        loading={loading}
-        pagination={{ pageSize: 10, hideOnSinglePage: true }}
-        scroll={{ x: 1000 }}
-        size="middle"
-        rowClassName={(record: ParkingRequest) =>
-          record.lotOwner === user?.name ? 'owner-approval-row' : ''
-        }
-      />
+          {/* Card list */}
+          <div className="approvals-card-list">
+            {sortedRequests.length === 0 && (
+              <div className="approvals-card-empty">{t('approvals.stats.total')}: 0</div>
+            )}
+            {sortedRequests.map((record: ParkingRequest) => (
+              <Card
+                key={record.id}
+                size="small"
+                className={`approval-card${record.lotOwner === user?.name ? ' approval-card--owner' : ''}`}
+              >
+                <div className="approval-card-header">
+                  <strong className="approval-card-requester">{record.requesterName}</strong>
+                  {record.approvedBy === 'auto' && (
+                    <Tag color="purple" style={{ fontSize: '11px' }}>Auto</Tag>
+                  )}
+                </div>
+                <div className="approval-card-row">
+                  <span className="approval-card-label">{t('approvals.columns.date')}</span>
+                  <span>{dayjs(record.date).format('DD/MM/YYYY')} · {record.startTime} – {record.endTime}</span>
+                </div>
+                <div className="approval-card-row">
+                  <span className="approval-card-label">{t('approvals.columns.assignedLot')}</span>
+                  <span><strong>{record.lotId}</strong>{record.floor ? ` · ${record.floor}` : ''}</span>
+                </div>
+                <div className="approval-card-row">
+                  <span className="approval-card-label">{t('approvals.columns.lotOwner')}</span>
+                  <span>{record.lotOwner}</span>
+                </div>
+                <div className="approval-card-row">
+                  <span className="approval-card-label">{t('approvals.columns.approvedAt')}</span>
+                  <span>{record.approvedAt ? dayjs(record.approvedAt).format('DD/MM/YYYY HH:mm') : '—'}</span>
+                </div>
+                {record.approvedBy && record.approvedBy !== 'auto' && (
+                  <div className="approval-card-row">
+                    <span className="approval-card-label">{t('approvals.columns.approvedBy')}</span>
+                    <span>{record.approvedBy}</span>
+                  </div>
+                )}
+                <div className="approval-card-actions">
+                  <Link to={`/request/${record.id}`}>
+                    <Button size="small" icon={<EyeOutlined />}>
+                      {t('approvals.actions.viewDetails')}
+                    </Button>
+                  </Link>
+                  <Button
+                    size="small"
+                    icon={<MessageOutlined />}
+                    onClick={() => handleViewMessages(record)}
+                  >
+                    {t('approvals.actions.viewMessages')}
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Stats — desktop: 3 visual cards at top */}
+          <Row gutter={16} style={{ marginBottom: '24px' }}>
+            <Col span={8}>
+              <Card size="small">
+                <Statistic
+                  title={t('approvals.stats.total')}
+                  value={stats.total}
+                  valueStyle={{ fontSize: '32px', fontWeight: 'bold' }}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card size="small">
+                <Statistic
+                  title={t('approvals.stats.today')}
+                  value={stats.today}
+                  valueStyle={{ fontSize: '32px', fontWeight: 'bold', color: '#1890ff' }}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card size="small">
+                <Statistic
+                  title={t('approvals.stats.thisWeek')}
+                  value={stats.thisWeek}
+                  valueStyle={{ fontSize: '32px', fontWeight: 'bold', color: '#722ed1' }}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Table */}
+          <Table
+            columns={columns}
+            dataSource={sortedRequests}
+            rowKey="id"
+            loading={loading}
+            pagination={{ pageSize: 10, hideOnSinglePage: true }}
+            scroll={{ x: 1000 }}
+            size="middle"
+            rowClassName={(record: ParkingRequest) =>
+              record.lotOwner === user?.name ? 'owner-approval-row' : ''
+            }
+          />
+        </>
+      )}
 
       {/* Info */}
       <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">

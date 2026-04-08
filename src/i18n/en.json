@@ -167,6 +167,7 @@
       "assignedLot": "Assigned Lot",
       "lotOwner": "Lot Owner",
       "approvedAt": "Approved At",
+      "approvedBy": "Approved By",
       "actions": "Actions"
     },
     "actions": {
