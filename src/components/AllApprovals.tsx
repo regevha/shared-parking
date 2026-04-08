@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import { Table, Space, Card, Row, Col, Statistic, Button, Modal, Tag } from 'antd';
-import { EyeOutlined, MessageOutlined } from '@ant-design/icons';
+import { EyeOutlined, MessageOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
+import EmptyState from './EmptyState';
 import './AllApprovals.css';
 
 const AllApprovals: React.FC = () => {
@@ -176,7 +177,7 @@ const AllApprovals: React.FC = () => {
           {/* Card list */}
           <div className="approvals-card-list">
             {sortedRequests.length === 0 && (
-              <div className="approvals-card-empty">{t('approvals.stats.total')}: 0</div>
+              <EmptyState icon={<CheckCircleOutlined />} title={t('approvals.emptyTitle')} description={t('approvals.emptyDescription')} />
             )}
             {sortedRequests.map((record: ParkingRequest) => (
               <Card
@@ -275,6 +276,7 @@ const AllApprovals: React.FC = () => {
             rowClassName={(record: ParkingRequest) =>
               record.lotOwner === user?.name ? 'owner-approval-row' : ''
             }
+            locale={{ emptyText: <EmptyState icon={<CheckCircleOutlined />} title={t('approvals.emptyTitle')} description={t('approvals.emptyDescription')} /> }}
           />
         </>
       )}

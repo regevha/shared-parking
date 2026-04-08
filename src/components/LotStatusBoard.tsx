@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { Tag, Space, Row, Col, Card, Alert, Spin, Modal, DatePicker, Button } from 'antd';
-import { CarOutlined, ClockCircleOutlined, ReloadOutlined } from '@ant-design/icons';
+import { CarOutlined, ClockCircleOutlined, ReloadOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import dayjs, { Dayjs } from 'dayjs';
 import { LotStatus } from '../types/enums';
 import { LotData } from '../api/lots';
 import { useRequests } from '../contexts/RequestsContext';
 import { getStatusColor, getStatusLabel } from '../utils/statusUtils';
+import EmptyState from './EmptyState';
 import './LotStatusBoard.css';
 
 const OCCUPIED_COLOR = '#1677ff';
@@ -16,6 +17,11 @@ type DisplayStatus = LotStatus | 'occupied';
 function getDisplayColor(status: DisplayStatus): string {
   if (status === 'occupied') return OCCUPIED_COLOR;
   return getStatusColor(status as LotStatus);
+}
+
+/** Statuses with light backgrounds that need dark text in dark mode */
+function isLightBg(status: DisplayStatus): boolean {
+  return status === LotStatus.AVAILABLE || status === LotStatus.UNOWNED || status === LotStatus.UNOWNED_BLOCKED;
 }
 
 const LotStatusBoard: React.FC = () => {
@@ -78,6 +84,9 @@ const LotStatusBoard: React.FC = () => {
       <Spin spinning={loading}>
         <Card style={{ marginBottom: '24px' }}>
           <div className="parking-grid">
+            {allLots.length === 0 && !loading && (
+              <EmptyState icon={<AppstoreOutlined />} title={t('lotStatusBoard.emptyTitle')} description={t('lotStatusBoard.emptyDescription')} />
+            )}
             {allLots.map(lot => {
               const status = getEffectiveStatus(lot);
               const bgColor = getDisplayColor(status);
@@ -85,7 +94,7 @@ const LotStatusBoard: React.FC = () => {
               return (
                 <div
                   key={lot.id}
-                  className="parking-spot"
+                  className={`parking-spot${isLightBg(status) ? ' parking-spot--light-bg' : ''}`}
                   style={{ backgroundColor: bgColor }}
                   onClick={() => setSelectedLot(lot)}
                 >
@@ -177,7 +186,7 @@ const LotStatusBoard: React.FC = () => {
                 {status === 'occupied' ? (
                   <Tag color={OCCUPIED_COLOR}>{t('lotStatusBoard.legend.occupied')}</Tag>
                 ) : (
-                  <Tag color={getStatusColor(status as LotStatus)} style={{ color: '#000' }}>
+                  <Tag color={getStatusColor(status as LotStatus)}>
                     {t(getStatusLabel(status as LotStatus))}
                   </Tag>
                 )}

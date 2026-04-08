@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Tag, Button, Input, Avatar, Divider, Row, Col, Spin, notification } from 'antd';
-import { SendOutlined, UserOutlined, CrownOutlined } from '@ant-design/icons';
+import { SendOutlined, UserOutlined, CrownOutlined, MessageOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -8,6 +8,7 @@ import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { messagesApi, Message } from '../api/messages';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
+import EmptyState from './EmptyState';
 import './RequestDetail.css';
 
 const RequestDetail: React.FC = () => {
@@ -185,6 +186,13 @@ const RequestDetail: React.FC = () => {
       >
         <Spin spinning={loadingMessages}>
           <div className="message-thread">
+            {messages.length === 0 && !loadingMessages && (
+              <EmptyState
+                icon={<MessageOutlined />}
+                title={t('requestDetail.messages.emptyTitle')}
+                description={t('requestDetail.messages.emptyDescription')}
+              />
+            )}
             {messages.map((message) => {
               const isFromMe = message.senderId === user?.id;
               return (

@@ -44,6 +44,7 @@
     "title": "הבקשות שלי",
     "newRequest": "בקשה חדשה",
     "noActiveRequests": "אין בקשות פעילות",
+    "emptyDescription": "שלחו בקשת חניה חדשה כדי להתחיל.",
     "columns": {
       "id": "מזהה",
       "timeSlot": "זמן חניה",
@@ -107,6 +108,8 @@
   },
   "pendingRequests": {
     "title": "בקשות ממתינות",
+    "emptyTitle": "אין בקשות ממתינות",
+    "emptyDescription": "כל הבקשות טופלו. בקשות חדשות יופיעו כאן.",
     "filterLabel": "הצג בקשות:",
     "filterAll": "הצג הכל",
     "filterHideRejected": "הסתר שנדחו",
@@ -158,6 +161,8 @@
   },
   "approvals": {
     "title": "אישורים",
+    "emptyTitle": "אין אישורים עדיין",
+    "emptyDescription": "בקשות חניה שאושרו יופיעו כאן.",
     "columns": {
       "requestId": "מזהה בקשה",
       "requester": "מבקש",
@@ -348,6 +353,8 @@
   },
   "lotStatusBoard": {
     "title": "מצב החניה",
+    "emptyTitle": "לא הוגדרו חניות",
+    "emptyDescription": "חניות יופיעו כאן לאחר שיוגדרו על ידי מנהל.",
     "legendTitle": "מקרא סטטוס",
     "legend": {
       "occupied": "תפוס - הזמנה פעילה",
@@ -425,7 +432,9 @@
       "placeholder": "כתוב הודעה...",
       "send": "שלח",
       "loadFailed": "טעינת הודעות נכשלה",
-      "sendFailed": "שליחת הודעה נכשלה"
+      "sendFailed": "שליחת הודעה נכשלה",
+      "emptyTitle": "אין הודעות עדיין",
+      "emptyDescription": "התחילו את השיחה באמצעות שדה ההודעה למטה."
     }
   },
   "availabilityWindows": {

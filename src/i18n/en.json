@@ -44,6 +44,7 @@
     "title": "My Requests",
     "newRequest": "New Request",
     "noActiveRequests": "No active requests",
+    "emptyDescription": "Submit a new parking request to get started.",
     "columns": {
       "id": "ID",
       "timeSlot": "Time Slot",
@@ -107,6 +108,8 @@
   },
   "pendingRequests": {
     "title": "Pending Requests",
+    "emptyTitle": "No pending requests",
+    "emptyDescription": "All requests have been processed. New requests will appear here when submitted.",
     "filterLabel": "Show Requests:",
     "filterAll": "Show all",
     "filterHideRejected": "Hide already rejected",
@@ -158,6 +161,8 @@
   },
   "approvals": {
     "title": "Approvals",
+    "emptyTitle": "No approved requests yet",
+    "emptyDescription": "Approved parking requests will appear here.",
     "columns": {
       "requestId": "Request ID",
       "requester": "Requester",
@@ -348,6 +353,8 @@
   },
   "lotStatusBoard": {
     "title": "Parking Status",
+    "emptyTitle": "No parking lots configured",
+    "emptyDescription": "Parking lots will appear here once configured by an administrator.",
     "legendTitle": "Status Legend",
     "legend": {
       "occupied": "Occupied - Active Booking",
@@ -425,7 +432,9 @@
       "placeholder": "Type your message...",
       "send": "Send",
       "loadFailed": "Failed to load messages",
-      "sendFailed": "Failed to send message"
+      "sendFailed": "Failed to send message",
+      "emptyTitle": "No messages yet",
+      "emptyDescription": "Start the conversation using the input below."
     }
   },
   "availabilityWindows": {

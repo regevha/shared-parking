@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { Table, Button, Tag, Space, Row, Col, Card, Segmented, Modal, notification } from 'antd';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, InboxOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import { UserRole } from '../types/enums';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
+import EmptyState from './EmptyState';
 import './AllPendingRequests.css';
 
 interface AllPendingRequestsProps {
@@ -221,6 +222,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
         pagination={{ pageSize: 10, hideOnSinglePage: true }}
         size="middle"
         rowClassName={getRowClassName}
+        locale={{ emptyText: <EmptyState icon={<InboxOutlined />} title={t('pendingRequests.emptyTitle')} description={t('pendingRequests.emptyDescription')} /> }}
       />
 
       <div className="legend-and-info" style={{ marginTop: '24px' }}>
