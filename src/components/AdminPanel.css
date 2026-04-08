@@ -39,3 +39,40 @@
 .admin-panel .broadcast-form .ant-input {
   margin-top: 8px;
 }
+
+/* Mobile card list */
+.admin-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-card {
+  border-radius: 8px;
+}
+
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.admin-card-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 2px 0;
+}
+
+.admin-card-label {
+  color: var(--label-color);
+  min-width: 72px;
+}
+
+.admin-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}

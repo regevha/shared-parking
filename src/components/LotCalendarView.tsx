@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LotData } from '../api/lots';
 import { LotStatus, RequestStatus } from '../types/enums';
 import { getRequestStatusColor, getRequestStatusLabel, getLotStatusTagColor } from '../utils/statusUtils';
+import StatsBar from './StatsBar';
 import './CalendarView.css';
 import './LotCalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
@@ -558,37 +559,18 @@ const LotCalendarView: React.FC = () => {
       )}
 
       {/* Stats */}
-      <Card size="small" style={{ marginBottom: '24px' }}>
-        <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
-          {selectedLot === 'available' ? (
-            <div>
-              <strong style={{ fontSize: '18px', color: EVENT_COLORS.available, marginRight: '8px' }}>{availableEvents.length}</strong>
-              <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.availableWindows')}</span>
-            </div>
-          ) : (
-            <>
-              <div>
-                <strong style={{ fontSize: '18px', color: 'inherit', marginRight: '8px' }}>
-                  {bookedEvents.length + pendingEvents.length + blockedEvents.length}
-                </strong>
-                <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.total')}</span>
-              </div>
-              <div>
-                <strong style={{ fontSize: '18px', color: EVENT_COLORS.booked, marginRight: '8px' }}>{bookedEvents.length}</strong>
-                <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.booked')}</span>
-              </div>
-              <div>
-                <strong style={{ fontSize: '18px', color: EVENT_COLORS.pending, marginRight: '8px' }}>{pendingEvents.length}</strong>
-                <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.pending')}</span>
-              </div>
-              <div>
-                <strong style={{ fontSize: '18px', color: EVENT_COLORS.blocked, marginRight: '8px' }}>{blockedEvents.length}</strong>
-                <span style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.stats.blocked')}</span>
-              </div>
-            </>
-          )}
-        </Space>
-      </Card>
+      <StatsBar
+        style={{ marginBottom: '24px' }}
+        items={selectedLot === 'available'
+          ? [{ label: t('lotCalendarView.stats.availableWindows'), value: availableEvents.length, color: EVENT_COLORS.available }]
+          : [
+              { label: t('lotCalendarView.stats.total'), value: bookedEvents.length + pendingEvents.length + blockedEvents.length },
+              { label: t('lotCalendarView.stats.booked'), value: bookedEvents.length, color: EVENT_COLORS.booked },
+              { label: t('lotCalendarView.stats.pending'), value: pendingEvents.length, color: EVENT_COLORS.pending },
+              { label: t('lotCalendarView.stats.blocked'), value: blockedEvents.length, color: EVENT_COLORS.blocked },
+            ]
+        }
+      />
 
       {/* Info */}
       <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">
