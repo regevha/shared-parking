@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "parking-mockup",
+      "name": "shared-parking preview 1",
       "runtimeExecutable": "C:/src/nvm/v25.4.0/node.exe",
       "runtimeArgs": ["C:/src/nvm/v25.4.0/node_modules/npm/bin/npm-cli.js", "start"],
       "port": 3000
