@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Upload, Alert,
-  Input, DatePicker, Tabs, Select, notification, Switch, Spin, Modal, Popconfirm,
+  Input, DatePicker, Tabs, Select, notification, Switch, Spin, Modal, Popconfirm, Drawer,
 } from 'antd';
 import {
   UserOutlined,
@@ -13,6 +13,7 @@ import {
   SendOutlined,
   UserAddOutlined,
   ThunderboltOutlined,
+  MenuOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { UploadProps } from 'antd';
@@ -48,7 +49,18 @@ const AdminPanel: React.FC = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const isDark = user?.preferences?.darkMode ?? true;
-  const [siderCollapsed, setSiderCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const [siderCollapsed, setSiderCollapsed] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches);
+      setSiderCollapsed(e.matches);
+    };
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   // ── Navigation ─────────────────────────────────────────────────────────────
   const [selectedMenu, setSelectedMenu] = useState('users');
@@ -476,6 +488,7 @@ const AdminPanel: React.FC = () => {
               rowKey="id"
               loading={loading}
               pagination={{ pageSize: 10, hideOnSinglePage: true }}
+              scroll={{ x: 'max-content' }}
             />
             <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
               <strong>{t('adminPanel.users.title')}:</strong> {t('adminPanel.users.info')}
@@ -587,8 +600,8 @@ const AdminPanel: React.FC = () => {
         return (
           <div>
             <h2>{t('adminPanel.import.title')}</h2>
-            <Row gutter={16}>
-              <Col span={12}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} sm={12}>
                 <Card title={t('adminPanel.import.importCardTitle')}>
                   <Upload {...uploadProps} accept=".csv">
                     <Button icon={<UploadOutlined />} size="large" block loading={importLoading}>
@@ -600,7 +613,7 @@ const AdminPanel: React.FC = () => {
                   </div>
                 </Card>
               </Col>
-              <Col span={12}>
+              <Col xs={24} sm={12}>
                 <Card title={t('adminPanel.import.exportCardTitle')}>
                   <Button
                     icon={<DownloadOutlined />}
@@ -638,8 +651,8 @@ const AdminPanel: React.FC = () => {
           <div>
             <h2>{t('adminPanel.config.title')}</h2>
             <Spin spinning={configLoading}>
-              <Row gutter={16}>
-                <Col span={12}>
+              <Row gutter={[16, 16]}>
+                <Col xs={24} sm={12}>
                   <Card title={t('adminPanel.config.cardTitle')}>
                     <Space direction="vertical" style={{ width: '100%' }}>
                       <div><strong>{t('adminPanel.config.timezone')}</strong> {systemConfig?.timezone ?? '—'}</div>
@@ -654,7 +667,7 @@ const AdminPanel: React.FC = () => {
                     </Space>
                   </Card>
                 </Col>
-                <Col span={12}>
+                <Col xs={24} sm={12}>
                   <Card title={t('adminPanel.config.schedulerTitle')}>
                     <Space direction="vertical" style={{ width: '100%' }}>
                       <div>{t('adminPanel.config.schedulerDesc')}</div>
@@ -710,6 +723,7 @@ const AdminPanel: React.FC = () => {
                   onChange={dates =>
                     setReportDateRange(dates as [dayjs.Dayjs, dayjs.Dayjs] | null)
                   }
+                  style={{ width: isMobile ? '100%' : 'auto' }}
                 />
                 <Button
                   type="primary"
@@ -819,7 +833,7 @@ const AdminPanel: React.FC = () => {
                   <Select
                     value={broadcastAudience}
                     onChange={setBroadcastAudience}
-                    style={{ width: '220px', marginLeft: '8px' }}
+                    style={{ width: isMobile ? '100%' : '220px', marginLeft: isMobile ? 0 : '8px' }}
                     options={[
                       { value: 'owners', label: t('adminPanel.broadcast.audiences.owners') },
                       { value: 'users', label: t('adminPanel.broadcast.audiences.users') },
@@ -863,28 +877,55 @@ const AdminPanel: React.FC = () => {
     }
   };
 
+  const siderMenu = (
+    <Menu
+      mode="inline"
+      selectedKeys={[selectedMenu]}
+      theme={isDark ? 'dark' : 'light'}
+      onClick={({ key }) => { setSelectedMenu(key); if (isMobile) setSiderCollapsed(true); }}
+      items={menuItems}
+    />
+  );
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider
-        width={250}
-        theme={isDark ? 'dark' : 'light'}
-        breakpoint="md"
-        collapsedWidth={0}
-        collapsed={siderCollapsed}
-        onCollapse={setSiderCollapsed}
-      >
-        <div style={{ padding: '16px', fontSize: '18px', fontWeight: 'bold', textAlign: 'center' }}>
-          {t('adminPanel.sidebarTitle')}
-        </div>
-        <Menu
-          mode="inline"
-          selectedKeys={[selectedMenu]}
-          onClick={({ key }) => setSelectedMenu(key)}
-          items={menuItems}
-        />
-      </Sider>
+      {isMobile ? (
+        <Drawer
+          open={!siderCollapsed}
+          onClose={() => setSiderCollapsed(true)}
+          placement="left"
+          width={250}
+          styles={{ body: { padding: 0 } }}
+          title={t('adminPanel.sidebarTitle')}
+        >
+          {siderMenu}
+        </Drawer>
+      ) : (
+        <Sider
+          width={250}
+          theme={isDark ? 'dark' : 'light'}
+          breakpoint="md"
+          collapsedWidth={0}
+          collapsed={siderCollapsed}
+          onCollapse={setSiderCollapsed}
+        >
+          <div style={{ padding: '16px', fontSize: '18px', fontWeight: 'bold', textAlign: 'center' }}>
+            {t('adminPanel.sidebarTitle')}
+          </div>
+          {siderMenu}
+        </Sider>
+      )}
       <Layout>
-        <Content style={{ padding: '24px' }}>
+        <Content style={{ padding: isMobile ? '16px' : '24px' }}>
+          {isMobile && (
+            <Button
+              icon={<MenuOutlined />}
+              onClick={() => setSiderCollapsed(false)}
+              style={{ marginBottom: 16 }}
+            >
+              {menuItems.find(m => m.key === selectedMenu)?.label}
+            </Button>
+          )}
           <Spin spinning={loading} tip={t('adminPanel.loadingTip')}>
             {renderContent()}
           </Spin>

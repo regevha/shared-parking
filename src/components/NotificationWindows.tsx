@@ -45,12 +45,20 @@ function overlapsWithBlackout(startTime: string, endTime: string): boolean {
 const NotificationWindows: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { t } = useTranslation();
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [windows, setWindows] = useState<DayWindows>(normalise({}));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -189,6 +197,7 @@ const NotificationWindows: React.FC = () => {
       <Modal
         title={t('notificationWindows.modal.title', { day: t(`notificationWindows.days.${selectedDay.toLowerCase()}`) })}
         open={addModalVisible}
+        width={isMobile ? '95vw' : 520}
         onOk={handleModalOk}
         onCancel={() => setAddModalVisible(false)}
         okText={t('notificationWindows.modal.okText')}

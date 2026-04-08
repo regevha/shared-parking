@@ -91,6 +91,8 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
   };
 
   const roleIcon = role === UserRole.OWNER ? <CrownOutlined /> : role === UserRole.MANAGER ? <TeamOutlined /> : <UserOutlined />;
+  const displayName = user?.name ?? role;
+  const truncatedName = isMobile && displayName.length > 12 ? displayName.slice(0, 12) + '…' : displayName;
 
   const headerBg = darkMode ? '#141414' : '#ffffff';
   const headerBtnStyle = { color: darkMode ? 'white' : 'rgba(0,0,0,0.88)' };
@@ -168,7 +170,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                 trigger={['click']}
               >
                 <Button type="text" style={{ ...headerBtnStyle, marginLeft: isMobile ? 0 : 8 }}>
-                  {roleIcon} {user?.name ?? role}
+                  {roleIcon} {truncatedName}
                 </Button>
               </Dropdown>
             </div>
