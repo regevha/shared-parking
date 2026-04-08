@@ -92,6 +92,7 @@ npm start
 - **Client Configuration**: Ensure `src/api/client.ts` uses the correct local IP if testing from a physical mobile device.
 
 ## Shutdown
+- **Script**: `bash stop.sh` — finds and kills processes on ports 8000 + 3000 (works on Windows Git Bash, macOS, Linux)
 - **Graceful**: Press `Ctrl+C` in the respective terminal windows.
 - **Force (Windows)**:
   - Stop Backend: `taskkill /F /IM python.exe`
