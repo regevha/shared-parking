@@ -290,9 +290,9 @@
     "statusRejected": "Rejeté"
   },
   "lotCalendarView": {
-    "allMyLots": "Toutes Mes Places",
+    "allMyLots": "Mes Places",
     "allLots": "Toutes les Places",
-    "availableSlots": "Créneaux Disponibles",
+    "availableSlots": "Places Disponibles",
     "toolbar": {
       "today": "Aujourd'hui",
       "weekShort": "Sem"

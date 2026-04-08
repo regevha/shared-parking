@@ -290,9 +290,9 @@
     "statusRejected": "נדחה"
   },
   "lotCalendarView": {
-    "allMyLots": "כל החניות שלי",
+    "allMyLots": "החניות שלי",
     "allLots": "כל החניות",
-    "availableSlots": "חלונות זמינים",
+    "availableSlots": "חניות זמינות",
     "toolbar": {
       "today": "היום",
       "weekShort": "שבוע"

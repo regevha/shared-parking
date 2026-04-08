@@ -21,3 +21,82 @@
     margin-bottom: 16px;
   }
 }
+
+/* Mobile stats chips */
+.pending-stats-chips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.pending-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  background: var(--info-card-bg);
+  border: 1px solid var(--border-color, #e8e8e8);
+  color: var(--label-color);
+}
+
+.pending-stat-chip strong {
+  color: inherit;
+  font-size: 15px;
+}
+
+.pending-stat-chip--blue strong {
+  color: #1890ff;
+}
+
+.pending-stat-chip--red strong {
+  color: #ff4d4f;
+}
+
+/* Mobile card list */
+.pending-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pending-card {
+  border-radius: 8px;
+}
+
+.pending-card--rejected {
+  opacity: 0.6;
+  border-left: 3px solid #ff4d4f;
+}
+
+.pending-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pending-card-requester {
+  font-size: 15px;
+}
+
+.pending-card-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 2px 0;
+}
+
+.pending-card-label {
+  color: var(--label-color);
+  min-width: 80px;
+}
+
+.pending-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
