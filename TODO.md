@@ -51,6 +51,10 @@ The following test suites and refinements are recommended to further harden the 
 ## 🗓️ New Features
 - [x] **Available Timeslots View**: Implemented as "Available Slots" filter in the Lot Calendar screen.
 
+## 🛠️ Scripts & Tooling
+- [x] **Startup Script** (`start.sh`): Starts backend + frontend, verifies login screen is accessible.
+- [ ] **Shutdown Script** (`stop.sh`): Gracefully shuts down backend and frontend processes.
+
 ## 🏗️ Refactor Ideas
 - [ ] **Lot-Specific Availability**: Migrate `notificationWindows` and `availabilityWindows` from `User` to `Lot` objects to allow granular control.
 - [ ] **Native Date Handling**: Migrate all ISO strings to native `DateTime` objects in the Database layer if we move away from SQLite.
