@@ -128,9 +128,10 @@ $env:CI='true'; npm test -- --ci --no-cache
 - `src/components/__tests__/AdminPanel.test.tsx` — Admin functionalities: User/Lot management and defensive UI rendering.
 - `src/components/__tests__/AllPendingRequests.test.tsx` — Real-world simulation of approval/rejection workflows across roles.
 - `src/components/__tests__/AdminPanelCharades.test.tsx` — Specialized logic for user preference synchronization and Edge-cases.
+- `src/components/__tests__/MyRequests.test.tsx` — 15 tests: visibility filters, edit/cancel button logic, stats, navigation, info banner.
 
 ### Backend Tests
-- 119 tests, always green. Uses in-memory SQLite (StaticPool) — never touches `parking.db`.
+- 147 tests, always green. Uses in-memory SQLite (StaticPool) — never touches `parking.db`.
 - `conftest.py` — Fixtures: in-memory DB, TestClient with overrides, headers, and pwd hashing patches.
 - `test_auth.py` — 9 tests: register, login, `/auth/me`.
 - `test_requests.py` — 41 tests: Full CRUD, approve/reject, RBAC, and status guards.
@@ -203,11 +204,17 @@ $env:CI='true'; npm test -- --ci --no-cache
 | `ParkingRequestForm.tsx` | `/submit-request` | (via "+ New Request" button) |
 | `RequestDetail.tsx` | `/request/:id` | (navigated to from request rows) |
 
+### Reusable Components
+- `src/components/EmptyState.tsx` — empty state with icon, title, description, optional CTA button
+
 ### Styles
 - `src/components/CalendarView.css` — shared by CalendarView and LotCalendarView
 - `src/components/LotCalendarView.css` — lot calendar specific
-- `src/components/AllApprovals.css` — `.owner-approval-row` highlight
+- `src/components/AllApprovals.css` — `.owner-approval-row` highlight, mobile card list + stats chips
+- `src/components/AllPendingRequests.css` — mobile card list + stats chips, rejected card styling
 - `src/components/MyRequests.css` — mobile card list styles
+- `src/components/MyLots.css` — mobile card list styles
+- `src/components/LotStatusBoard.css` — parking grid, dark mode fixes, mobile compact grid
 - `src/index.css` — global CSS variables (dark/light theme)
 
 ## Conventions
@@ -229,8 +236,21 @@ Always use `pagination={{ pageSize: 10, hideOnSinglePage: true }}` on all Tables
 
 ### Mobile Responsiveness
 - `window.matchMedia('(max-width: 768px)')` with `useEffect` listener
-- `MyRequests` uses card list on mobile
+- `MyRequests`, `AllPendingRequests`, `AllApprovals`, `MyLots` use card list on mobile
+- `LotStatusBoard` uses compact grid on mobile (smaller spots, full-width modal)
 - Calendars default to `day` view on mobile, `week` on desktop
+
+### Empty States
+- Reusable `<EmptyState />` component (`src/components/EmptyState.tsx`) with icon, title, description, optional CTA button
+- Wired into: `MyRequests`, `AllPendingRequests`, `AllApprovals`, `MyLots`, `LotStatusBoard`, `RequestDetail` (messages)
+- Desktop tables use `locale={{ emptyText: <EmptyState /> }}`; mobile card views render inline
+
+### Table Sorting & Search
+- **Sortable columns** via Ant Design `sorter` prop on key columns (date, requester, submitted, duration, lot owner, status)
+- `AllPendingRequests`: search input filters by requester name; sortable date, submitted, requester columns
+- `AllApprovals`: search input filters by requester or lot owner; "My lot only" toggle; sortable date, requester, lotOwner, approvedAt, duration
+- `MyRequests`: sortable Date, Duration, Submitted columns
+- `MyLots`: sortable Lot ID, Floor, Status columns
 
 ### Calendar Settings
 Both `CalendarView` and `LotCalendarView`:
@@ -249,11 +269,15 @@ Both `CalendarView` and `LotCalendarView`:
 - Current branch: `master`
 
 ## Pending TODOs
-1. Improve overlapping events display — hover tooltip for narrow calendar events
-2. Empty state UI for all tables (currently shows empty table when no data)
+1. Improve overlapping events display — hover tooltip for narrow calendar events (Phase 2 item #5)
+2. ~~Empty state UI for all tables~~ ✅ Done (Phase 1)
 3. Audit trail — `created_at` / `updated_at` timestamps on records (timestamps added to DB; full audit trail UI pending)
 4. RTL layout for react-big-calendar — library has no RTL support; calendar stays LTR even in Hebrew mode
 5. Remove restriction on time of day for requests — allow any time of day and max duration of 36 hours (multi-day support)
 6. Hide old requests from table views — except for admin screens, show only requests starting from 'yesterday' forward to keep views clean for users
 7. Invert availability logic — lots should be 'Blocked by Default'. Owners must define explicit availability windows/time slots for sharing; sharing is prohibited outside these slots
 8. Implement 'Availability Windows' UI — for owners to define when their lots are open for requests (possibly repurposing or extending NotificationWindows)
+9. Accessibility — `role="button"`, `tabIndex`, keyboard handlers on parking spots; `aria-label` on calendar nav (Phase 2 item #7)
+10. Component extraction — `<StatsBar />`, `<InfoBanner />`, `<PageWrapper />` reusable components (Phase 3 original plan)
+11. Loading skeleton states — replace `<Spin>` with `<Skeleton>` matching layout shapes (Phase 4 item #11)
+12. AdminPanel mobile card views — Users, Lots, Requests tables lack mobile card fallback

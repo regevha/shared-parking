@@ -25,13 +25,14 @@ const MyLots: React.FC = () => {
   }, []);
 
   const columns: ColumnsType<LotData> = [
-    { title: t('myLots.columns.lotId'), dataIndex: 'id', key: 'id', width: '15%' },
-    { title: t('myLots.columns.floor'), dataIndex: 'floorLabel', key: 'floorLabel', width: '30%' },
+    { title: t('myLots.columns.lotId'), dataIndex: 'id', key: 'id', width: '15%', sorter: (a: LotData, b: LotData) => a.id.localeCompare(b.id) },
+    { title: t('myLots.columns.floor'), dataIndex: 'floorLabel', key: 'floorLabel', width: '30%', sorter: (a: LotData, b: LotData) => (a.floorLabel || '').localeCompare(b.floorLabel || '') },
     {
       title: t('myLots.columns.status'),
       dataIndex: 'status',
       key: 'status',
       width: '20%',
+      sorter: (a: LotData, b: LotData) => a.status.localeCompare(b.status),
       render: (status: LotStatus) => {
         return <Tag color={getLotStatusTagColor(status)}>{t(getStatusLabel(status))}</Tag>;
       },

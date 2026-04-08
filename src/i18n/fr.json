@@ -47,6 +47,7 @@
     "emptyDescription": "Soumettez une nouvelle demande de stationnement pour commencer.",
     "columns": {
       "id": "ID",
+      "date": "Date",
       "timeSlot": "Plage Horaire",
       "duration": "Dur.",
       "status": "Statut",
@@ -108,6 +109,7 @@
   },
   "pendingRequests": {
     "title": "Demandes en Attente",
+    "searchPlaceholder": "Rechercher par nom du demandeur...",
     "emptyTitle": "Aucune demande en attente",
     "emptyDescription": "Toutes les demandes ont été traitées. Les nouvelles demandes apparaîtront ici.",
     "filterLabel": "Afficher les Demandes :",
@@ -161,6 +163,8 @@
   },
   "approvals": {
     "title": "Approbations",
+    "searchPlaceholder": "Rechercher par demandeur ou propriétaire...",
+    "myLotOnly": "Ma place uniquement",
     "emptyTitle": "Aucune approbation pour le moment",
     "emptyDescription": "Les demandes de stationnement approuvées apparaîtront ici.",
     "columns": {

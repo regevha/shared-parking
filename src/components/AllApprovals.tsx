@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import { Table, Space, Card, Row, Col, Statistic, Button, Modal, Tag } from 'antd';
-import { EyeOutlined, MessageOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { Table, Space, Card, Row, Col, Statistic, Button, Modal, Tag, Input, Switch } from 'antd';
+import { EyeOutlined, MessageOutlined, CheckCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,8 @@ const AllApprovals: React.FC = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const [searchText, setSearchText] = useState('');
+  const [myLotOnly, setMyLotOnly] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
@@ -50,12 +52,15 @@ const AllApprovals: React.FC = () => {
       dataIndex: 'requesterName',
       key: 'requesterName',
       width: '15%',
+      sorter: (a: ParkingRequest, b: ParkingRequest) => a.requesterName.localeCompare(b.requesterName),
     },
     {
       title: t('approvals.columns.date'),
       dataIndex: 'date',
       key: 'date',
       width: '12%',
+      sorter: (a: ParkingRequest, b: ParkingRequest) => a.date.localeCompare(b.date),
+      defaultSortOrder: 'ascend' as const,
       render: (v: string) => dayjs(v).format('DD/MM/YYYY'),
     },
     {
@@ -78,6 +83,7 @@ const AllApprovals: React.FC = () => {
       dataIndex: 'duration',
       key: 'duration',
       width: '8%',
+      sorter: (a: ParkingRequest, b: ParkingRequest) => a.duration - b.duration,
       render: (duration: number) => `${duration}h`,
     },
     {
@@ -97,12 +103,14 @@ const AllApprovals: React.FC = () => {
       dataIndex: 'lotOwner',
       key: 'lotOwner',
       width: '15%',
+      sorter: (a: ParkingRequest, b: ParkingRequest) => (a.lotOwner || '').localeCompare(b.lotOwner || ''),
     },
     {
       title: t('approvals.columns.approvedAt'),
       dataIndex: 'approvedAt',
       key: 'approvedAt',
       width: '15%',
+      sorter: (a: ParkingRequest, b: ParkingRequest) => (a.approvedAt || '').localeCompare(b.approvedAt || ''),
       render: (_: any, record: ParkingRequest) => (
         <div>
           <div>{record.approvedAt ? dayjs(record.approvedAt).format('DD/MM/YYYY HH:mm') : '—'}</div>
@@ -150,14 +158,45 @@ const AllApprovals: React.FC = () => {
     }).length,
   };
 
-  const sortedRequests = [...approvedRequests].sort((a, b) => {
-    const d = a.date.localeCompare(b.date);
-    return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
-  });
+  const filteredRequests = React.useMemo(() => {
+    let filtered = [...approvedRequests];
+
+    if (searchText.trim()) {
+      const q = searchText.toLowerCase();
+      filtered = filtered.filter((r) =>
+        r.requesterName.toLowerCase().includes(q) ||
+        (r.lotOwner || '').toLowerCase().includes(q)
+      );
+    }
+
+    if (myLotOnly && user?.name) {
+      filtered = filtered.filter((r) => r.lotOwner === user.name);
+    }
+
+    return filtered.sort((a, b) => {
+      const d = a.date.localeCompare(b.date);
+      return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
+    });
+  }, [approvedRequests, searchText, myLotOnly, user?.name]);
 
   return (
     <div className="all-approvals">
       <h1>{t('approvals.title')}</h1>
+
+      <Space wrap style={{ marginBottom: '16px', width: '100%' }}>
+        <Input
+          placeholder={t('approvals.searchPlaceholder')}
+          prefix={<SearchOutlined style={{ color: 'var(--label-color)' }} />}
+          allowClear
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ width: isMobile ? '100%' : 300 }}
+        />
+        <Space>
+          <Switch size="small" checked={myLotOnly} onChange={setMyLotOnly} />
+          <span style={{ fontSize: '13px' }}>{t('approvals.myLotOnly')}</span>
+        </Space>
+      </Space>
 
       {isMobile ? (
         <>
@@ -176,10 +215,10 @@ const AllApprovals: React.FC = () => {
 
           {/* Card list */}
           <div className="approvals-card-list">
-            {sortedRequests.length === 0 && (
+            {filteredRequests.length === 0 && (
               <EmptyState icon={<CheckCircleOutlined />} title={t('approvals.emptyTitle')} description={t('approvals.emptyDescription')} />
             )}
-            {sortedRequests.map((record: ParkingRequest) => (
+            {filteredRequests.map((record: ParkingRequest) => (
               <Card
                 key={record.id}
                 size="small"
@@ -267,7 +306,7 @@ const AllApprovals: React.FC = () => {
           {/* Table */}
           <Table
             columns={columns}
-            dataSource={sortedRequests}
+            dataSource={filteredRequests}
             rowKey="id"
             loading={loading}
             pagination={{ pageSize: 10, hideOnSinglePage: true }}

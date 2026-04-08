@@ -175,11 +175,21 @@ const MyRequests: React.FC = () => {
       ),
     },
     {
+      title: t('myRequests.columns.date'),
+      dataIndex: 'date',
+      key: 'date',
+      width: 100,
+      sorter: (a: ParkingRequest, b: ParkingRequest) => a.date.localeCompare(b.date),
+      defaultSortOrder: 'ascend' as const,
+      render: (v: string) => dayjs(v).format('DD/MM/YYYY'),
+    },
+    {
       title: t('myRequests.columns.duration'),
       dataIndex: 'duration',
       key: 'duration',
       width: 55,
       responsive: ['sm'],
+      sorter: (a: ParkingRequest, b: ParkingRequest) => a.duration - b.duration,
       render: (duration: number) => `${duration}h`,
     },
     {
@@ -204,6 +214,7 @@ const MyRequests: React.FC = () => {
       key: 'submittedAt',
       width: 140,
       responsive: ['md'],
+      sorter: (a: ParkingRequest, b: ParkingRequest) => (a.submittedAt || '').localeCompare(b.submittedAt || ''),
       render: (v: string) => dayjs(v).format('DD/MM/YYYY HH:mm'),
     },
     {

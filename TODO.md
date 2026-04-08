@@ -49,7 +49,39 @@ The following test suites and refinements are recommended to further harden the 
 - [ ] **Notification message i18n**: Backend approval/rejection notification messages are currently English-only hardcoded strings. Migrate to i18n-aware messages (e.g. store a message key + params, render translated in the frontend).
 
 ## 🗓️ New Features
-- [x] **Available Timeslots View**: Implemented as "Available Slots" filter in the Lot Calendar screen.
+- [x] **Available Timeslots View**: Implemented as "Available Lots" filter in the Lot Calendar screen.
+
+## 🎨 UI/UX Enhancement Phases
+
+### Phase 1 — Quick Wins ✅
+- [x] Dark mode fixes for LotStatusBoard (contrast-aware text, `parking-spot--light-bg` class)
+- [x] Reusable `<EmptyState />` component with contextual icons + CTA button
+- [x] Empty states for all tables: MyRequests, AllPendingRequests, AllApprovals, MyLots, LotStatusBoard
+- [x] RequestDetail empty messages placeholder with chat icon
+- [x] i18n keys for all empty states in en/fr/he
+
+### Phase 2 — Mobile Responsiveness ✅
+- [x] AllPendingRequests mobile card view with stats chips + approve/reject actions
+- [x] MyLots mobile card view with lot status tags
+- [x] LotStatusBoard isMobile state, compact grid, full-width modal
+- [x] Desktop table `scroll={{ x }}` for horizontal overflow
+- [x] i18n renames: "All My Lots" → "My Lots", "Available Slots" → "Available Lots" (en/fr/he)
+
+### Phase 3 — Sort & Search ✅
+- [x] AllPendingRequests: sortable columns (date, submitted, requester) + search input
+- [x] AllApprovals: sortable columns (date, requester, lotOwner, approvedAt, duration) + search + "My lot only" toggle
+- [x] MyRequests: Date column added, sortable date/duration/submitted columns
+- [x] MyLots: sortable lot ID, floor, status columns
+- [x] i18n: search placeholders and myLotOnly in en/fr/he
+
+### Phase 4 — Planned
+- [ ] Calendar event hover tooltips for overlapping events
+- [ ] LotStatusBoard parking spot hover preview
+- [ ] Accessibility: keyboard handlers, aria-labels
+- [ ] Component extraction: `<StatsBar />`, `<InfoBanner />`, `<PageWrapper />`
+- [ ] Loading skeleton states (replace `<Spin>` with `<Skeleton>`)
+- [ ] Form submission success feedback with "View My Requests" / "Submit Another" buttons
+- [ ] AdminPanel mobile card views for Users/Lots/Requests tables
 
 ## 🛠️ Scripts & Tooling
 - [x] **Startup Script** (`start.sh`): Starts backend + frontend, verifies login screen is accessible.
