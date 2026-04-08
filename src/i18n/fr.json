@@ -44,6 +44,7 @@
     "title": "Mes Demandes",
     "newRequest": "Nouvelle Demande",
     "noActiveRequests": "Aucune demande active",
+    "emptyDescription": "Soumettez une nouvelle demande de stationnement pour commencer.",
     "columns": {
       "id": "ID",
       "timeSlot": "Plage Horaire",
@@ -107,6 +108,8 @@
   },
   "pendingRequests": {
     "title": "Demandes en Attente",
+    "emptyTitle": "Aucune demande en attente",
+    "emptyDescription": "Toutes les demandes ont été traitées. Les nouvelles demandes apparaîtront ici.",
     "filterLabel": "Afficher les Demandes :",
     "filterAll": "Afficher tout",
     "filterHideRejected": "Masquer les rejets",
@@ -158,6 +161,8 @@
   },
   "approvals": {
     "title": "Approbations",
+    "emptyTitle": "Aucune approbation pour le moment",
+    "emptyDescription": "Les demandes de stationnement approuvées apparaîtront ici.",
     "columns": {
       "requestId": "ID Demande",
       "requester": "Demandeur",
@@ -348,6 +353,8 @@
   },
   "lotStatusBoard": {
     "title": "État du Parking",
+    "emptyTitle": "Aucune place de parking configurée",
+    "emptyDescription": "Les places de parking apparaîtront ici une fois configurées par un administrateur.",
     "legendTitle": "Légende",
     "legend": {
       "occupied": "Occupé - Réservation Active",
@@ -425,7 +432,9 @@
       "placeholder": "Votre message...",
       "send": "Envoyer",
       "loadFailed": "Erreur chargement",
-      "sendFailed": "Erreur envoi"
+      "sendFailed": "Erreur envoi",
+      "emptyTitle": "Aucun message pour le moment",
+      "emptyDescription": "Commencez la conversation en utilisant le champ ci-dessous."
     }
   },
   "availabilityWindows": {

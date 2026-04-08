@@ -1,6 +1,6 @@
 # Shared Parking
 
-A prototype application for managing corporate parking resources. Users request parking slots; owners approve or reject requests and manage their lots; managers administer users and lots. Authentication uses JWT.
+An application for managing corporate parking resources. Users request parking slots; owners approve or reject requests and manage their lots; managers administer users and lots. Authentication uses JWT.
 
 ## Tech Stack
 

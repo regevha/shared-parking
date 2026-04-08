@@ -45,6 +45,25 @@
   font-size: 24px;
 }
 
+/* ── Dark mode ─────────────────────────────────────────────────────── */
+
+[data-theme="dark"] .parking-spot {
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.08);
+}
+
+[data-theme="dark"] .parking-spot:hover {
+  box-shadow: 0 4px 8px rgba(255,255,255,0.1);
+}
+
+/* Light status colors need dark text even in dark mode */
+[data-theme="dark"] .parking-spot--light-bg {
+  color: #000;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+
 @media (max-width: 768px) {
   .lot-status-board {
     padding: 12px;

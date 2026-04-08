@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, Button, Tag, Space, Modal, Form, DatePicker, Select, notification, Popconfirm, Card, Row, Col } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusOutlined, CarOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
@@ -9,6 +9,7 @@ import type { Dayjs } from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import { RequestStatus } from '../types/enums';
+import EmptyState from './EmptyState';
 import './MyRequests.css';
 
 interface EditFormValues {
@@ -261,7 +262,13 @@ const MyRequests: React.FC = () => {
       {isMobile ? (
         <div className="requests-card-list">
           {visibleRequests.length === 0 && (
-            <div className="requests-card-empty">{t('myRequests.noActiveRequests')}</div>
+            <EmptyState
+              icon={<CarOutlined />}
+              title={t('myRequests.noActiveRequests')}
+              description={t('myRequests.emptyDescription')}
+              actionLabel={t('myRequests.newRequest')}
+              onAction={() => navigate('/submit-request')}
+            />
           )}
           {visibleRequests.map((record: ParkingRequest) => (
             <Card key={record.id} size="small" className="request-card">
@@ -316,6 +323,7 @@ const MyRequests: React.FC = () => {
           pagination={{ pageSize: 10, hideOnSinglePage: true }}
           scroll={{ x: 'max-content' }}
           size="small"
+          locale={{ emptyText: <EmptyState icon={<CarOutlined />} title={t('myRequests.noActiveRequests')} description={t('myRequests.emptyDescription')} actionLabel={t('myRequests.newRequest')} onAction={() => navigate('/submit-request')} /> }}
         />
       )}
 
