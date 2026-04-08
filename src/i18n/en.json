@@ -290,9 +290,9 @@
     "statusRejected": "Rejected"
   },
   "lotCalendarView": {
-    "allMyLots": "All My Lots",
+    "allMyLots": "My Lots",
     "allLots": "All Lots",
-    "availableSlots": "Available Slots",
+    "availableSlots": "Available Lots",
     "toolbar": {
       "today": "Today",
       "weekShort": "Wk"

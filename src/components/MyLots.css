@@ -5,3 +5,45 @@
 .my-lots .ant-table-thead > tr > th {
   font-weight: 600;
 }
+
+/* Mobile card list */
+.my-lots-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.my-lots-card {
+  border-radius: 8px;
+}
+
+.my-lots-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.my-lots-card-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 2px 0;
+}
+
+.my-lots-card-label {
+  color: var(--label-color);
+  min-width: 80px;
+}
+
+@media (max-width: 768px) {
+  .my-lots {
+    padding: 12px;
+  }
+
+  .my-lots h1 {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+}
