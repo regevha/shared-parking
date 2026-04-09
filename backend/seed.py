@@ -36,6 +36,10 @@ LOTS = [
     dict(id="LOT-101-D", floor="F1", floor_label="Floor 1 (D)", owner="Sarah",   owner_id="O1", status="available"),
     dict(id="LOT-102", floor="F1", floor_label="Floor 1", owner="Mike",   owner_id="O2", status="available"),
     dict(id="LOT-201", floor="F2", floor_label="Floor 2", owner="Lisa", owner_id="O3", status="available"),
+    dict(id="LOT-202", floor="F2", floor_label="Floor 2", owner="Mike",  owner_id="O2", status="available"),
+    dict(id="LOT-301", floor="F3", floor_label="Floor 3", owner="Sarah", owner_id="O1", status="available"),
+    dict(id="LOT-302", floor="F3", floor_label="Floor 3", owner="Lisa",  owner_id="O3", status="available"),
+    dict(id="LOT-303", floor="F3", floor_label="Floor 3", owner="Mike",  owner_id="O2", status="unavailable"),
 ]
 
 # ── Sample Requests ───────────────────────────────────────────────────────────
