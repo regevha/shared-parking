@@ -12,6 +12,8 @@ interface LoginForm {
 }
 
 const DEMO_ACCOUNTS = [
+  { name: 'Tom',   email: 'u1@parking.dev', icon: <UserOutlined />,  color: 'green'  },
+  { name: 'Amy',   email: 'u2@parking.dev', icon: <UserOutlined />,  color: 'green'  },
   { name: 'Sarah', email: 'o1@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
   { name: 'Mike',  email: 'o2@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
   { name: 'Lisa',  email: 'o3@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
