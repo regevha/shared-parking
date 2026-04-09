@@ -2,6 +2,7 @@ import React, { ReactElement } from 'react';
 import { render, RenderResult } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
+import enUS from 'antd/locale/en_US';
 import { AuthContext } from '../contexts/AuthContext';
 import { RequestsContext } from '../contexts/RequestsContext';
 import { AuthUser } from '../api/auth';
@@ -53,7 +54,7 @@ export function renderWithProviders(
 
   return render(
     <MemoryRouter initialEntries={[route]}>
-      <ConfigProvider>
+      <ConfigProvider locale={enUS}>
         <AuthContext.Provider value={auth}>
           <RequestsContext.Provider value={requests}>
             {ui}

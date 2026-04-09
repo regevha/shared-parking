@@ -46,3 +46,10 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Initialize i18n for tests so components render real English strings instead of translation keys
 import './i18n';
+
+// Initialize dayjs locale — required by Ant Design DatePicker/TimePicker which call
+// dayjs.locale() internally via @rc-component/picker. Without this, `parseLocale`
+// crashes with "Cannot read properties of undefined (reading 'split')".
+import dayjs from 'dayjs';
+import 'dayjs/locale/en';
+dayjs.locale('en');
