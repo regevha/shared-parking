@@ -105,7 +105,8 @@
       "cancelFailedDesc": "Failed to cancel the request. Please try again."
     },
     "durationOption_one": "{{count}} hour",
-    "durationOption_other": "{{count}} hours"
+    "durationOption_other": "{{count}} hours",
+    "autoApproved": "Auto"
   },
   "pendingRequests": {
     "title": "Pending Requests",
