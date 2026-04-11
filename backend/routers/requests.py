@@ -215,16 +215,18 @@ def create_request(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    """Create a new parking request. Limit: 5 pending requests per user."""
+    """Create a new parking request. Limit: 5 pending future requests per user."""
+    today = dt_mod.date.today().isoformat()
     pending_count = (
         db.query(models.ParkingRequest)
         .filter(
             models.ParkingRequest.requester_id == current_user.id,
-            models.ParkingRequest.status == models.RequestStatus.PENDING.value
+            models.ParkingRequest.status == models.RequestStatus.PENDING.value,
+            models.ParkingRequest.date >= today,
         )
         .count()
     )
-    max_pending = int(os.environ.get("MAX_PENDING_REQUESTS", 5))
+    max_pending = int(os.environ.get("MAX_PENDING_REQUESTS", 10))
     if pending_count >= max_pending:
         raise HTTPException(
             status_code=400,
