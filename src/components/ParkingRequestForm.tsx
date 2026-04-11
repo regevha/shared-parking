@@ -15,7 +15,7 @@ interface FormValues {
   duration: number;
 }
 
-const MAX_PENDING_REQUESTS = 5;
+const MAX_PENDING_REQUESTS = 10;
 
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
 

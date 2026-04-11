@@ -226,7 +226,7 @@ def create_request(
         )
         .count()
     )
-    max_pending = int(os.environ.get("MAX_PENDING_REQUESTS", 5))
+    max_pending = int(os.environ.get("MAX_PENDING_REQUESTS", 10))
     if pending_count >= max_pending:
         raise HTTPException(
             status_code=400,

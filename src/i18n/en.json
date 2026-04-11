@@ -60,8 +60,10 @@
     "mobile": {
       "date": "Date",
       "time": "Time",
-      "submitted": "Submitted"
+      "submitted": "Submitted",
+      "approvedBy": "Approved by"
     },
+    "approvedByLabel": "By {{name}}",
     "stats": {
       "totalActive": "Total Active",
       "pending": "Pending",

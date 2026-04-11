@@ -70,9 +70,14 @@ const MyRequests: React.FC = () => {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Filter to show only PENDING and APPROVED requests, newest date+time first
+  // Show only PENDING and APPROVED requests that haven't ended yet
+  const now = dayjs();
   const visibleRequests = userRequests
-    .filter((req: ParkingRequest) => req.status === 'pending' || req.status === 'approved')
+    .filter((req: ParkingRequest) => {
+      if (req.status !== 'pending' && req.status !== 'approved') return false;
+      const effectiveEndDate = req.endDate || req.date;
+      return dayjs(`${effectiveEndDate} ${req.endTime}`).isAfter(now);
+    })
     .sort((a, b) => {
       const d = a.date.localeCompare(b.date);
       return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
@@ -199,14 +204,21 @@ const MyRequests: React.FC = () => {
       key: 'status',
       width: 90,
       render: (_: any, record: ParkingRequest) => (
-        <>
-          <Tag color={getRequestStatusColor(record.status)}>
-            {t(getRequestStatusLabel(record.status))}
-          </Tag>
-          {record.approvedBy === 'auto' && (
-            <Tag color="purple" style={{ fontSize: '11px' }}>{t('myRequests.autoApproved')}</Tag>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div>
+            <Tag color={getRequestStatusColor(record.status)}>
+              {t(getRequestStatusLabel(record.status))}
+            </Tag>
+            {record.approvedBy === 'auto' && (
+              <Tag color="purple" style={{ fontSize: '11px' }}>{t('myRequests.autoApproved')}</Tag>
+            )}
+          </div>
+          {record.status === RequestStatus.APPROVED && record.approvedBy && record.approvedBy !== 'auto' && (
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary, #888)' }}>
+              {t('myRequests.approvedByLabel', { name: record.approvedBy })}
+            </span>
           )}
-        </>
+        </div>
       ),
     },
     {
@@ -305,6 +317,16 @@ const MyRequests: React.FC = () => {
                 <span className="request-card-label">{t('myRequests.mobile.submitted')}</span>
                 <span>{dayjs(record.submittedAt).format('DD/MM/YYYY HH:mm')}</span>
               </div>
+              {record.status === RequestStatus.APPROVED && record.approvedBy && (
+                <div className="request-card-row">
+                  <span className="request-card-label">{t('myRequests.mobile.approvedBy')}</span>
+                  <span>
+                    {record.approvedBy === 'auto'
+                      ? t('myRequests.autoApproved')
+                      : record.approvedBy}
+                  </span>
+                </div>
+              )}
               <div className="request-card-actions">
                 {record.status === 'pending' && (
                   <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
