@@ -32,8 +32,12 @@ const ParkingRequestForm: React.FC = () => {
   }));
 
   const activeRequests = useMemo(() => {
+    const today = dayjs().format('YYYY-MM-DD');
     return userRequests
-      .filter(r => r.status === RequestStatus.PENDING || r.status === RequestStatus.APPROVED)
+      .filter(r =>
+        (r.status === RequestStatus.PENDING || r.status === RequestStatus.APPROVED) &&
+        r.date >= today
+      )
       .sort((a, b) => {
         const d = a.date.localeCompare(b.date);
         return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
