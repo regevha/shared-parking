@@ -105,7 +105,8 @@
       "cancelFailedDesc": "נכשל ביטול הבקשה. נא לנסות שוב."
     },
     "durationOption_one": "שעה {{count}}",
-    "durationOption_other": "{{count}} שעות"
+    "durationOption_other": "{{count}} שעות",
+    "autoApproved": "אוטומטי"
   },
   "pendingRequests": {
     "title": "בקשות ממתינות",

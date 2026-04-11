@@ -105,7 +105,8 @@
       "cancelFailedDesc": "Échec de l'annulation de la demande. Veuillez réessayer."
     },
     "durationOption_one": "{{count}} heure",
-    "durationOption_other": "{{count}} heures"
+    "durationOption_other": "{{count}} heures",
+    "autoApproved": "Auto"
   },
   "pendingRequests": {
     "title": "Demandes en Attente",
