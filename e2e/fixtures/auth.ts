@@ -3,9 +3,9 @@ import { Page, APIRequestContext } from '@playwright/test';
 export type Role = 'user' | 'owner' | 'manager';
 
 export const CREDENTIALS: Record<Role, { email: string; password: string; name: string }> = {
-  user:    { email: 'alice@parking.dev',  password: 'password123', name: 'Alice Johnson' },
-  owner:   { email: 'sarah@parking.dev',  password: 'password123', name: 'Sarah Smith' },
-  manager: { email: 'admin@parking.dev',  password: 'password123', name: 'Admin User' },
+  user:    { email: 'e2e-user@parking.dev', password: 'password123', name: 'E2E User' },
+  owner:   { email: 'o1@parking.dev',       password: 'password123', name: 'Sarah' },
+  manager: { email: 'a1@parking.dev',       password: 'password123', name: 'David' },
 };
 
 /**

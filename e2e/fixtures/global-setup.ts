@@ -1,6 +1,9 @@
 import { FullConfig } from '@playwright/test';
 
+const API = 'http://localhost:8000';
+
 export default async function globalSetup(_config: FullConfig) {
+  // ── 1. Verify both servers are reachable ─────────────────────────────────
   const check = async (url: string, label: string) => {
     try {
       const res = await fetch(url);
@@ -17,6 +20,26 @@ export default async function globalSetup(_config: FullConfig) {
     }
   };
 
-  await check('http://localhost:8000/auth/me', 'Backend');
+  await check(`${API}/auth/me`, 'Backend');
   await check('http://localhost:3000', 'Frontend');
+
+  // ── 2. Ensure the E2E test user (user role) exists ───────────────────────
+  // seed.py only seeds owner and manager accounts; we register a user-role
+  // test account on demand. The endpoint is idempotent — duplicate email
+  // returns 400 which we silently ignore.
+  const registerRes = await fetch(`${API}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'E2E User',
+      email: 'e2e-user@parking.dev',
+      password: 'password123',
+      role: 'user',
+    }),
+  });
+
+  if (!registerRes.ok && registerRes.status !== 400) {
+    const body = await registerRes.text();
+    throw new Error(`Failed to register E2E test user: ${registerRes.status} ${body}`);
+  }
 }
