@@ -25,8 +25,7 @@ beforeEach(() => {
     senderRole: 'user', text: 'Hello', sentAt: new Date().toISOString(),
   });
 });
-afterEach(() => { jest.clearAllMocks(); jest.restoreAllMocks(); });
-afterAll(() => { jest.resetModules(); });
+afterEach(() => { jest.restoreAllMocks(); });
 
 const requestId = 'REQ-1';
 
