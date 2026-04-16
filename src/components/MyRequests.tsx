@@ -10,6 +10,7 @@ import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import { RequestStatus } from '../types/enums';
 import EmptyState from './EmptyState';
+import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './MyRequests.css';
 
@@ -350,10 +351,7 @@ const MyRequests: React.FC = () => {
         ]}
       />
 
-      {/* Info */}
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('myRequests.title')}:</strong> {t('myRequests.info')}
-      </Card>
+      <InfoBanner label={`${t('myRequests.title')}:`} description={t('myRequests.info')} />
 
       {/* Edit Modal */}
       <Modal

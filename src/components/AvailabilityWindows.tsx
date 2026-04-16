@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { usersApi } from '../api/users';
 import type { AvailabilityWindow } from '../api/auth';
+import InfoBanner from './InfoBanner';
 import './AvailabilityWindows.css';
 
 interface DayWindows {
@@ -194,9 +195,7 @@ const AvailabilityWindows: React.FC = () => {
         </Form>
       </Modal>
 
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('availabilityWindows.title')}:</strong> {t('availabilityWindows.info', { max: MAX_WINDOWS_PER_DAY })}
-      </Card>
+      <InfoBanner label={`${t('availabilityWindows.title')}:`} description={t('availabilityWindows.info', { max: MAX_WINDOWS_PER_DAY })} />
     </div>
   );
 };

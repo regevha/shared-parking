@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { usersApi } from '../api/users';
 import type { NotificationWindow } from '../api/auth';
+import InfoBanner from './InfoBanner';
 import './NotificationWindows.css';
 
 interface DayWindows {
@@ -227,9 +228,7 @@ const NotificationWindows: React.FC = () => {
         </Form>
       </Modal>
 
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('notificationWindows.title')}:</strong> {t('notificationWindows.info', { max: MAX_WINDOWS_PER_DAY })}
-      </Card>
+      <InfoBanner label={`${t('notificationWindows.title')}:`} description={t('notificationWindows.info', { max: MAX_WINDOWS_PER_DAY })} />
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import EmptyState from './EmptyState';
+import InfoBanner from './InfoBanner';
 import './AllApprovals.css';
 
 const AllApprovals: React.FC = () => {
@@ -320,10 +321,7 @@ const AllApprovals: React.FC = () => {
         </>
       )}
 
-      {/* Info */}
-      <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>{t('approvals.title')}:</strong> {t('approvals.info')}
-      </Card>
+      <InfoBanner label={`${t('approvals.title')}:`} description={t('approvals.info')} />
     </div>
   );
 };
