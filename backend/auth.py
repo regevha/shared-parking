@@ -21,7 +21,7 @@ if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY environment variable is not set!")
 
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 480))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("TOKEN_EXPIRE_MINUTES", os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60)))
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
