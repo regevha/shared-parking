@@ -156,6 +156,67 @@ def test_messages_preserved_after_request_deletion(client, db_session, user_head
     assert archived[0].text == "Audit trail message"
 
 
+# ── Owner lot-scoping (M-1) ───────────────────────────────────────────────
+
+def test_owner_cannot_access_messages_for_request_assigned_to_another_owner(client, user_headers, manager_headers):
+    """An owner must not read/post messages on a request whose lot belongs to a different owner."""
+    # Register a second owner
+    client.post("/auth/register", json={
+        "name": "Eve Owner",
+        "email": "eve@test.com",
+        "password": "Pass1234",
+        "role": "owner",
+    })
+    eve_resp = client.post(
+        "/auth/login",
+        data={"username": "eve@test.com", "password": "Pass1234"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    eve_headers = {"Authorization": f"Bearer {eve_resp.json()['access_token']}"}
+    eve_id = eve_resp.json()["user_id"]
+
+    # Create a request and a lot owned by Eve; approve it via manager
+    from .conftest import REQUEST_PAYLOAD
+    req_resp = client.post("/api/requests", json=REQUEST_PAYLOAD, headers=user_headers)
+    rid = req_resp.json()["id"]
+
+    client.post("/api/lots", json={
+        "id": "F9-001", "floor": "F9", "floor_label": "F9 - Test Floor",
+        "owner": "Eve Owner", "owner_id": eve_id, "status": "available",
+    }, headers=manager_headers)
+
+    # Manager approves and assigns Eve's lot
+    client.patch(f"/api/requests/{rid}/approve", json={
+        "lot_id": "F9-001", "floor": "F9", "lot_owner": "Eve Owner",
+    }, headers=manager_headers)
+
+    # Register a third owner (Frank) who owns no lots
+    client.post("/auth/register", json={
+        "name": "Frank Owner",
+        "email": "frank@test.com",
+        "password": "Pass1234",
+        "role": "owner",
+    })
+    frank_resp = client.post(
+        "/auth/login",
+        data={"username": "frank@test.com", "password": "Pass1234"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    frank_headers = {"Authorization": f"Bearer {frank_resp.json()['access_token']}"}
+
+    # Frank cannot read or post messages on this request (lot belongs to Eve)
+    assert client.get(f"/api/requests/{rid}/messages", headers=frank_headers).status_code == 403
+    assert client.post(
+        f"/api/requests/{rid}/messages", json={"text": "Hi"}, headers=frank_headers
+    ).status_code == 403
+
+    # Eve (the lot owner) can read and post messages
+    assert client.get(f"/api/requests/{rid}/messages", headers=eve_headers).status_code == 200
+    assert client.post(
+        f"/api/requests/{rid}/messages", json={"text": "Hi from Eve"}, headers=eve_headers
+    ).status_code == 201
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _register_and_login_user(client) -> dict:
@@ -163,12 +224,12 @@ def _register_and_login_user(client) -> dict:
     client.post("/auth/register", json={
         "name": "Other User",
         "email": "other@test.com",
-        "password": "pass123",
+        "password": "Pass1234",
         "role": "user",
     })
     resp = client.post(
         "/auth/login",
-        data={"username": "other@test.com", "password": "pass123"},
+        data={"username": "other@test.com", "password": "Pass1234"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     return {"Authorization": f"Bearer {resp.json()['access_token']}"}

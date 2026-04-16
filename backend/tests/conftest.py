@@ -89,17 +89,17 @@ def register_and_login(client, name: str, email: str, password: str, role: str) 
 
 @pytest.fixture()
 def user_headers(client) -> dict:
-    return register_and_login(client, "Alice User", "alice@test.com", "pass123", "user")
+    return register_and_login(client, "Alice User", "alice@test.com", "Pass1234", "user")
 
 
 @pytest.fixture()
 def owner_headers(client) -> dict:
-    return register_and_login(client, "Bob Owner", "bob@test.com", "pass123", "owner")
+    return register_and_login(client, "Bob Owner", "bob@test.com", "Pass1234", "owner")
 
 
 @pytest.fixture()
 def manager_headers(client) -> dict:
-    return register_and_login(client, "Carol Manager", "carol@test.com", "pass123", "manager")
+    return register_and_login(client, "Carol Manager", "carol@test.com", "Pass1234", "manager")
 
 
 # ── Request helpers ────────────────────────────────────────────────────────
@@ -139,6 +139,21 @@ def created_lot_id(client, manager_headers) -> str:
     resp = client.post("/api/lots", json=LOT_PAYLOAD, headers=manager_headers)
     assert resp.status_code == 201, resp.text
     return resp.json()["id"]
+
+
+def create_lot_owned_by(client, manager_headers, owner_headers, lot_id: str, floor: str = "F1") -> dict:
+    """Create a lot in the DB owned by the owner fixture user. Returns the created lot dict."""
+    me = client.get("/auth/me", headers=owner_headers).json()
+    resp = client.post("/api/lots", json={
+        "id": lot_id,
+        "floor": floor,
+        "floor_label": f"{floor} - Test Floor",
+        "owner": me["name"],
+        "owner_id": me["id"],
+        "status": "available",
+    }, headers=manager_headers)
+    assert resp.status_code == 201, resp.text
+    return resp.json()
 
 
 @pytest.fixture()

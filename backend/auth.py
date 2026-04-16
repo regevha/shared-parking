@@ -27,6 +27,21 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 # ── Password helpers (bcrypt used directly — passlib 1.7.4 incompatible with bcrypt >= 4.0) ──
+
+def _validate_password(password: str) -> None:
+    """Raise HTTP 422 if the password does not meet strength requirements."""
+    if (
+        len(password) < 8
+        or not any(c.isupper() for c in password)
+        or not any(c.islower() for c in password)
+        or not any(c.isdigit() for c in password)
+    ):
+        raise HTTPException(
+            status_code=422,
+            detail="Password must be at least 8 characters and include uppercase, lowercase, and a digit",
+        )
+
+
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
