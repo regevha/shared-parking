@@ -5,7 +5,7 @@ from typing import List
 from database import get_db
 import models
 import schemas
-from auth import get_current_user, require_manager, hash_password
+from auth import get_current_user, require_manager, hash_password, _validate_password
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -79,6 +79,7 @@ def update_user(
         user.email = payload.email
 
     if payload.password is not None:
+        _validate_password(payload.password)
         user.password_hash = hash_password(payload.password)
 
     if payload.role is not None:

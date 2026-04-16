@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime, timezone
 import models
+from .conftest import create_lot_owned_by
 
 def get_user_id(client, headers):
     resp = client.get("/auth/me", headers=headers)
@@ -43,11 +44,14 @@ def test_get_notifications_returns_only_own(client, user_headers, owner_headers,
 
 # ── Status Trigger Tests ────────────────────────────────────────────────────
 
-def test_approval_triggers_notification(client, user_headers, owner_headers, created_request_id):
+def test_approval_triggers_notification(client, user_headers, owner_headers, manager_headers, created_request_id):
+    # Create a lot owned by the owner so M-6 check passes
+    create_lot_owned_by(client, manager_headers, owner_headers, "F1-001")
+    owner_name = client.get("/auth/me", headers=owner_headers).json()["name"]
     # 2. Bob approves Alice's request
     client.patch(
         f"/api/requests/{created_request_id}/approve",
-        json={"lot_id": "F1-001", "floor": "F1", "lot_owner": "Bob Owner"},
+        json={"lot_id": "F1-001", "floor": "F1", "lot_owner": owner_name},
         headers=owner_headers
     )
     

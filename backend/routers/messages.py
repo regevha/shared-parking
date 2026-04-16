@@ -12,9 +12,19 @@ router = APIRouter(prefix="/api/requests", tags=["messages"])
 
 
 def _check_access(req: models.ParkingRequest, current_user: models.User) -> None:
-    """Allow requester or any owner/manager to read/write messages."""
-    if current_user.role in ("owner", "manager"):
+    """Allow requester, the assigned lot's owner, or manager to read/write messages.
+    Owners may also access pending requests that have no lot assigned yet (pre-approval).
+    """
+    if current_user.role == "manager":
         return
+    if current_user.role == "owner":
+        # Pending requests with no lot yet: any owner may participate (pre-approval dialogue)
+        if req.status == "pending" and not req.lot_id:
+            return
+        # Once a lot is assigned, only its owner may access
+        if req.lot_owner == current_user.name:
+            return
+        raise HTTPException(status_code=403, detail="Access denied")
     if req.requester_id == current_user.id:
         return
     raise HTTPException(status_code=403, detail="Access denied")
