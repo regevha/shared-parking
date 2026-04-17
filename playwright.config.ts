@@ -1,39 +1,30 @@
 import { defineConfig, devices } from '@playwright/test';
 
-/**
- * Playwright E2E configuration.
- *
- * IMPORTANT: These tests assume the dev servers are already running:
- *   - Frontend:  npm start  (port 3000)
- *   - Backend:   uvicorn main:app --reload  (port 8000)
- *
- * We intentionally do NOT auto-start servers here because:
- *   1. The backend requires an active parking.db (seeded with `python seed.py`)
- *   2. Starting/stopping both processes reliably across platforms is complex
- *   3. Developers typically have servers running during development anyway
- *
- * Start servers manually before running: npx playwright test
- */
 export default defineConfig({
-  testDir: './e2e',
-  fullyParallel: false,
+  testDir: './e2e/tests',
+  fullyParallel: false, // shared SQLite DB — serial execution keeps state predictable
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: 'html',
-
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: 'e2e/playwright-report', open: 'never' }],
+  ],
   use: {
     baseURL: 'http://localhost:3000',
-    headless: true,
+    trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    trace: 'retain-on-failure',
+    viewport: { width: 1280, height: 800 },
   },
-
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
   ],
+  // Both servers must be running before executing tests.
+  // Run: `bash start.sh` or start backend + frontend manually.
+  // See e2e/README.md for setup instructions.
+  globalSetup: require.resolve('./e2e/fixtures/global-setup.ts'),
 });

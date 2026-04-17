@@ -215,16 +215,18 @@ def create_request(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    """Create a new parking request. Limit: 5 pending requests per user."""
+    """Create a new parking request. Limit: 5 pending future requests per user."""
+    today = dt_mod.date.today().isoformat()
     pending_count = (
         db.query(models.ParkingRequest)
         .filter(
             models.ParkingRequest.requester_id == current_user.id,
-            models.ParkingRequest.status == models.RequestStatus.PENDING.value
+            models.ParkingRequest.status == models.RequestStatus.PENDING.value,
+            models.ParkingRequest.date >= today,
         )
         .count()
     )
-    max_pending = int(os.environ.get("MAX_PENDING_REQUESTS", 5))
+    max_pending = int(os.environ.get("MAX_PENDING_REQUESTS", 10))
     if pending_count >= max_pending:
         raise HTTPException(
             status_code=400,
@@ -264,6 +266,11 @@ def approve_request(
     if req.status != models.RequestStatus.PENDING.value:
         raise HTTPException(status_code=400, detail="Only pending requests can be approved")
     if payload.lot_id:
+        lot = db.query(models.Lot).filter(models.Lot.id == payload.lot_id).first()
+        if not lot:
+            raise HTTPException(status_code=404, detail="Lot not found")
+        if lot.owner != current_user.name and current_user.role != "manager":
+            raise HTTPException(status_code=403, detail="You can only assign lots you own")
         conflict_id = _has_conflict(
             db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=request_id
         )

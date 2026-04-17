@@ -15,7 +15,7 @@ def login(client, email: str, password: str):
 
 def test_register_success(client):
     resp = client.post("/auth/register", json={
-        "name": "Alice", "email": "alice@test.com", "password": "pass123", "role": "user",
+        "name": "Alice", "email": "alice@test.com", "password": "Pass1234", "role": "user",
     })
     assert resp.status_code == 201
     data = resp.json()
@@ -27,14 +27,14 @@ def test_register_success(client):
 
 def test_register_default_role_is_user(client):
     resp = client.post("/auth/register", json={
-        "name": "Bob", "email": "bob@test.com", "password": "pass123",
+        "name": "Bob", "email": "bob@test.com", "password": "Pass1234",
     })
     assert resp.status_code == 201
     assert resp.json()["role"] == "user"
 
 
 def test_register_duplicate_email_returns_400(client):
-    payload = {"name": "A", "email": "dup@test.com", "password": "pass123"}
+    payload = {"name": "A", "email": "dup@test.com", "password": "Pass1234"}
     client.post("/auth/register", json=payload)
     resp = client.post("/auth/register", json=payload)
     assert resp.status_code == 400
@@ -45,9 +45,9 @@ def test_register_duplicate_email_returns_400(client):
 
 def test_login_success_returns_token_and_user_fields(client):
     client.post("/auth/register", json={
-        "name": "Carol", "email": "carol@test.com", "password": "secret", "role": "owner",
+        "name": "Carol", "email": "carol@test.com", "password": "Secret1234", "role": "owner",
     })
-    resp = login(client, "carol@test.com", "secret")
+    resp = login(client, "carol@test.com", "Secret1234")
     assert resp.status_code == 200
     data = resp.json()
     assert "access_token" in data
@@ -59,7 +59,7 @@ def test_login_success_returns_token_and_user_fields(client):
 
 def test_login_wrong_password_returns_401(client):
     client.post("/auth/register", json={
-        "name": "Dave", "email": "dave@test.com", "password": "correct",
+        "name": "Dave", "email": "dave@test.com", "password": "Correct1234",
     })
     resp = login(client, "dave@test.com", "wrong")
     assert resp.status_code == 401
@@ -76,6 +76,37 @@ def test_me_returns_current_user(client, user_headers):
     resp = client.get("/auth/me", headers=user_headers)
     assert resp.status_code == 200
     assert resp.json()["email"] == "alice@test.com"
+
+
+# ── Password strength (M-2) ────────────────────────────────────────────────
+
+def test_register_weak_password_too_short_returns_422(client):
+    resp = client.post("/auth/register", json={
+        "name": "Weak", "email": "weak@test.com", "password": "Ab1",
+    })
+    assert resp.status_code == 422
+    assert "password" in resp.json()["detail"].lower()
+
+
+def test_register_weak_password_no_uppercase_returns_422(client):
+    resp = client.post("/auth/register", json={
+        "name": "Weak", "email": "weak@test.com", "password": "nouppercase1",
+    })
+    assert resp.status_code == 422
+
+
+def test_register_weak_password_no_digit_returns_422(client):
+    resp = client.post("/auth/register", json={
+        "name": "Weak", "email": "weak@test.com", "password": "NoDigitHere",
+    })
+    assert resp.status_code == 422
+
+
+def test_register_strong_password_succeeds(client):
+    resp = client.post("/auth/register", json={
+        "name": "Strong", "email": "strong@test.com", "password": "StrongPass1",
+    })
+    assert resp.status_code == 201
 
 
 def test_me_without_token_returns_401(client):

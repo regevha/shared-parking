@@ -238,15 +238,24 @@ const AppRoot: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const [language, setLanguageState] = useState<SupportedLanguage>(getStoredLanguage);
 
+  // Sync dark mode from DB on login (fires once per session when user.id is first set)
   useEffect(() => {
     if (user) {
       setDarkMode(user.preferences.darkMode);
-      const lang = (user.preferences.language ?? 'en') as SupportedLanguage;
-      setLanguage(lang);
-      storeLanguage(lang);
-      i18n.changeLanguage(lang);
     }
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync language from DB preference — fires when the stored preference changes, not on
+  // every route change. Uses direct state setters (not setLanguage) to avoid triggering
+  // another updateUser/API call, which would cause an infinite update loop.
+  useEffect(() => {
+    if (!user) return;
+    const lang = (user.preferences.language ?? 'en') as SupportedLanguage;
+    setLanguageState(lang);
+    storeLanguage(lang);
+    i18n.changeLanguage(lang);
+    dayjs.locale(lang);
+  }, [user?.preferences?.language]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useLayoutEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');

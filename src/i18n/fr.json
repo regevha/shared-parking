@@ -60,8 +60,10 @@
     "mobile": {
       "date": "Date",
       "time": "Heure",
-      "submitted": "Soumis"
+      "submitted": "Soumis",
+      "approvedBy": "Approuvé par"
     },
+    "approvedByLabel": "Par {{name}}",
     "stats": {
       "totalActive": "Total Actif",
       "pending": "En Attente",
@@ -105,7 +107,8 @@
       "cancelFailedDesc": "Échec de l'annulation de la demande. Veuillez réessayer."
     },
     "durationOption_one": "{{count}} heure",
-    "durationOption_other": "{{count}} heures"
+    "durationOption_other": "{{count}} heures",
+    "autoApproved": "Auto"
   },
   "pendingRequests": {
     "title": "Demandes en Attente",

@@ -1,10 +1,10 @@
 import pytest
 from datetime import datetime, timedelta, timezone
-from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE
+from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE, create_lot_owned_by
 
 # ── End-to-End Walkthrough Scenario ──────────────────────────────────────────
 
-def test_full_request_lifecycle_walkthrough(client, user_headers, owner_headers):
+def test_full_request_lifecycle_walkthrough(client, user_headers, owner_headers, manager_headers):
     """
     Scenario:
     1. Alice (User) submits a request for 2 hours.
@@ -30,11 +30,15 @@ def test_full_request_lifecycle_walkthrough(client, user_headers, owner_headers)
     r_sub = client.post("/api/requests", json=payload, headers=user_headers)
     assert r_sub.status_code == 201
     req_id = r_sub.json()["id"]
-    
+
+    # Create F1-001 owned by Bob Owner so the ownership check passes
+    create_lot_owned_by(client, manager_headers, owner_headers, "F1-001")
+    owner_name = client.get("/auth/me", headers=owner_headers).json()["name"]
+
     # 2. Approval
     r_app = client.patch(
         f"/api/requests/{req_id}/approve",
-        json={"lot_id": "F1-001", "floor": "F1", "lot_owner": "Bob Owner"},
+        json={"lot_id": "F1-001", "floor": "F1", "lot_owner": owner_name},
         headers=owner_headers
     )
     assert r_app.status_code == 200
@@ -59,7 +63,7 @@ def test_full_request_lifecycle_walkthrough(client, user_headers, owner_headers)
     }, headers=user_headers)
     tight_id = r_tight.json()["id"]
     
-    # Bob approves it
+    # Bob approves it (lot F1-001 already created above)
     client.patch(f"/api/requests/{tight_id}/approve", json={"lot_id": "F1-001"}, headers=owner_headers)
     
     # Now Alice tries to cancel — should be blocked by 2-hour policy
