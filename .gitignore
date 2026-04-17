@@ -43,3 +43,7 @@ docs/package-lock.json
 # Logs
 logs/
 backend/parking.log
+
+# Playwright E2E test artifacts
+playwright-report/
+test-results/
