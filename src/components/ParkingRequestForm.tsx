@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Form, DatePicker, Select, Button, Card, Alert, notification, Row, Col, Tag } from 'antd';
+import InfoBanner from './InfoBanner';
 import { useTranslation } from 'react-i18next';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -271,9 +272,7 @@ const ParkingRequestForm: React.FC = () => {
         </ul>
       </Card>
 
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('requestForm.title')}:</strong> {t('requestForm.info')}
-      </Card>
+      <InfoBanner label={`${t('requestForm.title')}:`} description={t('requestForm.info')} />
     </div>
   );
 };

@@ -43,3 +43,6 @@ docs/package-lock.json
 # Logs
 logs/
 backend/parking.log
+# Playwright
+e2e/playwright-report/
+e2e/test-results/

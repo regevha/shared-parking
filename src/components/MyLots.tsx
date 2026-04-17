@@ -9,6 +9,7 @@ import { LotData } from '../api/lots';
 import { getLotStatusTagColor, getStatusLabel } from '../utils/statusUtils';
 import { LotStatus } from '../types/enums';
 import EmptyState from './EmptyState';
+import InfoBanner from './InfoBanner';
 import './MyLots.css';
 
 const MyLots: React.FC = () => {
@@ -115,9 +116,7 @@ const MyLots: React.FC = () => {
         </>
       )}
 
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('myLots.title')}:</strong> {t('myLots.info')}
-      </Card>
+      <InfoBanner label={`${t('myLots.title')}:`} description={t('myLots.info')} />
     </div>
   );
 };

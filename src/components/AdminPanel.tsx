@@ -3,6 +3,7 @@ import {
   Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Upload, Alert,
   Input, DatePicker, Tabs, Select, notification, Switch, Spin, Skeleton, Modal, Popconfirm, Drawer,
 } from 'antd';
+import InfoBanner from './InfoBanner';
 import {
   UserOutlined,
   CarOutlined,
@@ -539,9 +540,7 @@ const AdminPanel: React.FC = () => {
                 scroll={{ x: 'max-content' }}
               />
             )}
-            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>{t('adminPanel.users.title')}:</strong> {t('adminPanel.users.info')}
-            </Card>
+            <InfoBanner label={`${t('adminPanel.users.title')}:`} description={t('adminPanel.users.info')} />
           </div>
         );
 
@@ -696,9 +695,7 @@ const AdminPanel: React.FC = () => {
               />
             </Modal>
 
-            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>{t('adminPanel.lots.title')}:</strong> {t('adminPanel.lots.info')}
-            </Card>
+            <InfoBanner label={`${t('adminPanel.lots.title')}:`} description={t('adminPanel.lots.info')} />
           </div>
         );
 
@@ -746,9 +743,7 @@ const AdminPanel: React.FC = () => {
                 </Card>
               </Col>
             </Row>
-            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>{t('adminPanel.import.title')}:</strong> {t('adminPanel.import.info')}
-            </Card>
+            <InfoBanner label={`${t('adminPanel.import.title')}:`} description={t('adminPanel.import.info')} />
           </div>
         );
 
@@ -809,9 +804,7 @@ const AdminPanel: React.FC = () => {
                   </Card>
                 </Col>
               </Row>}
-            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>{t('adminPanel.config.title')}:</strong> {t('adminPanel.config.info')}
-            </Card>
+            <InfoBanner label={`${t('adminPanel.config.title')}:`} description={t('adminPanel.config.info')} />
           </div>
         );
 
@@ -893,9 +886,7 @@ const AdminPanel: React.FC = () => {
               ))}
             </Tabs>
 
-            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>{t('adminPanel.reports.title')}:</strong> {t('adminPanel.reports.info')}
-            </Card>
+            <InfoBanner label={`${t('adminPanel.reports.title')}:`} description={t('adminPanel.reports.info')} />
           </div>
         );
 
@@ -966,9 +957,7 @@ const AdminPanel: React.FC = () => {
               </Space>
             </Card>
 
-            <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-              <strong>{t('adminPanel.broadcast.title')}:</strong> {t('adminPanel.broadcast.info')}
-            </Card>
+            <InfoBanner label={`${t('adminPanel.broadcast.title')}:`} description={t('adminPanel.broadcast.info')} />
           </div>
         );
 
