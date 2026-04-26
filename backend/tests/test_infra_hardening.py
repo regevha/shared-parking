@@ -25,3 +25,60 @@ def test_business_rules_loading():
     import os
     window = int(os.getenv("CANCELLATION_WINDOW_HOURS", 2))
     assert window == 2
+
+
+def test_parking_db_is_seeded():
+    """
+    Warn if parking.db exists but contains no users.
+    Catches the common mistake of running the app without seeding first.
+    The test backend uses an in-memory DB, so we check the real parking.db on disk.
+    """
+    import sqlite3
+
+    db_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "parking.db")
+    )
+
+    if not os.path.exists(db_path):
+        pytest.skip("parking.db not found — run `python backend/seed.py` before testing the live DB")
+
+    conn = sqlite3.connect(db_path)
+    try:
+        tables = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            ).fetchall()
+        }
+
+        if not tables:
+            pytest.fail(
+                f"parking.db at {db_path} has no tables. "
+                "Run `python backend/seed.py` to initialise and seed the database."
+            )
+
+        for table in ("users", "lots", "parking_requests"):
+            assert table in tables, (
+                f"Expected table '{table}' not found in parking.db. "
+                "Run `python backend/seed.py` to reinitialise the database."
+            )
+
+        user_count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        assert user_count > 0, (
+            f"parking.db has a 'users' table but it is empty. "
+            "Run `python backend/seed.py` to populate the database before starting the app."
+        )
+
+        lot_count = conn.execute("SELECT COUNT(*) FROM lots").fetchone()[0]
+        assert lot_count > 0, (
+            f"parking.db has a 'lots' table but it is empty. "
+            "Run `python backend/seed.py` to populate the database before starting the app."
+        )
+
+        request_count = conn.execute("SELECT COUNT(*) FROM parking_requests").fetchone()[0]
+        assert request_count > 0, (
+            f"parking.db has a 'parking_requests' table but it is empty. "
+            "Run `python backend/seed.py` to populate the database before starting the app."
+        )
+    finally:
+        conn.close()
