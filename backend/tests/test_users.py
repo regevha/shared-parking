@@ -123,21 +123,28 @@ def test_update_nonexistent_user_returns_404(client, manager_headers):
 
 def test_password_update_enables_new_login(client, user_headers):
     uid = get_user_id(client, user_headers)
-    client.patch(f"/api/users/{uid}", json={"password": "newpass456"}, headers=user_headers)
+    client.patch(f"/api/users/{uid}", json={"password": "NewPass456"}, headers=user_headers)
     # New password works
     resp = client.post(
         "/auth/login",
-        data={"username": "alice@test.com", "password": "newpass456"},
+        data={"username": "alice@test.com", "password": "NewPass456"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     assert resp.status_code == 200
     # Old password no longer works
     resp2 = client.post(
         "/auth/login",
-        data={"username": "alice@test.com", "password": "pass123"},
+        data={"username": "alice@test.com", "password": "Pass1234"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     assert resp2.status_code == 401
+
+
+def test_password_change_weak_password_returns_422(client, user_headers):
+    uid = get_user_id(client, user_headers)
+    resp = client.patch(f"/api/users/{uid}", json={"password": "weak"}, headers=user_headers)
+    assert resp.status_code == 422
+    assert "password" in resp.json()["detail"].lower()
 
 
 # ── DELETE /api/users/{user_id} ───────────────────────────────────────────
@@ -246,7 +253,7 @@ def test_preferences_persisted_after_update(client, user_headers):
 def test_login_response_includes_preferences(client, user_headers):
     resp = client.post(
         "/auth/login",
-        data={"username": "alice@test.com", "password": "pass123"},
+        data={"username": "alice@test.com", "password": "Pass1234"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     assert resp.status_code == 200

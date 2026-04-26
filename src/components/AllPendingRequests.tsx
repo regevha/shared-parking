@@ -8,6 +8,7 @@ import { UserRole } from '../types/enums';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import EmptyState from './EmptyState';
+import InfoBanner from './InfoBanner';
 import './AllPendingRequests.css';
 
 interface AllPendingRequestsProps {
@@ -379,9 +380,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
         </>
       )}
 
-      <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>{t('pendingRequests.title')}:</strong> {isOwner ? t('pendingRequests.infoOwner') : t('pendingRequests.infoManager')}
-      </Card>
+      <InfoBanner label={`${t('pendingRequests.title')}:`} description={isOwner ? t('pendingRequests.infoOwner') : t('pendingRequests.infoManager')} />
     </div>
   );
 };

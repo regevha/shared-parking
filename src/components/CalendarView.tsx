@@ -9,6 +9,7 @@ import { UserRole, RequestStatus } from '../types/enums';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
+import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './CalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
@@ -370,9 +371,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       />
 
       {/* Info */}
-      <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>{t('calendarView.infoTitle')}:</strong> {t('calendarView.info')}
-      </Card>
+      <InfoBanner label={`${t('calendarView.infoTitle')}:`} description={t('calendarView.info')} style={{ marginTop: 0, marginBottom: '16px' }} />
 
       {/* Legend */}
       {(() => {

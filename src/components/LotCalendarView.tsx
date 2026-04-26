@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LotData } from '../api/lots';
 import { LotStatus, RequestStatus } from '../types/enums';
 import { getRequestStatusColor, getRequestStatusLabel, getLotStatusTagColor } from '../utils/statusUtils';
+import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './CalendarView.css';
 import './LotCalendarView.css';
@@ -576,9 +577,7 @@ const LotCalendarView: React.FC = () => {
       />
 
       {/* Info */}
-      <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>{t('lotCalendarView.infoTitle')}:</strong> {t('lotCalendarView.info')}
-      </Card>
+      <InfoBanner label={`${t('lotCalendarView.infoTitle')}:`} description={t('lotCalendarView.info')} style={{ marginTop: 0, marginBottom: '16px' }} />
 
       {/* Legend */}
       {(() => {

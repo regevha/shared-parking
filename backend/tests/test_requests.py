@@ -1,7 +1,7 @@
 """Tests for /api/requests/* endpoints."""
 
 import pytest
-from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE
+from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE, create_lot_owned_by
 
 
 # ── GET /api/requests ──────────────────────────────────────────────────────
@@ -110,16 +110,18 @@ def test_approve_request_success_as_owner(client, user_headers, owner_headers, c
     assert data["approved_at"] is not None
 
 
-def test_approve_request_assigns_lot_fields(client, user_headers, owner_headers, created_request_id):
+def test_approve_request_assigns_lot_fields(client, user_headers, owner_headers, manager_headers, created_request_id):
+    create_lot_owned_by(client, manager_headers, owner_headers, "F1-001")
+    owner_name = client.get("/auth/me", headers=owner_headers).json()["name"]
     resp = client.patch(
         f"/api/requests/{created_request_id}/approve",
-        json={"lot_id": "F1-001", "floor": "F1 - Ground Floor", "lot_owner": "Bob Owner"},
+        json={"lot_id": "F1-001", "floor": "F1 - Ground Floor", "lot_owner": owner_name},
         headers=owner_headers,
     )
     data = resp.json()
     assert data["lot_id"] == "F1-001"
     assert data["floor"] == "F1 - Ground Floor"
-    assert data["lot_owner"] == "Bob Owner"
+    assert data["lot_owner"] == owner_name
 
 
 def test_approve_request_requires_owner_role(client, user_headers, created_request_id):
@@ -146,6 +148,50 @@ def test_approve_already_approved_returns_400(client, user_headers, owner_header
 def test_approve_nonexistent_request_returns_404(client, owner_headers):
     resp = client.patch("/api/requests/REQ-999/approve", json={}, headers=owner_headers)
     assert resp.status_code == 404
+
+
+def test_approve_nonexistent_lot_returns_404(client, owner_headers, created_request_id):
+    resp = client.patch(
+        f"/api/requests/{created_request_id}/approve",
+        json={"lot_id": "NONEXISTENT-LOT"},
+        headers=owner_headers,
+    )
+    assert resp.status_code == 404
+
+
+def test_owner_cannot_approve_with_another_owners_lot(client, user_headers, owner_headers, manager_headers, created_request_id):
+    """M-6: Owner must not approve a request by assigning a lot they don't own."""
+    # Create a lot owned by a different user (manager creates it, assigned to themselves for the test)
+    manager_me = client.get("/auth/me", headers=manager_headers).json()
+    client.post("/api/lots", json={
+        "id": "F8-001", "floor": "F8", "floor_label": "F8 - Test",
+        "owner": manager_me["name"], "owner_id": manager_me["id"], "status": "available",
+    }, headers=manager_headers)
+
+    # Owner (Bob) tries to approve using a lot owned by the manager — should be 403
+    resp = client.patch(
+        f"/api/requests/{created_request_id}/approve",
+        json={"lot_id": "F8-001", "floor": "F8", "lot_owner": manager_me["name"]},
+        headers=owner_headers,
+    )
+    assert resp.status_code == 403
+    assert "own" in resp.json()["detail"].lower()
+
+
+def test_manager_can_approve_with_any_lot(client, user_headers, manager_headers, created_request_id):
+    """Manager bypass: managers may assign any lot regardless of ownership."""
+    manager_me = client.get("/auth/me", headers=manager_headers).json()
+    client.post("/api/lots", json={
+        "id": "F8-002", "floor": "F8", "floor_label": "F8 - Test",
+        "owner": manager_me["name"], "owner_id": manager_me["id"], "status": "available",
+    }, headers=manager_headers)
+
+    resp = client.patch(
+        f"/api/requests/{created_request_id}/approve",
+        json={"lot_id": "F8-002", "floor": "F8", "lot_owner": manager_me["name"]},
+        headers=manager_headers,
+    )
+    assert resp.status_code == 200
 
 
 # ── PATCH /api/requests/{id}/reject ──────────────────────────────────────
@@ -310,9 +356,11 @@ def test_create_request_rejects_wrong_duration(client, user_headers):
 
 # ── Time conflict detection (PATCH /api/requests/{id}/approve) ────────────
 
-def test_approve_detects_time_slot_conflict(client, user_headers, owner_headers):
+def test_approve_detects_time_slot_conflict(client, user_headers, owner_headers, manager_headers):
     """Approving two requests for the same lot/date with overlapping times → 409."""
-    # Create two requests for the same date and overlapping slot
+    create_lot_owned_by(client, manager_headers, owner_headers, "F1-001")
+    owner_name = client.get("/auth/me", headers=owner_headers).json()["name"]
+
     r1 = client.post("/api/requests", json={
         **REQUEST_PAYLOAD, "start_time": "09:00", "end_time": "11:00", "duration": 2,
     }, headers=user_headers)
@@ -323,7 +371,7 @@ def test_approve_detects_time_slot_conflict(client, user_headers, owner_headers)
     assert r2.status_code == 201
     id1, id2 = r1.json()["id"], r2.json()["id"]
 
-    lot_info = {"lot_id": "F1-001", "floor": "F1", "lot_owner": "Bob"}
+    lot_info = {"lot_id": "F1-001", "floor": "F1", "lot_owner": owner_name}
 
     # Approve first request — should succeed
     resp1 = client.patch(f"/api/requests/{id1}/approve", json=lot_info, headers=owner_headers)
@@ -335,8 +383,12 @@ def test_approve_detects_time_slot_conflict(client, user_headers, owner_headers)
     assert "conflict" in resp2.json()["detail"].lower()
 
 
-def test_approve_no_conflict_different_lot(client, user_headers, owner_headers):
+def test_approve_no_conflict_different_lot(client, user_headers, owner_headers, manager_headers):
     """Same time slot on different lots is allowed."""
+    create_lot_owned_by(client, manager_headers, owner_headers, "F1-001")
+    create_lot_owned_by(client, manager_headers, owner_headers, "F1-002")
+    owner_name = client.get("/auth/me", headers=owner_headers).json()["name"]
+
     r1 = client.post("/api/requests", json={
         **REQUEST_PAYLOAD, "start_time": "09:00", "end_time": "11:00", "duration": 2,
     }, headers=user_headers)
@@ -346,16 +398,19 @@ def test_approve_no_conflict_different_lot(client, user_headers, owner_headers):
     id1, id2 = r1.json()["id"], r2.json()["id"]
 
     client.patch(f"/api/requests/{id1}/approve",
-                 json={"lot_id": "F1-001", "floor": "F1", "lot_owner": "Bob"},
+                 json={"lot_id": "F1-001", "floor": "F1", "lot_owner": owner_name},
                  headers=owner_headers)
     resp2 = client.patch(f"/api/requests/{id2}/approve",
-                         json={"lot_id": "F1-002", "floor": "F1", "lot_owner": "Bob"},
+                         json={"lot_id": "F1-002", "floor": "F1", "lot_owner": owner_name},
                          headers=owner_headers)
     assert resp2.status_code == 200
 
 
-def test_approve_no_conflict_adjacent_slots(client, user_headers, owner_headers):
+def test_approve_no_conflict_adjacent_slots(client, user_headers, owner_headers, manager_headers):
     """Adjacent (non-overlapping) slots on the same lot are allowed."""
+    create_lot_owned_by(client, manager_headers, owner_headers, "F1-001")
+    owner_name = client.get("/auth/me", headers=owner_headers).json()["name"]
+
     r1 = client.post("/api/requests", json={
         **REQUEST_PAYLOAD, "start_time": "09:00", "end_time": "11:00", "duration": 2,
     }, headers=user_headers)
@@ -364,7 +419,7 @@ def test_approve_no_conflict_adjacent_slots(client, user_headers, owner_headers)
     }, headers=user_headers)
     id1, id2 = r1.json()["id"], r2.json()["id"]
 
-    lot_info = {"lot_id": "F1-001", "floor": "F1", "lot_owner": "Bob"}
+    lot_info = {"lot_id": "F1-001", "floor": "F1", "lot_owner": owner_name}
     client.patch(f"/api/requests/{id1}/approve", json=lot_info, headers=owner_headers)
     resp2 = client.patch(f"/api/requests/{id2}/approve", json=lot_info, headers=owner_headers)
     assert resp2.status_code == 200

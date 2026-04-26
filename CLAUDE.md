@@ -41,10 +41,10 @@ Role is derived from the JWT — no manual dropdown.
 ## Demo Accounts (password: `password123`)
 | Email | Role |
 |-------|------|
-| `alice@parking.dev` | User |
 | `sarah@parking.dev` | Owner |
+| `mike@parking.dev` | Owner |
 | `admin@parking.dev` | Manager |
-All 21 users follow `<firstname>@parking.dev` pattern. See `seed.py` for the full list.
+All users follow `<firstname>@parking.dev` pattern. See `seed.py` for the full list.
 
 ## Python Libraries
 

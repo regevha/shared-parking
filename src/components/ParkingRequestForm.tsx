@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Form, DatePicker, Select, Button, Card, Alert, notification, Row, Col, Tag } from 'antd';
+import InfoBanner from './InfoBanner';
 import { useTranslation } from 'react-i18next';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,7 +16,7 @@ interface FormValues {
   duration: number;
 }
 
-const MAX_PENDING_REQUESTS = 5;
+const MAX_PENDING_REQUESTS = 10;
 
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
 
@@ -32,8 +33,12 @@ const ParkingRequestForm: React.FC = () => {
   }));
 
   const activeRequests = useMemo(() => {
+    const today = dayjs().format('YYYY-MM-DD');
     return userRequests
-      .filter(r => r.status === RequestStatus.PENDING || r.status === RequestStatus.APPROVED)
+      .filter(r =>
+        (r.status === RequestStatus.PENDING || r.status === RequestStatus.APPROVED) &&
+        r.date >= today
+      )
       .sort((a, b) => {
         const d = a.date.localeCompare(b.date);
         return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
@@ -267,9 +272,7 @@ const ParkingRequestForm: React.FC = () => {
         </ul>
       </Card>
 
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('requestForm.title')}:</strong> {t('requestForm.info')}
-      </Card>
+      <InfoBanner label={`${t('requestForm.title')}:`} description={t('requestForm.info')} />
     </div>
   );
 };
