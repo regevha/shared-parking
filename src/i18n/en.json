@@ -60,8 +60,10 @@
     "mobile": {
       "date": "Date",
       "time": "Time",
-      "submitted": "Submitted"
+      "submitted": "Submitted",
+      "approvedBy": "Approved by"
     },
+    "approvedByLabel": "By {{name}}",
     "stats": {
       "totalActive": "Total Active",
       "pending": "Pending",
@@ -105,7 +107,8 @@
       "cancelFailedDesc": "Failed to cancel the request. Please try again."
     },
     "durationOption_one": "{{count}} hour",
-    "durationOption_other": "{{count}} hours"
+    "durationOption_other": "{{count}} hours",
+    "autoApproved": "Auto"
   },
   "pendingRequests": {
     "title": "Pending Requests",

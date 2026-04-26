@@ -6,7 +6,6 @@ from datetime import datetime, timezone, date, timedelta
 import json
 import models
 from database import SessionLocal, engine, Base
-from auth import hash_password
 
 Base.metadata.create_all(bind=engine)
 
@@ -44,7 +43,7 @@ LOTS = [
 
 # ── Sample Requests ───────────────────────────────────────────────────────────
 REQUESTS = [
-    # ── Approved (past & present) ─────────────────────────────────────────────
+    # ── Approved (past & future) ─────────────────────────────────────────────
     dict(
         id="REQ-001", requester_id="adm", requester_name="Admin",
         date=_fd(0), start_time="09:00", duration=4, status="approved",
@@ -66,13 +65,13 @@ REQUESTS = [
     dict(
         id="REQ-A03", requester_id="sarah", requester_name="Sarah",
         date=_fd(-1), start_time="14:00", duration=2, status="approved",
-        lot_id="LOT-101-B", floor="Floor 1 (B)", lot_owner="Sarah",
+        lot_id="LOT-203", floor="Floor 2 (C)", lot_owner="Sarah",
         approved_by="Sarah"
     ),
     dict(
         id="REQ-A04", requester_id="adm", requester_name="Admin",
         date=_fd(1), start_time="11:00", duration=3, status="approved",
-        lot_id="LOT-102", floor="Floor 1", lot_owner="Mike",
+        lot_id="LOT-103", floor="Floor 1 (C)", lot_owner="Mike",
         approved_by="Mike"
     ),
     dict(
@@ -84,7 +83,7 @@ REQUESTS = [
     dict(
         id="REQ-A06", requester_id="mike", requester_name="Mike",
         date=_fd(2), start_time="09:00", duration=6, status="approved",
-        lot_id="LOT-101-B", floor="Floor 1 (B)", lot_owner="Sarah",
+        lot_id="LOT-203", floor="Floor 2 (C)", lot_owner="Sarah",
         approved_by="Sarah"
     ),
     dict(

@@ -14,7 +14,7 @@ def get_system_config():
         "timezone": os.getenv("TIMEZONE", "UTC+0 (Server time)"),
         "blackout_start": os.getenv("BLACKOUT_START", "22:00"),
         "blackout_end": os.getenv("BLACKOUT_END", "06:00"),
-        "max_pending_requests_per_user": int(os.getenv("MAX_PENDING_REQUESTS", 5)),
+        "max_pending_requests_per_user": int(os.getenv("MAX_PENDING_REQUESTS", 10)),
     }
 
 

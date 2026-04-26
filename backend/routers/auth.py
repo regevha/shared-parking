@@ -53,6 +53,7 @@ class UserOut(BaseModel):
 
 @router.post("/register", response_model=UserOut, status_code=201)
 def register(payload: RegisterRequest, db: Session = Depends(get_db)):
+    auth_utils._validate_password(payload.password)
     if db.query(models.User).filter(models.User.email == payload.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
