@@ -2,7 +2,7 @@ import os
 import logging
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
@@ -63,8 +63,13 @@ def _run_migrations() -> None:
             try:
                 conn.execute(text(sql))
                 conn.commit()
-            except Exception:
-                pass  # Column already exists — safe to ignore
+            except Exception as e:
+                msg = str(e).lower()
+                if "already exists" in msg or "duplicate column name" in msg:
+                    pass  # expected for idempotent migrations — safe to ignore
+                else:
+                    logger.error(f"Migration failed: {e}", exc_info=True)
+                    raise
 
 _run_migrations()
 
@@ -76,11 +81,16 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown()
 
 
+DEBUG = os.environ.get("DEBUG", "true").lower() == "true"
+
 app = FastAPI(
     title="Parking Management API",
     description="REST API for the shared parking management app",
     version="2.0.0",
     lifespan=lifespan,
+    docs_url="/docs" if DEBUG else None,
+    redoc_url="/redoc" if DEBUG else None,
+    openapi_url="/openapi.json" if DEBUG else None,
 )
 
 # Allow the React dev server (and LAN devices) to call the API.
@@ -88,7 +98,7 @@ app = FastAPI(
 # Set CORS_ORIGINS env var to restrict in production, e.g.:
 #   CORS_ORIGINS=https://parking.example.com
 _raw_origins = os.environ.get("CORS_ORIGINS", "")
-cors_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()] if _raw_origins else ["*"]
+cors_origins = [o.strip() for o in _raw_origins.split(",") if o.strip()] if _raw_origins else ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -97,6 +107,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next) -> Response:
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    return response
 
 app.include_router(auth.router)
 app.include_router(requests.router)

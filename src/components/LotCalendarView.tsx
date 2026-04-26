@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LotData } from '../api/lots';
 import { LotStatus, RequestStatus } from '../types/enums';
 import { getRequestStatusColor, getRequestStatusLabel, getLotStatusTagColor } from '../utils/statusUtils';
+import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './CalendarView.css';
 import './LotCalendarView.css';
@@ -95,6 +96,8 @@ const currentHourSlotPropGetter = (date: Date) => {
   return {};
 };
 
+const yesterday = dayjs().subtract(1, 'day').startOf('day');
+
 const LotCalendarView: React.FC = () => {
   const { pendingRequests, approvedRequests, approveRequest, rejectRequest, ownerLots, allLots } = useRequests();
   const { user } = useAuth();
@@ -131,6 +134,7 @@ const LotCalendarView: React.FC = () => {
   // Booked events — sourced from context so newly approved requests appear immediately
   const bookedEvents = useMemo(() =>
     approvedRequests
+      .filter(a => !dayjs(a.date).isBefore(yesterday))
       .filter(a => {
         if (selectedLot === 'all-system') return true;                          // all lots system-wide
         if (selectedLot === 'all' || selectedLot === 'available')
@@ -151,7 +155,7 @@ const LotCalendarView: React.FC = () => {
   const pendingEvents = useMemo(() =>
     (selectedLot !== 'all' && selectedLot !== 'all-system') ? [] :
     pendingRequests
-      .filter(r => !r.rejectedByOwner && r.status !== 'rejected')
+      .filter(r => !r.rejectedByOwner && r.status !== 'rejected' && !dayjs(r.date).isBefore(yesterday))
       .map(r => ({
         id: `pending-${r.id}`,
         title: `⏳ ${r.requesterName.split(' ')[0]}`,
@@ -573,9 +577,7 @@ const LotCalendarView: React.FC = () => {
       />
 
       {/* Info */}
-      <Card style={{ marginBottom: '16px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>{t('lotCalendarView.infoTitle')}:</strong> {t('lotCalendarView.info')}
-      </Card>
+      <InfoBanner label={`${t('lotCalendarView.infoTitle')}:`} description={t('lotCalendarView.info')} style={{ marginTop: 0, marginBottom: '16px' }} />
 
       {/* Legend */}
       {(() => {

@@ -10,6 +10,7 @@ import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import { RequestStatus } from '../types/enums';
 import EmptyState from './EmptyState';
+import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './MyRequests.css';
 
@@ -26,6 +27,8 @@ const HOUR_OPTIONS = [
   '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
   '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ];
+
+const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const MyRequests: React.FC = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -70,9 +73,12 @@ const MyRequests: React.FC = () => {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Filter to show only PENDING and APPROVED requests, newest date+time first
+  // Filter to show only PENDING and APPROVED requests from yesterday onwards
   const visibleRequests = userRequests
-    .filter((req: ParkingRequest) => req.status === 'pending' || req.status === 'approved')
+    .filter((req: ParkingRequest) =>
+      (req.status === 'pending' || req.status === 'approved') &&
+      !dayjs(req.date).isBefore(yesterday)
+    )
     .sort((a, b) => {
       const d = a.date.localeCompare(b.date);
       return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
@@ -199,14 +205,21 @@ const MyRequests: React.FC = () => {
       key: 'status',
       width: 90,
       render: (_: any, record: ParkingRequest) => (
-        <>
-          <Tag color={getRequestStatusColor(record.status)}>
-            {t(getRequestStatusLabel(record.status))}
-          </Tag>
-          {record.approvedBy === 'auto' && (
-            <Tag color="purple" style={{ fontSize: '11px' }}>Auto</Tag>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div>
+            <Tag color={getRequestStatusColor(record.status)}>
+              {t(getRequestStatusLabel(record.status))}
+            </Tag>
+            {record.approvedBy === 'auto' && (
+              <Tag color="purple" style={{ fontSize: '11px' }}>{t('myRequests.autoApproved')}</Tag>
+            )}
+          </div>
+          {record.status === RequestStatus.APPROVED && record.approvedBy && record.approvedBy !== 'auto' && (
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary, #888)' }}>
+              {t('myRequests.approvedByLabel', { name: record.approvedBy })}
+            </span>
           )}
-        </>
+        </div>
       ),
     },
     {
@@ -287,9 +300,9 @@ const MyRequests: React.FC = () => {
               <div className="request-card-header">
                 <strong>{record.id}</strong>
                 <div>
-                  <Tag color={getRequestStatusColor(record.status)}>{getRequestStatusLabel(record.status)}</Tag>
+                  <Tag color={getRequestStatusColor(record.status)}>{t(getRequestStatusLabel(record.status))}</Tag>
                   {record.approvedBy === 'auto' && (
-                    <Tag color="purple" style={{ fontSize: '11px' }}>Auto</Tag>
+                    <Tag color="purple" style={{ fontSize: '11px' }}>{t('myRequests.autoApproved')}</Tag>
                   )}
                 </div>
               </div>
@@ -305,6 +318,16 @@ const MyRequests: React.FC = () => {
                 <span className="request-card-label">{t('myRequests.mobile.submitted')}</span>
                 <span>{dayjs(record.submittedAt).format('DD/MM/YYYY HH:mm')}</span>
               </div>
+              {record.status === RequestStatus.APPROVED && record.approvedBy && (
+                <div className="request-card-row">
+                  <span className="request-card-label">{t('myRequests.mobile.approvedBy')}</span>
+                  <span>
+                    {record.approvedBy === 'auto'
+                      ? t('myRequests.autoApproved')
+                      : record.approvedBy}
+                  </span>
+                </div>
+              )}
               <div className="request-card-actions">
                 {record.status === 'pending' && (
                   <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
@@ -350,10 +373,7 @@ const MyRequests: React.FC = () => {
         ]}
       />
 
-      {/* Info */}
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('myRequests.title')}:</strong> {t('myRequests.info')}
-      </Card>
+      <InfoBanner label={`${t('myRequests.title')}:`} description={t('myRequests.info')} />
 
       {/* Edit Modal */}
       <Modal

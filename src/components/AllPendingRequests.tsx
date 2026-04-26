@@ -8,11 +8,14 @@ import { UserRole } from '../types/enums';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import EmptyState from './EmptyState';
+import InfoBanner from './InfoBanner';
 import './AllPendingRequests.css';
 
 interface AllPendingRequestsProps {
   role: UserRole;
 }
+
+const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const isOwner = role === UserRole.OWNER;
@@ -35,7 +38,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   // Filter requests
   const filteredRequests = useMemo(() => {
-    let filtered = [...pendingRequests];
+    let filtered = pendingRequests.filter(req => !dayjs(req.date).isBefore(yesterday));
 
     if (isOwner && filterMode === 'active') {
       filtered = filtered.filter((req) => !req.rejectedByOwner);
@@ -377,9 +380,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
         </>
       )}
 
-      <Card style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }} size="small">
-        <strong>{t('pendingRequests.title')}:</strong> {isOwner ? t('pendingRequests.infoOwner') : t('pendingRequests.infoManager')}
-      </Card>
+      <InfoBanner label={`${t('pendingRequests.title')}:`} description={isOwner ? t('pendingRequests.infoOwner') : t('pendingRequests.infoManager')} />
     </div>
   );
 };

@@ -60,15 +60,17 @@
     "mobile": {
       "date": "Date",
       "time": "Heure",
-      "submitted": "Soumis"
+      "submitted": "Soumis",
+      "approvedBy": "Approuvé par"
     },
+    "approvedByLabel": "Par {{name}}",
     "stats": {
       "totalActive": "Total Actif",
       "pending": "En Attente",
       "approved": "Approuvé",
       "rejected": "Rejeté"
     },
-    "info": "Gérez vos demandes de parking actives. Les demandes en attente peuvent être modifiées ; toute demande active peut être annulée. Les demandes rejetées ne sont pas affichées.",
+    "info": "Gérez vos demandes de parking actives. Les demandes en attente peuvent être modifiées ; toute demande active peut être annulée. Les demandes rejetées ne sont pas affichées. Affiche les demandes à partir d'hier.",
     "cancelConfirm": {
       "title": "Annuler la Demande",
       "description": "Êtes-vous sûr de vouloir annuler la demande {{id}} ?",
@@ -105,7 +107,8 @@
       "cancelFailedDesc": "Échec de l'annulation de la demande. Veuillez réessayer."
     },
     "durationOption_one": "{{count}} heure",
-    "durationOption_other": "{{count}} heures"
+    "durationOption_other": "{{count}} heures",
+    "autoApproved": "Auto"
   },
   "pendingRequests": {
     "title": "Demandes en Attente",
@@ -158,8 +161,8 @@
       "pending": "En Attente",
       "rejectedByYou": "Rejeté par Vous"
     },
-    "infoOwner": "Liste toutes les demandes de parking en attente de votre approbation. Les demandes déjà rejetées sont affichées en gris.",
-    "infoManager": "Liste toutes les demandes de parking en attente de l'approbation du propriétaire."
+    "infoOwner": "Liste toutes les demandes de parking en attente de votre approbation. Les demandes déjà rejetées sont affichées en gris. Affiche les demandes à partir d'hier.",
+    "infoManager": "Liste toutes les demandes de parking en attente de l'approbation du propriétaire. Affiche les demandes à partir d'hier."
   },
   "approvals": {
     "title": "Approbations",
@@ -194,7 +197,7 @@
       "today": "Approuvé Aujourd'hui",
       "thisWeek": "Cette Semaine"
     },
-    "info": "Historique complet de toutes les demandes de parking approuvées."
+    "info": "Historique complet de toutes les demandes de parking approuvées. Affiche les demandes à partir d'hier."
   },
   "requestForm": {
     "title": "Soumettre une Demande",
@@ -264,7 +267,7 @@
       "rejected": "Rejeté"
     },
     "infoTitle": "Vue Calendrier",
-    "info": "Vue d'ensemble de toutes les demandes.",
+    "info": "Vue d'ensemble de toutes les demandes. Affiche les demandes à partir d'hier.",
     "legendTitle": "Légende",
     "legend": {
       "pending": "En Attente",
@@ -315,7 +318,7 @@
       "availableWindows": "Fenêtres Disponibles"
     },
     "infoTitle": "Calendrier des Places",
-    "info": "Suivi des réservations et blocages de vos places.",
+    "info": "Suivi des réservations et blocages de vos places. Affiche les demandes à partir d'hier.",
     "legendTitle": "Légende",
     "legend": {
       "booked": "Réservé",

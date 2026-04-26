@@ -11,6 +11,9 @@ import { useRequests } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { availabilityApi, type AvailabilityWindowData, DAY_LABELS } from '../api/availability';
 import type { LotData } from '../api/lots';
+import { usersApi } from '../api/users';
+import type { AvailabilityWindow } from '../api/auth';
+import InfoBanner from './InfoBanner';
 import './AvailabilityWindows.css';
 
 const DOW_OPTIONS = Object.entries(DAY_LABELS).map(([v, label]) => ({
