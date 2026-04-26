@@ -27,6 +27,8 @@ const HOUR_OPTIONS = [
   '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ];
 
+const yesterday = dayjs().subtract(1, 'day').startOf('day');
+
 const MyRequests: React.FC = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingRequest, setEditingRequest] = useState<ParkingRequest | null>(null);
@@ -70,9 +72,12 @@ const MyRequests: React.FC = () => {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Filter to show only PENDING and APPROVED requests, newest date+time first
+  // Filter to show only PENDING and APPROVED requests from yesterday onwards
   const visibleRequests = userRequests
-    .filter((req: ParkingRequest) => req.status === 'pending' || req.status === 'approved')
+    .filter((req: ParkingRequest) =>
+      (req.status === 'pending' || req.status === 'approved') &&
+      !dayjs(req.date).isBefore(yesterday)
+    )
     .sort((a, b) => {
       const d = a.date.localeCompare(b.date);
       return d !== 0 ? d : a.startTime.localeCompare(b.startTime);
