@@ -15,6 +15,8 @@ interface AllPendingRequestsProps {
   role: UserRole;
 }
 
+const yesterday = dayjs().subtract(1, 'day').startOf('day');
+
 const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const isOwner = role === UserRole.OWNER;
   const isManager = role === UserRole.MANAGER;
@@ -36,7 +38,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   // Filter requests
   const filteredRequests = useMemo(() => {
-    let filtered = [...pendingRequests];
+    let filtered = pendingRequests.filter(req => !dayjs(req.date).isBefore(yesterday));
 
     if (isOwner && filterMode === 'active') {
       filtered = filtered.filter((req) => !req.rejectedByOwner);

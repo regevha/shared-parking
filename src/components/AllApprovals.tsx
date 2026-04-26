@@ -11,6 +11,8 @@ import EmptyState from './EmptyState';
 import InfoBanner from './InfoBanner';
 import './AllApprovals.css';
 
+const yesterday = dayjs().subtract(1, 'day').startOf('day');
+
 const AllApprovals: React.FC = () => {
   const { approvedRequests, loading } = useRequests();
   const { user } = useAuth();
@@ -147,10 +149,12 @@ const AllApprovals: React.FC = () => {
     },
   ];
 
+  const recentApprovedRequests = approvedRequests.filter(a => !dayjs(a.date).isBefore(yesterday));
+
   const stats = {
-    total: approvedRequests.length,
-    today: approvedRequests.filter(a => a.date === new Date().toISOString().split('T')[0]).length,
-    thisWeek: approvedRequests.filter(a => {
+    total: recentApprovedRequests.length,
+    today: recentApprovedRequests.filter(a => a.date === new Date().toISOString().split('T')[0]).length,
+    thisWeek: recentApprovedRequests.filter(a => {
       if (!a.approvedAt) return false;
       const approvalDate = new Date(a.approvedAt);
       const weekAgo = new Date();
@@ -160,7 +164,7 @@ const AllApprovals: React.FC = () => {
   };
 
   const filteredRequests = React.useMemo(() => {
-    let filtered = [...approvedRequests];
+    let filtered = approvedRequests.filter(a => !dayjs(a.date).isBefore(yesterday));
 
     if (searchText.trim()) {
       const q = searchText.toLowerCase();

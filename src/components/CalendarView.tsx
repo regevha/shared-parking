@@ -86,6 +86,8 @@ const currentHourSlotPropGetter = (date: Date) => {
   return {};
 };
 
+const yesterday = dayjs().subtract(1, 'day').startOf('day');
+
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const { pendingRequests, approvedRequests, userRequests, updateUserRequest } = useRequests();
   const { t } = useTranslation();
@@ -134,7 +136,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   };
 
   const events: CalendarEvent[] = useMemo(() =>
-    allRequests.map((req) => ({
+    allRequests
+      .filter(req => !dayjs(req.date).isBefore(yesterday))
+      .map((req) => ({
       id: req.id,
       title: `${myRequestIds.has(req.id) ? '★ ' : ''}${req.requesterName.split(' ')[0]}`,
       start: new Date(`${req.date}T${req.startTime}:00`),

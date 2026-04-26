@@ -70,7 +70,7 @@
       "approved": "Approved",
       "rejected": "Rejected"
     },
-    "info": "Manage your active parking requests. Pending requests can be edited; any active request can be cancelled. Rejected requests are not shown.",
+    "info": "Manage your active parking requests. Pending requests can be edited; any active request can be cancelled. Rejected requests are not shown. Showing requests from yesterday onwards.",
     "cancelConfirm": {
       "title": "Cancel Request",
       "description": "Are you sure you want to cancel request {{id}}?",
@@ -161,8 +161,8 @@
       "pending": "Pending",
       "rejectedByYou": "Rejected by You"
     },
-    "infoOwner": "Lists all parking requests awaiting your approval. Requests you have already rejected are shown in grey.",
-    "infoManager": "Lists all parking requests currently awaiting owner approval."
+    "infoOwner": "Lists all parking requests awaiting your approval. Requests you have already rejected are shown in grey. Showing requests from yesterday onwards.",
+    "infoManager": "Lists all parking requests currently awaiting owner approval. Showing requests from yesterday onwards."
   },
   "approvals": {
     "title": "Approvals",
@@ -197,7 +197,7 @@
       "today": "Approved Today",
       "thisWeek": "This Week"
     },
-    "info": "A complete history of all approved parking requests across the system."
+    "info": "A complete history of all approved parking requests across the system. Showing requests from yesterday onwards."
   },
   "requestForm": {
     "title": "Submit Parking Request",
@@ -267,7 +267,7 @@
       "rejected": "Rejected"
     },
     "infoTitle": "Requests View",
-    "info": "A calendar overview of all parking requests — pending, approved, and rejected.",
+    "info": "A calendar overview of all parking requests — pending, approved, and rejected. Showing requests from yesterday onwards.",
     "legendTitle": "Legend",
     "legend": {
       "pending": "Pending",
@@ -318,7 +318,7 @@
       "availableWindows": "Available Windows"
     },
     "infoTitle": "Lot Calendar",
-    "info": "A calendar view of your lots showing bookings, pending requests, and blocked periods.",
+    "info": "A calendar view of your lots showing bookings, pending requests, and blocked periods. Showing requests from yesterday onwards.",
     "legendTitle": "Legend",
     "legend": {
       "booked": "Booked",
