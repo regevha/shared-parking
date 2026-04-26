@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
 from enum import Enum
+from datetime import datetime
 
 
 class UserRole(str, Enum):
@@ -106,6 +107,21 @@ class Lot(Base):
     blocked_until = Column(String, nullable=True)
     created_at = Column(String, nullable=True)             # ISO string — set on creation
     updated_at = Column(String, nullable=True)             # ISO string — set on every update
+
+
+class LotAvailabilityWindow(Base):
+    __tablename__ = "lot_availability_windows"
+
+    id = Column(Integer, primary_key=True, index=True)
+    lot_id = Column(String, ForeignKey("lots.id", ondelete="CASCADE"), nullable=False, index=True)
+    # Recurring weekly slot: 0=Mon … 6=Sun; NULL means specific_date override
+    day_of_week = Column(Integer, nullable=True)
+    # One-time date override: "YYYY-MM-DD"; supersedes day_of_week when set
+    specific_date = Column(String, nullable=True)
+    start_time = Column(String, nullable=False)   # "HH:MM"
+    end_time = Column(String, nullable=False)     # "HH:MM"
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(String, nullable=True)
 
 
 class AuditLog(Base):

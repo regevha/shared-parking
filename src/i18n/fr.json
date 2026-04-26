@@ -442,47 +442,43 @@
     }
   },
   "availabilityWindows": {
-    "title": "Disponibilité",
-    "blackoutAlert": {
-      "message": "Partage restreint entre 22h et 06h",
-      "description": "Sécurité : pas de partage nocturne."
+    "title": "Disponibilité des Places",
+    "infoAlert": {
+      "message": "Les places sont bloquées par défaut",
+      "description": "Les demandes ne peuvent être auto-approuvées qu'aux créneaux que vous définissez ici."
     },
-    "saving": "Enregistrement...",
-    "days": {
-      "monday": "Lundi",
-      "tuesday": "Mardi",
-      "wednesday": "Mercredi",
-      "thursday": "Jeudi",
-      "friday": "Vendredi",
-      "saturday": "Samedi",
-      "sunday": "Dimanche"
-    },
-    "noWindows": "Fermé au partage",
+    "noLotsMessage": "Vous n'avez aucune place assignée. Contactez un gestionnaire.",
+    "noWindowsLot": "Aucun créneau — cette place est entièrement bloquée",
     "addWindow": "Ajouter un créneau",
-    "maxWindows": "Max {{max}} par jour",
+    "columns": {
+      "schedule": "Programmation",
+      "time": "Horaire",
+      "active": "Actif"
+    },
     "modal": {
-      "title": "Ajouter — {{day}}",
+      "title": "Ajouter un créneau — {{lot}}",
       "okText": "Ajouter",
+      "slotTypeLabel": "Type de créneau",
+      "recurring": "Récurrent (hebdomadaire)",
+      "specificDate": "Ponctuel (date précise)",
+      "dayLabel": "Jour de la semaine",
+      "dayRequired": "Veuillez sélectionner un jour",
+      "dayPlaceholder": "Choisir un jour",
+      "dateLabel": "Date",
+      "dateRequired": "Veuillez sélectionner une date",
       "timeRangeLabel": "Plage horaire",
-      "timeRangeRequired": "Veuillez sélectionner",
+      "timeRangeRequired": "Veuillez sélectionner une plage",
       "endAfterStart": "Fin après début",
       "startPlaceholder": "Début",
       "endPlaceholder": "Fin"
-    },
-    "blackoutWarning": {
-      "title": "Restriction Nocturne",
-      "content": "Chevauchement 22h-06h. Non autorisé.",
-      "ok": "Ajuster & Sauver",
-      "cancel": "Annuler"
     },
     "notifications": {
       "loadFailed": "Échec chargement",
       "saveFailed": "Échec sauvegarde",
       "removed": "Créneau supprimé",
-      "overlap": "Chevauchement !",
       "added": "Créneau ajouté"
     },
-    "info": "Quand votre place est-elle partageable ? Libre par défaut hors de ces créneaux."
+    "info": "Définissez quand chaque place est ouverte au partage. Les places sont bloquées par défaut."
   },
   "notificationWindows": {
     "title": "Préférences Notifications",

@@ -3,7 +3,6 @@ import os
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone, timedelta
 import datetime as dt_mod
-import json
 from typing import List
 
 from database import get_db
@@ -107,58 +106,63 @@ def _is_outside_availability(
     end_time: str,
 ) -> bool:
     """
-    Return True if the slot is NOT fully contained within the owner's availability windows.
+    Return True if the slot is NOT fully contained within the lot's availability windows.
+    Lots are blocked by default: if no active windows exist for a day, that day is blocked.
     Checked day-by-day for multi-day requests.
+    Specific-date windows take precedence over recurring day_of_week windows.
     """
     if not lot_id:
         return False
 
     lot = db.query(models.Lot).filter(models.Lot.id == lot_id).first()
+    # Unowned lots have no availability windows — allow any time
     if not lot or not lot.owner_id:
         return False
 
-    prefs = db.query(models.UserPreferences).filter(models.UserPreferences.user_id == lot.owner_id).first()
-    if not prefs:
+    active_windows = (
+        db.query(models.LotAvailabilityWindow)
+        .filter(
+            models.LotAvailabilityWindow.lot_id == lot_id,
+            models.LotAvailabilityWindow.is_active == True,
+        )
+        .all()
+    )
+    # No windows defined at all → lot is completely blocked
+    if not active_windows:
         return True
 
     try:
-        current_dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
-        end_dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
-        
-        windows_raw = json.loads(prefs.availability_windows or '{}')
+        start_dt = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+        end_dt   = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
 
-        # We evaluate the span day by day
-        check_dt = current_dt
+        check_dt = start_dt
         while check_dt < end_dt:
-            day_name = check_dt.strftime('%A')
-            day_slots = windows_raw.get(day_name, [])
-            
-            # Determine the segment of this request that falls on THIS day
-            segment_start_str = check_dt.strftime("%H:%M")
-            
-            # If end_dt is on the same day as check_dt
-            if end_dt.date() == check_dt.date():
-                segment_end_str = end_dt.strftime("%H:%M")
-            else:
-                segment_end_str = "23:59"
+            date_str = check_dt.strftime("%Y-%m-%d")
+            dow      = check_dt.weekday()  # 0=Mon … 6=Sun
 
-            # Check if THIS segment is covered by any window on THIS day
-            segment_covered = False
-            for slot in day_slots:
-                # If segment_end_str is 23:59, we treat it as being covered if the slot ends at 23:59
-                if segment_start_str >= slot['startTime'] and segment_end_str <= slot['endTime']:
-                    segment_covered = True
-                    break
-            
-            if not segment_covered:
+            segment_start = check_dt.strftime("%H:%M")
+            if end_dt.date() == check_dt.date():
+                segment_end = end_dt.strftime("%H:%M")
+            else:
+                segment_end = "23:59"
+
+            # Specific-date windows override recurring ones for this day
+            specific = [w for w in active_windows if w.specific_date == date_str]
+            recurring = [w for w in active_windows if w.specific_date is None and w.day_of_week == dow]
+            day_windows = specific if specific else recurring
+
+            covered = any(
+                segment_start >= w.start_time and segment_end <= w.end_time
+                for w in day_windows
+            )
+            if not covered:
                 return True
-            
-            # Move to the start of the next day (00:00)
+
             next_day = check_dt.date() + timedelta(days=1)
             check_dt = datetime.combine(next_day, datetime.min.time())
-        
+
         return False
-    except (ValueError, json.JSONDecodeError, KeyError):
+    except (ValueError, AttributeError):
         return True
 
 
@@ -272,10 +276,15 @@ def approve_request(
                 status_code=409,
                 detail=f"Time slot conflict: lot {payload.lot_id} is already approved for request {conflict_id} during this period",
             )
-
-    # Check availability slots (Allow manual override for managers/owners if they explicitly approve)
-    # However, to be helpful, we can keep it as a soft warning or just allow it if it's manual.
-    # The user is experiencing a hard error here, let's remove it for manual approval.
+        # Managers may override availability; owners respect their own windows
+        is_manager = current_user.role == models.UserRole.MANAGER.value
+        if not is_manager and _is_outside_availability(
+            db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time
+        ):
+            raise HTTPException(
+                status_code=403,
+                detail="Lot is not available at the requested time. Define an availability window first, or ask a manager to override.",
+            )
 
     now = datetime.now(timezone.utc).isoformat()
     req.status = models.RequestStatus.APPROVED.value

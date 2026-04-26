@@ -443,46 +443,42 @@
   },
   "availabilityWindows": {
     "title": "Lot Availability Settings",
-    "blackoutAlert": {
-      "message": "Lot sharing is restricted between 22:00 and 06:00",
-      "description": "System-wide security policy prevents parking sharing during late-night hours."
+    "infoAlert": {
+      "message": "Lots are blocked by default",
+      "description": "Parking requests can only be auto-approved during the availability windows you define here. Add a window for each lot to open it for sharing."
     },
-    "saving": "Saving availability...",
-    "days": {
-      "monday": "Monday",
-      "tuesday": "Tuesday",
-      "wednesday": "Wednesday",
-      "thursday": "Thursday",
-      "friday": "Friday",
-      "saturday": "Saturday",
-      "sunday": "Sunday"
+    "noLotsMessage": "You have no lots assigned. Ask a manager to assign lots to your account.",
+    "noWindowsLot": "No availability windows — this lot is fully blocked",
+    "addWindow": "Add Window",
+    "columns": {
+      "schedule": "Schedule",
+      "time": "Time",
+      "active": "Active"
     },
-    "noWindows": "Closed for sharing — no windows set",
-    "addWindow": "Add Availability Window",
-    "maxWindows": "Maximum {{max}} slots per day",
     "modal": {
-      "title": "Add Availability Slot — {{day}}",
-      "okText": "Add Slot",
+      "title": "Add Availability Window — {{lot}}",
+      "okText": "Add Window",
+      "slotTypeLabel": "Window Type",
+      "recurring": "Recurring (weekly)",
+      "specificDate": "One-time (specific date)",
+      "dayLabel": "Day of week",
+      "dayRequired": "Please select a day",
+      "dayPlaceholder": "Select day",
+      "dateLabel": "Date",
+      "dateRequired": "Please select a date",
       "timeRangeLabel": "Time Range",
       "timeRangeRequired": "Please select a time range",
       "endAfterStart": "End time must be after start time",
       "startPlaceholder": "Start time",
       "endPlaceholder": "End time"
     },
-    "blackoutWarning": {
-      "title": "Late Night Restriction",
-      "content": "This slot overlaps with the overnight restriction (22:00–06:00). Sharing is not permitted during this time.",
-      "ok": "Trim & Save",
-      "cancel": "Cancel"
-    },
     "notifications": {
       "loadFailed": "Failed to load availability settings",
       "saveFailed": "Failed to save availability settings",
-      "removed": "Availability slot removed",
-      "overlap": "This time range overlaps with an existing slot",
-      "added": "Availability slot added"
+      "removed": "Availability window removed",
+      "added": "Availability window added"
     },
-    "info": "Define the time slots when your lot is available for others to request. Your lot is blocked by default outside of these windows. Up to {{max}} slots per day."
+    "info": "Define when each of your lots is open for sharing. Lots are blocked by default — auto-approval only assigns lots that have an active window covering the requested time."
   },
   "notificationWindows": {
     "title": "Notification Preferences",
