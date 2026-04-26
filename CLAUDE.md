@@ -39,17 +39,12 @@ Backend role strings → frontend `Role` type mapping:
 Role is derived from the JWT — no manual dropdown.
 
 ## Demo Accounts (password: `password123`)
-| Email | Name | Role |
-|-------|------|------|
-| `u1@parking.dev` | Tom | User |
-| `u2@parking.dev` | Amy | User |
-| `o1@parking.dev` | Sarah | Owner |
-| `o2@parking.dev` | Mike | Owner |
-| `o3@parking.dev` | Lisa | Owner |
-| `a1@parking.dev` | David | Manager |
-| `a2@parking.dev` | Emma | Manager |
-
-All 7 users follow `<id>@parking.dev` pattern. See `seed.py` for the full list.
+| Email | Role |
+|-------|------|
+| `sarah@parking.dev` | Owner |
+| `mike@parking.dev` | Owner |
+| `admin@parking.dev` | Manager |
+All users follow `<firstname>@parking.dev` pattern. See `seed.py` for the full list.
 
 ## Python Libraries
 
