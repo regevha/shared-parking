@@ -289,3 +289,73 @@ class NotificationOut(BaseModel):
 class BroadcastPayload(BaseModel):
     audience: str # both | users | owners
     message: str
+
+
+# ── Lot Availability Windows ──────────────────────────────────────────────────
+
+_DOW_RE = re.compile(r'^[0-6]$')
+
+
+class LotAvailabilityWindowCreate(BaseModel):
+    day_of_week: Optional[int] = None     # 0=Mon … 6=Sun; mutually exclusive with specific_date
+    specific_date: Optional[str] = None   # "YYYY-MM-DD"
+    start_time: str
+    end_time: str
+
+    @field_validator('start_time', 'end_time')
+    @classmethod
+    def validate_time(cls, v: str) -> str:
+        if not _TIME_RE.match(v):
+            raise ValueError('time must be in HH:MM format')
+        return v
+
+    @field_validator('day_of_week')
+    @classmethod
+    def validate_dow(cls, v: Optional[int]) -> Optional[int]:
+        if v is not None and not (0 <= v <= 6):
+            raise ValueError('day_of_week must be 0 (Mon) … 6 (Sun)')
+        return v
+
+    @field_validator('specific_date')
+    @classmethod
+    def validate_specific_date(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not _DATE_RE.match(v):
+            raise ValueError('specific_date must be YYYY-MM-DD')
+        return v
+
+    @model_validator(mode='after')
+    def validate_exclusive(self) -> 'LotAvailabilityWindowCreate':
+        if self.day_of_week is None and self.specific_date is None:
+            raise ValueError('Provide either day_of_week or specific_date')
+        if self.day_of_week is not None and self.specific_date is not None:
+            raise ValueError('Provide only one of day_of_week or specific_date, not both')
+        if self.start_time >= self.end_time:
+            raise ValueError('end_time must be after start_time')
+        return self
+
+
+class LotAvailabilityWindowUpdate(BaseModel):
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    is_active: Optional[bool] = None
+
+    @field_validator('start_time', 'end_time')
+    @classmethod
+    def validate_time(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not _TIME_RE.match(v):
+            raise ValueError('time must be in HH:MM format')
+        return v
+
+
+class LotAvailabilityWindowOut(BaseModel):
+    id: int
+    lot_id: str
+    day_of_week: Optional[int] = None
+    specific_date: Optional[str] = None
+    start_time: str
+    end_time: str
+    is_active: bool
+    created_at: Optional[str] = None
+
+    class Config:
+        from_attributes = True

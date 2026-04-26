@@ -1,176 +1,328 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Button, TimePicker, Alert, Space, Row, Col, Tag, Modal, Form, notification, Spin, Skeleton } from 'antd';
-import { PlusOutlined, DeleteOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Card, Button, TimePicker, Space, Row, Col, Tag, Modal, Form,
+  notification, Spin, Skeleton, Switch, Table, Select, DatePicker, Alert, Tabs,
+} from 'antd';
+import { PlusOutlined, DeleteOutlined, ClockCircleOutlined, CarOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
+import type { ColumnsType } from 'antd/es/table';
+import { useRequests } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
+import { availabilityApi, type AvailabilityWindowData, DAY_LABELS } from '../api/availability';
+import type { LotData } from '../api/lots';
 import { usersApi } from '../api/users';
 import type { AvailabilityWindow } from '../api/auth';
 import InfoBanner from './InfoBanner';
 import './AvailabilityWindows.css';
 
-interface DayWindows {
-  [key: string]: AvailabilityWindow[];
-}
+const DOW_OPTIONS = Object.entries(DAY_LABELS).map(([v, label]) => ({
+  value: Number(v),
+  label,
+}));
 
-const DAYS_OF_WEEK = [
-  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
-];
-
-const MAX_WINDOWS_PER_DAY = 5;
-
-// Ensure every day of the week has an entry (even if empty)
-function normalise(raw: Record<string, AvailabilityWindow[]>): DayWindows {
-  const out: DayWindows = {};
-  DAYS_OF_WEEK.forEach(day => { out[day] = raw[day] ?? []; });
-  return out;
-}
-
-// Convert HH:MM to minutes since midnight
-function timeToMinutes(time: string): number {
-  const [h, m] = time.split(':').map(Number);
-  return h * 60 + m;
-}
-
-function timeRangesOverlap(s1: string, e1: string, s2: string, e2: string): boolean {
-  return timeToMinutes(s1) < timeToMinutes(e2) && timeToMinutes(e1) > timeToMinutes(s2);
-}
+type WindowsByLot = Record<string, AvailabilityWindowData[]>;
 
 const AvailabilityWindows: React.FC = () => {
-  const { user, updateUser } = useAuth();
+  const { ownerLots, loading: lotsLoading } = useRequests();
+  const { user } = useAuth();
   const { t } = useTranslation();
-  const [windows, setWindows] = useState<DayWindows>(normalise({}));
-  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+
+  const [windowsByLot, setWindowsByLot] = useState<WindowsByLot>({});
+  const [windowsLoading, setWindowsLoading] = useState(true);
+  const [addModalLot, setAddModalLot] = useState<LotData | null>(null);
   const [saving, setSaving] = useState(false);
-  const [addModalVisible, setAddModalVisible] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<string>('');
   const [form] = Form.useForm();
+  const [slotType, setSlotType] = useState<'recurring' | 'specific'>('recurring');
 
   useEffect(() => {
-    if (!user) return;
-    usersApi.getPreferences(user.id)
-      .then(prefs => setWindows(normalise(prefs.availabilityWindows)))
-      .catch(() => notification.error({ message: t('availabilityWindows.notifications.loadFailed') }))
-      .finally(() => setLoading(false));
-  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    const mq = window.matchMedia('(max-width: 768px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
-  const persist = async (next: DayWindows) => {
-    if (!user) return;
-    setSaving(true);
+  const loadAllWindows = useCallback(async (lots: LotData[]) => {
+    if (!lots.length) { setWindowsLoading(false); return; }
+    setWindowsLoading(true);
     try {
-      const updated = await usersApi.updatePreferences(user.id, {
-        availability_windows: JSON.stringify(next),
-      });
-      updateUser({ preferences: { ...user.preferences, availabilityWindows: updated.availabilityWindows } });
+      const results = await Promise.all(lots.map(l => availabilityApi.list(l.id)));
+      const map: WindowsByLot = {};
+      lots.forEach((l, i) => { map[l.id] = results[i]; });
+      setWindowsByLot(map);
     } catch {
-      notification.error({ message: t('availabilityWindows.notifications.saveFailed') });
+      notification.error({ message: t('availabilityWindows.notifications.loadFailed') });
+    } finally {
+      setWindowsLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    if (!lotsLoading) {
+      loadAllWindows(ownerLots);
+    }
+  }, [lotsLoading, ownerLots, loadAllWindows]);
+
+  const handleAddClick = (lot: LotData) => {
+    setAddModalLot(lot);
+    setSlotType('recurring');
+    form.resetFields();
+  };
+
+  const handleModalOk = async () => {
+    if (!addModalLot) return;
+    try {
+      const values = await form.validateFields();
+      setSaving(true);
+      const payload: any = {
+        start_time: values.timeRange[0].format('HH:mm'),
+        end_time: values.timeRange[1].format('HH:mm'),
+      };
+      if (slotType === 'recurring') {
+        payload.day_of_week = values.day_of_week;
+      } else {
+        payload.specific_date = values.specific_date.format('YYYY-MM-DD');
+      }
+      const created = await availabilityApi.create(addModalLot.id, payload);
+      setWindowsByLot(prev => ({
+        ...prev,
+        [addModalLot.id]: [...(prev[addModalLot.id] ?? []), created],
+      }));
+      setAddModalLot(null);
+      notification.success({ message: t('availabilityWindows.notifications.added') });
+    } catch (err: any) {
+      if (err?.errorFields) return; // form validation error — stay open
+      notification.error({ message: err?.message ?? t('availabilityWindows.notifications.saveFailed') });
     } finally {
       setSaving(false);
     }
   };
 
-  const handleAddWindow = (day: string) => {
-    setSelectedDay(day);
-    setAddModalVisible(true);
-    form.resetFields();
+  const handleToggle = async (lotId: string, win: AvailabilityWindowData) => {
+    try {
+      const updated = await availabilityApi.update(lotId, win.id, { is_active: !win.isActive });
+      setWindowsByLot(prev => ({
+        ...prev,
+        [lotId]: (prev[lotId] ?? []).map(w => w.id === win.id ? updated : w),
+      }));
+    } catch {
+      notification.error({ message: t('availabilityWindows.notifications.saveFailed') });
+    }
   };
 
-  const handleDeleteWindow = async (day: string, windowId: string) => {
-    const next = { ...windows, [day]: windows[day].filter(w => w.id !== windowId) };
-    setWindows(next);
-    await persist(next);
-    notification.success({ message: t('availabilityWindows.notifications.removed') });
+  const handleDelete = async (lotId: string, windowId: number) => {
+    try {
+      await availabilityApi.delete(lotId, windowId);
+      setWindowsByLot(prev => ({
+        ...prev,
+        [lotId]: (prev[lotId] ?? []).filter(w => w.id !== windowId),
+      }));
+      notification.success({ message: t('availabilityWindows.notifications.removed') });
+    } catch {
+      notification.error({ message: t('availabilityWindows.notifications.saveFailed') });
+    }
   };
 
-  const handleModalOk = () => {
-    form.validateFields().then(values => {
-      const startTime = values.timeRange[0].format('HH:mm');
-      const endTime   = values.timeRange[1].format('HH:mm');
+  const windowColumns = (lotId: string): ColumnsType<AvailabilityWindowData> => [
+    {
+      title: t('availabilityWindows.columns.schedule'),
+      key: 'schedule',
+      render: (_, w) =>
+        w.specificDate
+          ? <Tag color="purple">{dayjs(w.specificDate).format('DD/MM/YYYY')}</Tag>
+          : <Tag color="blue">{DAY_LABELS[w.dayOfWeek!]}</Tag>,
+    },
+    {
+      title: t('availabilityWindows.columns.time'),
+      key: 'time',
+      render: (_, w) => <Tag color="green">{w.startTime} – {w.endTime}</Tag>,
+    },
+    {
+      title: t('availabilityWindows.columns.active'),
+      key: 'active',
+      width: 80,
+      render: (_, w) => (
+        <Switch
+          checked={w.isActive}
+          size="small"
+          onChange={() => handleToggle(lotId, w)}
+        />
+      ),
+    },
+    {
+      title: '',
+      key: 'delete',
+      width: 48,
+      render: (_, w) => (
+        <Button
+          type="text"
+          size="small"
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => handleDelete(lotId, w.id)}
+        />
+      ),
+    },
+  ];
 
-      const hasOverlap = (windows[selectedDay] || []).some(w =>
-        timeRangesOverlap(startTime, endTime, w.startTime, w.endTime)
-      );
-      if (hasOverlap) {
-        notification.error({ message: t('availabilityWindows.notifications.overlap') });
-        return;
-      }
-
-      saveWindow(startTime, endTime);
-    });
-  };
-
-  const saveWindow = async (startTime: string, endTime: string) => {
-    const newWindow: AvailabilityWindow = { id: Date.now().toString(), startTime, endTime };
-    const next = { ...windows, [selectedDay]: [...(windows[selectedDay] || []), newWindow] };
-    setWindows(next);
-    setAddModalVisible(false);
-    await persist(next);
-    notification.success({ message: t('availabilityWindows.notifications.added') });
-  };
-
-  if (loading) {
-    return <div style={{ padding: '24px' }}><Skeleton active paragraph={{ rows: 8 }} /></div>;
+  if (lotsLoading || windowsLoading) {
+    return <div style={{ padding: '24px' }}><Skeleton active paragraph={{ rows: 10 }} /></div>;
   }
+
+  if (ownerLots.length === 0) {
+    return (
+      <div className="availability-windows">
+        <h1>{t('availabilityWindows.title')}</h1>
+        <Alert
+          type="info"
+          showIcon
+          message={t('availabilityWindows.noLotsMessage')}
+        />
+      </div>
+    );
+  }
+
+  const tabItems = ownerLots.map(lot => {
+    const wins = windowsByLot[lot.id] ?? [];
+    const activeCount = wins.filter(w => w.isActive).length;
+
+    return {
+      key: lot.id,
+      label: (
+        <span>
+          <CarOutlined style={{ marginRight: 4 }} />
+          {lot.id}
+          {activeCount > 0 && (
+            <Tag color="green" style={{ marginLeft: 6 }}>{activeCount}</Tag>
+          )}
+        </span>
+      ),
+      children: (
+        <Spin spinning={saving}>
+          <div style={{ marginBottom: 16 }}>
+            <Row justify="space-between" align="middle">
+              <Col>
+                <Space>
+                  <ClockCircleOutlined />
+                  <strong>{lot.floorLabel}</strong>
+                </Space>
+              </Col>
+              <Col>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  size="small"
+                  onClick={() => handleAddClick(lot)}
+                >
+                  {t('availabilityWindows.addWindow')}
+                </Button>
+              </Col>
+            </Row>
+          </div>
+
+          {wins.length === 0 ? (
+            <div className="no-windows-text">
+              {t('availabilityWindows.noWindowsLot')}
+            </div>
+          ) : isMobile ? (
+            <Space direction="vertical" style={{ width: '100%' }}>
+              {wins.map(w => (
+                <Card key={w.id} size="small" style={{ opacity: w.isActive ? 1 : 0.5 }}>
+                  <Row justify="space-between" align="middle">
+                    <Col>
+                      <Space>
+                        {w.specificDate
+                          ? <Tag color="purple">{dayjs(w.specificDate).format('DD/MM/YYYY')}</Tag>
+                          : <Tag color="blue">{DAY_LABELS[w.dayOfWeek!]}</Tag>}
+                        <Tag color="green">{w.startTime} – {w.endTime}</Tag>
+                      </Space>
+                    </Col>
+                    <Col>
+                      <Space>
+                        <Switch checked={w.isActive} size="small" onChange={() => handleToggle(lot.id, w)} />
+                        <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => handleDelete(lot.id, w.id)} />
+                      </Space>
+                    </Col>
+                  </Row>
+                </Card>
+              ))}
+            </Space>
+          ) : (
+            <Table
+              dataSource={wins}
+              columns={windowColumns(lot.id)}
+              rowKey="id"
+              size="small"
+              pagination={{ pageSize: 10, hideOnSinglePage: true }}
+              rowClassName={w => w.isActive ? '' : 'row-inactive'}
+            />
+          )}
+        </Spin>
+      ),
+    };
+  });
 
   return (
     <div className="availability-windows">
       <h1>{t('availabilityWindows.title')}</h1>
 
-      <Spin spinning={saving} tip={t('availabilityWindows.saving')}>
-        <Row gutter={[16, 16]}>
-          {DAYS_OF_WEEK.map(day => (
-            <Col xs={24} sm={12} lg={8} key={day}>
-              <Card
-                title={<Space><ClockCircleOutlined />{t(`availabilityWindows.days.${day.toLowerCase()}`)}</Space>}
-                size="small"
-              >
-                <div style={{ minHeight: '120px' }}>
-                  {windows[day] && windows[day].length > 0 ? (
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                      {windows[day].map(w => (
-                        <div key={w.id} className="window-item">
-                          <Tag color="green">{w.startTime} – {w.endTime}</Tag>
-                          <Button
-                            type="text"
-                            size="small"
-                            danger
-                            icon={<DeleteOutlined />}
-                            onClick={() => handleDeleteWindow(day, w.id)}
-                          />
-                        </div>
-                      ))}
-                    </Space>
-                  ) : (
-                    <div className="no-windows-text">
-                      {t('availabilityWindows.noWindows')}
-                    </div>
-                  )}
-                </div>
+      <Alert
+        type="info"
+        showIcon
+        message={t('availabilityWindows.infoAlert.message')}
+        description={t('availabilityWindows.infoAlert.description')}
+        style={{ marginBottom: 24 }}
+      />
 
-                <div style={{ marginTop: '16px', textAlign: 'center' }}>
-                  <Button
-                    type="dashed"
-                    icon={<PlusOutlined />}
-                    disabled={(windows[day] || []).length >= MAX_WINDOWS_PER_DAY}
-                    onClick={() => handleAddWindow(day)}
-                    size="small"
-                  >
-                    {t('availabilityWindows.addWindow')}
-                  </Button>
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </Spin>
+      <Card>
+        <Tabs items={tabItems} />
+      </Card>
 
       <Modal
-        title={t('availabilityWindows.modal.title', { day: t(`availabilityWindows.days.${selectedDay.toLowerCase()}`) })}
-        open={addModalVisible}
+        title={t('availabilityWindows.modal.title', { lot: addModalLot?.id ?? '' })}
+        open={!!addModalLot}
         onOk={handleModalOk}
-        onCancel={() => setAddModalVisible(false)}
+        onCancel={() => setAddModalLot(null)}
         okText={t('availabilityWindows.modal.okText')}
+        confirmLoading={saving}
+        width={isMobile ? '95vw' : 480}
+        destroyOnClose
       >
         <Form form={form} layout="vertical">
+          <Form.Item label={t('availabilityWindows.modal.slotTypeLabel')}>
+            <Select
+              value={slotType}
+              onChange={v => { setSlotType(v); form.resetFields(['day_of_week', 'specific_date']); }}
+              options={[
+                { value: 'recurring', label: t('availabilityWindows.modal.recurring') },
+                { value: 'specific', label: t('availabilityWindows.modal.specificDate') },
+              ]}
+            />
+          </Form.Item>
+
+          {slotType === 'recurring' ? (
+            <Form.Item
+              name="day_of_week"
+              label={t('availabilityWindows.modal.dayLabel')}
+              rules={[{ required: true, message: t('availabilityWindows.modal.dayRequired') }]}
+            >
+              <Select options={DOW_OPTIONS} placeholder={t('availabilityWindows.modal.dayPlaceholder')} />
+            </Form.Item>
+          ) : (
+            <Form.Item
+              name="specific_date"
+              label={t('availabilityWindows.modal.dateLabel')}
+              rules={[{ required: true, message: t('availabilityWindows.modal.dateRequired') }]}
+            >
+              <DatePicker
+                style={{ width: '100%' }}
+                disabledDate={d => d && d < dayjs().startOf('day')}
+                format="DD/MM/YYYY"
+              />
+            </Form.Item>
+          )}
+
           <Form.Item
             name="timeRange"
             label={t('availabilityWindows.modal.timeRangeLabel')}
@@ -195,7 +347,9 @@ const AvailabilityWindows: React.FC = () => {
         </Form>
       </Modal>
 
-      <InfoBanner label={`${t('availabilityWindows.title')}:`} description={t('availabilityWindows.info', { max: MAX_WINDOWS_PER_DAY })} />
+      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
+        <strong>{t('availabilityWindows.title')}:</strong> {t('availabilityWindows.info', { max: 10 })}
+      </Card>
     </div>
   );
 };

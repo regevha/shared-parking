@@ -26,7 +26,7 @@ logger = logging.getLogger("parking-api")
 logger.info("API Starting Up...")
 
 from database import engine, Base
-from routers import auth, requests, lots, messages, users, config, notifications, admin
+from routers import auth, requests, lots, messages, users, config, notifications, admin, availability
 from scheduler import scheduler
 
 # Create all tables on startup
@@ -47,6 +47,17 @@ def _run_migrations() -> None:
             "ALTER TABLE lots ADD COLUMN updated_at TEXT",
             "ALTER TABLE user_preferences ADD COLUMN language TEXT DEFAULT 'en'",
             "ALTER TABLE parking_requests ADD COLUMN requester_role TEXT",
+            (
+                "CREATE TABLE IF NOT EXISTS lot_availability_windows ("
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                "lot_id TEXT NOT NULL REFERENCES lots(id) ON DELETE CASCADE, "
+                "day_of_week INTEGER, "
+                "specific_date TEXT, "
+                "start_time TEXT NOT NULL, "
+                "end_time TEXT NOT NULL, "
+                "is_active BOOLEAN NOT NULL DEFAULT 1, "
+                "created_at TEXT)"
+            ),
         ]
         for sql in migrations:
             try:
@@ -116,6 +127,7 @@ app.include_router(users.router)
 app.include_router(config.router)
 app.include_router(notifications.router)
 app.include_router(admin.router)
+app.include_router(availability.router)
 
 
 @app.get("/")

@@ -29,3 +29,7 @@
   padding: 20px 0;
   text-align: center;
 }
+
+.row-inactive {
+  opacity: 0.45;
+}
