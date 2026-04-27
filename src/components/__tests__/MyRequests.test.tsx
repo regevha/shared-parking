@@ -4,13 +4,14 @@ import { notification } from 'antd';
 import MyRequests from '../MyRequests';
 import { renderWithProviders } from '../../test-utils/renderWithProviders';
 import { makeParkingRequest } from '../../test-utils/fixtures';
+import { RequestStatus } from '../../types/enums';
 
 jest.spyOn(notification, 'error').mockImplementation(() => ({ destroy: jest.fn() }));
 jest.spyOn(notification, 'success').mockImplementation(() => ({ destroy: jest.fn() }));
 
-const pendingReq  = makeParkingRequest({ id: '1', requesterName: 'Alice', status: 'pending',  startTime: '09:00', endTime: '10:00' });
-const approvedReq = makeParkingRequest({ id: '2', requesterName: 'Alice', status: 'approved', startTime: '14:00', endTime: '16:00' });
-const rejectedReq = makeParkingRequest({ id: '3', requesterName: 'Alice', status: 'rejected', startTime: '11:00', endTime: '12:00' });
+const pendingReq  = makeParkingRequest({ id: '1', requesterName: 'Alice', status: RequestStatus.PENDING,  startTime: '09:00', endTime: '10:00' });
+const approvedReq = makeParkingRequest({ id: '2', requesterName: 'Alice', status: RequestStatus.APPROVED, startTime: '14:00', endTime: '16:00' });
+const rejectedReq = makeParkingRequest({ id: '3', requesterName: 'Alice', status: RequestStatus.REJECTED, startTime: '11:00', endTime: '12:00' });
 
 // ── Visibility filter ─────────────────────────────────────────────────────────
 

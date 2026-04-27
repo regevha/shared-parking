@@ -4,6 +4,7 @@ import { notification } from 'antd';
 import AdminPanel from '../AdminPanel';
 import { renderWithProviders } from '../../test-utils/renderWithProviders';
 import { makeUser, makeOwnerUser, makeManagerUser, makeLot, makeParkingRequest } from '../../test-utils/fixtures';
+import { LotStatus, RequestStatus } from '../../types/enums';
 
 // ── Mock the three API modules ───────────────────────────────────────────────
 jest.mock('../../api/users', () => ({
@@ -53,12 +54,12 @@ const alice   = makeUser({ id: 'u1', name: 'Alice Johnson', email: 'alice@parkin
 const sarah   = makeOwnerUser({ id: 'u2', name: 'Sarah Smith', email: 'sarah@parking.dev' });
 const admin   = makeManagerUser({ id: 'u3', name: 'Admin User', email: 'admin@parking.dev' });
 
-const ownedLot   = makeLot({ id: 'LOT-001', floorLabel: 'P1-A', floor: 'F1', status: 'available', owner: 'Sarah Smith', ownerId: 'u2' });
-const unownedLot = makeLot({ id: 'LOT-002', floorLabel: 'P2-B', floor: 'F2', status: 'unowned',   owner: null,          ownerId: null });
+const ownedLot   = makeLot({ id: 'LOT-001', floorLabel: 'P1-A', floor: 'F1', status: LotStatus.AVAILABLE, owner: 'Sarah Smith', ownerId: 'u2' });
+const unownedLot = makeLot({ id: 'LOT-002', floorLabel: 'P2-B', floor: 'F2', status: LotStatus.UNOWNED,   owner: null,          ownerId: null });
 
-const pendingReq  = makeParkingRequest({ id: 'REQ-001', status: 'pending',  requesterName: 'Alice Johnson' });
-const approvedReq = makeParkingRequest({ id: 'REQ-002', status: 'approved', requesterName: 'Alice Johnson' });
-const rejectedReq = makeParkingRequest({ id: 'REQ-003', status: 'rejected', requesterName: 'Bob' });
+const pendingReq  = makeParkingRequest({ id: 'REQ-001', status: RequestStatus.PENDING,  requesterName: 'Alice Johnson' });
+const approvedReq = makeParkingRequest({ id: 'REQ-002', status: RequestStatus.APPROVED, requesterName: 'Alice Johnson' });
+const rejectedReq = makeParkingRequest({ id: 'REQ-003', status: RequestStatus.REJECTED, requesterName: 'Bob' });
 
 // ── Helper: set up default API responses and render ──────────────────────────
 function setup(overrides: {

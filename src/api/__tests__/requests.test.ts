@@ -157,6 +157,7 @@ describe('requestsApi.create', () => {
       requester_name: 'Alice',
       date: '2026-04-02',
       start_time: '10:00',
+      end_date: '2026-04-02',
       end_time: '12:00',
       duration: 2,
     });
