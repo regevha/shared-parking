@@ -142,7 +142,7 @@ def created_lot_id(client, manager_headers) -> str:
 
 
 def create_lot_owned_by(client, manager_headers, owner_headers, lot_id: str, floor: str = "F1") -> dict:
-    """Create a lot in the DB owned by the owner fixture user. Returns the created lot dict."""
+    """Create a lot owned by the owner fixture, with full-week availability windows so owners can approve."""
     me = client.get("/auth/me", headers=owner_headers).json()
     resp = client.post("/api/lots", json={
         "id": lot_id,
@@ -153,6 +153,13 @@ def create_lot_owned_by(client, manager_headers, owner_headers, lot_id: str, flo
         "status": "available",
     }, headers=manager_headers)
     assert resp.status_code == 201, resp.text
+    # Owned lots are blocked by default — create Mon-Sun windows so the owner can approve
+    for dow in range(7):
+        client.post(f"/api/lots/{lot_id}/availability", json={
+            "day_of_week": dow,
+            "start_time": "00:00",
+            "end_time": "23:59",
+        }, headers=owner_headers)
     return resp.json()
 
 
