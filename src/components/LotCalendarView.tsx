@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Card, Collapse, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
+import { Alert, Card, Collapse, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { isRTL, SupportedLanguage } from '../i18n';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -100,7 +101,8 @@ const LotCalendarView: React.FC = () => {
   const { user } = useAuth();
   const isManager = user?.role === 'manager';
   const visibleLots = isManager ? allLots : ownerLots;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isHebrewMode = isRTL(i18n.language as SupportedLanguage);
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
   const [date, setDate] = useState(new Date());
@@ -500,7 +502,8 @@ const LotCalendarView: React.FC = () => {
         />
       </div>
 
-      {/* Calendar */}
+      {/* Calendar — forced LTR: react-big-calendar has no RTL support */}
+      <div dir="ltr">
       {isMobile ? (
         <div className={`calendar-naked-wrapper${view === 'week' ? ' calendar-week-view' : ''}`}>
           <Calendar
@@ -556,6 +559,15 @@ const LotCalendarView: React.FC = () => {
             <div className="calendar-empty-state">{t('lotCalendarView.emptyState')}</div>
           )}
         </Card>
+      )}
+      </div>
+      {isHebrewMode && (
+        <Alert
+          type="info"
+          showIcon
+          message={t('lotCalendarView.rtlNote')}
+          style={{ marginBottom: '16px' }}
+        />
       )}
 
       {/* Stats */}
