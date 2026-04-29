@@ -39,8 +39,8 @@ class TestImportUsers:
         assert r.status_code == 400
 
     def test_import_users_skips_duplicate_email(self, client, manager_headers):
-        # Register a user first
-        client.post("/auth/register", json={"name": "Existing", "email": "dup@test.com", "password": "pw"})
+        # Register a user first (password must satisfy the strength policy: 8+ chars, upper, lower, digit)
+        client.post("/auth/register", json={"name": "Existing", "email": "dup@test.com", "password": "Pass1234"})
 
         csv = "name,email,role,password\nDuplicate,dup@test.com,user,pw\nNew,new@test.com,user,pw\n"
         r = client.post("/api/admin/import-users", files=csv_file(csv), headers=manager_headers)
@@ -129,8 +129,8 @@ class TestImportLots:
         assert len(body["errors"]) == 2
 
     def test_import_lots_resolves_owner_email(self, client, manager_headers):
-        # Create an owner user
-        client.post("/auth/register", json={"name": "Owner Jane", "email": "jane@test.com", "password": "pw"})
+        # Create an owner user (password must satisfy the strength policy: 8+ chars, upper, lower, digit)
+        client.post("/auth/register", json={"name": "Owner Jane", "email": "jane@test.com", "password": "Pass1234"})
 
         csv = "id,floor,floor_label,owner_email\nLOT-OWN,F1,Floor 1,jane@test.com\n"
         r = client.post("/api/admin/import-lots", files=csv_file(csv), headers=manager_headers)
