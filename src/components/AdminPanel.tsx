@@ -361,6 +361,13 @@ const AdminPanel: React.FC = () => {
     },
     { title: t('adminPanel.reports.columns.requester'), dataIndex: 'requesterName', key: 'requesterName' },
     {
+      title: t('adminPanel.reports.columns.submitted'),
+      dataIndex: 'submittedAt',
+      key: 'submittedAt',
+      width: 140,
+      render: (v: string) => v ? dayjs(v).format('DD/MM/YYYY HH:mm') : '—',
+    },
+    {
       title: t('adminPanel.reports.columns.timeSlot'),
       key: 'timeSlot',
       width: 130,

@@ -51,7 +51,8 @@
       "timeSlot": "זמן חניה",
       "duration": "משך",
       "status": "סטטוס",
-      "submitted": "שלח ב"
+      "submitted": "שלח ב",
+      "lastUpdated": "עודכן"
     },
     "actions": {
       "edit": "ערוך",
@@ -61,7 +62,8 @@
       "date": "תאריך",
       "time": "שעה",
       "submitted": "נשלח",
-      "approvedBy": "אושר על ידי"
+      "approvedBy": "אושר על ידי",
+      "lastUpdated": "עודכן"
     },
     "approvedByLabel": "על ידי {{name}}",
     "stats": {
@@ -651,6 +653,7 @@
         "date": "תאריך",
         "requester": "מבקש",
         "timeSlot": "זמן חניה",
+        "submitted": "נשלח",
         "status": "סטטוס",
         "duration": "משך"
       },
