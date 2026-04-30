@@ -132,17 +132,15 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
               />
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 4, direction: 'ltr' }}>
-              {!isMobile && (
-                <Dropdown menu={languageMenu} trigger={['click']}>
-                  <Button
-                    type="text"
-                    icon={<GlobalOutlined />}
-                    style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13 }}
-                  >
-                    {currentLangLabel}
-                  </Button>
-                </Dropdown>
-              )}
+              <Dropdown menu={languageMenu} trigger={['click']}>
+                <Button
+                  type="text"
+                  icon={<GlobalOutlined />}
+                  style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13 }}
+                >
+                  {!isMobile && currentLangLabel}
+                </Button>
+              </Dropdown>
               <Button
                 type="text"
                 icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
