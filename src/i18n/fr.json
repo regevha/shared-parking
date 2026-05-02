@@ -51,7 +51,8 @@
       "timeSlot": "Plage Horaire",
       "duration": "Dur.",
       "status": "Statut",
-      "submitted": "Soumis"
+      "submitted": "Soumis",
+      "lastUpdated": "Modifié"
     },
     "actions": {
       "edit": "Modifier",
@@ -61,7 +62,8 @@
       "date": "Date",
       "time": "Heure",
       "submitted": "Soumis",
-      "approvedBy": "Approuvé par"
+      "approvedBy": "Approuvé par",
+      "lastUpdated": "Modifié"
     },
     "approvedByLabel": "Par {{name}}",
     "stats": {
@@ -651,6 +653,7 @@
         "date": "Date",
         "requester": "Demandeur",
         "timeSlot": "Heure",
+        "submitted": "Soumis",
         "status": "Statut",
         "duration": "Dur."
       },

@@ -51,7 +51,8 @@
       "timeSlot": "Time Slot",
       "duration": "Dur.",
       "status": "Status",
-      "submitted": "Submitted"
+      "submitted": "Submitted",
+      "lastUpdated": "Updated"
     },
     "actions": {
       "edit": "Edit",
@@ -61,7 +62,8 @@
       "date": "Date",
       "time": "Time",
       "submitted": "Submitted",
-      "approvedBy": "Approved by"
+      "approvedBy": "Approved by",
+      "lastUpdated": "Updated"
     },
     "approvedByLabel": "By {{name}}",
     "stats": {
@@ -651,6 +653,7 @@
         "date": "Date",
         "requester": "Requester",
         "timeSlot": "Time Slot",
+        "submitted": "Submitted",
         "status": "Status",
         "duration": "Dur."
       },

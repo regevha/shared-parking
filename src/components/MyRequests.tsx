@@ -229,7 +229,16 @@ const MyRequests: React.FC = () => {
       width: 140,
       responsive: ['md'],
       sorter: (a: ParkingRequest, b: ParkingRequest) => (a.submittedAt || '').localeCompare(b.submittedAt || ''),
-      render: (v: string) => dayjs(v).format('DD/MM/YYYY HH:mm'),
+      render: (v: string, record: ParkingRequest) => (
+        <div>
+          <div>{dayjs(v).format('DD/MM/YYYY HH:mm')}</div>
+          {record.updatedAt && record.updatedAt !== record.submittedAt && (
+            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
+              {t('myRequests.columns.lastUpdated')}: {dayjs(record.updatedAt).format('DD/MM/YYYY HH:mm')}
+            </div>
+          )}
+        </div>
+      ),
     },
     {
       title: '',
@@ -326,6 +335,12 @@ const MyRequests: React.FC = () => {
                       ? t('myRequests.autoApproved')
                       : record.approvedBy}
                   </span>
+                </div>
+              )}
+              {record.updatedAt && record.updatedAt !== record.submittedAt && (
+                <div className="request-card-row">
+                  <span className="request-card-label">{t('myRequests.mobile.lastUpdated')}</span>
+                  <span>{dayjs(record.updatedAt).format('DD/MM/YYYY HH:mm')}</span>
                 </div>
               )}
               <div className="request-card-actions">
