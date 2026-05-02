@@ -275,6 +275,8 @@
       "pending": "Pending",
       "approved": "Approved",
       "rejected": "Rejected",
+      "expired": "Expired",
+      "cancelled": "Cancelled",
       "myRequest": "★ My Request"
     },
     "modal": {

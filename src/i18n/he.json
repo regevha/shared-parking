@@ -275,6 +275,8 @@
       "pending": "ממתין",
       "approved": "מאושר",
       "rejected": "נדחה",
+      "expired": "פג תוקף",
+      "cancelled": "בוטל",
       "myRequest": "★ הבקשה שלי"
     },
     "modal": {
