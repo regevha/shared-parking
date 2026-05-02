@@ -294,7 +294,8 @@
       "rescheduled": "הבקשה הוזזה",
       "rescheduledDesc": "בקשה {{id}} הועברה ל-{{from}} – {{to}}"
     },
-    "statusRejected": "נדחה"
+    "statusRejected": "נדחה",
+    "rtlNote": "לוח השנה מוצג משמאל לימין — הספרייה אינה תומכת בפריסת ימין-לשמאל"
   },
   "lotCalendarView": {
     "allMyLots": "החניות שלי",
@@ -356,7 +357,8 @@
     "notifications": {
       "approved": "אושר בהצלחה",
       "rejected": "הבקשה נדחתה"
-    }
+    },
+    "rtlNote": "לוח השנה מוצג משמאל לימין — הספרייה אינה תומכת בפריסת ימין-לשמאל"
   },
   "lotStatusBoard": {
     "title": "מצב החניה",

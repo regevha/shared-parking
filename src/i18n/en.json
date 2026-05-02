@@ -294,7 +294,8 @@
       "rescheduled": "Request Rescheduled",
       "rescheduledDesc": "Request {{id}} moved to {{from}} – {{to}}"
     },
-    "statusRejected": "Rejected"
+    "statusRejected": "Rejected",
+    "rtlNote": ""
   },
   "lotCalendarView": {
     "allMyLots": "My Lots",
@@ -356,7 +357,8 @@
     "notifications": {
       "approved": "Request approved successfully",
       "rejected": "Request rejected"
-    }
+    },
+    "rtlNote": ""
   },
   "lotStatusBoard": {
     "title": "Parking Status",

@@ -3,8 +3,9 @@ import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Card, Collapse, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
+import { Alert, Card, Collapse, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { isRTL, SupportedLanguage } from '../i18n';
 import { UserRole, RequestStatus } from '../types/enums';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
@@ -90,7 +91,8 @@ const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const { pendingRequests, approvedRequests, userRequests, updateUserRequest } = useRequests();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isHebrewMode = isRTL(i18n.language as SupportedLanguage);
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
   const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
   const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
@@ -293,7 +295,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
 
   return (
     <div className="calendar-view">
-      {/* Calendar */}
+      {/* Calendar — forced LTR: react-big-calendar has no RTL support */}
+      <div dir="ltr">
       {isMobile ? (
         <div className={`calendar-naked-wrapper${view === 'week' ? ' calendar-week-view' : ''}`}>
           <DnDCalendar
@@ -357,6 +360,15 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             <div className="calendar-empty-state">{t('calendarView.emptyState')}</div>
           )}
         </Card>
+      )}
+      </div>
+      {isHebrewMode && (
+        <Alert
+          type="info"
+          showIcon
+          message={t('calendarView.rtlNote')}
+          style={{ marginBottom: '16px' }}
+        />
       )}
 
       {/* Stats */}

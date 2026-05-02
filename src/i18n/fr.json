@@ -294,7 +294,8 @@
       "rescheduled": "Placé Déplacée",
       "rescheduledDesc": "{{id}} de {{from}} à {{to}}"
     },
-    "statusRejected": "Rejeté"
+    "statusRejected": "Rejeté",
+    "rtlNote": ""
   },
   "lotCalendarView": {
     "allMyLots": "Mes Places",
@@ -356,7 +357,8 @@
     "notifications": {
       "approved": "Approuvé !",
       "rejected": "Rejeté."
-    }
+    },
+    "rtlNote": ""
   },
   "lotStatusBoard": {
     "title": "État du Parking",
