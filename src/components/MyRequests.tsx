@@ -287,7 +287,7 @@ const MyRequests: React.FC = () => {
               <div className="request-card-header">
                 <strong>{record.id}</strong>
                 <div>
-                  <Tag color={getRequestStatusColor(record.status)}>{getRequestStatusLabel(record.status)}</Tag>
+                  <Tag color={getRequestStatusColor(record.status)}>{t(getRequestStatusLabel(record.status))}</Tag>
                   {record.approvedBy === 'auto' && (
                     <Tag color="purple" style={{ fontSize: '11px' }}>Auto</Tag>
                   )}

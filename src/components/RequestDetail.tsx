@@ -96,7 +96,7 @@ const RequestDetail: React.FC = () => {
               <div className="label">{t('requestDetail.requestInfo.status')}</div>
               <div className="value">
                 <Tag color={getRequestStatusColor(request.status)}>
-                  {getRequestStatusLabel(request.status)}
+                  {t(getRequestStatusLabel(request.status))}
                 </Tag>
                 {request.approvedBy === 'auto' && (
                   <Tag color="purple" style={{ marginLeft: 4 }}>Auto</Tag>

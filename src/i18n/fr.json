@@ -270,6 +270,8 @@
       "pending": "En Attente",
       "approved": "Approuvé",
       "rejected": "Rejeté",
+      "expired": "Expiré",
+      "cancelled": "Annulé",
       "myRequest": "★ Ma Demande"
     },
     "modal": {
