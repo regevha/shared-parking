@@ -1,8 +1,15 @@
 .notification-popover {
   width: 320px;
+  max-width: 100%;
   max-height: 480px;
   display: flex;
   flex-direction: column;
+}
+
+@media (max-width: 480px) {
+  .notification-popover {
+    width: calc(100vw - 16px);
+  }
 }
 
 .notification-header {

@@ -114,6 +114,7 @@ const NotificationBell: React.FC = () => {
       onOpenChange={setVisible}
       placement="bottomRight"
       overlayClassName="notification-overlay"
+      overlayStyle={{ maxWidth: 'min(320px, calc(100vw - 16px))' }}
     >
       <div className="notification-trigger">
         <Badge count={unreadCount} overflowCount={9} size="small" offset={[2, 0]}>
