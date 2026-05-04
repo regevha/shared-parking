@@ -1,7 +1,7 @@
 # CLAUDE.md — Shared Parking Project
 
 ## Project Overview
-A React + FastAPI parking management system. Users request parking slots; owners approve/reject; managers administer. Data is persisted in SQLite via SQLAlchemy. Authentication uses JWT (bcrypt passwords, 8-hour tokens).
+A React + FastAPI parking management system. Users request parking slots; owners approve/reject; managers administer. Data is persisted in SQLite via SQLAlchemy. Authentication uses JWT (bcrypt password hashing, python-jose tokens). Multi-language support (EN/FR/HE) with RTL layout for Hebrew.
 
 ## Tech Stack
 ### Frontend
@@ -132,7 +132,7 @@ $env:CI='true'; npm test -- --ci --no-cache
 - `src/components/__tests__/MyRequests.test.tsx` — 15 tests: visibility filters, edit/cancel button logic, stats, navigation, info banner.
 
 ### Backend Tests
-- 147 tests, always green. Uses in-memory SQLite (StaticPool) — never touches `parking.db`.
+- 147 tests, always green. Uses in-memory SQLite (StaticPool) for testing — never touches `parking.db` in production.
 - `conftest.py` — Fixtures: in-memory DB, TestClient with overrides, headers, and pwd hashing patches.
 - `test_auth.py` — 9 tests: register, login, `/auth/me`.
 - `test_requests.py` — 41 tests: Full CRUD, approve/reject, RBAC, and status guards.
@@ -143,12 +143,12 @@ $env:CI='true'; npm test -- --ci --no-cache
 ## Key Files
 
 ### Internationalisation (i18n)
-- `src/i18n/index.ts` — i18next init; `SupportedLanguage` type (`'en' | 'fr' | 'he'`); `SUPPORTED_LANGUAGES` array (with `nativeLabel`); `isRTL(lang)` helper; `getStoredLanguage()` / `storeLanguage()`
-- `src/i18n/en.json` — English translations (12 namespaces: nav, common, login, myRequests, pendingRequests, approvals, requestForm, requestDetail, notificationWindows, adminPanel, calendarView, lotCalendarView, lotStatusBoard, myLots, app)
+- `src/i18n/index.ts` — i18next init; `SupportedLanguage` type (`'en' | 'fr' | 'he'`); `SUPPORTED_LANGUAGES` array (with `nativeLabel`); `isRTL(lang)` helper; `getStoredLanguage()` / `storeLanguage()` helpers
+- `src/i18n/en.json` — English translations (12 namespaces: nav, common, login, myRequests, pendingRequests, approvals, requestForm, requestDetail, notificationWindows, adminPanel, calendarView, lotCalendarView)
 - `src/i18n/fr.json` — French translations (same 12 namespaces)
 - `src/i18n/he.json` — Hebrew translations (same 12 namespaces; RTL)
 - Language is persisted in `localStorage` (`parking_language`) and synced to/from the DB (`UserPreferences.language`)
-- `App.tsx` — `ConfigProvider direction="rtl"` when Hebrew; `useLayoutEffect` syncs `<html dir>` and `<html lang>`; language dropdown in header (globe icon); `dayjs.locale()` activated on change
+- `App.tsx` — `ConfigProvider direction="rtl"` when Hebrew; `useLayoutEffect` syncs `<html dir>` and `<html lang>`; language dropdown in header (globe icon); `dayjs.locale()` activated on language change
 - react-big-calendar is LTR-only — left as-is with explanatory comment in CalendarView/LotCalendarView
 
 ### Auth Layer
@@ -171,7 +171,7 @@ $env:CI='true'; npm test -- --ci --no-cache
 - `backend/main.py` — FastAPI app, CORS, router registration
 - `backend/models.py` — `User`, `UserPreferences`, `ParkingRequest`, `Lot`, `RequestMessage` SQLAlchemy models
   - `UserPreferences`: `ondelete="CASCADE"` (preferences have no meaning without the owner); columns: `dark_mode`, `notification_windows` (JSON), `language` (allowlist: `en|fr|he`)
-  - `RequestMessage.request_id`: nullable, `ondelete="SET NULL"` — messages are preserved for 7-day audit retention after a request is deleted; FK is nulled explicitly in `delete_request()` because SQLite does not enforce FK actions without `PRAGMA foreign_keys=ON`
+  - `RequestMessage.request_id`: nullable, `ondelete="SET NULL"` — messages are preserved for 7-day audit retention after a request is deleted; FK is nulled explicitly in `delete_request()` because cascading delete is not suitable for an audit trail
 - `backend/auth.py` — JWT utilities, `get_current_user`, `require_owner`, `require_manager`
 - `backend/routers/auth.py` — `/auth/login`, `/auth/register`, `/auth/me`
 - `backend/routers/requests.py` — `/api/requests/*`
@@ -183,7 +183,7 @@ $env:CI='true'; npm test -- --ci --no-cache
 - `backend/requirements-test.txt` — test dependencies (`pytest`, `httpx`, `pytest-cov`)
 
 ### Tests
-- `backend/tests/conftest.py` — fixtures: in-memory SQLite (StaticPool), TestClient with `get_db` override, `user_headers` / `owner_headers` / `manager_headers`, `created_request_id`, `created_lot_id`, `owner_lot_id`; patches `pwd_context` to `sha256_crypt`
+- `backend/tests/conftest.py` — fixtures: in-memory SQLite (StaticPool), TestClient with `get_db` override, `user_headers` / `owner_headers` / `manager_headers`, `created_request_id`, `created_lot_id`
 - `backend/tests/test_auth.py` — 9 tests: register, login, `/auth/me`
 - `backend/tests/test_requests.py` — 41 tests: full CRUD, approve/reject, RBAC, status guards
 - `backend/tests/test_lots.py` — 23 tests: full CRUD, `/mine`, `/owner/{name}`, dual-role PATCH
