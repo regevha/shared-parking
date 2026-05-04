@@ -1,6 +1,6 @@
 # Shared Parking
 
-An application for managing corporate parking resources. Users request parking slots; owners approve or reject requests and manage their lots; managers administer users and lots. Authentication uses JWT.
+An application for managing corporate parking resources. Users request parking slots; owners approve or reject requests and manage their lots; managers administer users and lots. Full backend persistence with SQLite, authentication, and audit trail.
 
 ## Tech Stack
 
@@ -26,7 +26,9 @@ The application implements a robust security model to protect administrative fea
 - **Fail-safe Component Logic**: Components like `AdminPanel.tsx` include internal permission checks to prevent unauthorized rendering, providing defense-in-depth even if navigation logic is bypassed.
 
 ### Session Isolation & Cleanup (Verified Fix)
-Previously, a "URL leakage" issue existed where the `/admin` path would persist in the browser address bar after an administrator logged out. This could lead to a newly logged-in non-admin user briefly seeing the administrative interface.
+Previously, a "URL leakage" issue existed where the `/admin` path would persist in the browser address bar after an administrator logged out. This could lead to a newly logged-in non-admin user browsing directly to the cached `/admin` URL and potentially viewing cached admin content before the route guard kicked in.
+
+**Resolution:**
 - **Centralized Router**: The `BrowserRouter` was moved to the top-level `index.tsx` to ensure it survives the entire session lifecycle.
 - **Explicit Logout Navigation**: The `logout` process now explicitly clears the session state and navigates back to the root (`/`), ensuring every new login starts from a clean URL state.
 
@@ -225,7 +227,7 @@ All 12 screen components are fully translated:
 Language preference is stored in the **database** in the `user_preferences` table (same pattern as dark mode):
 
 - **On toggle:** `PATCH /api/users/{id}/preferences` is called with `{ language: 'fr' }` (fire-and-forget — the UI updates immediately without waiting for the network).
-- **On login:** The stored language is read from `user.preferences.language` returned by `/auth/me` and applied to i18next before the app shell renders. This means a user's language follows them across devices and sessions.
+- **On login:** The stored language is read from `user.preferences.language` returned by `/auth/me` and applied to i18next before the app shell renders. This means a user's language follows them across devices.
 - **Fallback:** `localStorage` (`parking_language` key) is kept in sync as a fast-read cache; it is always overwritten by the value from the DB on login.
 
 ---
