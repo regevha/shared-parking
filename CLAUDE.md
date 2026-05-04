@@ -271,14 +271,16 @@ Both `CalendarView` and `LotCalendarView`:
 
 ## Pending TODOs
 1. Improve overlapping events display — hover tooltip for narrow calendar events (Phase 2 item #5)
-2. ~~Empty state UI for all tables~~ ✅ Done (Phase 1)
-3. Audit trail — `created_at` / `updated_at` timestamps on records (timestamps added to DB; full audit trail UI pending)
-4. RTL layout for react-big-calendar — library has no RTL support; calendar stays LTR even in Hebrew mode
-5. Remove restriction on time of day for requests — allow any time of day and max duration of 36 hours (multi-day support)
-6. Hide old requests from table views — except for admin screens, show only requests starting from 'yesterday' forward to keep views clean for users
-7. Invert availability logic — lots should be 'Blocked by Default'. Owners must define explicit availability windows/time slots for sharing; sharing is prohibited outside these slots
-8. Implement 'Availability Windows' UI — for owners to define when their lots are open for requests (possibly repurposing or extending NotificationWindows)
-9. Accessibility — `role="button"`, `tabIndex`, keyboard handlers on parking spots; `aria-label` on calendar nav (Phase 2 item #7)
-10. Component extraction — `<StatsBar />`, `<InfoBanner />`, `<PageWrapper />` reusable components (Phase 3 original plan)
-11. Loading skeleton states — replace `<Spin>` with `<Skeleton>` matching layout shapes (Phase 4 item #11)
-12. AdminPanel mobile card views — Users, Lots, Requests tables lack mobile card fallback
+2. Remove restriction on time of day for requests — allow any time of day and max duration of 36 hours (multi-day support)
+3. Accessibility — `role="button"`, `tabIndex`, keyboard handlers on parking spots; `aria-label` on calendar nav (Phase 2 item #7)
+
+### Completed
+- ~~Empty state UI for all tables~~ ✅ Done (Phase 1)
+- ~~Audit trail — `created_at` / `updated_at` timestamps on records~~ ✅ Done (PR #61: "Last Updated" sub-line in MyRequests, "Submitted" column in AdminPanel)
+- ~~RTL layout for react-big-calendar — library has no RTL support; calendar stays LTR even in Hebrew mode~~ ✅ Done (PR #60: wrapped calendar in `dir="ltr"`, added Hebrew-only info note)
+- ~~Hide old requests from table views — except for admin screens, show only requests starting from 'yesterday' forward~~ ✅ Done
+- ~~Invert availability logic — lots should be 'Blocked by Default'. Owners must define explicit availability windows/time slots for sharing~~ ✅ Done
+- ~~Implement 'Availability Windows' UI — for owners to define when their lots are open for requests~~ ✅ Done
+- ~~Component extraction — `<StatsBar />`, `<InfoBanner />`, `<PageWrapper />` reusable components~~ ✅ Done (Phase 3)
+- ~~Loading skeleton states — replace `<Spin>` with `<Skeleton>` matching layout shapes~~ ✅ Done (Phase 4 item #11)
+- ~~AdminPanel mobile card views — Users, Lots, Requests tables lack mobile card fallback~~ ✅ Done
