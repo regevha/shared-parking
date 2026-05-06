@@ -7,7 +7,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install global tools
-RUN npm install -g npm@latest
+# Pin npm to v10 — npm@latest (v11+) requires Node ^20.17.0 || >=22.9.0,
+# which the nodesource setup_20.x script does not always provide.
+RUN npm install -g npm@10
 
 # Set up the workspace
 WORKDIR /workspaces/shared-parking
