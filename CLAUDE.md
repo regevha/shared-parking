@@ -272,7 +272,8 @@ Both `CalendarView` and `LotCalendarView`:
 ## Pending TODOs
 1. Improve overlapping events display — hover tooltip for narrow calendar events (Phase 2 item #5)
 2. Remove restriction on time of day for requests — allow any time of day and max duration of 36 hours (multi-day support)
-3. Accessibility — `role="button"`, `tabIndex`, keyboard handlers on parking spots; `aria-label` on calendar nav (Phase 2 item #7)
+3. Keyboard accessibility — full-app pass: `role="button"` + `tabIndex` + `onKeyDown` (Enter/Space) on all clickable non-button elements (parking spots, card rows, status tags); audit and fix tab order across all 11 screens; `aria-label` on all icon-only controls (language toggle, dark mode button, calendar nav arrows); verify focus trapping and focus restoration in all modals; add skip-to-content link
+4. Color & contrast audit — run a WCAG AA check (4.5:1 normal text, 3:1 large text / UI components) against all status tag colors (`statusUtils.ts`: `getStatusColor`, `getLotStatusTagColor`, `getRequestStatusColor`), info banner backgrounds (`--info-card-bg`), and all text/background combinations in both light and dark mode; fix any failures
 
 ### Completed
 - ~~Empty state UI for all tables~~ ✅ Done (Phase 1)
