@@ -35,6 +35,6 @@
     "8000": { "label": "Backend (FastAPI)", "onAutoForward": "notify" }
   },
   "postCreateCommand": "npm install && pip install -r backend/requirements.txt && (test -f backend/parking.db || (cd backend && python seed.py))",
-  "postStartCommand": "mkdir -p logs && (pgrep -f 'uvicorn main:app' > /dev/null || nohup bash -c 'cd backend && python -m uvicorn main:app --host 0.0.0.0 --reload' > logs/backend.out 2>&1 &) && (pgrep -f 'react-scripts start' > /dev/null || BROWSER=none nohup npm start > logs/frontend.out 2>&1 &)",
+  "postStartCommand": "bash .devcontainer/start.sh",
   "remoteUser": "vscode"
 }
