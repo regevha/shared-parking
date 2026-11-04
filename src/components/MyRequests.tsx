@@ -241,7 +241,7 @@ const MyRequests: React.FC = () => {
       ),
     },
     {
-      title: '',
+      title: <span className="visually-hidden">{t('myRequests.columns.actions')}</span>,
       key: 'actions',
       width: 70,
       render: (_, record: ParkingRequest) => (

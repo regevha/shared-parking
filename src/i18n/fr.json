@@ -52,7 +52,8 @@
       "duration": "Dur.",
       "status": "Statut",
       "submitted": "Soumis",
-      "lastUpdated": "Modifié"
+      "lastUpdated": "Modifié",
+      "actions": "Actions"
     },
     "actions": {
       "edit": "Modifier",

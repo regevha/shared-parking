@@ -52,7 +52,8 @@
       "duration": "משך",
       "status": "סטטוס",
       "submitted": "שלח ב",
-      "lastUpdated": "עודכן"
+      "lastUpdated": "עודכן",
+      "actions": "פעולות"
     },
     "actions": {
       "edit": "ערוך",
