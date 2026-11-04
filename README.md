@@ -71,7 +71,18 @@ Each user has a persisted preferences record:
 - Node.js 18+
 - Python 3.11+
 
-### 1 — Install dependencies
+### 1 — Create your `.env`
+
+`.env` holds secrets and is **not committed**. Copy the template and set a real key:
+
+```bash
+cp .env.example .env
+python -c 'import secrets; print(secrets.token_hex(32))'   # paste into SECRET_KEY
+```
+
+The backend refuses to start without `SECRET_KEY`.
+
+### 2 — Install dependencies
 
 **Frontend**
 ```bash
@@ -84,7 +95,7 @@ cd backend
 pip install -r requirements.txt
 ```
 
-### 2 — Seed the database (first time only)
+### 3 — Seed the database (first time only)
 
 ```bash
 cd backend
@@ -93,7 +104,7 @@ python seed.py
 
 Creates `backend/parking.db` with 21 users, 20 requests, and 17 lots. Re-run at any time to reset to the original sample data.
 
-### 3 — Start the backend
+### 4 — Start the backend
 
 ```bash
 cd backend
@@ -108,7 +119,7 @@ To expose the API on your local network (for mobile testing):
 python -m uvicorn main:app --host 0.0.0.0 --reload
 ```
 
-### 4 — Start the frontend (separate terminal)
+### 5 — Start the frontend (separate terminal)
 
 ```bash
 npm start
