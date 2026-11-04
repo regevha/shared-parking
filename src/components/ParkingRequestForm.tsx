@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Form, DatePicker, Select, Button, Card, Alert, notification, Row, Col, Tag } from 'antd';
 import InfoBanner from './InfoBanner';
 import { useTranslation } from 'react-i18next';
-import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
+import { useRequests } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
 import { RequestStatus } from '../types/enums';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';

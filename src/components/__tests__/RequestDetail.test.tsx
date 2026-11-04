@@ -3,7 +3,7 @@ import { screen, waitFor, fireEvent, act } from '@testing-library/react';
 import { notification } from 'antd';
 import RequestDetail from '../RequestDetail';
 import { renderWithProviders } from '../../test-utils/renderWithProviders';
-import { makeParkingRequest, makeUser, makeOwnerUser } from '../../test-utils/fixtures';
+import { makeParkingRequest, makeUser } from '../../test-utils/fixtures';
 import { RequestStatus } from '../../types/enums';
 import * as messagesApiModule from '../../api/messages';
 

@@ -30,6 +30,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "lint": "eslint src --ext .ts,.tsx --max-warnings=0",
     "eject": "react-scripts eject",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
@@ -38,7 +39,35 @@
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:jsx-a11y/recommended"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "src/**/__tests__/**",
+          "src/**/*.test.ts",
+          "src/**/*.test.tsx",
+          "src/setupTests.ts"
+        ],
+        "rules": {
+          "testing-library/no-wait-for-multiple-assertions": "off",
+          "testing-library/prefer-find-by": "off",
+          "testing-library/no-node-access": "off",
+          "testing-library/no-unnecessary-act": "off",
+          "testing-library/no-container": "off",
+          "jest/no-conditional-expect": "off",
+          "import/first": "off"
+        }
+      },
+      {
+        "files": [
+          "src/api/__tests__/**"
+        ],
+        "rules": {
+          "testing-library/no-await-sync-query": "off"
+        }
+      }
     ]
   },
   "jest": {
@@ -63,6 +92,7 @@
     ]
   },
   "devDependencies": {
-    "@playwright/test": "^1.59.1"
+    "@playwright/test": "^1.59.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2"
   }
 }

@@ -1,5 +1,4 @@
 import { notificationsApi } from '../notifications';
-import { ApiError } from '../client';
 
 // ── fetch mock setup ─────────────────────────────────────────────────────────
 

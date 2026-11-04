@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor, fireEvent } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import CalendarView from '../CalendarView';
 import { renderWithProviders } from '../../test-utils/renderWithProviders';
 import { makeParkingRequest, makeUser } from '../../test-utils/fixtures';
@@ -84,7 +84,7 @@ describe('CalendarView', () => {
   });
 
   it('renders the calendar stub without errors', async () => {
-    const { container } = renderWithProviders(<CalendarView />, {
+    renderWithProviders(<CalendarView />, {
       authValue: { user: makeUser() },
       requestsValue: { pendingRequests: [], approvedRequests: [], userRequests: [] },
     });

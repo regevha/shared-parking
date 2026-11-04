@@ -29,6 +29,15 @@ const AuditTrailModal: React.FC<AuditTrailModalProps> = ({ requestId, onClose })
        .finally(() => setLoading(false));
   }, [requestId]);
 
+  // Escape closes the dialog (keyboard users have no backdrop to click)
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
   const formatTimestamp = (iso: string) => {
     return new Date(iso).toLocaleString();
   };
@@ -41,11 +50,20 @@ const AuditTrailModal: React.FC<AuditTrailModalProps> = ({ requestId, onClose })
   };
 
   return (
-    <div className="audit-modal-overlay" onClick={onClose}>
-      <div className="audit-modal-content" onClick={e => e.stopPropagation()}>
+    <div
+      className="audit-modal-overlay"
+      role="presentation"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        className="audit-modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="audit-modal-title"
+      >
         <div className="audit-modal-header">
-          <h3>{t('auditTrail.title', { id: requestId })}</h3>
-          <button className="close-btn" onClick={onClose}>&times;</button>
+          <h3 id="audit-modal-title">{t('auditTrail.title', { id: requestId })}</h3>
+          <button className="close-btn" aria-label={t('auditTrail.close')} onClick={onClose}>&times;</button>
         </div>
         
         <div className="audit-modal-body">

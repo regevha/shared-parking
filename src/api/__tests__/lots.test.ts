@@ -1,5 +1,4 @@
 import { lotsApi } from '../lots';
-import { ApiError } from '../client';
 
 // ── fetch mock setup ─────────────────────────────────────────────────────────
 

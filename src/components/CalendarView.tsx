@@ -3,7 +3,7 @@ import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Alert, Card, Collapse, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
+import { Alert, Card, Collapse, DatePicker, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { isRTL, SupportedLanguage } from '../i18n';
 import { UserRole, RequestStatus } from '../types/enums';

@@ -3,7 +3,7 @@ import { screen, waitFor, fireEvent } from '@testing-library/react';
 import { notification } from 'antd';
 import AdminPanel from '../AdminPanel';
 import { renderWithProviders } from '../../test-utils/renderWithProviders';
-import { makeUser, makeManagerUser } from '../../test-utils/fixtures';
+import { makeManagerUser } from '../../test-utils/fixtures';
 
 // ── Mock APIs ───────────────────────────────────────────────────────────────
 jest.mock('../../api/users', () => ({
