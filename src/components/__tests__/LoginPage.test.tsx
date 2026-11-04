@@ -59,7 +59,7 @@ describe('LoginPage', () => {
 
     await waitFor(() => {
       const emailInput = screen.getByRole('textbox', { name: /email/i }) as HTMLInputElement;
-      expect(emailInput.value).toBe('o1@parking.dev');
+      expect(emailInput.value).toBe('sarah@parking.dev');
     });
 
     const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;

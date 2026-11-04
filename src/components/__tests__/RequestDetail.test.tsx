@@ -105,8 +105,13 @@ describe('RequestDetail', () => {
     });
   });
 
-  it('renders the go-back button', async () => {
-    renderDetail();
+  it('shows a go-back button when the request is not found', async () => {
+    // The Go Back button lives on the "not found" screen only
+    renderWithProviders(<RequestDetail />, {
+      authValue: { user: makeUser() },
+      requestsValue: { pendingRequests: [], approvedRequests: [], userRequests: [] },
+      route: `/request/${requestId}`,
+    });
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /go back/i })).toBeInTheDocument();
     });

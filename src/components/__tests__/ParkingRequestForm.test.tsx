@@ -13,6 +13,14 @@ jest.spyOn(notification, 'success').mockImplementation(() => ({ destroy: jest.fn
 
 const alice = makeUser();
 
+// Must match MAX_PENDING_REQUESTS in ParkingRequestForm.tsx (and .env.example)
+const MAX_ACTIVE = 10;
+
+function makeActiveRequests(count: number) {
+  return Array.from({ length: count }, (_, i) =>
+    makeParkingRequest({ status: i % 2 === 0 ? RequestStatus.PENDING : RequestStatus.APPROVED }));
+}
+
 describe('ParkingRequestForm — max-requests gate', () => {
   it('shows "Submit Request" button text with 0 active requests', () => {
     renderWithProviders(<ParkingRequestForm />, {
@@ -35,14 +43,8 @@ describe('ParkingRequestForm — max-requests gate', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('shows "Cannot Submit" button text at limit (5 active)', () => {
-    const active = [
-      makeParkingRequest({ status: RequestStatus.PENDING }),
-      makeParkingRequest({ status: RequestStatus.APPROVED }),
-      makeParkingRequest({ status: RequestStatus.PENDING }),
-      makeParkingRequest({ status: RequestStatus.PENDING }),
-      makeParkingRequest({ status: RequestStatus.PENDING }),
-    ];
+  it('shows "Cannot Submit" button text at limit (10 active)', () => {
+    const active = makeActiveRequests(MAX_ACTIVE);
     renderWithProviders(<ParkingRequestForm />, {
       authValue: { user: alice },
       requestsValue: { userRequests: active },
@@ -51,13 +53,7 @@ describe('ParkingRequestForm — max-requests gate', () => {
   });
 
   it('shows warning Alert at limit', () => {
-    const active = [
-      makeParkingRequest({ status: RequestStatus.PENDING }),
-      makeParkingRequest({ status: RequestStatus.APPROVED }),
-      makeParkingRequest({ status: RequestStatus.PENDING }),
-      makeParkingRequest({ status: RequestStatus.PENDING }),
-      makeParkingRequest({ status: RequestStatus.PENDING }),
-    ];
+    const active = makeActiveRequests(MAX_ACTIVE);
     renderWithProviders(<ParkingRequestForm />, {
       authValue: { user: alice },
       requestsValue: { userRequests: active },
@@ -74,7 +70,7 @@ describe('ParkingRequestForm — max-requests gate', () => {
   });
 
   it('rejected requests do not count toward the active limit', () => {
-    // 4 active + 1 rejected = still under the 5-active limit
+    // 4 active + 1 rejected = still under the 10-active limit
     const requests = [
       makeParkingRequest({ status: RequestStatus.PENDING }),
       makeParkingRequest({ status: RequestStatus.APPROVED }),
@@ -101,7 +97,7 @@ describe('ParkingRequestForm — active requests card', () => {
       authValue: { user: alice },
       requestsValue: { userRequests: active },
     });
-    expect(screen.getByText(/Your Pending Requests \(2 \/ 5\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your Pending Requests \(2 \/ 10\)/i)).toBeInTheDocument();
   });
 
   it('does not show active requests card with 0 active requests', () => {
