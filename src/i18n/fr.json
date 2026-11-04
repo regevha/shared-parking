@@ -303,6 +303,7 @@
     "rtlNote": ""
   },
   "lotCalendarView": {
+    "selectLot": "Sélectionner un parking",
     "allMyLots": "Mes Places",
     "allLots": "Toutes les Places",
     "availableSlots": "Places Disponibles",

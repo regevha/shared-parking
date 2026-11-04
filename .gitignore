@@ -48,3 +48,8 @@ backend/parking.log
 # Playwright
 e2e/playwright-report/
 e2e/test-results/
+
+# Playwright local artefacts
+test-results/
+playwright-report/
+playwright.local.config.ts

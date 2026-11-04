@@ -303,6 +303,7 @@
     "rtlNote": ""
   },
   "lotCalendarView": {
+    "selectLot": "Select lot",
     "allMyLots": "My Lots",
     "allLots": "All Lots",
     "availableSlots": "Available Lots",

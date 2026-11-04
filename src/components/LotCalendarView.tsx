@@ -503,6 +503,7 @@ const LotCalendarView: React.FC = () => {
       <div className="lot-selector">
         <Select
           value={selectedLot}
+          aria-label={t('lotCalendarView.selectLot')}
           onChange={setSelectedLot}
           options={lotOptions}
           style={{ width: isMobile ? '100%' : 260 }}
