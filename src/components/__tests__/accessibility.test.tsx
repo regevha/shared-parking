@@ -42,6 +42,9 @@ import * as requestsApiModule from '../../api/requests';
 
 expect.extend(toHaveNoViolations);
 
+// axe over large Ant Design tables is slow in jsdom (several seconds per screen)
+jest.setTimeout(30000);
+
 const axe = configureAxe({
   rules: {
     'color-contrast': { enabled: false }, // needs a real browser — see Playwright scan
