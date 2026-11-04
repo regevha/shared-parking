@@ -1,11 +1,12 @@
 import pytest
 from fastapi.testclient import TestClient
+from .conftest import future_date
 
 def test_audit_trail_privacy(client: TestClient, user_headers: dict, owner_headers: dict, manager_headers: dict):
     """Verify User B cannot see User A's audit log."""
     # 1. Create a request as User A
     payload = {
-        "date": "2026-05-01",
+        "date": future_date(14),
         "start_time": "09:00",
         "duration": 4
     }
@@ -37,7 +38,7 @@ def test_audit_trail_immutability(client: TestClient, manager_headers: dict):
 def test_audit_trail_retention_on_deletion(client: TestClient, user_headers: dict, manager_headers: dict):
     """Verify audit logs survive request deletion."""
     # 1. Create request
-    payload = {"date": "2026-06-01", "start_time": "10:00", "duration": 2}
+    payload = {"date": future_date(14), "start_time": "10:00", "duration": 2}
     resp = client.post("/api/requests", json=payload, headers=user_headers)
     req_id = resp.json()["id"]
 
