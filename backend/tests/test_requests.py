@@ -1,7 +1,6 @@
 """Tests for /api/requests/* endpoints."""
 
-import pytest
-from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE, create_lot_owned_by, future_date
+from .conftest import REQUEST_PAYLOAD, create_lot_owned_by, future_date
 
 
 # ── GET /api/requests ──────────────────────────────────────────────────────

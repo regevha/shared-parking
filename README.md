@@ -172,6 +172,16 @@ The suite runs against a fresh in-memory SQLite database — it never touches `p
 | `test_users.py` | 30 | List, get, update, delete, RBAC, password change, preferences |
 | `test_messages.py` | 16 | Send/read messages, RBAC, audit retention after request deletion |
 
+### Backend lint
+
+```bash
+cd backend
+pip install -r requirements-test.txt   # includes ruff
+ruff check .
+```
+
+Configured in `backend/pyproject.toml` (correctness rules only: pycodestyle errors and pyflakes).
+
 ### Frontend
 
 ```bash

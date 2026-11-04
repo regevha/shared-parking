@@ -89,7 +89,8 @@ class ParkingRequestCreate(BaseModel):
                 raise ValueError(f'end_date/end_time do not match duration {self.duration}h. Expected {calc_end_dt}')
 
         except Exception as ex:
-            if isinstance(ex, ValueError): raise ex
+            if isinstance(ex, ValueError):
+                raise ex
             raise ValueError(f'Invalid date/time combination: {ex}')
 
         return self

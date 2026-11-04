@@ -42,7 +42,7 @@ def run_auto_approval(db=None):
             
             # If request already has a lot specified, check only that one
             if req.lot_id:
-                lot = next((l for l in all_lots if l.id == req.lot_id), None)
+                lot = next((lot_ for lot_ in all_lots if lot_.id == req.lot_id), None)
                 if lot and lot.status == models.LotStatus.AVAILABLE.value:
                     if not _has_conflict(db, lot.id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=req.id) and \
                        not _is_outside_availability(db, lot.id, req.date, req.start_time, req.end_date, req.end_time):

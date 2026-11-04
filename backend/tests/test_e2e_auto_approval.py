@@ -1,5 +1,3 @@
-import pytest
-import models
 from .conftest import REQUEST_PAYLOAD, LOT_PAYLOAD
 
 def test_e2e_auto_approval_flow(client, user_headers, manager_headers, db_session):

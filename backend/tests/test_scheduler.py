@@ -5,7 +5,6 @@ Directly calls run_auto_approval(db=...) rather than spinning up the
 BackgroundScheduler so tests remain fast and fully isolated.
 """
 
-import pytest
 from datetime import date, timedelta
 from .conftest import REQUEST_PAYLOAD
 from scheduler import run_auto_approval

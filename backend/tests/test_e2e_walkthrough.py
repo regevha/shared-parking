@@ -1,6 +1,5 @@
-import pytest
 from datetime import datetime, timedelta, timezone
-from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE, create_lot_owned_by
+from .conftest import create_lot_owned_by
 
 # ── End-to-End Walkthrough Scenario ──────────────────────────────────────────
 

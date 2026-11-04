@@ -5,6 +5,7 @@ Seed the SQLite database with sample data: 2 Owners, 1 Admin/Manager.
 from datetime import datetime, timezone, date, timedelta
 import json
 import models
+from auth import hash_password
 from database import SessionLocal, engine, Base
 
 Base.metadata.create_all(bind=engine)

@@ -1,4 +1,3 @@
-import pytest
 from datetime import datetime, timezone
 import models
 from .conftest import create_lot_owned_by, future_date
@@ -20,7 +19,6 @@ def test_get_notifications_requires_auth(client):
 
 def test_get_notifications_returns_only_own(client, user_headers, owner_headers, db_session):
     # Get actual IDs
-    alice_id = get_user_id(client, user_headers)
     bob_id = get_user_id(client, owner_headers)
 
     # Create notification for Bob manually
