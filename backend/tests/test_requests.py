@@ -423,3 +423,39 @@ def test_approve_no_conflict_adjacent_slots(client, user_headers, owner_headers,
     client.patch(f"/api/requests/{id1}/approve", json=lot_info, headers=owner_headers)
     resp2 = client.patch(f"/api/requests/{id2}/approve", json=lot_info, headers=owner_headers)
     assert resp2.status_code == 200
+
+
+
+# ── Request id generation ──────────────────────────────────────────────────
+
+def _insert_request_row(db_session, request_id: str) -> None:
+    import models
+    db_session.add(models.ParkingRequest(
+        id=request_id, requester_id="u-1", requester_name="Seed", date="2030-01-01",
+        start_time="09:00", end_date="2030-01-01", end_time="10:00", duration=1,
+        submitted_at="2030-01-01T00:00:00+00:00",
+    ))
+    db_session.commit()
+
+
+def test_generate_id_starts_at_req_001(db_session):
+    from routers.requests import _generate_id
+    assert _generate_id(db_session) == "REQ-001"
+
+
+def test_generate_id_increments_past_999(db_session):
+    """Regression: string ordering put REQ-999 above REQ-1000, so ids collided after 999."""
+    from routers.requests import _generate_id
+    _insert_request_row(db_session, "REQ-998")
+    _insert_request_row(db_session, "REQ-999")
+    assert _generate_id(db_session) == "REQ-1000"
+
+    _insert_request_row(db_session, "REQ-1000")
+    assert _generate_id(db_session) == "REQ-1001"
+
+
+def test_generate_id_ignores_non_numeric_ids(db_session):
+    from routers.requests import _generate_id
+    _insert_request_row(db_session, "REQ-007")
+    _insert_request_row(db_session, "REQ-ABC123")
+    assert _generate_id(db_session) == "REQ-008"

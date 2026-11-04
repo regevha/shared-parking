@@ -14,26 +14,17 @@ router = APIRouter(prefix="/api/requests", tags=["requests"])
 
 
 def _generate_id(db: Session) -> str:
-    """Generate a sequential REQ-XXX ID or fallback to a short UUID on error/collision."""
-    last = db.query(models.ParkingRequest.id).order_by(models.ParkingRequest.id.desc()).first()
-    if not last:
+    """Generate the next sequential REQ-NNN id.
+
+    The next number is the numeric maximum of the existing REQ-<digits> ids.
+    (Sorting the id strings is wrong: "REQ-999" sorts above "REQ-1000", which
+    made the generator hand out REQ-1000 repeatedly once it was first used.)
+    """
+    rows = db.query(models.ParkingRequest.id).filter(models.ParkingRequest.id.like("REQ-%")).all()
+    numbers = [int(r[0][4:]) for r in rows if r[0][4:].isdigit()]
+    if not numbers:
         return "REQ-001"
-    
-    id_str = last[0]
-    if "-" in id_str:
-        try:
-            prefix, num_str = id_str.split("-", 1)
-            if prefix == "REQ":
-                last_num = int(num_str)
-                # Keep padding but allow growth beyond 999
-                padding = max(3, len(num_str))
-                return f"REQ-{last_num + 1:0{padding}d}"
-        except (ValueError, IndexError):
-            pass
-    
-    # Fallback for non-standard IDs to avoid collisions
-    import uuid
-    return f"REQ-{uuid.uuid4().hex[:6].upper()}"
+    return f"REQ-{max(numbers) + 1:03d}"
 
 
 def _add_audit_log(
