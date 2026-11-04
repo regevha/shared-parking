@@ -233,7 +233,7 @@ Authorization: Bearer <token>
 
 | Method | Path | Role | Description |
 |--------|------|------|-------------|
-| POST | `/auth/register` | — | Create account |
+| POST | `/auth/register` | — | Create account (always role `user`; managers promote users via `PATCH /api/users/{id}`) |
 | POST | `/auth/login` | — | Sign in, returns JWT |
 | GET | `/auth/me` | Any | Current user profile |
 

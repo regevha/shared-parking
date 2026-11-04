@@ -23,6 +23,7 @@ os.environ.setdefault("SECRET_KEY", "test-only-secret-key-do-not-use-in-producti
 # Make the backend package importable when running pytest from backend/
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+import models
 from database import Base, get_db
 from main import app
 
@@ -73,14 +74,28 @@ def client(db_session):
 
 # ── Auth helpers ───────────────────────────────────────────────────────────
 
-def register_and_login(client, name: str, email: str, password: str, role: str) -> dict:
-    """Register a user and return their Authorization headers."""
+def promote_user(db_session, email: str, role: str) -> None:
+    """Set a user's role directly in the test DB.
+
+    Public registration always creates role="user" (see routers/auth.py), so
+    tests that need an owner or manager promote the account here instead.
+    """
+    user = db_session.query(models.User).filter(models.User.email == email).first()
+    assert user is not None, f"No user {email} to promote"
+    user.role = role
+    db_session.commit()
+
+
+def register_and_login(client, name: str, email: str, password: str, role: str, db_session=None) -> dict:
+    """Register a user (promoting to `role` via the DB if needed) and return auth headers."""
     client.post("/auth/register", json={
         "name": name,
         "email": email,
         "password": password,
-        "role": role,
     })
+    if role != "user":
+        assert db_session is not None, "db_session is required to create an owner/manager"
+        promote_user(db_session, email, role)
     resp = client.post(
         "/auth/login",
         data={"username": email, "password": password},
@@ -97,13 +112,13 @@ def user_headers(client) -> dict:
 
 
 @pytest.fixture()
-def owner_headers(client) -> dict:
-    return register_and_login(client, "Bob Owner", "bob@test.com", "Pass1234", "owner")
+def owner_headers(client, db_session) -> dict:
+    return register_and_login(client, "Bob Owner", "bob@test.com", "Pass1234", "owner", db_session)
 
 
 @pytest.fixture()
-def manager_headers(client) -> dict:
-    return register_and_login(client, "Carol Manager", "carol@test.com", "Pass1234", "manager")
+def manager_headers(client, db_session) -> dict:
+    return register_and_login(client, "Carol Manager", "carol@test.com", "Pass1234", "manager", db_session)
 
 
 # ── Request helpers ────────────────────────────────────────────────────────

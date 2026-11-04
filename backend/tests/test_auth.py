@@ -33,6 +33,25 @@ def test_register_default_role_is_user(client):
     assert resp.json()["role"] == "user"
 
 
+@pytest.mark.parametrize("requested_role", ["owner", "manager"])
+def test_register_cannot_self_assign_privileged_role(client, requested_role):
+    """Public signup must never grant owner/manager, even if the client asks for it."""
+    resp = client.post("/auth/register", json={
+        "name": "Mallory", "email": "mallory@test.com", "password": "Pass1234",
+        "role": requested_role,
+    })
+    assert resp.status_code == 201
+    assert resp.json()["role"] == "user"
+
+    token = login(client, "mallory@test.com", "Pass1234").json()
+    assert token["role"] == "user"
+
+    headers = {"Authorization": f"Bearer {token['access_token']}"}
+    assert client.get("/auth/me", headers=headers).json()["role"] == "user"
+    # And the privileged endpoints stay closed to the new account
+    assert client.get("/api/users", headers=headers).status_code == 403
+
+
 def test_register_duplicate_email_returns_400(client):
     payload = {"name": "A", "email": "dup@test.com", "password": "Pass1234"}
     client.post("/auth/register", json=payload)
@@ -43,10 +62,13 @@ def test_register_duplicate_email_returns_400(client):
 
 # ── Login ──────────────────────────────────────────────────────────────────
 
-def test_login_success_returns_token_and_user_fields(client):
+def test_login_success_returns_token_and_user_fields(client, db_session):
+    from .conftest import promote_user
+
     client.post("/auth/register", json={
-        "name": "Carol", "email": "carol@test.com", "password": "Secret1234", "role": "owner",
+        "name": "Carol", "email": "carol@test.com", "password": "Secret1234",
     })
+    promote_user(db_session, "carol@test.com", "owner")
     resp = login(client, "carol@test.com", "Secret1234")
     assert resp.status_code == 200
     data = resp.json()
