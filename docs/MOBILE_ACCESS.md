@@ -36,7 +36,7 @@ uvicorn main:app --reload --host 0.0.0.0
 ```bash
 npm start
 ```
-The `.env` file at the project root already sets `HOST=0.0.0.0`.
+Create the `.env` file at the project root from `.env.example` (`cp .env.example .env`); the template already sets `HOST=0.0.0.0`.
 
 ---
 

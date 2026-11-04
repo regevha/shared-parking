@@ -16,6 +16,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 
+# auth.py refuses to import without SECRET_KEY. Use a throwaway test key so the
+# suite runs on a fresh clone with no .env file (the real .env is not committed).
+os.environ.setdefault("SECRET_KEY", "test-only-secret-key-do-not-use-in-production")
+
 # Make the backend package importable when running pytest from backend/
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 

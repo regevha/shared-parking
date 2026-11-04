@@ -14,11 +14,12 @@ def test_logging_file_exists():
         assert "API Starting Up..." in content or "INFO" in content
 
 def test_secret_key_from_env():
-    """Verify that the auth module is loading the SECRET_KEY from the environment/dotenv."""
-    # In auth.py we have SECRET_KEY = os.getenv("SECRET_KEY", "fallback-dev-secret-key-very-unsafe")
-    # Our .env in the root has "shared-parking-dev-secret-key-change-in-production"
-    assert SECRET_KEY == "shared-parking-dev-secret-key-change-in-production"
+    """Verify that the auth module loads a non-empty SECRET_KEY from the environment/dotenv."""
+    # auth.py raises at import time if SECRET_KEY is unset; the key itself comes from
+    # the (uncommitted) .env or, under pytest, from conftest's throwaway test key.
+    assert SECRET_KEY
     assert SECRET_KEY != "fallback-dev-secret-key-very-unsafe"
+
 
 def test_business_rules_loading():
     """Verify that business rule constants are correctly loaded from the environment."""
