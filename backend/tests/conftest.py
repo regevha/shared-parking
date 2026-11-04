@@ -123,7 +123,13 @@ def manager_headers(client, db_session) -> dict:
 
 # ── Request helpers ────────────────────────────────────────────────────────
 
-_FUTURE_DATE = (date.today() + timedelta(days=7)).isoformat()
+def future_date(days_ahead: int = 7) -> str:
+    """ISO date `days_ahead` days from today. Use instead of hardcoded dates, which go stale
+    (the API rejects requests dated in the past)."""
+    return (date.today() + timedelta(days=days_ahead)).isoformat()
+
+
+_FUTURE_DATE = future_date(7)
 
 REQUEST_PAYLOAD = {
     "requester_id":   "ignored",

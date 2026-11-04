@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, timezone
 import models
-from .conftest import create_lot_owned_by
+from .conftest import create_lot_owned_by, future_date
 
 def get_user_id(client, headers):
     resp = client.get("/auth/me", headers=headers)
@@ -64,7 +64,7 @@ def test_approval_triggers_notification(client, user_headers, owner_headers, man
 def test_rejection_triggers_notification(client, user_headers, owner_headers):
     # 1. Alice creates a new request
     r = client.post("/api/requests", json={
-        "date": "2026-06-01", "start_time": "12:00", "end_date": "2026-06-01", "end_time": "14:00", "duration": 2
+        "date": future_date(14), "start_time": "12:00", "end_date": future_date(14), "end_time": "14:00", "duration": 2
     }, headers=user_headers)
     req_id = r.json()["id"]
     

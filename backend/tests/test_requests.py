@@ -1,7 +1,7 @@
 """Tests for /api/requests/* endpoints."""
 
 import pytest
-from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE, create_lot_owned_by
+from .conftest import REQUEST_PAYLOAD, _FUTURE_DATE, create_lot_owned_by, future_date
 
 
 # ── GET /api/requests ──────────────────────────────────────────────────────
@@ -222,28 +222,28 @@ def test_reject_nonexistent_returns_404(client, owner_headers):
 def test_update_own_pending_request(client, user_headers, created_request_id):
     resp = client.patch(
         f"/api/requests/{created_request_id}",
-        json={"date": "2026-05-01", "start_time": "10:00", "end_time": "12:00", "duration": 2},
+        json={"date": future_date(14), "start_time": "10:00", "end_time": "12:00", "duration": 2},
         headers=user_headers,
     )
     assert resp.status_code == 200
-    assert resp.json()["date"] == "2026-05-01"
+    assert resp.json()["date"] == future_date(14)
 
 
 def test_update_only_sends_changed_fields(client, user_headers, created_request_id):
     resp = client.patch(
         f"/api/requests/{created_request_id}",
-        json={"date": "2026-06-15"},
+        json={"date": future_date(21)},
         headers=user_headers,
     )
     data = resp.json()
-    assert data["date"] == "2026-06-15"
+    assert data["date"] == future_date(21)
     assert data["start_time"] == REQUEST_PAYLOAD["start_time"]  # unchanged
 
 
 def test_update_another_users_request_returns_403(client, owner_headers, created_request_id):
     resp = client.patch(
         f"/api/requests/{created_request_id}",
-        json={"date": "2026-07-01"},
+        json={"date": future_date(28)},
         headers=owner_headers,
     )
     assert resp.status_code == 403
@@ -253,7 +253,7 @@ def test_update_approved_request_returns_400(client, user_headers, owner_headers
     client.patch(f"/api/requests/{created_request_id}/approve", json={}, headers=owner_headers)
     resp = client.patch(
         f"/api/requests/{created_request_id}",
-        json={"date": "2026-08-01"},
+        json={"date": future_date(35)},
         headers=user_headers,
     )
     assert resp.status_code == 400
@@ -263,7 +263,7 @@ def test_update_approved_request_returns_400(client, user_headers, owner_headers
 def test_update_nonexistent_returns_404(client, user_headers):
     resp = client.patch(
         "/api/requests/REQ-999",
-        json={"date": "2026-09-01"},
+        json={"date": future_date(42)},
         headers=user_headers,
     )
     assert resp.status_code == 404
