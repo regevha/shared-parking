@@ -16,7 +16,9 @@ class RegisterRequest(BaseModel):
     name: str
     email: str
     password: str
-    role: str = "user"  # user | owner | manager
+    # NOTE: there is intentionally no `role` field. Public registration always
+    # creates a plain "user"; owners/managers are promoted by a manager via
+    # PATCH /api/users/{id}. Any `role` sent by a client is ignored.
 
 
 class PreferencesOut(BaseModel):
@@ -62,7 +64,7 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
         name=payload.name,
         email=payload.email,
         password_hash=auth_utils.hash_password(payload.password),
-        role=payload.role,
+        role=models.UserRole.USER.value,
         created_at=datetime.now(timezone.utc).isoformat(),
     )
     db.add(user)

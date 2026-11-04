@@ -158,15 +158,17 @@ def test_messages_preserved_after_request_deletion(client, db_session, user_head
 
 # ── Owner lot-scoping (M-1) ───────────────────────────────────────────────
 
-def test_owner_cannot_access_messages_for_request_assigned_to_another_owner(client, user_headers, manager_headers):
+def test_owner_cannot_access_messages_for_request_assigned_to_another_owner(client, db_session, user_headers, manager_headers):
     """An owner must not read/post messages on a request whose lot belongs to a different owner."""
+    from .conftest import promote_user
+
     # Register a second owner
     client.post("/auth/register", json={
         "name": "Eve Owner",
         "email": "eve@test.com",
         "password": "Pass1234",
-        "role": "owner",
     })
+    promote_user(db_session, "eve@test.com", "owner")
     eve_resp = client.post(
         "/auth/login",
         data={"username": "eve@test.com", "password": "Pass1234"},
@@ -195,8 +197,8 @@ def test_owner_cannot_access_messages_for_request_assigned_to_another_owner(clie
         "name": "Frank Owner",
         "email": "frank@test.com",
         "password": "Pass1234",
-        "role": "owner",
     })
+    promote_user(db_session, "frank@test.com", "owner")
     frank_resp = client.post(
         "/auth/login",
         data={"username": "frank@test.com", "password": "Pass1234"},
