@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Alert, Card, Collapse, DatePicker, Row, Col, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
+import { Alert, Card, Collapse, DatePicker, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { isRTL, SupportedLanguage } from '../i18n';
 import dayjs from 'dayjs';
@@ -195,7 +195,7 @@ const LotCalendarView: React.FC = () => {
         start: new Date(`${a.date}T${a.startTime}:00`),
         end: new Date(`${a.endDate || a.date}T${a.endTime}:00`),
       })),
-  [approvedRequests, user?.name]);
+  [approvedRequests, user?.name, isManager]);
 
   // Available slots — timeslots where at least 1 owner lot is free
   const availableEvents = useMemo((): LotCalendarEvent[] => {
@@ -213,13 +213,14 @@ const LotCalendarView: React.FC = () => {
     let day = rangeStart;
 
     while (!day.isAfter(rangeEnd)) {
+      const currentDay = day; // stable per-iteration copy for the callbacks below
       // Per-lot busy hour flags [WORK_START..WORK_END)
       const lotBusy: Record<string, boolean[]> = {};
       visibleLots.forEach(l => { lotBusy[l.id] = new Array(WORK_END - WORK_START).fill(false); });
 
       // Mark blocked lots as fully busy for this day
       visibleLots.forEach(l => {
-        if (l.status === 'blocked' && l.blockedUntil && dayjs(l.blockedUntil).isAfter(day)) {
+        if (l.status === 'blocked' && l.blockedUntil && dayjs(l.blockedUntil).isAfter(currentDay)) {
           lotBusy[l.id].fill(true);
         }
       });
@@ -230,8 +231,8 @@ const LotCalendarView: React.FC = () => {
       allOwnerBookedEvents.forEach(({ lotId, start, end }) => {
         if (!lotId || !lotBusy[lotId] || start >= dayWorkEnd || end <= dayWorkStart) return;
         for (let h = WORK_START; h < WORK_END; h++) {
-          const slotStart = day.hour(h).minute(0).second(0).toDate();
-          const slotEnd   = day.hour(h + 1).minute(0).second(0).toDate();
+          const slotStart = currentDay.hour(h).minute(0).second(0).toDate();
+          const slotEnd   = currentDay.hour(h + 1).minute(0).second(0).toDate();
           if (start < slotEnd && end > slotStart) {
             lotBusy[lotId][h - WORK_START] = true;
           }
@@ -258,6 +259,9 @@ const LotCalendarView: React.FC = () => {
       day = day.add(1, 'day');
     }
     return result;
+    // `t` is not read here, but it is kept on purpose: switching language changes the dayjs
+    // locale (and so the week start), which must recompute the visible range.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLot, date, view, visibleLots, allOwnerBookedEvents, t]);
 
   const events: LotCalendarEvent[] = useMemo(() =>

@@ -1,5 +1,4 @@
 import { messagesApi } from '../messages';
-import { ApiError } from '../client';
 
 // ── fetch mock setup ─────────────────────────────────────────────────────────
 

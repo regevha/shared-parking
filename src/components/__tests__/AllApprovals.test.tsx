@@ -12,7 +12,6 @@ beforeEach(() => {
 });
 afterEach(() => { jest.restoreAllMocks(); });
 
-const TODAY = new Date().toISOString().split('T')[0];
 
 function makeApproved(overrides = {}) {
   return makeParkingRequest({

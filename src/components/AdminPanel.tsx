@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Upload, Alert,
-  Input, DatePicker, Tabs, Select, notification, Switch, Spin, Skeleton, Modal, Popconfirm, Drawer,
+  Input, DatePicker, Tabs, Select, notification, Switch, Skeleton, Modal, Popconfirm, Drawer,
 } from 'antd';
 import InfoBanner from './InfoBanner';
 import {
@@ -333,7 +333,6 @@ const AdminPanel: React.FC = () => {
     });
 
   const handleExport = () => {
-    const activeTab = document.querySelector('.ant-tabs-tab-active')?.textContent ?? 'All';
     const rows = filteredRequests.map(r => ({
       ID: r.id,
       Date: dayjs(r.date).format('DD/MM/YYYY'),

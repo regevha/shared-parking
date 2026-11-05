@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Badge, Popover, List, Button, Typography, Space, Spin, notification } from 'antd';
+import { Badge, Popover, List, Button, Typography, notification } from 'antd';
 import { BellOutlined, CheckOutlined, InboxOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';

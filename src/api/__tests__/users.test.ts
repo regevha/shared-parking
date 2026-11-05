@@ -1,5 +1,4 @@
 import { usersApi } from '../users';
-import { ApiError } from '../client';
 
 // ── fetch mock setup ─────────────────────────────────────────────────────────
 

@@ -111,7 +111,16 @@ const LotStatusBoard: React.FC = () => {
                   key={lot.id}
                   className={`parking-spot${isLightBg(status) ? ' parking-spot--light-bg' : ''}`}
                   style={{ backgroundColor: bgColor }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${lot.id}: ${status}`}
                   onClick={() => setSelectedLot(lot)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedLot(lot);
+                    }
+                  }}
                 >
                   <div className="lot-id">{lot.id}</div>
                   {isBlocked && <CarOutlined className="car-icon" />}
