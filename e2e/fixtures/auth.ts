@@ -46,5 +46,7 @@ export async function loginViaUI(page: Page, email: string, password: string): P
  * Call this after loginAs() + page.goto(route) to ensure auth is resolved.
  */
 export async function waitForNav(page: Page): Promise<void> {
-  await page.getByRole('menuitem', { name: 'Parking Status' }).waitFor({ timeout: 10000 });
+  // Language-agnostic: any menu item means the shell rendered and auth resolved (the label is
+  // translated, so 'Parking Status' does not exist in Hebrew/French).
+  await page.getByRole('menuitem').first().waitFor({ timeout: 10000 });
 }
