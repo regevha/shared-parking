@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { ParkingRequest } from '../contexts/RequestsContext';
 import { LotData } from '../api/lots';
 import { AuthUser } from '../api/auth';
@@ -5,18 +6,23 @@ import { RequestStatus, LotStatus } from '../types/enums';
 
 let _reqCounter = 1;
 
+// Relative dates: the UI hides requests dated before yesterday, so a hardcoded
+// date makes every fixture-based test fail once that date passes.
+const FIXTURE_DATE = dayjs().add(7, 'day').format('YYYY-MM-DD');
+const FIXTURE_SUBMITTED_AT = dayjs().subtract(2, 'day').toISOString();
+
 export function makeParkingRequest(overrides: Partial<ParkingRequest> = {}): ParkingRequest {
   const id = String(_reqCounter++);
   return {
     id,
     requesterId: 'user-1',
     requesterName: 'Alice Johnson',
-    date: '2026-04-10',
+    date: FIXTURE_DATE,
     startTime: '09:00',
-    endDate: '2026-04-10',
+    endDate: FIXTURE_DATE,
     endTime: '10:00',
     duration: 1,
-    submittedAt: '2026-03-28T08:00:00Z',
+    submittedAt: FIXTURE_SUBMITTED_AT,
     status: RequestStatus.PENDING,
     rejectedByOwner: false,
     ...overrides,
