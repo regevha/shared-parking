@@ -1,8 +1,7 @@
 """Tests for /api/lots/{lot_id}/availability endpoints and availability enforcement."""
 
-import pytest
 from datetime import date, timedelta
-from .conftest import _FUTURE_DATE, REQUEST_PAYLOAD
+from .conftest import _FUTURE_DATE
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -83,8 +82,6 @@ def test_create_window_user_forbidden(client, user_headers, owner_lot_id):
 
 def test_create_window_wrong_owner_forbidden(client, owner_lot_id):
     """A second owner cannot create windows for a lot they don't own."""
-    from .conftest import register_and_login
-    import pytest
 
     # We need a fresh client fixture here; instead use a direct registration
     # approach within this test via a helper call.
@@ -321,7 +318,6 @@ def test_wrong_day_window_does_not_unlock(client, user_headers, owner_headers, o
 def test_scheduler_skips_lot_without_window(client, user_headers, owner_headers, owner_lot_id):
     """Auto-approve leaves request pending when no window covers it."""
     from routers.requests import _is_outside_availability
-    from database import get_db
 
     monday = _future_monday()
     # No windows → blocked

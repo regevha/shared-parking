@@ -1,6 +1,5 @@
 """Tests for /api/requests/{id}/messages endpoints."""
 
-import pytest
 from .conftest import REQUEST_PAYLOAD
 
 

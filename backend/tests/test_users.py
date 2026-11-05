@@ -1,6 +1,5 @@
 """Tests for /api/users/* endpoints."""
 
-import pytest
 
 
 def get_user_id(client, headers) -> str:

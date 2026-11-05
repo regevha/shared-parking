@@ -1,6 +1,5 @@
 """Tests for /api/lots/* endpoints."""
 
-import pytest
 from .conftest import LOT_PAYLOAD
 
 
@@ -20,7 +19,7 @@ def test_get_all_lots_requires_auth(client):
 def test_get_all_lots_after_creation(client, user_headers, created_lot_id):
     resp = client.get("/api/lots", headers=user_headers)
     assert resp.status_code == 200
-    assert any(l["id"] == created_lot_id for l in resp.json())
+    assert any(lot["id"] == created_lot_id for lot in resp.json())
 
 
 # ── GET /api/lots/mine ────────────────────────────────────────────────────
@@ -28,14 +27,14 @@ def test_get_all_lots_after_creation(client, user_headers, created_lot_id):
 def test_get_my_lots_returns_owned_lots(client, owner_headers, owner_lot_id):
     resp = client.get("/api/lots/mine", headers=owner_headers)
     assert resp.status_code == 200
-    ids = [l["id"] for l in resp.json()]
+    ids = [lot["id"] for lot in resp.json()]
     assert owner_lot_id in ids
 
 
 def test_get_my_lots_excludes_unowned(client, owner_headers, created_lot_id):
     # created_lot_id has no owner_id set
     resp = client.get("/api/lots/mine", headers=owner_headers)
-    ids = [l["id"] for l in resp.json()]
+    ids = [lot["id"] for lot in resp.json()]
     assert created_lot_id not in ids
 
 
@@ -54,7 +53,7 @@ def test_get_lots_by_owner_name(client, manager_headers, owner_headers):
     }, headers=manager_headers)
     resp = client.get(f"/api/lots/owner/{me['name']}", headers=owner_headers)
     assert resp.status_code == 200
-    assert any(l["id"] == "F3-001" for l in resp.json())
+    assert any(lot["id"] == "F3-001" for lot in resp.json())
 
 
 def test_get_lots_by_unknown_owner_returns_empty(client, user_headers):

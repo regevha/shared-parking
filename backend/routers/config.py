@@ -1,12 +1,12 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import models
 from auth import get_current_user
-from database import SessionLocal, get_db
+from database import get_db
 
 router = APIRouter(prefix="/api/config", tags=["config"])
-
-import os
 
 # These constants mirror the validation rules enforced in schemas.py
 def get_system_config():

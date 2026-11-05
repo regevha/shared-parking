@@ -66,19 +66,19 @@ def test_parking_db_is_seeded():
 
         user_count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
         assert user_count > 0, (
-            f"parking.db has a 'users' table but it is empty. "
+            "parking.db has a 'users' table but it is empty. "
             "Run `python backend/seed.py` to populate the database before starting the app."
         )
 
         lot_count = conn.execute("SELECT COUNT(*) FROM lots").fetchone()[0]
         assert lot_count > 0, (
-            f"parking.db has a 'lots' table but it is empty. "
+            "parking.db has a 'lots' table but it is empty. "
             "Run `python backend/seed.py` to populate the database before starting the app."
         )
 
         request_count = conn.execute("SELECT COUNT(*) FROM parking_requests").fetchone()[0]
         assert request_count > 0, (
-            f"parking.db has a 'parking_requests' table but it is empty. "
+            "parking.db has a 'parking_requests' table but it is empty. "
             "Run `python backend/seed.py` to populate the database before starting the app."
         )
     finally:

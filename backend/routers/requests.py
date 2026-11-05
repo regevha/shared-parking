@@ -432,7 +432,6 @@ def get_request_audit(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    from typing import List
     logs = db.query(models.AuditLog).filter(models.AuditLog.request_id == request_id).order_by(models.AuditLog.timestamp.desc()).all()
     if not logs:
         raise HTTPException(status_code=404, detail="No audit logs found for this request")
