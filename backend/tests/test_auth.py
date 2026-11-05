@@ -139,3 +139,38 @@ def test_me_without_token_returns_401(client):
 def test_me_with_garbage_token_returns_401(client):
     resp = client.get("/auth/me", headers={"Authorization": "Bearer not-a-real-token"})
     assert resp.status_code == 401
+
+
+# ── Saved preferences are returned by auth endpoints ─────────────────────────
+
+def _login(client, email="alice@test.com", password="Pass1234"):
+    return client.post(
+        "/auth/login",
+        data={"username": email, "password": password},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+
+
+def test_me_and_login_return_saved_language_and_windows(client, user_headers):
+    """Regression: /auth/me and /auth/login used to return only dark_mode, so the
+    saved language (and windows) were never restored after a login or page reload."""
+    me = client.get("/auth/me", headers=user_headers).json()
+    user_id = me["id"]
+    assert me["preferences"]["language"] == "en"  # default
+
+    resp = client.patch(
+        f"/api/users/{user_id}/preferences",
+        json={"language": "he", "dark_mode": False,
+              "notification_windows": '{"Monday": []}'},
+        headers=user_headers,
+    )
+    assert resp.status_code == 200
+
+    me_prefs = client.get("/auth/me", headers=user_headers).json()["preferences"]
+    assert me_prefs["language"] == "he"
+    assert me_prefs["dark_mode"] is False
+    assert me_prefs["notification_windows"] == '{"Monday": []}'
+
+    login_prefs = _login(client).json()["preferences"]
+    assert login_prefs["language"] == "he"
+    assert login_prefs["dark_mode"] is False
