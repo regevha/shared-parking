@@ -3,6 +3,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from pydantic import BaseModel, EmailStr, field_validator
+
+from schemas import PreferencesOut
 import uuid
 
 from database import get_db
@@ -21,8 +23,22 @@ class RegisterRequest(BaseModel):
     # PATCH /api/users/{id}. Any `role` sent by a client is ignored.
 
 
-class PreferencesOut(BaseModel):
-    dark_mode: bool = True
+def _prefs_out(user: models.User) -> PreferencesOut:
+    """Serialise ALL of a user's preferences (language, windows, theme).
+
+    Auth responses used to return only ``dark_mode``, so the saved language and
+    availability/notification windows were never restored after login.
+    """
+    prefs = user.preferences[0] if user.preferences else None
+    if prefs is None:
+        return PreferencesOut()
+    defaults = PreferencesOut()
+    return PreferencesOut(
+        dark_mode=True if prefs.dark_mode is None else prefs.dark_mode,
+        availability_windows=prefs.availability_windows or defaults.availability_windows,
+        notification_windows=prefs.notification_windows or defaults.notification_windows,
+        language=prefs.language or defaults.language,
+    )
 
 
 class TokenResponse(BaseModel):
@@ -90,24 +106,22 @@ def login(
         )
 
     token = auth_utils.create_access_token({"sub": user.id, "role": user.role})
-    prefs = user.preferences[0] if user.preferences else models.UserPreferences(user_id=user.id)
     return TokenResponse(
         access_token=token,
         user_id=user.id,
         name=user.name,
         email=user.email,
         role=user.role,
-        preferences=PreferencesOut(dark_mode=prefs.dark_mode),
+        preferences=_prefs_out(user),
     )
 
 
 @router.get("/me", response_model=UserOut)
 def me(current_user: models.User = Depends(auth_utils.get_current_user)):
-    prefs = current_user.preferences[0] if current_user.preferences else models.UserPreferences(user_id=current_user.id)
     return UserOut(
         id=current_user.id,
         name=current_user.name,
         email=current_user.email,
         role=current_user.role,
-        preferences=PreferencesOut(dark_mode=prefs.dark_mode),
+        preferences=_prefs_out(current_user),
     )
