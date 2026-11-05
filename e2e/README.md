@@ -54,3 +54,17 @@ e2e/
 - **Re-seed before each run**: `python seed.py` in the `backend/` directory restores clean data.
 - Tests that depend on pending requests in the DB will skip gracefully if the DB is empty (e.g. after all requests have been approved in a previous run).
 - The `loginAs()` helper injects a JWT directly into `localStorage`, bypassing the login form — ~10x faster than UI login for tests that don't test auth itself.
+
+## Accessibility scan (axe)
+
+`e2e/tests/accessibility.spec.ts` runs axe-core (WCAG 2.0/2.1 A + AA) over every screen each
+role can reach, in light mode, dark mode and Hebrew (RTL).
+
+```bash
+npx playwright test accessibility                 # must pass; new violations fail it
+A11Y_CONTRAST=1 npx playwright test accessibility # also report colour-contrast (known issues, TODO #4)
+```
+
+Theme/language are per-user preferences, so the spec sets them through the API before logging in.
+Seeded demo accounts: `sarah@parking.dev` (owner), `admin@parking.dev` (manager); the `e2e-user`
+account is registered by global setup.

@@ -32,8 +32,7 @@ export default async function globalSetup(_config: FullConfig) {
     body: JSON.stringify({
       name: 'E2E User',
       email: 'e2e-user@parking.dev',
-      password: 'password123',
-      role: 'user',
+      password: 'E2eUser123',
     }),
   });
 
@@ -47,7 +46,7 @@ export default async function globalSetup(_config: FullConfig) {
   const loginRes = await fetch(`${API}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'username=e2e-user%40parking.dev&password=password123',
+    body: 'username=e2e-user%40parking.dev&password=E2eUser123',
   });
   const { access_token } = await loginRes.json();
 

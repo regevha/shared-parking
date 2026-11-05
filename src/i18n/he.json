@@ -52,7 +52,8 @@
       "duration": "משך",
       "status": "סטטוס",
       "submitted": "שלח ב",
-      "lastUpdated": "עודכן"
+      "lastUpdated": "עודכן",
+      "actions": "פעולות"
     },
     "actions": {
       "edit": "ערוך",
@@ -302,6 +303,7 @@
     "rtlNote": "לוח השנה מוצג משמאל לימין — הספרייה אינה תומכת בפריסת ימין-לשמאל"
   },
   "lotCalendarView": {
+    "selectLot": "בחירת חניה",
     "allMyLots": "החניות שלי",
     "allLots": "כל החניות",
     "availableSlots": "חניות זמינות",

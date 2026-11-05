@@ -158,6 +158,7 @@ const AdminPanel: React.FC = () => {
       render: (role: string, record: UserData) => (
         <Select
           value={role}
+          aria-label={`${t('adminPanel.users.columns.role')}: ${record.name}`}
           size="small"
           style={{ width: 110 }}
           disabled={record.role === 'manager'}
@@ -693,6 +694,7 @@ const AdminPanel: React.FC = () => {
               <Select
                 style={{ width: '100%' }}
                 placeholder={t('adminPanel.lots.assignModal.placeholder')}
+                aria-label={t('adminPanel.lots.assignModal.placeholder')}
                 value={assignOwnerValue}
                 onChange={setAssignOwnerValue}
                 options={users
@@ -929,6 +931,7 @@ const AdminPanel: React.FC = () => {
                   <strong>{t('adminPanel.broadcast.audienceLabel')}</strong>
                   <Select
                     value={broadcastAudience}
+                    aria-label={t('adminPanel.broadcast.audienceLabel')}
                     onChange={setBroadcastAudience}
                     style={{ width: isMobile ? '100%' : '220px', marginLeft: isMobile ? 0 : '8px' }}
                     options={[

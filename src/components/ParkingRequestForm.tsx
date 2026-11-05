@@ -262,7 +262,7 @@ const ParkingRequestForm: React.FC = () => {
 
       {/* Business Rules Info */}
       <Card style={{ marginTop: '24px' }} size="small">
-        <h3>{t('requestForm.businessRules.title')}</h3>
+        <h2>{t('requestForm.businessRules.title')}</h2>
         <ul>
           <li>{t('requestForm.businessRules.rule1start')}<strong>{t('requestForm.businessRules.rule1bold')}</strong></li>
           <li>{t('requestForm.businessRules.rule2')}</li>

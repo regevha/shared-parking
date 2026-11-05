@@ -7,7 +7,9 @@
   margin-bottom: 24px;
 }
 
-.parking-request-form h3 {
+.parking-request-form h2 {
+  /* h2 (not h3) so the page heading order is h1 -> h2; font-size keeps the old h3 look */
+  font-size: 1.17em;
   margin-top: 0;
   margin-bottom: 16px;
 }

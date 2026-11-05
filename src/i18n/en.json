@@ -52,7 +52,8 @@
       "duration": "Dur.",
       "status": "Status",
       "submitted": "Submitted",
-      "lastUpdated": "Updated"
+      "lastUpdated": "Updated",
+      "actions": "Actions"
     },
     "actions": {
       "edit": "Edit",
@@ -302,6 +303,7 @@
     "rtlNote": ""
   },
   "lotCalendarView": {
+    "selectLot": "Select lot",
     "allMyLots": "My Lots",
     "allLots": "All Lots",
     "availableSlots": "Available Lots",

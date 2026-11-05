@@ -3,9 +3,9 @@ import { Page, APIRequestContext } from '@playwright/test';
 export type Role = 'user' | 'owner' | 'manager';
 
 export const CREDENTIALS: Record<Role, { email: string; password: string; name: string }> = {
-  user:    { email: 'e2e-user@parking.dev', password: 'password123', name: 'E2E User' },
-  owner:   { email: 'o1@parking.dev',       password: 'password123', name: 'Sarah' },
-  manager: { email: 'a1@parking.dev',       password: 'password123', name: 'David' },
+  user:    { email: 'e2e-user@parking.dev', password: 'E2eUser123', name: 'E2E User' },
+  owner:   { email: 'sarah@parking.dev',    password: 'password123', name: 'Sarah' },
+  manager: { email: 'admin@parking.dev',    password: 'password123', name: 'Admin' },
 };
 
 /**
@@ -46,5 +46,7 @@ export async function loginViaUI(page: Page, email: string, password: string): P
  * Call this after loginAs() + page.goto(route) to ensure auth is resolved.
  */
 export async function waitForNav(page: Page): Promise<void> {
-  await page.getByRole('menuitem', { name: 'Parking Status' }).waitFor({ timeout: 10000 });
+  // Language-agnostic: any menu item means the shell rendered and auth resolved (the label is
+  // translated, so 'Parking Status' does not exist in Hebrew/French).
+  await page.getByRole('menuitem').first().waitFor({ timeout: 10000 });
 }

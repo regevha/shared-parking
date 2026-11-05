@@ -198,7 +198,7 @@ const AllApprovals: React.FC = () => {
           style={{ width: isMobile ? '100%' : 300 }}
         />
         <Space>
-          <Switch size="small" checked={myLotOnly} onChange={setMyLotOnly} />
+          <Switch size="small" checked={myLotOnly} onChange={setMyLotOnly} aria-label={t('approvals.myLotOnly')} />
           <span style={{ fontSize: '13px' }}>{t('approvals.myLotOnly')}</span>
         </Space>
       </Space>
