@@ -32,6 +32,8 @@ jobs:
           cache-dependency-path: backend/requirements*.txt
       - run: pip install -r requirements-test.txt
       - run: ruff check .
+      # test_infra_hardening asserts the dev database is seeded (as the README instructs)
+      - run: python seed.py
       - run: pytest tests/ -v
 
   frontend:
