@@ -74,10 +74,16 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Seed database and start servers
         run: |
-          cd backend && python seed.py
-          nohup python -m uvicorn main:app --port 8000 > ../backend.log 2>&1 &
-          cd .. && BROWSER=none nohup npm start > frontend.log 2>&1 &
-          npx --yes wait-on http://localhost:8000/ http://localhost:3000 --timeout 180000
+          (cd backend && python seed.py)
+          (cd backend && nohup python -m uvicorn main:app --host 127.0.0.1 --port 8000 > "$GITHUB_WORKSPACE/backend.log" 2>&1 &)
+          (BROWSER=none nohup npm start > "$GITHUB_WORKSPACE/frontend.log" 2>&1 &)
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:8000/ > /dev/null && curl -fsS http://127.0.0.1:3000/ > /dev/null; then
+              echo "servers up after ~$((i * 2))s"; exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::servers did not start"; tail -n 40 backend.log frontend.log; exit 1
       - run: npx playwright test accessibility
         env:
           CI: 'true'
