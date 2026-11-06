@@ -35,7 +35,7 @@ interface CalendarEvent {
 
 // Fills carry white text, so they must meet WCAG AA (see utils/calendarColors.ts)
 const STATUS_COLORS: Record<RequestStatus, string> = {
-  [RequestStatus.PENDING]: EVENT_FILL.pendingBlue,
+  [RequestStatus.PENDING]: EVENT_FILL.pending,
   [RequestStatus.APPROVED]: EVENT_FILL.approved,
   [RequestStatus.REJECTED]: EVENT_FILL.rejected,
 };
