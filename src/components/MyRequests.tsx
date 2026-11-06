@@ -14,6 +14,7 @@ import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './MyRequests.css';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { notifyError } from '../utils/notify';
 
 interface EditFormValues {
   date: Dayjs | null;
@@ -129,10 +130,7 @@ const MyRequests: React.FC = () => {
         description: t('myRequests.notifications.updatedDesc', { id: editingRequest.id }),
       });
     } catch (err: any) {
-      notification.error({
-        message: t('myRequests.notifications.updateFailed'),
-        description: err.message || t('myRequests.notifications.updateFailedDesc'),
-      });
+      notifyError(t('myRequests.notifications.updateFailed'), err, t('myRequests.notifications.updateFailedDesc'));
     } finally {
       setLoading(false);
     }
@@ -146,10 +144,7 @@ const MyRequests: React.FC = () => {
         description: t('myRequests.notifications.cancelledDesc', { id: requestId }),
       });
     } catch (err: any) {
-      notification.error({
-        message: t('myRequests.notifications.cancelFailed'),
-        description: err.message || t('myRequests.notifications.cancelFailedDesc'),
-      });
+      notifyError(t('myRequests.notifications.cancelFailed'), err, t('myRequests.notifications.cancelFailedDesc'));
     }
   };
 
