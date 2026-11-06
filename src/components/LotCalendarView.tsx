@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Alert, Card, Collapse, DatePicker, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
+import { Alert, Card, Collapse, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { isRTL, SupportedLanguage } from '../i18n';
 import dayjs from 'dayjs';
@@ -18,6 +18,7 @@ import AuditTrailModal from './AuditTrailModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { usePermissions } from '../hooks/usePermissions';
 import { isFromYesterdayOnward } from '../utils/dates';
+import { MobileDayHeader, currentHourSlotPropGetter, useCalendarHours, useCalendarToolbars } from './calendar/calendarShared';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -60,18 +61,6 @@ const CustomEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => {
   );
 };
 
-const CustomMobileHeader: React.FC<{ date: Date }> = ({ date: headerDate }) => {
-  const isToday = dayjs(headerDate).isSame(dayjs(), 'day');
-  return (
-    <div className="mobile-week-header">
-      <span className="mobile-week-header-day">{dayjs(headerDate).format('ddd').slice(0, 2).toUpperCase()}</span>
-      <span className={`mobile-week-header-num${isToday ? ' mobile-week-header-today' : ''}`}>
-        {dayjs(headerDate).format('D')}
-      </span>
-    </div>
-  );
-};
-
 const CustomMobileWeekEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => {
   const isRequest = event.type === 'booked' || event.type === 'pending';
   const resource = event.resource as ParkingRequest;
@@ -87,20 +76,6 @@ const CustomMobileWeekEvent: React.FC<{ event: LotCalendarEvent }> = ({ event })
   );
 };
 
-const currentHourSlotPropGetter = (date: Date) => {
-  const now = new Date();
-  if (
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate() &&
-    date.getHours() === now.getHours()
-  ) {
-    return { style: { backgroundColor: 'rgba(22, 119, 255, 0.18)' } };
-  }
-  return {};
-};
-
-
 const LotCalendarView: React.FC = () => {
   const { pendingRequests, approvedRequests, approveRequest, rejectRequest, ownerLots, allLots } = useRequests();
   const { user } = useAuth();
@@ -115,9 +90,7 @@ const LotCalendarView: React.FC = () => {
   const [selectedLot, setSelectedLot] = useState<string>('all');
   const [showHistory, setShowHistory] = useState(false);
 
-  const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
-  const minTime    = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
-  const maxTime    = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
+  const { scrollTo8AM, minTime, maxTime } = useCalendarHours();
 
 
   // Lot selector options
@@ -307,62 +280,7 @@ const LotCalendarView: React.FC = () => {
   };
 
   // Desktop toolbar
-  const CustomDesktopToolbar = useCallback((tb: any) => (
-    <div className="desktop-toolbar">
-      <div className="desktop-toolbar-nav">
-        <button onClick={() => tb.onNavigate('TODAY')}>{t('lotCalendarView.toolbar.today')}</button>
-        <button onClick={() => tb.onNavigate('PREV')}>‹</button>
-        <button onClick={() => tb.onNavigate('NEXT')}>›</button>
-      </div>
-      <span className="desktop-toolbar-label">{tb.label}</span>
-      <div className="desktop-toolbar-right">
-        <DatePicker
-          size="small"
-          value={dayjs(date)}
-          onChange={(d) => { if (d) setDate(d.toDate()); }}
-          allowClear={false}
-          inputReadOnly
-          style={{ width: 120 }}
-        />
-        <div className="desktop-toolbar-views">
-          {tb.views.map((v: View) => (
-            <button key={v} className={tb.view === v ? 'rbc-active' : ''} onClick={() => tb.onView(v)}>
-              {t(`lotCalendarView.viewNames.${v}`)}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  ), [date, t]);
-
-  // Mobile toolbar
-  const CustomMobileToolbar = useCallback((tb: any) => (
-    <div className="mobile-toolbar">
-      <div className="mobile-toolbar-nav">
-        <button onClick={() => tb.onNavigate('TODAY')}>{t('lotCalendarView.toolbar.today')}</button>
-        <button onClick={() => tb.onNavigate('PREV')}>‹</button>
-        <button onClick={() => tb.onNavigate('NEXT')}>›</button>
-      </div>
-      <span className="mobile-toolbar-label">{tb.label}</span>
-      <div className="mobile-toolbar-right">
-        <DatePicker
-          size="small"
-          value={dayjs(date)}
-          onChange={(d) => { if (d) setDate(d.toDate()); }}
-          allowClear={false}
-          inputReadOnly
-          style={{ width: 110 }}
-        />
-        <div className="mobile-toolbar-views">
-          {tb.views.map((v: View) => (
-            <button key={v} className={tb.view === v ? 'rbc-active' : ''} onClick={() => tb.onView(v)}>
-              {v === 'week' ? t('lotCalendarView.toolbar.weekShort') : t(`lotCalendarView.viewNames.${v}`)}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  ), [date, t]);
+  const { DesktopToolbar: CustomDesktopToolbar, MobileToolbar: CustomMobileToolbar } = useCalendarToolbars('lotCalendarView', date, setDate);
 
   const desktopComponents = useMemo(() => ({
     toolbar: CustomDesktopToolbar,
@@ -372,13 +290,13 @@ const LotCalendarView: React.FC = () => {
   const mobileComponents = useMemo(() => ({
     toolbar: CustomMobileToolbar,
     event: CustomEvent,
-    header: CustomMobileHeader,
+    header: MobileDayHeader,
   }), [CustomMobileToolbar]);
 
   const mobileWeekComponents = useMemo(() => ({
     toolbar: CustomMobileToolbar,
     event: CustomMobileWeekEvent,
-    header: CustomMobileHeader,
+    header: MobileDayHeader,
   }), [CustomMobileToolbar]);
 
   const mobileWeekFormats = useMemo(() => ({
