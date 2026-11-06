@@ -132,21 +132,31 @@ $env:CI='true'; npm test -- --ci --no-cache
 ## Test Coverage Summary
 
 ### Frontend Tests
+- 24 jest suites, 221 tests (`src/**/__tests__/*.test.ts(x)` plus `src/App.test.tsx`): API clients, contexts, components, i18n, status helpers, and jest-axe accessibility checks.
 - `src/App.test.tsx` — Basic app rendering, navigation, and provider initialization.
-- `src/RBAC.test.tsx` — **Critical**: Role-Based Access Control, session isolation, and logout URL state cleanup (verified by title-based lookups).
 - `src/components/__tests__/AdminPanel.test.tsx` — Admin functionalities: User/Lot management and defensive UI rendering.
 - `src/components/__tests__/AllPendingRequests.test.tsx` — Real-world simulation of approval/rejection workflows across roles.
-- `src/components/__tests__/AdminPanelCharades.test.tsx` — Specialized logic for user preference synchronization and Edge-cases.
+- `src/components/__tests__/AdminPanelCharades.test.tsx` — Verifies the Broadcast and Import actions really call their APIs.
 - `src/components/__tests__/MyRequests.test.tsx` — 15 tests: visibility filters, edit/cancel button logic, stats, navigation, info banner.
 
+### E2E Tests (Playwright)
+- `e2e/tests/*.spec.ts` — 15 specs run serially against live servers (see `e2e/README.md`), including an axe accessibility scan of every screen in light, dark and Hebrew. Run in CI by the "E2E (Playwright + axe)" job.
+
 ### Backend Tests
-- 147 tests, always green. Uses in-memory SQLite (StaticPool) for testing — never touches `parking.db` in production.
+- 243 tests (1 skipped: opt-in live-DB check, `CHECK_LIVE_DB=1`), always green. Uses in-memory SQLite (StaticPool) for testing — never touches `parking.db` in production.
 - `conftest.py` — Fixtures: in-memory DB, TestClient with overrides, headers, and pwd hashing patches.
-- `test_auth.py` — 9 tests: register, login, `/auth/me`.
-- `test_requests.py` — 41 tests: Full CRUD, approve/reject, RBAC, and status guards.
+- `test_auth.py` — 16 tests: register, login, `/auth/me`.
+- `test_auth_tokens.py` — 13 tests: JWT rejection paths (deleted user, no `sub`, expired, forged, `alg=none`, malformed header).
+- `test_requests.py` — 47 tests: Full CRUD, approve/reject, RBAC, and status guards.
+- `test_request_limits.py` — 7 tests: per-user pending-request limit (`MAX_PENDING_REQUESTS`).
 - `test_lots.py` — 23 tests: Full CRUD, owner-scoping, and specialized role updates.
-- `test_users.py` — 30 tests: Role restrictions, password changes, and self-delete prevention.
-- `test_messages.py` — 16 tests: Communication RBAC and audit retention after request deletion.
+- `test_users.py` — 31 tests: Role restrictions, password changes, and self-delete prevention.
+- `test_messages.py` — 17 tests: Communication RBAC and audit retention after request deletion.
+- `test_notifications.py` — 14 tests: own-only listing, read/ownership, approval triggers, broadcast audiences.
+- `test_availability.py` — 26 tests: availability windows CRUD, owner scoping, enforcement.
+- `test_system_endpoints.py` — 11 tests: health route, `GET /api/config`, manual auto-approve RBAC.
+- `test_dst.py` — 6 tests: wall-clock end-time calculation around DST changes.
+- Also: `test_admin_import.py` (14), `test_scheduler.py` (7), `test_audit_integrity.py` (3), `test_e2e_auto_approval.py` (3), `test_infra_hardening.py` (4), `test_e2e_walkthrough.py` (1).
 
 ## Key Files
 
@@ -192,11 +202,11 @@ $env:CI='true'; npm test -- --ci --no-cache
 
 ### Tests
 - `backend/tests/conftest.py` — fixtures: in-memory SQLite (StaticPool), TestClient with `get_db` override, `user_headers` / `owner_headers` / `manager_headers`, `created_request_id`, `created_lot_id`
-- `backend/tests/test_auth.py` — 9 tests: register, login, `/auth/me`
-- `backend/tests/test_requests.py` — 41 tests: full CRUD, approve/reject, RBAC, status guards
+- `backend/tests/test_auth.py` — 16 tests: register, login, `/auth/me`
+- `backend/tests/test_requests.py` — 47 tests: full CRUD, approve/reject, RBAC, status guards
 - `backend/tests/test_lots.py` — 23 tests: full CRUD, `/mine`, `/owner/{name}`, dual-role PATCH
-- `backend/tests/test_users.py` — 30 tests: list, get, update, delete, role restrictions, password change, self-delete prevention
-- `backend/tests/test_messages.py` — 16 tests: send/read messages, RBAC, audit retention (messages preserved with `request_id=NULL` after request deletion)
+- `backend/tests/test_users.py` — 31 tests: list, get, update, delete, role restrictions, password change, self-delete prevention
+- `backend/tests/test_messages.py` — 17 tests: send/read messages, RBAC, audit retention (messages preserved with `request_id=NULL` after request deletion)
 
 ### Screens
 | File | Route | Menu Label |
