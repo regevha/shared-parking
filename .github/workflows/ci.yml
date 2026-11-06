@@ -55,7 +55,7 @@ jobs:
           CI: 'true'
 
   e2e-a11y:
-    name: E2E accessibility (Playwright + axe)
+    name: E2E (Playwright + axe)
     runs-on: ubuntu-latest
     needs: [backend, frontend]
     steps:
@@ -84,7 +84,7 @@ jobs:
             sleep 2
           done
           echo "::error::servers did not start"; tail -n 40 backend.log frontend.log; exit 1
-      - run: npx playwright test accessibility
+      - run: npx playwright test
         env:
           CI: 'true'
       - name: Upload Playwright artefacts

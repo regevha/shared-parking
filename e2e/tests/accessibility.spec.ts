@@ -1,6 +1,7 @@
 import { test, expect, APIRequestContext } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { CREDENTIALS, loginAs, waitForNav, Role } from '../fixtures/auth';
+import { resetSharedAccountPreferences } from '../fixtures/api';
 
 /**
  * Automated accessibility scan (axe-core, WCAG 2.0/2.1 A + AA) of every screen a role can
@@ -54,6 +55,12 @@ async function setPreferences(request: APIRequestContext, role: Role, v: Variant
   });
   expect(resp.ok(), `could not set preferences for ${role}`).toBeTruthy();
 }
+
+// Preferences are per user and persist in the DB: put the shared accounts back when the scan is done
+// so specs that run afterwards (English labels, default theme) are not affected.
+test.afterAll(async () => {
+  await resetSharedAccountPreferences();
+});
 
 for (const role of Object.keys(SCREENS) as Role[]) {
   for (const variant of VARIANTS) {

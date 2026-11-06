@@ -136,3 +136,52 @@ def test_broadcast_audience_targeting(client, manager_headers, user_headers, own
     # 3. Regular user should NOT see it
     resp_user = client.get("/api/notifications", headers=user_headers)
     assert not any("Owners Only Alert" in n["message"] for n in resp_user.json())
+
+
+# ── Broadcast: users / both audiences ───────────────────────────────────────
+
+def _messages(client, headers):
+    return [n["message"] for n in client.get("/api/notifications", headers=headers).json()]
+
+def test_broadcast_to_users_reaches_only_regular_users(client, manager_headers, user_headers, owner_headers):
+    resp = client.post("/api/notifications/broadcast", json={"audience": "users", "message": "Users Only Alert"}, headers=manager_headers)
+    assert resp.status_code == 200
+    assert resp.json()["delivered_to"] >= 1
+
+    assert any("Users Only Alert" in m for m in _messages(client, user_headers))
+    assert not any("Users Only Alert" in m for m in _messages(client, owner_headers))
+    assert not any("Users Only Alert" in m for m in _messages(client, manager_headers))
+
+def test_broadcast_to_both_reaches_users_and_owners(client, manager_headers, user_headers, owner_headers):
+    resp = client.post("/api/notifications/broadcast", json={"audience": "both", "message": "Everyone Alert"}, headers=manager_headers)
+    assert resp.status_code == 200
+    assert resp.json()["delivered_to"] >= 2
+
+    assert any("Everyone Alert" in m for m in _messages(client, user_headers))
+    assert any("Everyone Alert" in m for m in _messages(client, owner_headers))
+
+def test_broadcast_message_is_prefixed(client, manager_headers, user_headers):
+    client.post("/api/notifications/broadcast", json={"audience": "users", "message": "Hello"}, headers=manager_headers)
+    assert any(m.startswith("📢 ") and "Hello" in m for m in _messages(client, user_headers))
+
+
+# ── PATCH /api/notifications/{id}/read: ownership ───────────────────────────
+
+def test_mark_nonexistent_notification_returns_404(client, user_headers):
+    resp = client.patch("/api/notifications/999999/read", headers=user_headers)
+    assert resp.status_code == 404
+    assert resp.json()["detail"] == "Notification not found"
+
+def test_cannot_mark_another_users_notification_read(client, user_headers, owner_headers, db_session):
+    bob_id = get_user_id(client, owner_headers)
+    notif = models.Notification(user_id=bob_id, message="Bob's private note",
+                                created_at=datetime.now(timezone.utc).isoformat())
+    db_session.add(notif)
+    db_session.commit()
+    notif_id = notif.id
+
+    resp = client.patch(f"/api/notifications/{notif_id}/read", headers=user_headers)
+    assert resp.status_code == 404
+
+    db_session.expire_all()
+    assert db_session.get(models.Notification, notif_id).is_read in (False, 0, None)

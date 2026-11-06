@@ -14,7 +14,7 @@ test.describe('My Lots (Owner)', () => {
 
   test('lots table shows at least one lot row', async ({ page }) => {
     await expect(
-      page.locator('.ant-table-tbody tr:not(.ant-table-placeholder), .my-lots-card').first()
+      page.locator('tr.ant-table-row, .my-lots-card').first()
     ).toBeVisible({ timeout: 8000 });
   });
 
