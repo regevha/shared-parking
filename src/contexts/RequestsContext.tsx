@@ -3,6 +3,7 @@ import { requestsApi } from '../api/requests';
 import { lotsApi, LotData } from '../api/lots';
 import { useAuth } from './AuthContext';
 import { RequestStatus } from '../types/enums';
+import { usePermissions } from '../hooks/usePermissions';
 
 export interface ParkingRequest {
   id: string;
@@ -56,7 +57,7 @@ interface RequestsProviderProps {
 
 export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) => {
   const { user } = useAuth();
-  const isOwner = user?.role === 'owner';
+  const { isOwner } = usePermissions();
 
   const [pendingRequests, setPendingRequests] = useState<ParkingRequest[]>([]);
   const [approvedRequests, setApprovedRequests] = useState<ParkingRequest[]>([]);
