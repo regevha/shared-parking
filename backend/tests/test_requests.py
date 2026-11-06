@@ -458,3 +458,65 @@ def test_generate_id_ignores_non_numeric_ids(db_session):
     _insert_request_row(db_session, "REQ-007")
     _insert_request_row(db_session, "REQ-ABC123")
     assert _generate_id(db_session) == "REQ-008"
+
+
+# ── GET /api/requests/availability-check ───────────────────────────────────
+
+def _check(client, headers, day, start="09:00", end="11:00"):
+    return client.get(
+        "/api/requests/availability-check",
+        params={"date": day, "start_time": start, "end_date": day, "end_time": end},
+        headers=headers,
+    )
+
+
+def test_availability_check_requires_auth(client):
+    resp = client.get(
+        "/api/requests/availability-check",
+        params={"date": future_date(), "start_time": "09:00", "end_date": future_date(), "end_time": "11:00"},
+    )
+    assert resp.status_code == 401
+
+
+def test_availability_check_no_lots_means_zero(client, user_headers):
+    resp = _check(client, user_headers, future_date())
+    assert resp.status_code == 200
+    assert resp.json() == {"available_lots": 0, "total_lots": 0}
+
+
+def test_availability_check_counts_free_lot(client, user_headers, manager_headers, owner_headers):
+    create_lot_owned_by(client, manager_headers, owner_headers, "F1-001")
+    resp = _check(client, user_headers, future_date())
+    assert resp.status_code == 200
+    assert resp.json() == {"available_lots": 1, "total_lots": 1}
+
+
+def test_availability_check_excludes_lot_with_approved_booking(client, user_headers, manager_headers, owner_headers):
+    create_lot_owned_by(client, manager_headers, owner_headers, "F1-001")
+    created = client.post("/api/requests", json=REQUEST_PAYLOAD, headers=user_headers)
+    assert created.status_code == 201, created.text
+    rid = created.json()["id"]
+    approve = client.patch(f"/api/requests/{rid}/approve", json={"lot_id": "F1-001"}, headers=owner_headers)
+    assert approve.status_code == 200, approve.text
+    booked = created.json()
+    resp = client.get(
+        "/api/requests/availability-check",
+        params={
+            "date": booked["date"], "start_time": booked["start_time"],
+            "end_date": booked["end_date"], "end_time": booked["end_time"],
+        },
+        headers=user_headers,
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"available_lots": 0, "total_lots": 1}
+
+
+def test_availability_check_rejects_bad_input(client, user_headers):
+    resp = _check(client, user_headers, future_date(), start="11:00", end="09:00")
+    assert resp.status_code == 422
+    resp = client.get(
+        "/api/requests/availability-check",
+        params={"date": "not-a-date", "start_time": "09:00", "end_date": "x", "end_time": "11:00"},
+        headers=user_headers,
+    )
+    assert resp.status_code == 422

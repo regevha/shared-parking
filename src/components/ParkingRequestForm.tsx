@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Form, DatePicker, Select, Button, Card, Alert, notification, Row, Col, Tag } from 'antd';
 import InfoBanner from './InfoBanner';
 import { useTranslation } from 'react-i18next';
 import { useRequests } from '../contexts/RequestsContext';
 import { useAuth } from '../contexts/AuthContext';
+import { requestsApi } from '../api/requests';
 import { RequestStatus } from '../types/enums';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import dayjs from 'dayjs';
@@ -63,6 +64,23 @@ const ParkingRequestForm: React.FC = () => {
     };
   }, [dateValue, startTime, duration]);
 
+  // Non-blocking hint: does any lot look free for the chosen slot? (null = unknown / not checked)
+  const [availableLots, setAvailableLots] = useState<number | null>(null);
+  useEffect(() => {
+    if (!dateValue || !startTime || !endDate || !endTime) {
+      setAvailableLots(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      requestsApi
+        .checkAvailability({ date: dateValue.format('YYYY-MM-DD'), startTime, endDate, endTime })
+        .then(r => { if (!cancelled) setAvailableLots(r.availableLots); })
+        .catch(() => { if (!cancelled) setAvailableLots(null); });
+    }, 300);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [dateValue, startTime, endDate, endTime]);
+
   const handleFormChange = () => {
     form.validateFields();
   };
@@ -118,12 +136,15 @@ const ParkingRequestForm: React.FC = () => {
   return (
     <div className="parking-request-form">
       <h1>{t('requestForm.title')}</h1>
+      <p style={{ color: 'var(--label-color)', marginTop: 0 }}>
+        {t('requestForm.helper', { max: MAX_PENDING_REQUESTS })}
+      </p>
 
       {/* Warning Banner */}
       {hasMaxRequests && (
         <Alert
           message={t('requestForm.limitAlert.title')}
-          description={t('requestForm.limitAlert.description')}
+          description={t('requestForm.limitAlert.description', { max: MAX_PENDING_REQUESTS })}
           type="warning"
           showIcon
           style={{ marginBottom: '24px' }}
@@ -245,6 +266,16 @@ const ParkingRequestForm: React.FC = () => {
             )
           )}
 
+          {availableLots === 0 && (
+            <Alert
+              type="warning"
+              showIcon
+              style={{ marginBottom: '16px' }}
+              message={t('requestForm.availabilityWarning.title')}
+              description={t('requestForm.availabilityWarning.description')}
+            />
+          )}
+
           <Form.Item>
             <Button
               type="primary"
@@ -258,18 +289,6 @@ const ParkingRequestForm: React.FC = () => {
             </Button>
           </Form.Item>
         </Form>
-      </Card>
-
-      {/* Business Rules Info */}
-      <Card style={{ marginTop: '24px' }} size="small">
-        <h2>{t('requestForm.businessRules.title')}</h2>
-        <ul>
-          <li>{t('requestForm.businessRules.rule1start')}<strong>{t('requestForm.businessRules.rule1bold')}</strong></li>
-          <li>{t('requestForm.businessRules.rule2')}</li>
-          <li>{t('requestForm.businessRules.rule3')}</li>
-          <li>{t('requestForm.businessRules.rule4')}</li>
-          <li>{t('requestForm.businessRules.rule5')}</li>
-        </ul>
       </Card>
 
       <InfoBanner label={`${t('requestForm.title')}:`} description={t('requestForm.info')} />

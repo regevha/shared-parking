@@ -206,7 +206,7 @@
     "title": "Soumettre une Demande",
     "limitAlert": {
       "title": "Limite de Demandes Atteinte",
-      "description": "Vous avez atteint le maximum de 5 demandes en attente. Annulez-en une pour en soumettre une nouvelle."
+      "description": "Vous avez atteint le maximum de {{max}} demandes actives. Annulez-en une pour en soumettre une nouvelle."
     },
     "activeRequestsCard": "Vos Demandes ({{count}} / {{max}})",
     "labels": {
@@ -231,14 +231,10 @@
     "endTimeInvalid": "⚠️ Invalide : Dépasse 20:00",
     "submitButton": "Soumettre",
     "submitButtonDisabled": "Limite Atteinte",
-    "businessRules": {
-      "title": "Règles de Gestion",
-      "rule1start": "Maximum de ",
-      "rule1bold": "5 demandes en attente",
-      "rule2": "Dates à partir d'aujourd'hui",
-      "rule3": "Début à l'heure pile (08:00 – 19:00)",
-      "rule4": "Durée 1–6h, limite 20:00",
-      "rule5": "Fin auto-calculée (max 20:00)"
+    "helper": "Choisissez une date, une heure de début et une durée (1 à 36 h). L'heure de fin est calculée automatiquement. Vous pouvez avoir jusqu'à {{max}} demandes actives ; l'approbation dépend de la disponibilité d'une place à ce moment.",
+    "availabilityWarning": {
+      "title": "Aucune place ne semble libre à ce moment",
+      "description": "Toutes les places sont hors des disponibilités de leur propriétaire ou déjà réservées pour ce créneau : l'approbation est peu probable. Vous pouvez quand même soumettre la demande ou essayer un autre horaire."
     },
     "info": "Soumettez une demande ; un propriétaire l'examinera.",
     "notifications": {
