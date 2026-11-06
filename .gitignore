@@ -53,3 +53,4 @@ e2e/test-results/
 test-results/
 playwright-report/
 playwright.local.config.ts
+parking-backup-*.db

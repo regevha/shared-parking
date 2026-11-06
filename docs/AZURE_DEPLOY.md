@@ -95,6 +95,7 @@ From now on every push to `master` redeploys both parts.
 
 - **Change the demo password** if you share the link widely: the seeded accounts are public knowledge.
   Edit `backend/seed.py`, or sign in as the manager and change the passwords in the Admin Panel.
+- **Backups:** see `BACKUP.md` (manual SQLite backup over SSH, download, restore).
 - **Reset the demo data:** delete `/home/data/parking.db` (App Service → SSH, or Kudu) and restart the app.
 - **Logs:** `az webapp log tail -n $APP -g $RG`, or the files in `/home/LogFiles/parking`.
 - **Custom domain:** optional. If you add one for the frontend, update `CORS_ORIGINS` to match.

@@ -111,6 +111,10 @@ npm run lint                     # frontend lint
 Browser accessibility checks (Playwright + axe) need both servers running and a seeded
 database, see `e2e/README.md`.
 
+## Backups
+
+See `BACKUP.md` for a safe backup and restore of `parking.db` (local and Azure).
+
 ## Troubleshooting
 
 | Problem | Cause / fix |
