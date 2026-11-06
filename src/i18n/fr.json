@@ -179,6 +179,7 @@
       "date": "Date",
       "timeSlot": "Heure",
       "duration": "Durée",
+      "when": "Quand",
       "assignedLot": "Place Attribuée",
       "lotOwner": "Propriétaire",
       "approvedAt": "Approuvé le",

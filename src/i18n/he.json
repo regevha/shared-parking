@@ -179,6 +179,7 @@
       "date": "תאריך",
       "timeSlot": "זמן חניה",
       "duration": "משך",
+      "when": "מתי",
       "assignedLot": "חניה שהוקצתה",
       "lotOwner": "בעלים",
       "approvedAt": "אושר ב-",
