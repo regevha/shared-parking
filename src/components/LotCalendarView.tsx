@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LotData } from '../api/lots';
 import { LotStatus, RequestStatus } from '../types/enums';
 import { getRequestStatusColor, getRequestStatusLabel, getLotStatusTagColor } from '../utils/statusUtils';
+import { EVENT_FILL, ACCENT_TEXT } from '../utils/calendarColors';
 import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './CalendarView.css';
@@ -31,11 +32,12 @@ interface LotCalendarEvent {
   totalLots?: number;
 }
 
+// Fills carry white text, so they must meet WCAG AA (see utils/calendarColors.ts)
 const EVENT_COLORS: Record<EventType, string> = {
-  booked: '#52c41a',
-  pending: '#fa8c16',
-  blocked: '#f5222d',
-  available: '#13c2c2',
+  booked: EVENT_FILL.approved,
+  pending: EVENT_FILL.pending,
+  blocked: EVENT_FILL.rejected,
+  available: EVENT_FILL.available,
 };
 
 // Defined outside component for stable reference
@@ -470,12 +472,12 @@ const LotCalendarView: React.FC = () => {
     if (selectedEvent.type === 'available') {
       return (
         <div style={{ textAlign: 'center', padding: '16px 0' }}>
-          <div style={{ fontSize: 32, color: EVENT_COLORS.available, marginBottom: 8 }}>✓</div>
+          <div style={{ fontSize: 32, color: ACCENT_TEXT.available, marginBottom: 8 }}>✓</div>
           <div style={{ fontWeight: 600, marginBottom: 4 }}>
             {dayjs(selectedEvent.start).format('DD/MM/YYYY')} &nbsp;
             {dayjs(selectedEvent.start).format('HH:mm')} – {dayjs(selectedEvent.end).format('HH:mm')}
           </div>
-          <div style={{ fontSize: 20, color: EVENT_COLORS.available, fontWeight: 700, margin: '8px 0' }}>
+          <div style={{ fontSize: 20, color: ACCENT_TEXT.available, fontWeight: 700, margin: '8px 0' }}>
             {selectedEvent.availableCount}/{selectedEvent.totalLots} {t('lotCalendarView.modal.availableLotsLabel')}
           </div>
           <div style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.modal.availableDesc')}</div>
@@ -583,12 +585,12 @@ const LotCalendarView: React.FC = () => {
       <StatsBar
         style={{ marginBottom: '24px' }}
         items={selectedLot === 'available'
-          ? [{ label: t('lotCalendarView.stats.availableWindows'), value: availableEvents.length, color: EVENT_COLORS.available }]
+          ? [{ label: t('lotCalendarView.stats.availableWindows'), value: availableEvents.length, color: ACCENT_TEXT.available }]
           : [
               { label: t('lotCalendarView.stats.total'), value: bookedEvents.length + pendingEvents.length + blockedEvents.length },
-              { label: t('lotCalendarView.stats.booked'), value: bookedEvents.length, color: EVENT_COLORS.booked },
-              { label: t('lotCalendarView.stats.pending'), value: pendingEvents.length, color: EVENT_COLORS.pending },
-              { label: t('lotCalendarView.stats.blocked'), value: blockedEvents.length, color: EVENT_COLORS.blocked },
+              { label: t('lotCalendarView.stats.booked'), value: bookedEvents.length, color: ACCENT_TEXT.booked },
+              { label: t('lotCalendarView.stats.pending'), value: pendingEvents.length, color: ACCENT_TEXT.pending },
+              { label: t('lotCalendarView.stats.blocked'), value: blockedEvents.length, color: ACCENT_TEXT.blocked },
             ]
         }
       />
