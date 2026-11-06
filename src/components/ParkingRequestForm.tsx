@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import './ParkingRequestForm.css';
 import { notifyError } from '../utils/notify';
+import { isBeforeToday } from '../utils/dates';
 
 interface FormValues {
   date: Dayjs | null;
@@ -177,7 +178,7 @@ const ParkingRequestForm: React.FC = () => {
             <DatePicker
               style={{ width: '100%' }}
               disabledDate={(current) => {
-                return current && current < dayjs().startOf('day');
+                return current && isBeforeToday(current);
               }}
               placeholder={t('requestForm.placeholders.selectDate')}
             />

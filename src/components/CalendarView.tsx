@@ -15,6 +15,7 @@ import StatsBar from './StatsBar';
 import './CalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { isFromYesterdayOnward } from '../utils/dates';
 
 const DnDCalendar = withDragAndDrop(Calendar as any) as any;
 
@@ -88,7 +89,6 @@ const currentHourSlotPropGetter = (date: Date) => {
   return {};
 };
 
-const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const { pendingRequests, approvedRequests, userRequests, updateUserRequest } = useRequests();
@@ -134,7 +134,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
 
   const events: CalendarEvent[] = useMemo(() =>
     allRequests
-      .filter(req => !dayjs(req.date).isBefore(yesterday))
+      .filter(req => isFromYesterdayOnward(req.date))
       .map((req) => ({
       id: req.id,
       title: `${myRequestIds.has(req.id) ? '★ ' : ''}${req.requesterName.split(' ')[0]}`,

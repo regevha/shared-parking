@@ -254,7 +254,8 @@ Summary stat cards appear **at the bottom**, above the info banner.
 Always use `pagination={{ pageSize: 10, hideOnSinglePage: true }}` on all Tables.
 
 ### Mobile Responsiveness
-- `window.matchMedia('(max-width: 768px)')` with `useEffect` listener
+- `useIsMobile()` (`src/hooks/useIsMobile.ts`, `max-width: 768px`) — do not re-implement `matchMedia` per component
+- Other shared helpers: `usePermissions()` (`src/hooks/`), `notifyError()` and `isFromYesterdayOnward()` / `isBeforeToday()` (`src/utils/`)
 - `MyRequests`, `AllPendingRequests`, `AllApprovals`, `MyLots` use card list on mobile
 - `LotStatusBoard` uses compact grid on mobile (smaller spots, full-width modal)
 - Calendars default to `day` view on mobile, `week` on desktop
@@ -306,6 +307,6 @@ Both `CalendarView` and `LotCalendarView`:
 - ~~Hide old requests from table views — except for admin screens, show only requests starting from 'yesterday' forward~~ ✅ Done
 - ~~Invert availability logic — lots should be 'Blocked by Default'. Owners must define explicit availability windows/time slots for sharing~~ ✅ Done
 - ~~Implement 'Availability Windows' UI — for owners to define when their lots are open for requests~~ ✅ Done
-- ~~Component extraction — `<StatsBar />`, `<InfoBanner />`, `<PageWrapper />` reusable components~~ ✅ Done (Phase 3)
+- ~~Component extraction — `<StatsBar />`, `<InfoBanner />` reusable components~~ ✅ Done (`<PageWrapper />` was never created; see the refactor plan)
 - ~~Loading skeleton states — replace `<Spin>` with `<Skeleton>` matching layout shapes~~ ✅ Done (Phase 4 item #11)
 - ~~AdminPanel mobile card views — Users, Lots, Requests tables lack mobile card fallback~~ ✅ Done

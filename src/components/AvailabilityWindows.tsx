@@ -10,8 +10,10 @@ import type { ColumnsType } from 'antd/es/table';
 import { useRequests } from '../contexts/RequestsContext';
 import { availabilityApi, type AvailabilityWindowData, DAY_LABELS } from '../api/availability';
 import type { LotData } from '../api/lots';
+import InfoBanner from './InfoBanner';
 import './AvailabilityWindows.css';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { isBeforeToday } from '../utils/dates';
 
 const DOW_OPTIONS = Object.entries(DAY_LABELS).map(([v, label]) => ({
   value: Number(v),
@@ -307,7 +309,7 @@ const AvailabilityWindows: React.FC = () => {
             >
               <DatePicker
                 style={{ width: '100%' }}
-                disabledDate={d => d && d < dayjs().startOf('day')}
+                disabledDate={d => d && isBeforeToday(d)}
                 format="DD/MM/YYYY"
               />
             </Form.Item>
@@ -337,9 +339,7 @@ const AvailabilityWindows: React.FC = () => {
         </Form>
       </Modal>
 
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('availabilityWindows.title')}:</strong> {t('availabilityWindows.info', { max: 10 })}
-      </Card>
+      <InfoBanner label={`${t('availabilityWindows.title')}:`} description={t('availabilityWindows.info', { max: 10 })} />
     </div>
   );
 };
