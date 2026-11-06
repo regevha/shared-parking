@@ -1,0 +1,55 @@
+name: Deploy demo to Azure
+
+# Deploys on every push to master once the one-time Azure setup in docs/AZURE_DEPLOY.md is done.
+# Until the repository variable AZURE_DEPLOY is set to "true" both jobs are skipped, so merging
+# this workflow changes nothing.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-azure
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend (App Service)
+    if: ${{ vars.AZURE_DEPLOY == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # App Service builds the package itself (SCM_DO_BUILD_DURING_DEPLOYMENT=true) from requirements.txt
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: backend
+
+  frontend:
+    name: Frontend (Static Web Apps)
+    if: ${{ vars.AZURE_DEPLOY == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          CI: 'false'
+          # baked into the bundle at build time
+          REACT_APP_API_URL: https://${{ vars.AZURE_WEBAPP_NAME }}.azurewebsites.net
+      - uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          app_location: build
+          skip_app_build: true
+          skip_api_build: true

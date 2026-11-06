@@ -10,17 +10,18 @@ from sqlalchemy import text
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 # Ensure logs directory exists
-_log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
-if not os.path.exists(_log_dir):
-    os.makedirs(_log_dir)
+_log_dir = os.environ.get("LOG_DIR") or os.path.join(os.path.dirname(__file__), "..", "logs")
+_handlers: list[logging.Handler] = [logging.StreamHandler()]
+try:
+    os.makedirs(_log_dir, exist_ok=True)
+    _handlers.append(logging.FileHandler(os.path.join(_log_dir, "parking.log")))
+except OSError:
+    pass  # read-only deployment: log to stdout only
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler(os.path.join(_log_dir, "parking.log"))
-    ]
+    handlers=_handlers,
 )
 logger = logging.getLogger("parking-api")
 logger.info("API Starting Up...")
@@ -72,6 +73,26 @@ def _run_migrations() -> None:
                     raise
 
 _run_migrations()
+
+
+def _seed_demo_data_if_empty() -> None:
+    """Demo deployments: populate an empty database so a wiped file comes back on restart."""
+    if os.environ.get("AUTO_SEED_DEMO", "").lower() != "true":
+        return
+    from database import SessionLocal
+    import models
+    db = SessionLocal()
+    try:
+        has_users = db.query(models.User).first() is not None
+    finally:
+        db.close()
+    if not has_users:
+        logger.info("AUTO_SEED_DEMO: database is empty, seeding demo data")
+        import seed
+        seed.seed()
+
+
+_seed_demo_data_if_empty()
 
 
 @asynccontextmanager

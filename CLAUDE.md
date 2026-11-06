@@ -88,8 +88,13 @@ npm start
 
 ## Mobile Access & CORS
 - **Binding**: Running with `--host 0.0.0.0` makes the backend available on your machine's local IP (e.g., `192.168.x.x`).
-- **CORS**: The backend is configured with `allow_origins=["*"]` in `main.py` to facilitate local network testing.
+- **CORS**: Allowed origins come from the `CORS_ORIGINS` env var (comma-separated); default is `http://localhost:3000`. Add your phone-facing origin, e.g. `http://192.168.x.x:3000`, when testing from another device.
 - **Client Configuration**: Ensure `src/api/client.ts` uses the correct local IP if testing from a physical mobile device.
+
+## Deployment (Azure demo)
+- See `docs/AZURE_DEPLOY.md`: Static Web Apps (frontend) + App Service B1 (backend, SQLite in `/home/data`).
+- Backend env: `SECRET_KEY`, `DATABASE_URL`, `AUTO_SEED_DEMO=true` (seeds an empty DB on start), `DEBUG=false`, `CORS_ORIGINS`, `LOG_DIR`.
+- `.github/workflows/deploy-azure.yml` is gated by the repo variable `AZURE_DEPLOY=true`.
 
 ## Shutdown
 - **Script**: `bash stop.sh` — finds and kills processes on ports 8000 + 3000 (works on Windows Git Bash, macOS, Linux)
