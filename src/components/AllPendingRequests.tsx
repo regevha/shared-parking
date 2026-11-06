@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { Table, Button, Tag, Space, Row, Col, Card, Segmented, Modal, notification, Input } from 'antd';
 import { CheckOutlined, CloseOutlined, InboxOutlined, SearchOutlined } from '@ant-design/icons';
@@ -10,12 +10,14 @@ import { useAuth } from '../contexts/AuthContext';
 import EmptyState from './EmptyState';
 import InfoBanner from './InfoBanner';
 import './AllPendingRequests.css';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { notifyError } from '../utils/notify';
+import { isFromYesterdayOnward } from '../utils/dates';
 
 interface AllPendingRequestsProps {
   role: UserRole;
 }
 
-const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const isOwner = role === UserRole.OWNER;
@@ -27,18 +29,12 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const { pendingRequests, approveRequest, rejectRequest } = useRequests();
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   // Filter requests
   const filteredRequests = useMemo(() => {
-    let filtered = pendingRequests.filter(req => !dayjs(req.date).isBefore(yesterday));
+    let filtered = pendingRequests.filter(req => isFromYesterdayOnward(req.date));
 
     if (isOwner && filterMode === 'active') {
       filtered = filtered.filter((req) => !req.rejectedByOwner);
@@ -71,10 +67,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
             description: t('pendingRequests.notifications.approvedDesc', { name: requesterName }),
           });
         } catch (err: any) {
-          notification.error({
-            message: t('pendingRequests.notifications.approvalFailed'),
-            description: err.message || t('pendingRequests.notifications.approvalFailedDesc'),
-          });
+          notifyError(t('pendingRequests.notifications.approvalFailed'), err, t('pendingRequests.notifications.approvalFailedDesc'));
         } finally {
           setApprovalInProgress(null);
         }
@@ -98,10 +91,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
             description: t('pendingRequests.notifications.rejectedDesc', { name: requesterName }),
           });
         } catch (err: any) {
-          notification.error({
-            message: t('pendingRequests.notifications.rejectionFailed'),
-            description: err.message || t('pendingRequests.notifications.rejectionFailedDesc'),
-          });
+          notifyError(t('pendingRequests.notifications.rejectionFailed'), err, t('pendingRequests.notifications.rejectionFailedDesc'));
         } finally {
           setApprovalInProgress(null);
         }

@@ -32,6 +32,8 @@ import { configApi, SystemConfig } from '../api/config';
 import { notificationsApi } from '../api/notifications';
 import { adminApi } from '../api/admin';
 import './AdminPanel.css';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { notifyError } from '../utils/notify';
 
 const { Sider, Content } = Layout;
 const { TextArea } = Input;
@@ -50,18 +52,11 @@ const AdminPanel: React.FC = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const isDark = user?.preferences?.darkMode ?? true;
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
-  const [siderCollapsed, setSiderCollapsed] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
+  const [siderCollapsed, setSiderCollapsed] = useState(isMobile);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => {
-      setIsMobile(e.matches);
-      setSiderCollapsed(e.matches);
-    };
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
+  // The sider collapses/expands whenever the viewport crosses the mobile breakpoint.
+  useEffect(() => { setSiderCollapsed(isMobile); }, [isMobile]);
 
   // ── Navigation ─────────────────────────────────────────────────────────────
   const [selectedMenu, setSelectedMenu] = useState('users');
@@ -115,10 +110,7 @@ const AdminPanel: React.FC = () => {
         setLots(fetchedLots);
         setRequests(fetchedRequests);
       } catch (err: any) {
-        notification.error({
-          message: t('adminPanel.loadFailed'),
-          description: err.message || t('adminPanel.loadFailedDesc'),
-        });
+        notifyError(t('adminPanel.loadFailed'), err, t('adminPanel.loadFailedDesc'));
       } finally {
         setLoading(false);
       }
@@ -179,7 +171,7 @@ const AdminPanel: React.FC = () => {
               });
               await refreshUsers();
             } catch (err: any) {
-              notification.error({ message: t('adminPanel.users.notifications.roleUpdateFailed'), description: err.message });
+              notifyError(t('adminPanel.users.notifications.roleUpdateFailed'), err);
             } finally {
               setActionLoading(prev => ({ ...prev, [record.id]: false }));
             }
@@ -211,7 +203,7 @@ const AdminPanel: React.FC = () => {
               notification.success({ message: t('adminPanel.users.notifications.userDeleted'), description: record.name });
               await refreshUsers();
             } catch (err: any) {
-              notification.error({ message: t('adminPanel.users.notifications.deleteFailed'), description: err.message });
+              notifyError(t('adminPanel.users.notifications.deleteFailed'), err);
             } finally {
               setActionLoading(prev => ({ ...prev, [record.id]: false }));
             }
@@ -299,7 +291,7 @@ const AdminPanel: React.FC = () => {
                 notification.success({ message: t('adminPanel.lots.notifications.ownerRemoved'), description: record.id });
                 await refreshLots();
               } catch (err: any) {
-                notification.error({ message: t('adminPanel.lots.notifications.ownerRemoveFailed'), description: err.message });
+                notifyError(t('adminPanel.lots.notifications.ownerRemoveFailed'), err);
               } finally {
                 setActionLoading(prev => ({ ...prev, [record.id]: false }));
               }
@@ -418,10 +410,7 @@ const AdminPanel: React.FC = () => {
       });
       setBroadcastMessage('');
     } catch (err: any) {
-      notification.error({
-        message: t('adminPanel.broadcast.notifications.blocked'),
-        description: err.message,
-      });
+      notifyError(t('adminPanel.broadcast.notifications.blocked'), err);
     } finally {
       setBroadcastLoading(false);
     }
@@ -470,10 +459,7 @@ const AdminPanel: React.FC = () => {
           usersApi.getAll().then(setUsers);
         }
       } catch (err: any) {
-        notification.error({
-          message: t('adminPanel.import.notifications.uploadFailed'),
-          description: err.message,
-        });
+        notifyError(t('adminPanel.import.notifications.uploadFailed'), err);
       } finally {
         setImportLoading(false);
       }
@@ -522,7 +508,7 @@ const AdminPanel: React.FC = () => {
                               notification.success({ message: t('adminPanel.users.notifications.userDeleted'), description: u.name });
                               await refreshUsers();
                             } catch (err: any) {
-                              notification.error({ message: t('adminPanel.users.notifications.deleteFailed'), description: err.message });
+                              notifyError(t('adminPanel.users.notifications.deleteFailed'), err);
                             } finally {
                               setActionLoading(prev => ({ ...prev, [u.id]: false }));
                             }
@@ -629,7 +615,7 @@ const AdminPanel: React.FC = () => {
                               notification.success({ message: t('adminPanel.lots.notifications.ownerRemoved'), description: lot.id });
                               await refreshLots();
                             } catch (err: any) {
-                              notification.error({ message: t('adminPanel.lots.notifications.ownerRemoveFailed'), description: err.message });
+                              notifyError(t('adminPanel.lots.notifications.ownerRemoveFailed'), err);
                             } finally {
                               setActionLoading(prev => ({ ...prev, [lot.id]: false }));
                             }
@@ -682,10 +668,7 @@ const AdminPanel: React.FC = () => {
                   setAssignOwnerValue(null);
                   await refreshLots();
                 } catch (err: any) {
-                  notification.error({
-                    message: t('adminPanel.lots.notifications.ownerAssignFailed'),
-                    description: err.message,
-                  });
+                  notifyError(t('adminPanel.lots.notifications.ownerAssignFailed'), err);
                 } finally {
                   setAssignOwnerLoading(false);
                 }
@@ -795,10 +778,7 @@ const AdminPanel: React.FC = () => {
                               }),
                             });
                           } catch (err: any) {
-                            notification.error({
-                              message: t('adminPanel.config.autoApprovalFailed'),
-                              description: err.message,
-                            });
+                            notifyError(t('adminPanel.config.autoApprovalFailed'), err);
                           } finally {
                             setAutoApprovalLoading(false);
                           }

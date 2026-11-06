@@ -9,6 +9,8 @@ import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUti
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import './ParkingRequestForm.css';
+import { notifyError } from '../utils/notify';
+import { isBeforeToday } from '../utils/dates';
 
 interface FormValues {
   date: Dayjs | null;
@@ -106,10 +108,7 @@ const ParkingRequestForm: React.FC = () => {
       });
       form.resetFields();
     } catch (err: any) {
-      notification.error({
-        message: t('requestForm.notifications.failed'),
-        description: err.message || t('requestForm.notifications.failedDesc'),
-      });
+      notifyError(t('requestForm.notifications.failed'), err, t('requestForm.notifications.failedDesc'));
     } finally {
       setLoading(false);
     }
@@ -179,7 +178,7 @@ const ParkingRequestForm: React.FC = () => {
             <DatePicker
               style={{ width: '100%' }}
               disabledDate={(current) => {
-                return current && current < dayjs().startOf('day');
+                return current && isBeforeToday(current);
               }}
               placeholder={t('requestForm.placeholders.selectDate')}
             />

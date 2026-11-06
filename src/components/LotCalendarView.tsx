@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Alert, Card, Collapse, DatePicker, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
@@ -15,6 +15,9 @@ import StatsBar from './StatsBar';
 import './CalendarView.css';
 import './LotCalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { usePermissions } from '../hooks/usePermissions';
+import { isFromYesterdayOnward } from '../utils/dates';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -97,17 +100,16 @@ const currentHourSlotPropGetter = (date: Date) => {
   return {};
 };
 
-const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const LotCalendarView: React.FC = () => {
   const { pendingRequests, approvedRequests, approveRequest, rejectRequest, ownerLots, allLots } = useRequests();
   const { user } = useAuth();
-  const isManager = user?.role === 'manager';
+  const { isManager } = usePermissions();
   const visibleLots = isManager ? allLots : ownerLots;
   const { t, i18n } = useTranslation();
   const isHebrewMode = isRTL(i18n.language as SupportedLanguage);
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
-  const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
+  const isMobile = useIsMobile();
+  const [view, setView] = useState<View>(() => isMobile ? 'day' : 'week');
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<LotCalendarEvent | null>(null);
   const [selectedLot, setSelectedLot] = useState<string>('all');
@@ -117,12 +119,6 @@ const LotCalendarView: React.FC = () => {
   const minTime    = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
   const maxTime    = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   // Lot selector options
   const lotOptions = useMemo(() => [
@@ -136,7 +132,7 @@ const LotCalendarView: React.FC = () => {
   // Booked events — sourced from context so newly approved requests appear immediately
   const bookedEvents = useMemo(() =>
     approvedRequests
-      .filter(a => !dayjs(a.date).isBefore(yesterday))
+      .filter(a => isFromYesterdayOnward(a.date))
       .filter(a => {
         if (selectedLot === 'all-system') return true;                          // all lots system-wide
         if (selectedLot === 'all' || selectedLot === 'available')
@@ -157,7 +153,7 @@ const LotCalendarView: React.FC = () => {
   const pendingEvents = useMemo(() =>
     (selectedLot !== 'all' && selectedLot !== 'all-system') ? [] :
     pendingRequests
-      .filter(r => !r.rejectedByOwner && r.status !== 'rejected' && !dayjs(r.date).isBefore(yesterday))
+      .filter(r => !r.rejectedByOwner && r.status !== 'rejected' && isFromYesterdayOnward(r.date))
       .map(r => ({
         id: `pending-${r.id}`,
         title: `⏳ ${r.requesterName.split(' ')[0]}`,

@@ -13,6 +13,9 @@ import EmptyState from './EmptyState';
 import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './MyRequests.css';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { notifyError } from '../utils/notify';
+import { isFromYesterdayOnward, isBeforeToday } from '../utils/dates';
 
 interface EditFormValues {
   date: Dayjs | null;
@@ -28,14 +31,13 @@ const HOUR_OPTIONS = [
   '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ];
 
-const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const MyRequests: React.FC = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingRequest, setEditingRequest] = useState<ParkingRequest | null>(null);
   const [form] = Form.useForm<EditFormValues>();
   const [loading, setLoading] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { userRequests, cancelUserRequest, updateUserRequest } = useRequests();
@@ -66,18 +68,12 @@ const MyRequests: React.FC = () => {
     }
   }, [editStartTime]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   // Filter to show only PENDING and APPROVED requests from yesterday onwards
   const visibleRequests = userRequests
     .filter((req: ParkingRequest) =>
       (req.status === 'pending' || req.status === 'approved') &&
-      !dayjs(req.date).isBefore(yesterday)
+      isFromYesterdayOnward(req.date)
     )
     .sort((a, b) => {
       const d = a.date.localeCompare(b.date);
@@ -134,10 +130,7 @@ const MyRequests: React.FC = () => {
         description: t('myRequests.notifications.updatedDesc', { id: editingRequest.id }),
       });
     } catch (err: any) {
-      notification.error({
-        message: t('myRequests.notifications.updateFailed'),
-        description: err.message || t('myRequests.notifications.updateFailedDesc'),
-      });
+      notifyError(t('myRequests.notifications.updateFailed'), err, t('myRequests.notifications.updateFailedDesc'));
     } finally {
       setLoading(false);
     }
@@ -151,10 +144,7 @@ const MyRequests: React.FC = () => {
         description: t('myRequests.notifications.cancelledDesc', { id: requestId }),
       });
     } catch (err: any) {
-      notification.error({
-        message: t('myRequests.notifications.cancelFailed'),
-        description: err.message || t('myRequests.notifications.cancelFailedDesc'),
-      });
+      notifyError(t('myRequests.notifications.cancelFailed'), err, t('myRequests.notifications.cancelFailedDesc'));
     }
   };
 
@@ -423,7 +413,7 @@ const MyRequests: React.FC = () => {
             <DatePicker
               style={{ width: '100%' }}
               disabledDate={(current) => {
-                return current && current < dayjs().startOf('day');
+                return current && isBeforeToday(current);
               }}
               placeholder={t('myRequests.editModal.selectDate')}
             />

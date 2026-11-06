@@ -7,6 +7,7 @@ import { usersApi } from '../api/users';
 import type { NotificationWindow } from '../api/auth';
 import InfoBanner from './InfoBanner';
 import './NotificationWindows.css';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface DayWindows {
   [key: string]: NotificationWindow[];
@@ -46,7 +47,7 @@ function overlapsWithBlackout(startTime: string, endTime: string): boolean {
 const NotificationWindows: React.FC = () => {
   const { user, updateUser } = useAuth();
   const { t } = useTranslation();
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
   const [windows, setWindows] = useState<DayWindows>(normalise({}));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -54,12 +55,6 @@ const NotificationWindows: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   useEffect(() => {
     if (!user) return;

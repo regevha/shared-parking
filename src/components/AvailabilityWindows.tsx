@@ -10,7 +10,10 @@ import type { ColumnsType } from 'antd/es/table';
 import { useRequests } from '../contexts/RequestsContext';
 import { availabilityApi, type AvailabilityWindowData, DAY_LABELS } from '../api/availability';
 import type { LotData } from '../api/lots';
+import InfoBanner from './InfoBanner';
 import './AvailabilityWindows.css';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { isBeforeToday } from '../utils/dates';
 
 const DOW_OPTIONS = Object.entries(DAY_LABELS).map(([v, label]) => ({
   value: Number(v),
@@ -22,7 +25,7 @@ type WindowsByLot = Record<string, AvailabilityWindowData[]>;
 const AvailabilityWindows: React.FC = () => {
   const { ownerLots, loading: lotsLoading } = useRequests();
   const { t } = useTranslation();
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
 
   const [windowsByLot, setWindowsByLot] = useState<WindowsByLot>({});
   const [windowsLoading, setWindowsLoading] = useState(true);
@@ -31,12 +34,6 @@ const AvailabilityWindows: React.FC = () => {
   const [form] = Form.useForm();
   const [slotType, setSlotType] = useState<'recurring' | 'specific'>('recurring');
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   const loadAllWindows = useCallback(async (lots: LotData[]) => {
     if (!lots.length) { setWindowsLoading(false); return; }
@@ -312,7 +309,7 @@ const AvailabilityWindows: React.FC = () => {
             >
               <DatePicker
                 style={{ width: '100%' }}
-                disabledDate={d => d && d < dayjs().startOf('day')}
+                disabledDate={d => d && isBeforeToday(d)}
                 format="DD/MM/YYYY"
               />
             </Form.Item>
@@ -342,9 +339,7 @@ const AvailabilityWindows: React.FC = () => {
         </Form>
       </Modal>
 
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('availabilityWindows.title')}:</strong> {t('availabilityWindows.info', { max: 10 })}
-      </Card>
+      <InfoBanner label={`${t('availabilityWindows.title')}:`} description={t('availabilityWindows.info', { max: 10 })} />
     </div>
   );
 };

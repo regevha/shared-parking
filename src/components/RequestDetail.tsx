@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Tag, Button, Input, Avatar, Divider, Row, Col, Skeleton, notification } from 'antd';
+import { Card, Tag, Button, Input, Avatar, Divider, Row, Col, Skeleton } from 'antd';
 import { SendOutlined, UserOutlined, CrownOutlined, MessageOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import { messagesApi, Message } from '../api/messages';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import EmptyState from './EmptyState';
 import './RequestDetail.css';
+import { notifyError } from '../utils/notify';
 
 const RequestDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +35,7 @@ const RequestDetail: React.FC = () => {
     messagesApi.getForRequest(id)
       .then(setMessages)
       .catch((err: any) => {
-        notification.error({ message: t('requestDetail.messages.loadFailed'), description: err.message });
+        notifyError(t('requestDetail.messages.loadFailed'), err);
       })
       .finally(() => setLoadingMessages(false));
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -61,7 +62,7 @@ const RequestDetail: React.FC = () => {
       setMessages(prev => [...prev, msg]);
       setNewMessage('');
     } catch (err: any) {
-      notification.error({ message: t('requestDetail.messages.sendFailed'), description: err.message });
+      notifyError(t('requestDetail.messages.sendFailed'), err);
     } finally {
       setSending(false);
     }

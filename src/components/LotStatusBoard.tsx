@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Tag, Space, Row, Col, Card, Alert, Skeleton, Modal, DatePicker, Button } from 'antd';
 import { CarOutlined, ClockCircleOutlined, ReloadOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import { getStatusColor, getStatusLabel } from '../utils/statusUtils';
 import EmptyState from './EmptyState';
 import StatsBar from './StatsBar';
 import './LotStatusBoard.css';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const OCCUPIED_COLOR = '#1677ff';
 
@@ -31,14 +32,8 @@ const LotStatusBoard: React.FC = () => {
 
   const [selectedLot, setSelectedLot] = useState<LotData | null>(null);
   const [viewTime, setViewTime] = useState<Dayjs>(dayjs());
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   // For each lot, find the active approved request at viewTime (if any)
   const occupancyMap = useMemo(() => {
