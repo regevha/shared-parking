@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { Table, Space, Card, Row, Col, Statistic, Button, Modal, Tag, Input, Switch } from 'antd';
 import { EyeOutlined, MessageOutlined, CheckCircleOutlined, SearchOutlined } from '@ant-design/icons';
@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import EmptyState from './EmptyState';
 import InfoBanner from './InfoBanner';
 import './AllApprovals.css';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
@@ -17,16 +18,10 @@ const AllApprovals: React.FC = () => {
   const { approvedRequests, loading } = useRequests();
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
   const [searchText, setSearchText] = useState('');
   const [myLotOnly, setMyLotOnly] = useState(false);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   const handleViewMessages = (record: ParkingRequest) => {
     Modal.info({

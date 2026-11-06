@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { Table, Button, Tag, Space, Row, Col, Card, Segmented, Modal, notification, Input } from 'antd';
 import { CheckOutlined, CloseOutlined, InboxOutlined, SearchOutlined } from '@ant-design/icons';
@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import EmptyState from './EmptyState';
 import InfoBanner from './InfoBanner';
 import './AllPendingRequests.css';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface AllPendingRequestsProps {
   role: UserRole;
@@ -27,14 +28,8 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const { pendingRequests, approveRequest, rejectRequest } = useRequests();
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   // Filter requests
   const filteredRequests = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, Table, Tag, Row, Col, Button } from 'antd';
 import { CarOutlined, UserOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -11,19 +11,14 @@ import { LotStatus } from '../types/enums';
 import EmptyState from './EmptyState';
 import InfoBanner from './InfoBanner';
 import './MyLots.css';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const MyLots: React.FC = () => {
   const { ownerLots, loading } = useRequests();
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   const columns: ColumnsType<LotData> = [
     { title: t('myLots.columns.lotId'), dataIndex: 'id', key: 'id', width: '15%', sorter: (a: LotData, b: LotData) => a.id.localeCompare(b.id) },

@@ -13,6 +13,7 @@ import EmptyState from './EmptyState';
 import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './MyRequests.css';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface EditFormValues {
   date: Dayjs | null;
@@ -35,7 +36,7 @@ const MyRequests: React.FC = () => {
   const [editingRequest, setEditingRequest] = useState<ParkingRequest | null>(null);
   const [form] = Form.useForm<EditFormValues>();
   const [loading, setLoading] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { userRequests, cancelUserRequest, updateUserRequest } = useRequests();
@@ -66,12 +67,6 @@ const MyRequests: React.FC = () => {
     }
   }, [editStartTime]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   // Filter to show only PENDING and APPROVED requests from yesterday onwards
   const visibleRequests = userRequests
