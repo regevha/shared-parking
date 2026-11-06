@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Alert, Card, Collapse, DatePicker, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
@@ -15,6 +15,7 @@ import StatsBar from './StatsBar';
 import './CalendarView.css';
 import './LotCalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -106,8 +107,8 @@ const LotCalendarView: React.FC = () => {
   const visibleLots = isManager ? allLots : ownerLots;
   const { t, i18n } = useTranslation();
   const isHebrewMode = isRTL(i18n.language as SupportedLanguage);
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
-  const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
+  const isMobile = useIsMobile();
+  const [view, setView] = useState<View>(() => isMobile ? 'day' : 'week');
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<LotCalendarEvent | null>(null);
   const [selectedLot, setSelectedLot] = useState<string>('all');
@@ -117,12 +118,6 @@ const LotCalendarView: React.FC = () => {
   const minTime    = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
   const maxTime    = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   // Lot selector options
   const lotOptions = useMemo(() => [

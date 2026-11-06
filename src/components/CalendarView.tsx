@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -14,6 +14,7 @@ import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './CalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const DnDCalendar = withDragAndDrop(Calendar as any) as any;
 
@@ -93,8 +94,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const { pendingRequests, approvedRequests, userRequests, updateUserRequest } = useRequests();
   const { t, i18n } = useTranslation();
   const isHebrewMode = isRTL(i18n.language as SupportedLanguage);
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
-  const [view, setView] = useState<View>(() => window.matchMedia('(max-width: 768px)').matches ? 'day' : 'week');
+  const isMobile = useIsMobile();
+  const [view, setView] = useState<View>(() => isMobile ? 'day' : 'week');
   const scrollTo8AM = useMemo(() => { const d = new Date(); d.setHours(8, 0, 0, 0); return d; }, []);
   const minTime = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
   const maxTime = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
@@ -102,12 +103,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const [selectedRequest, setSelectedRequest] = useState<ParkingRequest | null>(null);
   const [showHistory, setShowHistory] = useState(false);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   const myRequestIds = useMemo(() => new Set(userRequests.map((r) => r.id)), [userRequests]);
 

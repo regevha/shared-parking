@@ -32,6 +32,7 @@ import { configApi, SystemConfig } from '../api/config';
 import { notificationsApi } from '../api/notifications';
 import { adminApi } from '../api/admin';
 import './AdminPanel.css';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const { Sider, Content } = Layout;
 const { TextArea } = Input;
@@ -50,18 +51,11 @@ const AdminPanel: React.FC = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const isDark = user?.preferences?.darkMode ?? true;
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 768px)').matches);
-  const [siderCollapsed, setSiderCollapsed] = useState(() => window.matchMedia('(max-width: 768px)').matches);
+  const isMobile = useIsMobile();
+  const [siderCollapsed, setSiderCollapsed] = useState(isMobile);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const handler = (e: MediaQueryListEvent) => {
-      setIsMobile(e.matches);
-      setSiderCollapsed(e.matches);
-    };
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
+  // The sider collapses/expands whenever the viewport crosses the mobile breakpoint.
+  useEffect(() => { setSiderCollapsed(isMobile); }, [isMobile]);
 
   // ── Navigation ─────────────────────────────────────────────────────────────
   const [selectedMenu, setSelectedMenu] = useState('users');
