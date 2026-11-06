@@ -9,6 +9,7 @@ import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUti
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import './ParkingRequestForm.css';
+import { notifyError } from '../utils/notify';
 
 interface FormValues {
   date: Dayjs | null;
@@ -106,10 +107,7 @@ const ParkingRequestForm: React.FC = () => {
       });
       form.resetFields();
     } catch (err: any) {
-      notification.error({
-        message: t('requestForm.notifications.failed'),
-        description: err.message || t('requestForm.notifications.failedDesc'),
-      });
+      notifyError(t('requestForm.notifications.failed'), err, t('requestForm.notifications.failedDesc'));
     } finally {
       setLoading(false);
     }

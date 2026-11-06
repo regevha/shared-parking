@@ -11,6 +11,7 @@ import EmptyState from './EmptyState';
 import InfoBanner from './InfoBanner';
 import './AllPendingRequests.css';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { notifyError } from '../utils/notify';
 
 interface AllPendingRequestsProps {
   role: UserRole;
@@ -66,10 +67,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
             description: t('pendingRequests.notifications.approvedDesc', { name: requesterName }),
           });
         } catch (err: any) {
-          notification.error({
-            message: t('pendingRequests.notifications.approvalFailed'),
-            description: err.message || t('pendingRequests.notifications.approvalFailedDesc'),
-          });
+          notifyError(t('pendingRequests.notifications.approvalFailed'), err, t('pendingRequests.notifications.approvalFailedDesc'));
         } finally {
           setApprovalInProgress(null);
         }
@@ -93,10 +91,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
             description: t('pendingRequests.notifications.rejectedDesc', { name: requesterName }),
           });
         } catch (err: any) {
-          notification.error({
-            message: t('pendingRequests.notifications.rejectionFailed'),
-            description: err.message || t('pendingRequests.notifications.rejectionFailedDesc'),
-          });
+          notifyError(t('pendingRequests.notifications.rejectionFailed'), err, t('pendingRequests.notifications.rejectionFailedDesc'));
         } finally {
           setApprovalInProgress(null);
         }
