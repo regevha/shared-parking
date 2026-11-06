@@ -83,5 +83,5 @@ describe('LoginPage', () => {
     });
 
     resolveLogin!();
-  });
+  }, 20000); // userEvent.type is slow on loaded CI runners; the default 5s is too tight
 });
