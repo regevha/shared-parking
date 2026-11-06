@@ -29,6 +29,7 @@ import LotCalendarView from './components/LotCalendarView';
 import LoginPage from './components/LoginPage';
 import NotificationBell from './components/NotificationBell';
 import './App.css';
+import { usePermissions } from './hooks/usePermissions';
 
 const { Header, Content } = Layout;
 
@@ -44,7 +45,7 @@ interface AppShellProps {
 const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language, setLanguage }) => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
-  const role = (user?.role ?? UserRole.USER) as UserRole;
+  const { role } = usePermissions();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
 

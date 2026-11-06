@@ -16,6 +16,7 @@ import './CalendarView.css';
 import './LotCalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { usePermissions } from '../hooks/usePermissions';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -103,7 +104,7 @@ const yesterday = dayjs().subtract(1, 'day').startOf('day');
 const LotCalendarView: React.FC = () => {
   const { pendingRequests, approvedRequests, approveRequest, rejectRequest, ownerLots, allLots } = useRequests();
   const { user } = useAuth();
-  const isManager = user?.role === 'manager';
+  const { isManager } = usePermissions();
   const visibleLots = isManager ? allLots : ownerLots;
   const { t, i18n } = useTranslation();
   const isHebrewMode = isRTL(i18n.language as SupportedLanguage);
