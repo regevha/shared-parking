@@ -59,15 +59,19 @@ test.describe('Role-based navigation — Manager', () => {
 test.describe('Direct URL access', () => {
   test('user visiting /admin gets no crash (403 from API, graceful empty state)', async ({ page, request }) => {
     await loginAs(page, request, 'user');
+
+    // Attach the listener BEFORE navigating, otherwise errors thrown while the page loads are missed
+    const errors: string[] = [];
+    page.on('pageerror', (err) => errors.push(err.message));
+
     await page.goto('/admin');
     await waitForNav(page);
+    await page.waitForLoadState('networkidle');
+
     // Page must not show an unhandled error boundary / blank screen
     const body = await page.locator('body').textContent();
     expect(body).not.toBe('');
     // No uncaught JS errors
-    const errors: string[] = [];
-    page.on('pageerror', (err) => errors.push(err.message));
-    await page.waitForTimeout(1000);
-    expect(errors).toHaveLength(0);
+    expect(errors).toEqual([]);
   });
 });

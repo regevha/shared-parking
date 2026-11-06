@@ -29,24 +29,15 @@ jest.mock('../../api/admin', () => ({
 }));
 
 // Grab the mocked modules
+const { usersApi } = require('../../api/users');
+const { lotsApi } = require('../../api/lots');
+const { requestsApi } = require('../../api/requests');
+const { configApi } = require('../../api/config');
 const { notificationsApi } = require('../../api/notifications');
 const { adminApi } = require('../../api/admin');
 
-// Mock window.matchMedia and scrollTo which antd components rely on
+// matchMedia is polyfilled globally in src/setupTests.ts (a jest.fn here would be reset between tests)
 beforeAll(() => {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: jest.fn().mockImplementation(query => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
-      addEventListener: jest.fn(),
-      removeEventListener: jest.fn(),
-      dispatchEvent: jest.fn(),
-    })),
-  });
   window.scrollTo = jest.fn();
 });
 
@@ -56,6 +47,11 @@ describe('AdminPanel — Real Actions (Anti-Charade)', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // CRA resets mock implementations between tests, so the default loaders are restored here
+    usersApi.getAll.mockResolvedValue([]);
+    lotsApi.getAll.mockResolvedValue([]);
+    requestsApi.getAll.mockResolvedValue([]);
+    configApi.get.mockResolvedValue({});
     jest.spyOn(notification, 'success').mockImplementation(() => ({ destroy: jest.fn() }));
     jest.spyOn(notification, 'error').mockImplementation(() => ({ destroy: jest.fn() }));
   });
@@ -64,7 +60,7 @@ describe('AdminPanel — Real Actions (Anti-Charade)', () => {
     jest.restoreAllMocks();
   });
 
-  it.skip('verifies Broadcast actually calls the API', async () => {
+  it('verifies Broadcast actually calls the API', async () => {
     notificationsApi.broadcast.mockResolvedValue({ status: 'ok', delivered_to: 5 });
 
     renderWithProviders(<AdminPanel />, { authValue: { user: manager } });
@@ -73,10 +69,10 @@ describe('AdminPanel — Real Actions (Anti-Charade)', () => {
     const broadcastMenu = await screen.findByText('Broadcast', {}, { timeout: 5000 });
     fireEvent.click(broadcastMenu);
 
-    const input = await screen.findByPlaceholderText(/broadcast message/i, {}, { timeout: 5000 });
+    const input = await screen.findByPlaceholderText(/system-wide message/i, {}, { timeout: 5000 });
     fireEvent.change(input, { target: { value: 'Important Announcement' } });
 
-    const sendBtn = screen.getByRole('button', { name: /Send Broadcast/i });
+    const sendBtn = screen.getByRole('button', { name: /Send Global Alert/i });
     fireEvent.click(sendBtn);
 
     await waitFor(() => {
@@ -84,14 +80,14 @@ describe('AdminPanel — Real Actions (Anti-Charade)', () => {
       expect(notificationsApi.broadcast).toHaveBeenCalledWith('both', 'Important Announcement');
       expect(notification.success).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringContaining('Broadcast sent'),
-          description: expect.stringContaining('5 users')
+          message: 'Alert Disseminated',
+          description: expect.stringContaining('5 active sessions')
         })
       );
     }, { timeout: 5000 });
   }, 15000);
 
-  it.skip('verifies Import actually calls the API', async () => {
+  it('verifies Import actually calls the API', async () => {
     adminApi.importUsers.mockResolvedValue({ status: 'ok', imported: 10, errors: [] });
 
     renderWithProviders(<AdminPanel />, { authValue: { user: manager } });
@@ -106,7 +102,8 @@ describe('AdminPanel — Real Actions (Anti-Charade)', () => {
 
     // Simulate File Upload
     const file = new File(['name,email\nTest,test@test.com'], 'users.csv', { type: 'text/csv' });
-    const uploadInput = screen.getByLabelText(/Upload CSV/i); // AntD Upload uses a hidden input
+    const uploadInput = document.querySelector('input[type="file"]') as HTMLInputElement; // AntD Upload's hidden input
+    expect(uploadInput).not.toBeNull();
 
     Object.defineProperty(uploadInput, 'files', { value: [file] });
     fireEvent.change(uploadInput);
@@ -114,7 +111,7 @@ describe('AdminPanel — Real Actions (Anti-Charade)', () => {
     await waitFor(() => {
       expect(adminApi.importUsers).toHaveBeenCalled();
       expect(notification.success).toHaveBeenCalledWith(
-        expect.objectContaining({ message: 'Import Successful' })
+        expect.objectContaining({ message: 'users.csv uploaded successfully: 10 records' })
       );
     }, { timeout: 5000 });
   }, 15000);

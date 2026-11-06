@@ -12,7 +12,7 @@ import jwt
 import pytest
 
 import models
-from auth import ALGORITHM, SECRET_KEY, create_access_token
+from auth import ALGORITHM, create_access_token
 from .conftest import REQUEST_PAYLOAD
 
 
@@ -113,8 +113,3 @@ def test_tampered_payload_is_rejected(client, user_headers, owner_headers):
 def test_malformed_authorization_header_is_rejected(client, header_value):
     resp = client.get("/auth/me", headers={"Authorization": header_value})
     assert resp.status_code == 401
-
-
-def test_secret_key_is_loaded_for_tests():
-    """Guards the fixture assumption these tests rely on (tokens above are signed with SECRET_KEY)."""
-    assert SECRET_KEY

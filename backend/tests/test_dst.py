@@ -1,50 +1,68 @@
+"""
+Daylight-saving behaviour of request time calculation.
+
+The app deliberately works in naive local wall-clock time: end = start + duration on the clock face, with no
+timezone conversion (schemas.ParkingRequestCreate and the PATCH handler in routers/requests.py). These tests
+pin that contract against the real schema code, so a change to the calculation (for example switching to
+elapsed-time maths) shows up as a deliberate test change rather than a silent behaviour change.
+
+The schema rejects past dates, so "today" is frozen at 2026-01-01 to keep these fixed DST dates valid forever.
+"""
+
+import datetime as dt
+
 import pytest
-from datetime import datetime
-import datetime as dt_mod
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
+from pydantic import ValidationError
 
-def test_dst_spring_forward_naive():
-    """
-    Verification of naive math on DST spring forward.
-    In 2026, Israel jumps 02:00 -> 03:00 on March 27.
-    """
-    # Current codebase math:
-    start_str = "2026-03-27 01:00"
-    duration = 2
-    
-    start_dt = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
-    end_dt = start_dt + dt_mod.timedelta(hours=duration)
-    
-    # Naive math fails (01:00 + 2h = 03:00), ignoring the missing hour.
-    assert end_dt.strftime("%H:%M") == "03:00"
+import schemas
+from schemas import ParkingRequestCreate
 
-def test_dst_spring_forward_aware():
-    """
-    Verification using timezone-aware logic (correct way).
-    """
-    try:
-        tz = zoneinfo.ZoneInfo("Asia/Jerusalem")
-        
-        start_str = "2026-03-27 01:00"
-        duration = 2
-        
-        # 1. Create a UTC-aware datetime first (Absolute time)
-        # Or create localized then convert to UTC
-        start_dt_naive = datetime.strptime(start_str, "%Y-%m-%d %H:%M")
-        start_dt = start_dt_naive.replace(tzinfo=tz)
-        
-        # 2. To correctly add ELAPSED hours, we should normally convert to UTC, add, then back.
-        # But aware + timedelta in Python is supposed to handle it if the tz handles it.
-        # However, to be extra safe across platforms:
-        start_utc = start_dt.astimezone(dt_mod.timezone.utc)
-        end_utc = start_utc + dt_mod.timedelta(hours=duration)
-        end_dt = end_utc.astimezone(tz)
-        
-        # 01:00 + 2h ELAPSED should land on 04:00 local time 
-        # (because 02:00 was skipped by the gap)
-        assert end_dt.strftime("%H:%M") == "04:00"
-    except (zoneinfo.ZoneInfoNotFoundError, ModuleNotFoundError):
-        pytest.skip("Asia/Jerusalem timezone info not found in zoneinfo registry")
+
+@pytest.fixture(autouse=True)
+def _frozen_today(monkeypatch):
+    class _FrozenDate(dt.date):
+        @classmethod
+        def today(cls):
+            return cls(2026, 1, 1)
+
+    monkeypatch.setattr(schemas, "DateType", _FrozenDate)
+
+
+def _build(**overrides):
+    payload = {"date": "2026-03-27", "start_time": "01:00", "duration": 2}
+    payload.update(overrides)
+    return ParkingRequestCreate(**payload)
+
+
+def test_spring_forward_end_time_is_wall_clock():
+    """Israel skips 02:00-03:00 on 2026-03-27: the app still reports 01:00 + 2h as 03:00 (wall clock)."""
+    req = _build(date="2026-03-27", start_time="01:00", duration=2)
+    assert (req.end_date, req.end_time) == ("2026-03-27", "03:00")
+
+
+def test_fall_back_end_time_is_wall_clock():
+    """Israel repeats 01:00-02:00 on 2026-10-25: the app still reports 00:00 + 3h as 03:00 (wall clock)."""
+    req = _build(date="2026-10-25", start_time="00:00", duration=3)
+    assert (req.end_date, req.end_time) == ("2026-10-25", "03:00")
+
+
+def test_request_crossing_midnight_on_dst_day_rolls_end_date():
+    req = _build(date="2026-03-27", start_time="22:00", duration=5)
+    assert (req.end_date, req.end_time) == ("2026-03-28", "03:00")
+
+
+def test_maximum_duration_spans_the_dst_change_by_wall_clock():
+    """36h starting the evening before the change ends exactly 36 wall-clock hours later."""
+    req = _build(date="2026-03-26", start_time="12:00", duration=36)
+    assert (req.end_date, req.end_time) == ("2026-03-28", "00:00")
+
+
+def test_explicit_end_matching_wall_clock_duration_is_accepted():
+    req = _build(end_date="2026-03-27", end_time="03:00")
+    assert req.end_time == "03:00"
+
+
+def test_explicit_end_using_elapsed_time_is_rejected():
+    """04:00 would be the real elapsed time across the gap; the app's contract is wall clock, so it refuses it."""
+    with pytest.raises(ValidationError, match="do not match duration"):
+        _build(end_date="2026-03-27", end_time="04:00")
