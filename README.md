@@ -67,7 +67,7 @@ Each user has a persisted preferences record:
 
 ## Getting Started
 
-> Windows, macOS, Linux, **WSL** and phone testing: see [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md). Deploying a demo to Azure: [docs/AZURE_DEPLOY.md](docs/AZURE_DEPLOY.md).
+> Windows, macOS, Linux, **WSL** and phone testing: see [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md). Deploying a demo to Azure: [docs/AZURE_DEPLOY.md](docs/AZURE_DEPLOY.md). Backup and restore: [docs/BACKUP.md](docs/BACKUP.md).
 
 ### Prerequisites
 - Node.js 18+
