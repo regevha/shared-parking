@@ -86,6 +86,9 @@ npm install
 npm start
 ```
 
+## Local setup
+- Full cross-platform and WSL instructions: `docs/LOCAL_SETUP.md` (phone access: `docs/MOBILE_ACCESS.md`).
+
 ## Mobile Access & CORS
 - **Binding**: Running with `--host 0.0.0.0` makes the backend available on your machine's local IP (e.g., `192.168.x.x`).
 - **CORS**: Allowed origins come from the `CORS_ORIGINS` env var (comma-separated); default is `http://localhost:3000`. Add your phone-facing origin, e.g. `http://192.168.x.x:3000`, when testing from another device.

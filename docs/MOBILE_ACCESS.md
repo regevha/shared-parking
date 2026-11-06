@@ -71,5 +71,6 @@ New-NetFirewallRule -DisplayName "Shared Parking - API (8000)" -Direction Inboun
 ## Notes
 
 - Both devices must be on the **same WiFi network**.
-- **CORS is handled automatically**: In development, the backend automatically allows all origins (`*`) unless explicitly overridden with the `CORS_ORIGINS` env var, so LAN access works out of the box.
+- **CORS must allow your phone's origin.** The backend only accepts `http://localhost:3000` by default. Start it with `CORS_ORIGINS=http://<LAN-IP>:3000` (comma-separate several origins), otherwise the page loads but every API call fails.
+- **Running in WSL?** See the WSL section of `LOCAL_SETUP.md` for the networking steps.
 - **Dynamic API Host**: The frontend automatically uses the hostname the browser loaded (`window.location.hostname`), meaning both `localhost` and your LAN IP will resolve the backend appropriately on port `8000`.
