@@ -296,6 +296,6 @@ Both `CalendarView` and `LotCalendarView`:
 - ~~Hide old requests from table views — except for admin screens, show only requests starting from 'yesterday' forward~~ ✅ Done
 - ~~Invert availability logic — lots should be 'Blocked by Default'. Owners must define explicit availability windows/time slots for sharing~~ ✅ Done
 - ~~Implement 'Availability Windows' UI — for owners to define when their lots are open for requests~~ ✅ Done
-- ~~Component extraction — `<StatsBar />`, `<InfoBanner />`, `<PageWrapper />` reusable components~~ ✅ Done (Phase 3)
+- ~~Component extraction — `<StatsBar />`, `<InfoBanner />` reusable components~~ ✅ Done (`<PageWrapper />` was never created; see the refactor plan)
 - ~~Loading skeleton states — replace `<Spin>` with `<Skeleton>` matching layout shapes~~ ✅ Done (Phase 4 item #11)
 - ~~AdminPanel mobile card views — Users, Lots, Requests tables lack mobile card fallback~~ ✅ Done

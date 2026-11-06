@@ -10,6 +10,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useRequests } from '../contexts/RequestsContext';
 import { availabilityApi, type AvailabilityWindowData, DAY_LABELS } from '../api/availability';
 import type { LotData } from '../api/lots';
+import InfoBanner from './InfoBanner';
 import './AvailabilityWindows.css';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { isBeforeToday } from '../utils/dates';
@@ -338,9 +339,7 @@ const AvailabilityWindows: React.FC = () => {
         </Form>
       </Modal>
 
-      <Card size="small" style={{ marginTop: '24px', backgroundColor: 'var(--info-card-bg)' }}>
-        <strong>{t('availabilityWindows.title')}:</strong> {t('availabilityWindows.info', { max: 10 })}
-      </Card>
+      <InfoBanner label={`${t('availabilityWindows.title')}:`} description={t('availabilityWindows.info', { max: 10 })} />
     </div>
   );
 };
