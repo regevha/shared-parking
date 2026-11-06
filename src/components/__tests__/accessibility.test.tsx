@@ -36,7 +36,7 @@ import { renderWithProviders } from '../../test-utils/renderWithProviders';
 import {
   makeParkingRequest, makeLot, makeUser, makeOwnerUser,
 } from '../../test-utils/fixtures';
-import { RequestStatus } from '../../types/enums';
+import { RequestStatus, UserRole } from '../../types/enums';
 import * as messagesApiModule from '../../api/messages';
 import * as requestsApiModule from '../../api/requests';
 
@@ -103,7 +103,7 @@ describe('accessibility (axe)', () => {
   });
 
   it('AllPendingRequests', async () => {
-    const { container } = renderWithProviders(<AllPendingRequests />, {
+    const { container } = renderWithProviders(<AllPendingRequests role={UserRole.OWNER} />, {
       authValue: { user: makeOwnerUser() },
       requestsValue: { pendingRequests: [pending], ownerLots: lots, allLots: lots },
     });

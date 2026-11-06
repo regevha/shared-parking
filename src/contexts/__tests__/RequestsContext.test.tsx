@@ -60,7 +60,12 @@ function renderWithUser(user: ReturnType<typeof makeUser> | null = makeUser()) {
   );
 }
 
-const emptyResponse = { pending: [], approved: [], mine: [], lots: [], ownerLots: [] };
+type ParkingRequestT = ReturnType<typeof makeParkingRequest>;
+type LotT = ReturnType<typeof makeLot>;
+const emptyResponse: {
+  pending: ParkingRequestT[]; approved: ParkingRequestT[]; mine: ParkingRequestT[];
+  lots: LotT[]; ownerLots: LotT[];
+} = { pending: [], approved: [], mine: [], lots: [], ownerLots: [] };
 
 function setupMocks(overrides: Partial<typeof emptyResponse> = {}) {
   const { pending, approved, mine, lots, ownerLots } = { ...emptyResponse, ...overrides };
