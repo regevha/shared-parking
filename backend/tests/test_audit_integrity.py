@@ -25,14 +25,19 @@ def test_audit_trail_privacy(client: TestClient, user_headers: dict, owner_heade
     resp = client.get(f"/api/requests/{req_id}/audit", headers=owner_headers)
     assert resp.status_code == 403
 
-def test_audit_trail_immutability(client: TestClient, manager_headers: dict):
-    """Verify the audit trail cannot be modified via API."""
-    # Try POST, PUT, PATCH to the audit endpoint (which only supports GET)
-    resp = client.post("/api/requests/REQ-001/audit", headers=manager_headers)
-    assert resp.status_code in [404, 405]
+def test_audit_trail_immutability(client: TestClient, user_headers: dict, manager_headers: dict):
+    """Verify the audit trail cannot be modified via API (the endpoint only supports GET)."""
+    resp = client.post("/api/requests", json={"date": future_date(14), "start_time": "09:00", "duration": 2}, headers=user_headers)
+    assert resp.status_code == 201
+    req_id = resp.json()["id"]
+    audit_url = f"/api/requests/{req_id}/audit"
 
-    resp = client.patch("/api/requests/REQ-001/audit", headers=manager_headers)
-    assert resp.status_code in [404, 405]
+    # The route exists and is readable, so a refusal below is about the method, not a missing record
+    assert client.get(audit_url, headers=manager_headers).status_code == 200
+
+    for method in ("post", "put", "patch", "delete"):
+        resp = getattr(client, method)(audit_url, headers=manager_headers)
+        assert resp.status_code == 405, f"{method.upper()} on the audit endpoint returned {resp.status_code}"
 
 def test_audit_trail_retention_on_deletion(client: TestClient, user_headers: dict, manager_headers: dict):
     """Verify audit logs survive request deletion."""

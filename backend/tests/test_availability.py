@@ -80,14 +80,37 @@ def test_create_window_user_forbidden(client, user_headers, owner_lot_id):
     assert resp.status_code == 403
 
 
-def test_create_window_wrong_owner_forbidden(client, owner_lot_id):
-    """A second owner cannot create windows for a lot they don't own."""
+def _other_owner_headers(client, db_session):
+    from .conftest import register_and_login
+    return register_and_login(client, "Erin Other", "erin@test.com", "Pass1234", "owner", db_session)
 
-    # We need a fresh client fixture here; instead use a direct registration
-    # approach within this test via a helper call.
-    # Since we can't easily do nested fixtures, we test this via the 403 path
-    # already covered by test_create_window_user_forbidden (role=owner without
-    # lot ownership would get the same 403 from _assert_lot_access).
+
+def test_create_window_wrong_owner_forbidden(client, db_session, owner_lot_id):
+    """A second owner cannot create windows for a lot they don't own."""
+    other = _other_owner_headers(client, db_session)
+    before = client.get(f"/api/lots/{owner_lot_id}/availability", headers=other).json()
+
+    resp = client.post(f"/api/lots/{owner_lot_id}/availability", json=WINDOW_PAYLOAD, headers=other)
+
+    assert resp.status_code == 403
+    assert client.get(f"/api/lots/{owner_lot_id}/availability", headers=other).json() == before
+
+
+def test_update_and_delete_window_wrong_owner_forbidden(client, db_session, owner_headers, owner_lot_id):
+    """A second owner can neither modify nor remove another owner's window."""
+    created = client.post(f"/api/lots/{owner_lot_id}/availability", json=WINDOW_PAYLOAD, headers=owner_headers)
+    assert created.status_code == 201
+    win_id = created.json()["id"]
+    other = _other_owner_headers(client, db_session)
+
+    patch = client.patch(f"/api/lots/{owner_lot_id}/availability/{win_id}", json={"is_active": False}, headers=other)
+    assert patch.status_code == 403
+    delete = client.delete(f"/api/lots/{owner_lot_id}/availability/{win_id}", headers=other)
+    assert delete.status_code == 403
+
+    windows = client.get(f"/api/lots/{owner_lot_id}/availability", headers=owner_headers).json()
+    assert [w["id"] for w in windows] == [win_id]
+    assert windows[0]["is_active"] is True
 
 
 def test_create_window_specific_date(client, owner_headers, owner_lot_id):

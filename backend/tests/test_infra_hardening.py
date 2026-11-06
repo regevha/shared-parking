@@ -40,6 +40,9 @@ def test_parking_db_is_seeded():
         os.path.join(os.path.dirname(__file__), "..", "parking.db")
     )
 
+    if not os.environ.get("CHECK_LIVE_DB"):
+        pytest.skip("Opt-in check of the developer's local parking.db — set CHECK_LIVE_DB=1 to run it")
+
     if not os.path.exists(db_path):
         pytest.skip("parking.db not found — run `python backend/seed.py` before testing the live DB")
 
