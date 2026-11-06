@@ -244,7 +244,8 @@ Summary stat cards appear **at the bottom**, above the info banner.
 Always use `pagination={{ pageSize: 10, hideOnSinglePage: true }}` on all Tables.
 
 ### Mobile Responsiveness
-- `window.matchMedia('(max-width: 768px)')` with `useEffect` listener
+- `useIsMobile()` (`src/hooks/useIsMobile.ts`, `max-width: 768px`) — do not re-implement `matchMedia` per component
+- Other shared helpers: `usePermissions()` (`src/hooks/`), `notifyError()` and `isFromYesterdayOnward()` / `isBeforeToday()` (`src/utils/`)
 - `MyRequests`, `AllPendingRequests`, `AllApprovals`, `MyLots` use card list on mobile
 - `LotStatusBoard` uses compact grid on mobile (smaller spots, full-width modal)
 - Calendars default to `day` view on mobile, `week` on desktop
