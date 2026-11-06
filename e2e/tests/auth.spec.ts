@@ -31,12 +31,9 @@ test.describe('Authentication', () => {
     await page.goto('/my-requests');
     await waitForNav(page);
 
-    // Open user dropdown and click Sign out
-    await page.getByText('Sign out').click({ force: true }).catch(async () => {
-      // On some layouts Sign out is inside a dropdown — click the avatar/name first
-      await page.locator('.ant-dropdown-trigger').last().click();
-      await page.getByText('Sign out').click();
-    });
+    // "Sign out" lives in the dropdown behind the user-name button in the header
+    await page.getByRole('button', { name: /E2E User/ }).click();
+    await page.getByRole('menuitem', { name: 'Sign out' }).click();
 
     // Login form should appear
     await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible({ timeout: 8000 });

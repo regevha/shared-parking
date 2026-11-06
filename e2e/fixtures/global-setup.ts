@@ -1,4 +1,5 @@
 import { FullConfig } from '@playwright/test';
+import { resetSharedAccountPreferences } from './api';
 
 const API = 'http://localhost:8000';
 
@@ -40,6 +41,11 @@ export default async function globalSetup(_config: FullConfig) {
     const body = await registerRes.text();
     throw new Error(`Failed to register E2E test user: ${registerRes.status} ${body}`);
   }
+
+  // ── 2b. Start from default preferences ───────────────────────────────────
+  // Theme/language are per-user DB settings; an interrupted run (or manual testing) may have left the
+  // shared accounts in Hebrew / light mode, which would break every English-label assertion.
+  await resetSharedAccountPreferences();
 
   // ── 3. Ensure pending requests exist for the approve-request tests ────────
   // Login as e2e-user and submit requests on future dates if none are pending.
