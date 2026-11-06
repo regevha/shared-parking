@@ -17,6 +17,7 @@ import './LotCalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { usePermissions } from '../hooks/usePermissions';
+import { isFromYesterdayOnward } from '../utils/dates';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -99,7 +100,6 @@ const currentHourSlotPropGetter = (date: Date) => {
   return {};
 };
 
-const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const LotCalendarView: React.FC = () => {
   const { pendingRequests, approvedRequests, approveRequest, rejectRequest, ownerLots, allLots } = useRequests();
@@ -132,7 +132,7 @@ const LotCalendarView: React.FC = () => {
   // Booked events — sourced from context so newly approved requests appear immediately
   const bookedEvents = useMemo(() =>
     approvedRequests
-      .filter(a => !dayjs(a.date).isBefore(yesterday))
+      .filter(a => isFromYesterdayOnward(a.date))
       .filter(a => {
         if (selectedLot === 'all-system') return true;                          // all lots system-wide
         if (selectedLot === 'all' || selectedLot === 'available')
@@ -153,7 +153,7 @@ const LotCalendarView: React.FC = () => {
   const pendingEvents = useMemo(() =>
     (selectedLot !== 'all' && selectedLot !== 'all-system') ? [] :
     pendingRequests
-      .filter(r => !r.rejectedByOwner && r.status !== 'rejected' && !dayjs(r.date).isBefore(yesterday))
+      .filter(r => !r.rejectedByOwner && r.status !== 'rejected' && isFromYesterdayOnward(r.date))
       .map(r => ({
         id: `pending-${r.id}`,
         title: `⏳ ${r.requesterName.split(' ')[0]}`,

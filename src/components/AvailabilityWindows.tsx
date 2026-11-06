@@ -12,6 +12,7 @@ import { availabilityApi, type AvailabilityWindowData, DAY_LABELS } from '../api
 import type { LotData } from '../api/lots';
 import './AvailabilityWindows.css';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { isBeforeToday } from '../utils/dates';
 
 const DOW_OPTIONS = Object.entries(DAY_LABELS).map(([v, label]) => ({
   value: Number(v),
@@ -307,7 +308,7 @@ const AvailabilityWindows: React.FC = () => {
             >
               <DatePicker
                 style={{ width: '100%' }}
-                disabledDate={d => d && d < dayjs().startOf('day')}
+                disabledDate={d => d && isBeforeToday(d)}
                 format="DD/MM/YYYY"
               />
             </Form.Item>

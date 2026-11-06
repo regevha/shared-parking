@@ -15,6 +15,7 @@ import StatsBar from './StatsBar';
 import './MyRequests.css';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { notifyError } from '../utils/notify';
+import { isFromYesterdayOnward, isBeforeToday } from '../utils/dates';
 
 interface EditFormValues {
   date: Dayjs | null;
@@ -30,7 +31,6 @@ const HOUR_OPTIONS = [
   '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
 ];
 
-const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const MyRequests: React.FC = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -73,7 +73,7 @@ const MyRequests: React.FC = () => {
   const visibleRequests = userRequests
     .filter((req: ParkingRequest) =>
       (req.status === 'pending' || req.status === 'approved') &&
-      !dayjs(req.date).isBefore(yesterday)
+      isFromYesterdayOnward(req.date)
     )
     .sort((a, b) => {
       const d = a.date.localeCompare(b.date);
@@ -413,7 +413,7 @@ const MyRequests: React.FC = () => {
             <DatePicker
               style={{ width: '100%' }}
               disabledDate={(current) => {
-                return current && current < dayjs().startOf('day');
+                return current && isBeforeToday(current);
               }}
               placeholder={t('myRequests.editModal.selectDate')}
             />

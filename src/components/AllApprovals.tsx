@@ -11,8 +11,8 @@ import EmptyState from './EmptyState';
 import InfoBanner from './InfoBanner';
 import './AllApprovals.css';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { isFromYesterdayOnward } from '../utils/dates';
 
-const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const AllApprovals: React.FC = () => {
   const { approvedRequests, loading } = useRequests();
@@ -144,7 +144,7 @@ const AllApprovals: React.FC = () => {
     },
   ];
 
-  const recentApprovedRequests = approvedRequests.filter(a => !dayjs(a.date).isBefore(yesterday));
+  const recentApprovedRequests = approvedRequests.filter(a => isFromYesterdayOnward(a.date));
 
   const stats = {
     total: recentApprovedRequests.length,
@@ -159,7 +159,7 @@ const AllApprovals: React.FC = () => {
   };
 
   const filteredRequests = React.useMemo(() => {
-    let filtered = approvedRequests.filter(a => !dayjs(a.date).isBefore(yesterday));
+    let filtered = approvedRequests.filter(a => isFromYesterdayOnward(a.date));
 
     if (searchText.trim()) {
       const q = searchText.toLowerCase();

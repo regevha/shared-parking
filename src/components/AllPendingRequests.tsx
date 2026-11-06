@@ -12,12 +12,12 @@ import InfoBanner from './InfoBanner';
 import './AllPendingRequests.css';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { notifyError } from '../utils/notify';
+import { isFromYesterdayOnward } from '../utils/dates';
 
 interface AllPendingRequestsProps {
   role: UserRole;
 }
 
-const yesterday = dayjs().subtract(1, 'day').startOf('day');
 
 const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
   const isOwner = role === UserRole.OWNER;
@@ -34,7 +34,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   // Filter requests
   const filteredRequests = useMemo(() => {
-    let filtered = pendingRequests.filter(req => !dayjs(req.date).isBefore(yesterday));
+    let filtered = pendingRequests.filter(req => isFromYesterdayOnward(req.date));
 
     if (isOwner && filterMode === 'active') {
       filtered = filtered.filter((req) => !req.rejectedByOwner);
