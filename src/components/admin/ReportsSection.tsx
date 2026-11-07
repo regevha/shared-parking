@@ -101,7 +101,7 @@ const ReportsSection: React.FC<ReportsSectionProps> = ({ requests, loading }) =>
   return (
     <div>
       <h2>{t('adminPanel.reports.title')}</h2>
-      <Card style={{ marginBottom: '16px' }}>
+      <Card className="mb-16">
         <Space wrap>
           <span>{t('adminPanel.reports.dateRange')}</span>
           <RangePicker

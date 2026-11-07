@@ -27,7 +27,7 @@ const ConfigSection: React.FC = () => {
       {configLoading ? <Skeleton active paragraph={{ rows: 4 }} /> : <Row gutter={[16, 16]}>
           <Col xs={24} sm={12}>
             <Card title={t('adminPanel.config.cardTitle')}>
-              <Space direction="vertical" style={{ width: '100%' }}>
+              <Space direction="vertical" className="w-full">
                 <div><strong>{t('adminPanel.config.timezone')}</strong> {systemConfig?.timezone ?? '—'}</div>
                 <div>
                   <strong>{t('adminPanel.config.blackoutPeriod')}</strong>{' '}
@@ -42,7 +42,7 @@ const ConfigSection: React.FC = () => {
           </Col>
           <Col xs={24} sm={12}>
             <Card title={t('adminPanel.config.schedulerTitle')}>
-              <Space direction="vertical" style={{ width: '100%' }}>
+              <Space direction="vertical" className="w-full">
                 <div>{t('adminPanel.config.schedulerDesc')}</div>
                 <Button
                   type="primary"

@@ -164,7 +164,7 @@ const MyRequests: React.FC = () => {
         <>
           {record.startTime} - {record.endTime}
           {record.endDate !== record.date && (
-            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
+            <div className="text-label-xs">
               ({dayjs(record.endDate).format('DD/MM')})
             </div>
           )}
@@ -223,7 +223,7 @@ const MyRequests: React.FC = () => {
         <div>
           <div>{dayjs(v).format('DD/MM/YYYY HH:mm')}</div>
           {record.updatedAt && record.updatedAt !== record.submittedAt && (
-            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
+            <div className="text-label-xs">
               {t('myRequests.columns.lastUpdated')}: {dayjs(record.updatedAt).format('DD/MM/YYYY HH:mm')}
             </div>
           )}
@@ -369,7 +369,7 @@ const MyRequests: React.FC = () => {
 
       {/* Stats */}
       <StatsBar
-        style={{ marginTop: '24px' }}
+        className="mt-24"
         items={[
           { label: t('myRequests.stats.totalActive'), value: stats.total },
           { label: t('myRequests.stats.pending'), value: stats.pending, color: '#1890ff' },
@@ -411,7 +411,7 @@ const MyRequests: React.FC = () => {
             rules={[{ required: true, message: t('myRequests.editModal.dateRequired') }]}
           >
             <DatePicker
-              style={{ width: '100%' }}
+              className="w-full"
               disabledDate={(current) => {
                 return current && isBeforeToday(current);
               }}
@@ -424,7 +424,7 @@ const MyRequests: React.FC = () => {
               label={t('myRequests.editModal.startTime')}
               name="startTime"
               rules={[{ required: true, message: t('myRequests.editModal.startTimeRequired') }]}
-              style={{ flex: 1 }}
+              className="flex-1"
             >
               <Select
                 placeholder={t('myRequests.editModal.selectStartTime')}
@@ -438,7 +438,7 @@ const MyRequests: React.FC = () => {
               label={t('myRequests.editModal.duration')}
               name="duration"
               rules={[{ required: true, message: t('myRequests.editModal.durationRequired') }]}
-              style={{ flex: 1 }}
+              className="flex-1"
             >
               <Select
                 placeholder={t('myRequests.editModal.selectDuration')}

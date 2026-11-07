@@ -389,7 +389,7 @@ const LotCalendarView: React.FC = () => {
           <div style={{ fontSize: 20, color: ACCENT_TEXT.available, fontWeight: 700, margin: '8px 0' }}>
             {selectedEvent.availableCount}/{selectedEvent.totalLots} {t('lotCalendarView.modal.availableLotsLabel')}
           </div>
-          <div style={{ color: 'var(--label-color)' }}>{t('lotCalendarView.modal.availableDesc')}</div>
+          <div className="text-label">{t('lotCalendarView.modal.availableDesc')}</div>
         </div>
       );
     }
@@ -462,7 +462,7 @@ const LotCalendarView: React.FC = () => {
           )}
         </div>
       ) : (
-        <Card style={{ marginBottom: '24px' }}>
+        <Card className="mb-24">
           <Calendar
             localizer={localizer}
             events={events}
@@ -495,13 +495,13 @@ const LotCalendarView: React.FC = () => {
           type="info"
           showIcon
           message={t('lotCalendarView.rtlNote')}
-          style={{ marginBottom: '16px' }}
+          className="mb-16"
         />
       )}
 
       {/* Stats */}
       <StatsBar
-        style={{ marginBottom: '24px' }}
+        className="mb-24"
         items={selectedLot === 'available'
           ? [{ label: t('lotCalendarView.stats.availableWindows'), value: availableEvents.length, color: ACCENT_TEXT.available }]
           : [
@@ -521,7 +521,7 @@ const LotCalendarView: React.FC = () => {
         const legendGrid = (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '16px' }}>
             {(['booked', 'pending', 'blocked', 'available'] as EventType[]).map(type => (
-              <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div key={type} className="flex-center-gap-8">
                 <div style={{ width: 16, height: 16, backgroundColor: EVENT_COLORS[type], borderRadius: 2, flexShrink: 0 }} />
                 <span>{t(`lotCalendarView.legend.${type}`)}</span>
               </div>

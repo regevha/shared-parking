@@ -32,3 +32,16 @@ code {
 
 /* WCAG AA (dark mode): antd's purple tag text is ~3.4:1 on its dark background; lighten it (~6:1). */
 [data-theme="dark"] .ant-tag-purple { color: #b37feb; }
+
+/* ── Utility classes (replace repeated inline styles) ─────────────────────────
+   !important keeps the precedence the inline styles had over component-library CSS. */
+.mb-16 { margin-bottom: 16px !important; }
+.mb-24 { margin-bottom: 24px !important; }
+.mt-24 { margin-top: 24px !important; }
+.w-full { width: 100% !important; }
+.h-full { height: 100% !important; }
+.flex-1 { flex: 1 !important; }
+.flex-center-gap-8 { display: flex !important; align-items: center !important; gap: 8px !important; }
+.text-label { color: var(--label-color) !important; }
+.text-label-xs { font-size: 11px !important; color: var(--label-color) !important; }
+.text-label-sm { font-size: 12px !important; color: var(--label-color) !important; }

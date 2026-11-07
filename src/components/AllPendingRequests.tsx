@@ -124,7 +124,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
         <>
           {record.startTime} - {record.endTime}
           {record.endDate && record.endDate !== record.date && (
-            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
+            <div className="text-label-xs">
               ({dayjs(record.endDate).format('DD/MM')})
             </div>
           )}
@@ -205,7 +205,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
   return (
     <div className="pending-requests">
-      <Row justify="space-between" align="middle" style={{ marginBottom: '16px' }}>
+      <Row justify="space-between" align="middle" className="mb-16">
         <Col>
           <h1>{t('pendingRequests.title')}</h1>
         </Col>
@@ -227,7 +227,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
       </Row>
       <Input
         placeholder={t('pendingRequests.searchPlaceholder')}
-        prefix={<SearchOutlined style={{ color: 'var(--label-color)' }} />}
+        prefix={<SearchOutlined className="text-label" />}
         allowClear
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
@@ -345,12 +345,12 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
 
             <Row gutter={16}>
               <Col xs={24} md={8}>
-                 <Card size="small" title={t('pendingRequests.stats.total')} style={{ height: '100%' }}>
+                 <Card size="small" title={t('pendingRequests.stats.total')} className="h-full">
                     <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{pendingRequests.length}</div>
                  </Card>
               </Col>
               <Col xs={24} md={8}>
-                 <Card size="small" title={t('pendingRequests.stats.pending')} style={{ height: '100%' }}>
+                 <Card size="small" title={t('pendingRequests.stats.pending')} className="h-full">
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1890ff' }}>
                       {pendingRequests.filter(r => !r.rejectedByOwner).length}
                     </div>
@@ -358,7 +358,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
               </Col>
               {isOwner && (
                 <Col xs={24} md={8}>
-                  <Card size="small" title={t('pendingRequests.stats.rejectedByYou')} style={{ height: '100%' }}>
+                  <Card size="small" title={t('pendingRequests.stats.rejectedByYou')} className="h-full">
                       <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ff4d4f' }}>
                         {pendingRequests.filter(r => r.rejectedByOwner).length}
                       </div>

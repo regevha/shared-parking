@@ -69,14 +69,14 @@ const LotsSection: React.FC<LotsSectionProps> = ({ lots, users, loading, refresh
       title: t('adminPanel.lots.columns.owner'),
       key: 'owner',
       render: (_: unknown, record: LotData) =>
-        record.owner ?? <em style={{ color: 'var(--label-color)' }}>{t('adminPanel.lots.unowned')}</em>,
+        record.owner ?? <em className="text-label">{t('adminPanel.lots.unowned')}</em>,
     },
     {
       title: t('adminPanel.lots.columns.lastModified'),
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       width: 130,
-      render: (v?: string) => v ? dayjs(v).format('DD/MM/YYYY HH:mm') : <em style={{ color: 'var(--label-color)' }}>—</em>,
+      render: (v?: string) => v ? dayjs(v).format('DD/MM/YYYY HH:mm') : <em className="text-label">—</em>,
     },
     {
       title: t('adminPanel.lots.columns.actions'),
@@ -135,11 +135,11 @@ const LotsSection: React.FC<LotsSectionProps> = ({ lots, users, loading, refresh
           description={t('adminPanel.lots.unownedAlertDesc')}
           type="warning"
           showIcon
-          style={{ marginBottom: '16px' }}
+          className="mb-16"
         />
       )}
 
-      <Card style={{ marginBottom: '16px' }}>
+      <Card className="mb-16">
         <Space wrap>
           <span>{t('adminPanel.lots.filterLabel')}</span>
           {(['All', 'Available', 'Blocked', 'Unowned'] as const).map(filter => {
@@ -178,7 +178,7 @@ const LotsSection: React.FC<LotsSectionProps> = ({ lots, users, loading, refresh
               </div>
               <div className="admin-card-row">
                 <span className="admin-card-label">{t('adminPanel.lots.columns.owner')}</span>
-                <span>{lot.owner ?? <em style={{ color: 'var(--label-color)' }}>{t('adminPanel.lots.unowned')}</em>}</span>
+                <span>{lot.owner ?? <em className="text-label">{t('adminPanel.lots.unowned')}</em>}</span>
               </div>
               <div className="admin-card-actions">
                 {!lot.ownerId ? (
@@ -262,7 +262,7 @@ const LotsSection: React.FC<LotsSectionProps> = ({ lots, users, loading, refresh
         }}
       >
         <Select
-          style={{ width: '100%' }}
+          className="w-full"
           placeholder={t('adminPanel.lots.assignModal.placeholder')}
           aria-label={t('adminPanel.lots.assignModal.placeholder')}
           value={assignOwnerValue}

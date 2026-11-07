@@ -10,17 +10,18 @@ export interface StatItem {
 interface StatsBarProps {
   items: StatItem[];
   style?: React.CSSProperties;
+  className?: string;
 }
 
-const StatsBar: React.FC<StatsBarProps> = ({ items, style }) => (
-  <Card size="small" style={style}>
+const StatsBar: React.FC<StatsBarProps> = ({ items, style, className }) => (
+  <Card size="small" style={style} className={className}>
     <Space wrap size="large" style={{ width: '100%', justifyContent: 'space-around' }}>
       {items.map((item, i) => (
         <div key={i}>
           <strong style={{ fontSize: '18px', color: item.color ?? 'inherit', marginRight: '8px' }}>
             {item.value}
           </strong>
-          <span style={{ color: 'var(--label-color)' }}>{item.label}</span>
+          <span className="text-label">{item.label}</span>
         </div>
       ))}
     </Space>

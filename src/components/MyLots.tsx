@@ -55,7 +55,7 @@ const MyLots: React.FC = () => {
   return (
     <div className="my-lots">
       <h1>{t('myLots.title')}</h1>
-      <Card style={{ marginBottom: 24 }}>
+      <Card className="mb-24">
         <Row gutter={16}>
           <Col xs={24} sm={12}>
             <div style={{ fontSize: 16 }}>

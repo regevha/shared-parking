@@ -276,7 +276,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           )}
         </div>
       ) : (
-        <Card style={{ marginBottom: '24px' }}>
+        <Card className="mb-24">
           <DnDCalendar
             localizer={localizer}
             events={events}
@@ -313,13 +313,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           type="info"
           showIcon
           message={t('calendarView.rtlNote')}
-          style={{ marginBottom: '16px' }}
+          className="mb-16"
         />
       )}
 
       {/* Stats */}
       <StatsBar
-        style={{ marginBottom: '24px' }}
+        className="mb-24"
         items={[
           { label: t('calendarView.stats.total'), value: totalRequests },
           { label: t('calendarView.stats.pending'), value: pendingCount, color: '#1890ff' },
@@ -335,19 +335,19 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       {(() => {
         const legendGrid = (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex-center-gap-8">
               <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.pending, borderRadius: 2 }} />
               <span>{t('calendarView.legend.pending')}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex-center-gap-8">
               <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.approved, borderRadius: 2 }} />
               <span>{t('calendarView.legend.approved')}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex-center-gap-8">
               <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.rejected, borderRadius: 2 }} />
               <span>{t('calendarView.legend.rejected')}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="flex-center-gap-8">
               <div style={{ width: 16, height: 16, backgroundColor: STATUS_COLORS.pending, borderRadius: 2, outline: '2px solid #fadb14' }} />
               <span>{t('calendarView.legend.myRequest')}</span>
             </div>

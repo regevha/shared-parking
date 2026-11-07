@@ -51,7 +51,7 @@ const BroadcastSection: React.FC = () => {
     <div>
       <h2>{t('adminPanel.broadcast.title')}</h2>
 
-      <Card style={{ marginBottom: '16px' }}>
+      <Card className="mb-16">
         <Space>
           <span>{t('adminPanel.broadcast.simulateBlackout')}</span>
           <Switch
@@ -69,12 +69,12 @@ const BroadcastSection: React.FC = () => {
           description={t('adminPanel.broadcast.blackoutAlertDesc')}
           type="warning"
           showIcon
-          style={{ marginBottom: '16px' }}
+          className="mb-16"
         />
       )}
 
       <Card>
-        <Space direction="vertical" style={{ width: '100%' }}>
+        <Space direction="vertical" className="w-full">
           <div>
             <strong>{t('adminPanel.broadcast.audienceLabel')}</strong>
             <Select

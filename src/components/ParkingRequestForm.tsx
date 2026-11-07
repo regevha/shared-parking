@@ -146,7 +146,7 @@ const ParkingRequestForm: React.FC = () => {
           description={t('requestForm.limitAlert.description', { max: MAX_PENDING_REQUESTS })}
           type="warning"
           showIcon
-          style={{ marginBottom: '24px' }}
+          className="mb-24"
         />
       )}
 
@@ -154,7 +154,7 @@ const ParkingRequestForm: React.FC = () => {
       {activeRequests.length > 0 && (
         <Card
           title={t('requestForm.activeRequestsCard', { count: activeRequests.length, max: MAX_PENDING_REQUESTS })}
-          style={{ marginBottom: '24px' }}
+          className="mb-24"
           size="small"
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -162,15 +162,15 @@ const ParkingRequestForm: React.FC = () => {
               <div key={req.id} style={{ padding: '12px', backgroundColor: 'var(--item-bg)', borderRadius: '4px' }}>
                 <Row gutter={16}>
                   <Col xs={24} sm={6}>
-                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>{t('requestForm.labels.date')}</div>
+                    <div className="text-label-sm">{t('requestForm.labels.date')}</div>
                     <div style={{ fontWeight: 'bold' }}>{dayjs(req.date).format('DD/MM/YYYY')}</div>
                   </Col>
                   <Col xs={24} sm={9}>
-                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>{t('requestForm.labels.timeSlot')}</div>
+                    <div className="text-label-sm">{t('requestForm.labels.timeSlot')}</div>
                     <div style={{ fontWeight: 'bold' }}>{req.startTime} – {req.endTime}</div>
                   </Col>
                   <Col xs={24} sm={9}>
-                    <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>{t('requestForm.labels.status')}</div>
+                    <div className="text-label-sm">{t('requestForm.labels.status')}</div>
                     <Tag color={getRequestStatusColor(req.status)}>
                       {t(getRequestStatusLabel(req.status))}
                     </Tag>
@@ -197,7 +197,7 @@ const ParkingRequestForm: React.FC = () => {
             rules={[{ required: true, message: t('requestForm.validation.dateRequired') }]}
           >
             <DatePicker
-              style={{ width: '100%' }}
+              className="w-full"
               disabledDate={(current) => {
                 return current && isBeforeToday(current);
               }}
@@ -269,7 +269,7 @@ const ParkingRequestForm: React.FC = () => {
             <Alert
               type="warning"
               showIcon
-              style={{ marginBottom: '16px' }}
+              className="mb-16"
               message={t('requestForm.availabilityWarning.title')}
               description={t('requestForm.availabilityWarning.description')}
             />

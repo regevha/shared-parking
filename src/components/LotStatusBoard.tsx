@@ -68,7 +68,7 @@ const LotStatusBoard: React.FC = () => {
       <h1>{t('lotStatusBoard.title')}</h1>
 
       {/* Datetime selector */}
-      <Card size="small" style={{ marginBottom: '16px' }}>
+      <Card size="small" className="mb-16">
         <Space wrap>
           <ClockCircleOutlined />
           <DatePicker
@@ -85,7 +85,7 @@ const LotStatusBoard: React.FC = () => {
       </Card>
 
       {/* All Lots Grid */}
-      <Card style={{ marginBottom: '24px' }}>
+      <Card className="mb-24">
         {loading ? (
           <div className="parking-grid">
             {Array.from({ length: 10 }).map((_, i) => (
@@ -129,7 +129,7 @@ const LotStatusBoard: React.FC = () => {
 
       {/* Summary Stats */}
       <StatsBar
-        style={{ marginBottom: '24px' }}
+        className="mb-24"
         items={[
           { label: t('lotStatusBoard.stats.occupied'), value: stats.occupied, color: OCCUPIED_COLOR },
           { label: t('lotStatusBoard.stats.available'), value: stats.available, color: getStatusColor(LotStatus.AVAILABLE) },
@@ -140,7 +140,7 @@ const LotStatusBoard: React.FC = () => {
       />
 
       {/* Legend */}
-      <Card style={{ marginBottom: '24px' }} title={t('lotStatusBoard.legendTitle')} size="small">
+      <Card className="mb-24" title={t('lotStatusBoard.legendTitle')} size="small">
         <Row gutter={[24, 16]}>
           <Col xs={24} sm={12} md={6}>
             <Space>
@@ -186,7 +186,7 @@ const LotStatusBoard: React.FC = () => {
           const status = getEffectiveStatus(selectedLot);
           const activeReq = occupancyMap.get(selectedLot.id);
           return (
-            <Space direction="vertical" style={{ width: '100%' }}>
+            <Space direction="vertical" className="w-full">
               <div>
                 <strong>{t('lotStatusBoard.columns.status')}: </strong>
                 {status === 'occupied' ? (
@@ -237,7 +237,7 @@ const LotStatusBoard: React.FC = () => {
         description={isNow ? t('lotStatusBoard.infoDesc') : t('lotStatusBoard.infoDescAt', { time: viewTime.format('DD/MM/YYYY HH:mm') })}
         type="info"
         showIcon
-        style={{ marginTop: '24px' }}
+        className="mt-24"
       />
     </div>
   );

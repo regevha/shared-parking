@@ -76,7 +76,7 @@ const LoginPage: React.FC = () => {
             message={errorMsg}
             type="error"
             showIcon
-            style={{ marginBottom: 16 }}
+            className="mb-16"
           />
         )}
 
