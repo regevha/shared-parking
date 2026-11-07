@@ -10,6 +10,7 @@ import { UserRole, RequestStatus } from '../types/enums';
 import dayjs from 'dayjs';
 import { useRequests, ParkingRequest } from '../contexts/RequestsContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
+import { EVENT_FILL } from '../utils/calendarColors';
 import InfoBanner from './InfoBanner';
 import StatsBar from './StatsBar';
 import './CalendarView.css';
@@ -35,10 +36,11 @@ interface CalendarEvent {
   isMine: boolean;
 }
 
+// Fills carry white text, so they must meet WCAG AA (see utils/calendarColors.ts)
 const STATUS_COLORS: Record<RequestStatus, string> = {
-  [RequestStatus.PENDING]: '#1890ff',
-  [RequestStatus.APPROVED]: '#52c41a',
-  [RequestStatus.REJECTED]: '#f5222d',
+  [RequestStatus.PENDING]: EVENT_FILL.pendingBlue,
+  [RequestStatus.APPROVED]: EVENT_FILL.approved,
+  [RequestStatus.REJECTED]: EVENT_FILL.rejected,
 };
 
 const CustomEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => {

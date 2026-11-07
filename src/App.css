@@ -58,6 +58,11 @@
   --toolbar-border: #f0f0f0;
   --label-color: #666;
   --window-item-bg: #f5f5f5;
+  /* Coloured text on cards (WCAG AA on light backgrounds) */
+  --accent-booked: #237804;
+  --accent-pending: #ad4e00;
+  --accent-blocked: #cf1322;
+  --accent-available: #006d75;
 }
 
 /* ── CSS variables (dark mode overrides) ── */
@@ -73,6 +78,11 @@
   --toolbar-border: #303030;
   --label-color: #888;
   --window-item-bg: #1f1f1f;
+  /* Lighter variants so coloured text stays readable on dark cards */
+  --accent-booked: #73d13d;
+  --accent-pending: #ffa940;
+  --accent-blocked: #ff7875;
+  --accent-available: #36cfc9;
 }
 
 /* ── Dark mode: global background ── */
