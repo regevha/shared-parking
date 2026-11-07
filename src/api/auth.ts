@@ -20,7 +20,14 @@ export interface UserPreferences {
   // add new preference fields here
 }
 
-function mapPreferences(raw: any): UserPreferences {
+interface ApiPreferences {
+  dark_mode?: boolean | null;
+  availability_windows?: string | null;
+  notification_windows?: string | null;
+  language?: string | null;
+}
+
+function mapPreferences(raw: ApiPreferences | null | undefined): UserPreferences {
   let availabilityWindows: Record<string, AvailabilityWindow[]> = {};
   if (raw?.availability_windows) {
     try { availabilityWindows = JSON.parse(raw.availability_windows); } catch { /* ignore */ }

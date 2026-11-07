@@ -10,7 +10,17 @@ export interface Message {
   sentAt: string;
 }
 
-function toMessage(raw: any): Message {
+interface ApiMessage {
+  id: number;
+  request_id: string | null;
+  sender_id: string;
+  sender_name: string;
+  sender_role: string;
+  text: string;
+  sent_at: string;
+}
+
+function toMessage(raw: ApiMessage): Message {
   return {
     id: raw.id,
     requestId: raw.request_id,
@@ -24,12 +34,12 @@ function toMessage(raw: any): Message {
 
 export const messagesApi = {
   getForRequest: async (requestId: string): Promise<Message[]> => {
-    const data = await api.get<any[]>(`/api/requests/${requestId}/messages`);
+    const data = await api.get<ApiMessage[]>(`/api/requests/${requestId}/messages`);
     return data.map(toMessage);
   },
 
   send: async (requestId: string, text: string): Promise<Message> => {
-    const data = await api.post<any>(`/api/requests/${requestId}/messages`, { text });
+    const data = await api.post<ApiMessage>(`/api/requests/${requestId}/messages`, { text });
     return toMessage(data);
   },
 };

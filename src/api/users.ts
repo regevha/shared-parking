@@ -9,7 +9,22 @@ export interface UserData {
   createdAt?: string; // ISO string
 }
 
-function mapUser(u: any): UserData {
+interface ApiUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  created_at?: string | null;
+}
+
+interface ApiPreferences {
+  dark_mode?: boolean | null;
+  availability_windows?: string | null;
+  notification_windows?: string | null;
+  language?: string | null;
+}
+
+function mapUser(u: ApiUser): UserData {
   return { id: u.id, name: u.name, email: u.email, role: u.role, createdAt: u.created_at ?? undefined };
 }
 
@@ -35,7 +50,7 @@ export interface PreferencesUpdatePayload {
   language?: string;
 }
 
-function mapPreferences(raw: any): PreferencesData {
+function mapPreferences(raw: ApiPreferences): PreferencesData {
   let availabilityWindows: Record<string, AvailabilityWindow[]> = {};
   if (raw?.availability_windows) {
     try { availabilityWindows = JSON.parse(raw.availability_windows); } catch { /* ignore */ }
@@ -53,19 +68,19 @@ function mapPreferences(raw: any): PreferencesData {
 }
 
 export const usersApi = {
-  getAll: ()            => api.get<any[]>('/api/users').then(us => us.map(mapUser)),
-  getById: (id: string) => api.get<any>(`/api/users/${id}`).then(mapUser),
-  getMe: ()             => api.get<any>('/api/users/me').then(mapUser),
+  getAll: ()            => api.get<ApiUser[]>('/api/users').then(us => us.map(mapUser)),
+  getById: (id: string) => api.get<ApiUser>(`/api/users/${id}`).then(mapUser),
+  getMe: ()             => api.get<ApiUser>('/api/users/me').then(mapUser),
 
   update: (id: string, payload: UserUpdatePayload) =>
-    api.patch<any>(`/api/users/${id}`, payload).then(mapUser),
+    api.patch<ApiUser>(`/api/users/${id}`, payload).then(mapUser),
 
   delete: (id: string) =>
     api.delete<void>(`/api/users/${id}`),
 
   getPreferences: (id: string) =>
-    api.get<any>(`/api/users/${id}/preferences`).then(mapPreferences),
+    api.get<ApiPreferences>(`/api/users/${id}/preferences`).then(mapPreferences),
 
   updatePreferences: (id: string, payload: PreferencesUpdatePayload) =>
-    api.patch<any>(`/api/users/${id}/preferences`, payload).then(mapPreferences),
+    api.patch<ApiPreferences>(`/api/users/${id}/preferences`, payload).then(mapPreferences),
 };

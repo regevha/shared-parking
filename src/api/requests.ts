@@ -1,5 +1,6 @@
 import { api } from './client';
 import { ParkingRequest } from '../contexts/RequestsContext';
+import type { RequestStatus } from '../types/enums';
 
 export interface CreateRequestPayload {
   requester_id: string;
@@ -25,8 +26,46 @@ export interface ApprovePayload {
   lot_owner?: string;
 }
 
+/** Raw request as returned by the API (snake_case). */
+interface ApiRequest {
+  id: string;
+  requester_id: string;
+  requester_name: string;
+  requester_role?: string;
+  date: string;
+  start_time: string;
+  end_date: string;
+  end_time: string;
+  duration: number;
+  submitted_at: string;
+  status: RequestStatus;
+  rejected_by_owner?: boolean | null;
+  lot_id?: string | null;
+  floor?: string | null;
+  lot_owner?: string | null;
+  approved_at?: string | null;
+  approved_by?: string | null;
+  updated_at?: string | null;
+}
+
+export interface AutoApproveResult {
+  approved?: number;
+  remaining_pending?: number;
+  [key: string]: unknown;
+}
+
+/** One row of a request's audit trail (snake_case, as returned by the API). */
+export interface AuditEntry {
+  id: number;
+  request_id: string;
+  user_name: string;
+  action: string;
+  details?: string;
+  timestamp: string;
+}
+
 // Map snake_case API response → camelCase ParkingRequest
-function mapRequest(r: any): ParkingRequest {
+function mapRequest(r: ApiRequest): ParkingRequest {
   return {
     id: r.id,
     requesterId: r.requester_id,
@@ -50,27 +89,27 @@ function mapRequest(r: any): ParkingRequest {
 }
 
 export const requestsApi = {
-  getAll:     ()              => api.get<any[]>('/api/requests').then(rs => rs.map(mapRequest)),
-  getPending: ()              => api.get<any[]>('/api/requests/pending').then(rs => rs.map(mapRequest)),
-  getApproved:()              => api.get<any[]>('/api/requests/approved').then(rs => rs.map(mapRequest)),
+  getAll:     ()              => api.get<ApiRequest[]>('/api/requests').then(rs => rs.map(mapRequest)),
+  getPending: ()              => api.get<ApiRequest[]>('/api/requests/pending').then(rs => rs.map(mapRequest)),
+  getApproved:()              => api.get<ApiRequest[]>('/api/requests/approved').then(rs => rs.map(mapRequest)),
   /** Returns only the authenticated user's requests (server-scoped) */
-  getMe:      ()              => api.get<any[]>('/api/requests/me').then(rs => rs.map(mapRequest)),
+  getMe:      ()              => api.get<ApiRequest[]>('/api/requests/me').then(rs => rs.map(mapRequest)),
 
   create: (payload: CreateRequestPayload) =>
-    api.post<any>('/api/requests', payload).then(mapRequest),
+    api.post<ApiRequest>('/api/requests', payload).then(mapRequest),
 
   approve: (id: string, lotInfo?: ApprovePayload) =>
-    api.patch<any>(`/api/requests/${id}/approve`, {
+    api.patch<ApiRequest>(`/api/requests/${id}/approve`, {
       lot_id:    lotInfo?.lot_id,
       floor:     lotInfo?.floor,
       lot_owner: lotInfo?.lot_owner,
     }).then(mapRequest),
 
   reject: (id: string) =>
-    api.patch<any>(`/api/requests/${id}/reject`).then(mapRequest),
+    api.patch<ApiRequest>(`/api/requests/${id}/reject`).then(mapRequest),
 
   update: (id: string, payload: UpdateRequestPayload) =>
-    api.patch<any>(`/api/requests/${id}`, {
+    api.patch<ApiRequest>(`/api/requests/${id}`, {
       date:       payload.date,
       start_time: payload.start_time,
       end_date:   payload.end_date,
@@ -82,8 +121,8 @@ export const requestsApi = {
     api.delete<void>(`/api/requests/${id}`),
 
   runAutoApprove: () =>
-    api.post<any>('/api/requests/run-auto-approve', {}),
+    api.post<AutoApproveResult>('/api/requests/run-auto-approve', {}),
 
   getAuditTrail: (id: string) =>
-    api.get<any[]>(`/api/requests/${id}/audit`),
+    api.get<AuditEntry[]>(`/api/requests/${id}/audit`),
 };
