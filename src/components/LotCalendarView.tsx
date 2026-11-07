@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Alert, Card, Collapse, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
+import { Alert, Card, Collapse, Drawer, Modal, Descriptions, Tag, Button, Select, notification, Space, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { isRTL, SupportedLanguage } from '../i18n';
 import dayjs from 'dayjs';
@@ -33,6 +33,7 @@ interface LotCalendarEvent {
   resource: ParkingRequest | LotData;
   availableCount?: number;
   totalLots?: number;
+  isMine?: boolean;
 }
 
 const EVENT_COLORS: Record<EventType, string> = {
@@ -61,20 +62,12 @@ const CustomEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => {
   );
 };
 
-const CustomMobileWeekEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => {
-  const isRequest = event.type === 'booked' || event.type === 'pending';
-  const resource = event.resource as ParkingRequest;
-  return (
-    <div className="custom-event-week-mobile">
-      <span className="custom-event-week-mobile-title">
-        {event.title}
-        {isRequest && resource.requesterRole && (
-          ` (${resource.requesterRole.charAt(0).toUpperCase()})`
-        )}
-      </span>
-    </div>
-  );
-};
+
+// Text-free block for the mobile week view: colour + position carry the meaning,
+// the full details open in a bottom sheet on tap.
+const CustomMobileWeekEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => (
+  <div className="custom-event-week-mobile" role="img" aria-label={event.title} title={event.title} />
+);
 
 const LotCalendarView: React.FC = () => {
   const { pendingRequests, approvedRequests, approveRequest, rejectRequest, ownerLots, allLots } = useRequests();
@@ -84,7 +77,7 @@ const LotCalendarView: React.FC = () => {
   const { t, i18n } = useTranslation();
   const isHebrewMode = isRTL(i18n.language as SupportedLanguage);
   const isMobile = useIsMobile();
-  const [view, setView] = useState<View>(() => isMobile ? 'day' : 'week');
+  const [view, setView] = useState<View>('week');
   const [date, setDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<LotCalendarEvent | null>(null);
   const [selectedLot, setSelectedLot] = useState<string>('all');
@@ -119,6 +112,7 @@ const LotCalendarView: React.FC = () => {
         end: new Date(`${a.endDate || a.date}T${a.endTime}:00`),
         type: 'booked' as EventType,
         resource: a as ParkingRequest,
+        isMine: a.requesterName === user?.name,
       })),
   [approvedRequests, selectedLot, isManager, user?.name]);
 
@@ -134,8 +128,9 @@ const LotCalendarView: React.FC = () => {
         end: new Date(`${r.endDate || r.date}T${r.endTime}:00`),
         type: 'pending' as EventType,
         resource: r as ParkingRequest,
+        isMine: r.requesterName === user?.name,
       })),
-  [pendingRequests, selectedLot]);
+  [pendingRequests, selectedLot, user?.name]);
 
   // Blocked events
   const blockedEvents = useMemo(() => {
@@ -244,7 +239,7 @@ const LotCalendarView: React.FC = () => {
     return {
       style: {
         backgroundColor: color,
-        border: `1px solid ${color}`,
+        border: event.isMine ? '2px solid #fadb14' : `1px solid ${color}`,
         color: '#fff',
         borderRadius: '3px',
         fontSize: '12px',
@@ -410,6 +405,15 @@ const LotCalendarView: React.FC = () => {
     );
   };
 
+  const detailFooter = (
+    <Space>
+      {(selectedEvent?.type === 'booked' || selectedEvent?.type === 'pending') && (
+        <Button onClick={() => setShowHistory(true)}>{t('lotCalendarView.modal.history') || 'View History'}</Button>
+      )}
+      <Button type="primary" onClick={() => setSelectedEvent(null)}>{t('lotCalendarView.modal.close')}</Button>
+    </Space>
+  );
+
   return (
     <div className="calendar-view lot-calendar-view">
 
@@ -532,23 +536,30 @@ const LotCalendarView: React.FC = () => {
         );
       })()}
 
-      {/* Event Detail Modal */}
-      <Modal
-        open={!!selectedEvent}
-        width={isMobile ? '95vw' : 520}
-        onCancel={() => setSelectedEvent(null)}
-        footer={
-          <Space>
-            {(selectedEvent?.type === 'booked' || selectedEvent?.type === 'pending') && (
-              <Button onClick={() => setShowHistory(true)}>{t('lotCalendarView.modal.history') || 'View History'}</Button>
-            )}
-            <Button type="primary" onClick={() => setSelectedEvent(null)}>{t('lotCalendarView.modal.close')}</Button>
-          </Space>
-        }
-        title={modalTitle}
-      >
-        {renderModalContent()}
-      </Modal>
+      {/* Event details — bottom sheet on mobile, modal on desktop */}
+      {isMobile ? (
+        <Drawer
+          open={!!selectedEvent}
+          placement="bottom"
+          height="auto"
+          onClose={() => setSelectedEvent(null)}
+          title={modalTitle}
+          footer={detailFooter}
+          styles={{ body: { maxHeight: '60vh', overflowY: 'auto' } }}
+        >
+          {renderModalContent()}
+        </Drawer>
+      ) : (
+        <Modal
+          open={!!selectedEvent}
+          width={520}
+          onCancel={() => setSelectedEvent(null)}
+          footer={detailFooter}
+          title={modalTitle}
+        >
+          {renderModalContent()}
+        </Modal>
+      )}
 
       {showHistory && selectedEvent?.resource?.id && (
         <AuditTrailModal 

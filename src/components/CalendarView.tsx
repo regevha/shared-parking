@@ -3,7 +3,7 @@ import { Calendar, dayjsLocalizer, View } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Alert, Card, Collapse, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
+import { Alert, Card, Collapse, Drawer, Modal, Descriptions, Tag, Button, notification, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { isRTL, SupportedLanguage } from '../i18n';
 import { UserRole, RequestStatus } from '../types/enums';
@@ -55,14 +55,12 @@ const CustomEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => {
   );
 };
 
-// Compact event for mobile week view — single line, no time sub-label
-const CustomMobileWeekEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => (
-  <div className="custom-event-week-mobile">
-    <span className="custom-event-week-mobile-title">
-      {event.resource.requesterName.split(' ')[0]} ({event.resource.requesterRole?.charAt(0).toUpperCase()})
-    </span>
-  </div>
-);
+// Text-free block for the mobile week view: colour + position carry the meaning,
+// the full details open in a bottom sheet on tap.
+const CustomMobileWeekEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => {
+  const label = `${event.resource.requesterName}, ${event.resource.startTime}–${event.resource.endTime}`;
+  return <div className="custom-event-week-mobile" role="img" aria-label={label} title={label} />;
+};
 
 
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
@@ -70,7 +68,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const { t, i18n } = useTranslation();
   const isHebrewMode = isRTL(i18n.language as SupportedLanguage);
   const isMobile = useIsMobile();
-  const [view, setView] = useState<View>(() => isMobile ? 'day' : 'week');
+  const [view, setView] = useState<View>('week');
   const { scrollTo8AM, minTime, maxTime } = useCalendarHours();
   const [date, setDate] = useState(new Date());
   const [selectedRequest, setSelectedRequest] = useState<ParkingRequest | null>(null);
@@ -207,6 +205,38 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
 
   const mobileCalendarHeight = view === 'month' ? 620 : 500;
 
+  const detailTitle = selectedRequest ? t('calendarView.modal.title', { name: selectedRequest.requesterName }) : '';
+  const detailFooter = (
+    <Space>
+      <Button onClick={() => setShowHistory(true)}>{t('calendarView.modal.history') || 'View History'}</Button>
+      <Button type="primary" onClick={() => setSelectedRequest(null)}>{t('calendarView.modal.close')}</Button>
+    </Space>
+  );
+  const detailBody = (
+        selectedRequest && (
+          <Descriptions column={1} size="small" bordered>
+            <Descriptions.Item label={t('calendarView.modal.requestId')}>{selectedRequest.id}</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.requester')}>{selectedRequest.requesterName}</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.date')}>{dayjs(selectedRequest.date).format('DD/MM/YYYY')}</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.time')}>
+              {selectedRequest.startTime} – {selectedRequest.endTime}
+              {selectedRequest.endDate && selectedRequest.endDate !== selectedRequest.date && (
+                <span style={{ fontSize: '11px', color: 'var(--label-color)', marginLeft: '8px' }}>
+                  ({dayjs(selectedRequest.endDate).format('DD/MM')})
+                </span>
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.duration')}>{selectedRequest.duration}h</Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.status')}>
+              <Tag color={getStatusTagColor(selectedRequest)}>{t(getStatusLabel(selectedRequest))}</Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label={t('calendarView.modal.submitted')}>{dayjs(selectedRequest.submittedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
+            {selectedRequest.lotId && <Descriptions.Item label={t('calendarView.modal.lot')}>{selectedRequest.lotId}</Descriptions.Item>}
+            {selectedRequest.floor && <Descriptions.Item label={t('calendarView.modal.floor')}>{selectedRequest.floor}</Descriptions.Item>}
+            {selectedRequest.lotOwner && <Descriptions.Item label={t('calendarView.modal.lotOwner')}>{selectedRequest.lotOwner}</Descriptions.Item>}
+          </Descriptions>)
+  );
+
   return (
     <div className="calendar-view">
       {/* Calendar — forced LTR: react-big-calendar has no RTL support */}
@@ -331,42 +361,29 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
         );
       })()}
 
-      {/* Request Detail Modal */}
-      <Modal
-        open={!!selectedRequest}
-        onCancel={() => setSelectedRequest(null)}
-        footer={
-          <Space>
-            <Button onClick={() => setShowHistory(true)}>{t('calendarView.modal.history') || 'View History'}</Button>
-            <Button type="primary" onClick={() => setSelectedRequest(null)}>{t('calendarView.modal.close')}</Button>
-          </Space>
-        }
-        title={selectedRequest ? t('calendarView.modal.title', { name: selectedRequest.requesterName }) : ''}
-      >
-        {selectedRequest && (
-          <Descriptions column={1} size="small" bordered>
-            <Descriptions.Item label={t('calendarView.modal.requestId')}>{selectedRequest.id}</Descriptions.Item>
-            <Descriptions.Item label={t('calendarView.modal.requester')}>{selectedRequest.requesterName}</Descriptions.Item>
-            <Descriptions.Item label={t('calendarView.modal.date')}>{dayjs(selectedRequest.date).format('DD/MM/YYYY')}</Descriptions.Item>
-            <Descriptions.Item label={t('calendarView.modal.time')}>
-              {selectedRequest.startTime} – {selectedRequest.endTime}
-              {selectedRequest.endDate && selectedRequest.endDate !== selectedRequest.date && (
-                <span style={{ fontSize: '11px', color: 'var(--label-color)', marginLeft: '8px' }}>
-                  ({dayjs(selectedRequest.endDate).format('DD/MM')})
-                </span>
-              )}
-            </Descriptions.Item>
-            <Descriptions.Item label={t('calendarView.modal.duration')}>{selectedRequest.duration}h</Descriptions.Item>
-            <Descriptions.Item label={t('calendarView.modal.status')}>
-              <Tag color={getStatusTagColor(selectedRequest)}>{t(getStatusLabel(selectedRequest))}</Tag>
-            </Descriptions.Item>
-            <Descriptions.Item label={t('calendarView.modal.submitted')}>{dayjs(selectedRequest.submittedAt).format('DD/MM/YYYY HH:mm')}</Descriptions.Item>
-            {selectedRequest.lotId && <Descriptions.Item label={t('calendarView.modal.lot')}>{selectedRequest.lotId}</Descriptions.Item>}
-            {selectedRequest.floor && <Descriptions.Item label={t('calendarView.modal.floor')}>{selectedRequest.floor}</Descriptions.Item>}
-            {selectedRequest.lotOwner && <Descriptions.Item label={t('calendarView.modal.lotOwner')}>{selectedRequest.lotOwner}</Descriptions.Item>}
-          </Descriptions>
-        )}
-      </Modal>
+      {/* Request details — bottom sheet on mobile, modal on desktop */}
+      {isMobile ? (
+        <Drawer
+          open={!!selectedRequest}
+          placement="bottom"
+          height="auto"
+          onClose={() => setSelectedRequest(null)}
+          title={detailTitle}
+          footer={detailFooter}
+          styles={{ body: { maxHeight: '60vh', overflowY: 'auto' } }}
+        >
+          {detailBody}
+        </Drawer>
+      ) : (
+        <Modal
+          open={!!selectedRequest}
+          onCancel={() => setSelectedRequest(null)}
+          footer={detailFooter}
+          title={detailTitle}
+        >
+          {detailBody}
+        </Modal>
+      )}
 
       {showHistory && selectedRequest && (
         <AuditTrailModal 
