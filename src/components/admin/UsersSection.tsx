@@ -83,7 +83,7 @@ const UsersSection: React.FC<UsersSectionProps> = ({ users, loading, refreshUser
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 110,
-      render: (v?: string) => v ? dayjs(v).format('DD/MM/YYYY') : <em style={{ color: 'var(--label-color)' }}>—</em>,
+      render: (v?: string) => v ? dayjs(v).format('DD/MM/YYYY') : <em className="text-label">—</em>,
     },
     {
       title: t('adminPanel.users.columns.actions'),

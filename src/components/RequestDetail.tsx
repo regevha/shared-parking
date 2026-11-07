@@ -82,7 +82,7 @@ const RequestDetail: React.FC = () => {
       {/* Request Info Card */}
       <Card
         title={t('requestDetail.requestInfo.cardTitle')}
-        style={{ marginBottom: '24px' }}
+        className="mb-24"
         size="small"
       >
         <Row gutter={[16, 16]}>
@@ -182,7 +182,7 @@ const RequestDetail: React.FC = () => {
       {/* Message Thread */}
       <Card
         title={t('requestDetail.messages.cardTitle')}
-        style={{ marginBottom: '24px' }}
+        className="mb-24"
         bodyStyle={{ padding: '16px' }}
       >
         <div className="message-thread">
@@ -191,7 +191,7 @@ const RequestDetail: React.FC = () => {
               {[1, 2, 3].map(i => (
                 <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
                   <Skeleton.Avatar size="small" active />
-                  <Skeleton active paragraph={{ rows: 1, width: ['60%'] }} title={{ width: '30%' }} style={{ flex: 1 }} />
+                  <Skeleton active paragraph={{ rows: 1, width: ['60%'] }} title={{ width: '30%' }} className="flex-1" />
                 </div>
               ))}
             </>

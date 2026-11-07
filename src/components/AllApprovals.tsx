@@ -62,7 +62,7 @@ const AllApprovals: React.FC = () => {
       render: (_: unknown, record: ParkingRequest) => (
         <div>
           <div>{dayjs(record.date).format('DD/MM/YYYY')}</div>
-          <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>
+          <div className="text-label-sm">
             {record.startTime} - {record.endTime}
             {record.endDate && record.endDate !== record.date && ` (${dayjs(record.endDate).format('DD/MM')})`}
             {' · '}{record.duration}h
@@ -79,7 +79,7 @@ const AllApprovals: React.FC = () => {
       render: (lotId: string, record: ParkingRequest) => (
         <div>
           <div><strong>{lotId}</strong></div>
-          <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>
+          <div className="text-label-sm">
             {[record.floor, record.lotOwner].filter(Boolean).join(' · ')}
           </div>
         </div>
@@ -168,7 +168,7 @@ const AllApprovals: React.FC = () => {
       <Space wrap style={{ marginBottom: '16px', width: '100%' }}>
         <Input
           placeholder={t('approvals.searchPlaceholder')}
-          prefix={<SearchOutlined style={{ color: 'var(--label-color)' }} />}
+          prefix={<SearchOutlined className="text-label" />}
           allowClear
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
@@ -255,7 +255,7 @@ const AllApprovals: React.FC = () => {
       ) : (
         <>
           {/* Stats — desktop: 3 visual cards at top */}
-          <Row gutter={16} style={{ marginBottom: '24px' }}>
+          <Row gutter={16} className="mb-24">
             <Col span={8}>
               <Card size="small">
                 <Statistic

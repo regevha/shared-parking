@@ -139,7 +139,7 @@ const NotificationWindows: React.FC = () => {
         description={t('notificationWindows.blackoutAlert.description')}
         type="info"
         showIcon
-        style={{ marginBottom: '24px' }}
+        className="mb-24"
       />
 
       <Spin spinning={saving} tip={t('notificationWindows.saving')}>
@@ -152,7 +152,7 @@ const NotificationWindows: React.FC = () => {
               >
                 <div style={{ minHeight: '120px' }}>
                   {windows[day] && windows[day].length > 0 ? (
-                    <Space direction="vertical" style={{ width: '100%' }}>
+                    <Space direction="vertical" className="w-full">
                       {windows[day].map(w => (
                         <div key={w.id} className="window-item">
                           <Tag color="blue">{w.startTime} – {w.endTime}</Tag>
@@ -217,7 +217,7 @@ const NotificationWindows: React.FC = () => {
               format="HH:mm"
               minuteStep={15}
               placeholder={[t('notificationWindows.modal.startPlaceholder'), t('notificationWindows.modal.endPlaceholder')]}
-              style={{ width: '100%' }}
+              className="w-full"
             />
           </Form.Item>
         </Form>

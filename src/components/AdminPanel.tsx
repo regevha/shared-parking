@@ -162,7 +162,7 @@ const AdminPanel: React.FC = () => {
             <Button
               icon={<MenuOutlined />}
               onClick={() => setSiderCollapsed(false)}
-              style={{ marginBottom: 16 }}
+              className="mb-16"
             >
               {menuItems.find(m => m.key === selectedMenu)?.label}
             </Button>

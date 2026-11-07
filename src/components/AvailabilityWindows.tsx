@@ -193,7 +193,7 @@ const AvailabilityWindows: React.FC = () => {
       ),
       children: (
         <Spin spinning={saving}>
-          <div style={{ marginBottom: 16 }}>
+          <div className="mb-16">
             <Row justify="space-between" align="middle">
               <Col>
                 <Space>
@@ -219,7 +219,7 @@ const AvailabilityWindows: React.FC = () => {
               {t('availabilityWindows.noWindowsLot')}
             </div>
           ) : isMobile ? (
-            <Space direction="vertical" style={{ width: '100%' }}>
+            <Space direction="vertical" className="w-full">
               {wins.map(w => (
                 <Card key={w.id} size="small" style={{ opacity: w.isActive ? 1 : 0.5 }}>
                   <Row justify="space-between" align="middle">
@@ -265,7 +265,7 @@ const AvailabilityWindows: React.FC = () => {
         showIcon
         message={t('availabilityWindows.infoAlert.message')}
         description={t('availabilityWindows.infoAlert.description')}
-        style={{ marginBottom: 24 }}
+        className="mb-24"
       />
 
       <Card>
@@ -309,7 +309,7 @@ const AvailabilityWindows: React.FC = () => {
               rules={[{ required: true, message: t('availabilityWindows.modal.dateRequired') }]}
             >
               <DatePicker
-                style={{ width: '100%' }}
+                className="w-full"
                 disabledDate={d => d && isBeforeToday(d)}
                 format="DD/MM/YYYY"
               />
@@ -334,7 +334,7 @@ const AvailabilityWindows: React.FC = () => {
               format="HH:mm"
               minuteStep={15}
               placeholder={[t('availabilityWindows.modal.startPlaceholder'), t('availabilityWindows.modal.endPlaceholder')]}
-              style={{ width: '100%' }}
+              className="w-full"
             />
           </Form.Item>
         </Form>
