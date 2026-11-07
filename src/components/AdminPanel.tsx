@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
   Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Upload, Alert,
-  Input, DatePicker, Tabs, Select, notification, Switch, Skeleton, Modal, Popconfirm, Drawer,
+  DatePicker, Tabs, Select, notification, Skeleton, Modal, Popconfirm, Drawer,
 } from 'antd';
 import InfoBanner from './InfoBanner';
+import BroadcastSection from './admin/BroadcastSection';
 import {
   UserOutlined,
   CarOutlined,
@@ -29,14 +30,12 @@ import { UserRole, RequestStatus, LotStatus } from '../types/enums';
 import { useAuth } from '../contexts/AuthContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
 import { configApi, SystemConfig } from '../api/config';
-import { notificationsApi } from '../api/notifications';
 import { adminApi } from '../api/admin';
 import './AdminPanel.css';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { notifyError } from '../utils/notify';
 
 const { Sider, Content } = Layout;
-const { TextArea } = Input;
 const { RangePicker } = DatePicker;
 
 // Colour map for the four real lot-status values from the backend
@@ -78,9 +77,6 @@ const AdminPanel: React.FC = () => {
   // ── UI-only state (sections with no backend) ────────────────────────────────
   const [lotFilter, setLotFilter] = useState<'All' | 'Available' | 'Blocked' | 'Unowned'>('All');
   const [reportDateRange, setReportDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
-  const [broadcastMessage, setBroadcastMessage] = useState('');
-  const [broadcastAudience, setBroadcastAudience] = useState<'owners' | 'users' | 'both'>('both');
-  const [isBlackoutSimulated, setIsBlackoutSimulated] = useState(false);
   const [hasImportedData, setHasImportedData] = useState(false);
 
   // ── System config ───────────────────────────────────────────────────────────
@@ -384,37 +380,6 @@ const AdminPanel: React.FC = () => {
       render: (d: number) => `${d}h`,
     },
   ];
-
-  // ── Broadcast ───────────────────────────────────────────────────────────────
-  const [broadcastLoading, setBroadcastLoading] = useState(false);
-  const handleBroadcastSend = async () => {
-    if (isBlackoutSimulated) {
-      notification.error({
-        message: t('adminPanel.broadcast.notifications.sent'),
-        description: t('adminPanel.broadcast.notifications.blockedDesc'),
-      });
-      return;
-    }
-
-    if (!broadcastMessage.trim()) return;
-
-    setBroadcastLoading(true);
-    try {
-      const result = await notificationsApi.broadcast(broadcastAudience, broadcastMessage);
-      notification.success({
-        message: t('adminPanel.broadcast.notifications.sent'),
-        description: t('adminPanel.broadcast.notifications.sentDesc', {
-          audience: broadcastAudience,
-          count: result.delivered_to
-        }),
-      });
-      setBroadcastMessage('');
-    } catch (err: any) {
-      notifyError(t('adminPanel.broadcast.notifications.blocked'), err);
-    } finally {
-      setBroadcastLoading(false);
-    }
-  };
 
   // ── Import / Export ─────────────────────────────────────────────────────────
   const [importLoading, setImportLoading] = useState(false);
@@ -879,76 +844,7 @@ const AdminPanel: React.FC = () => {
         );
 
       case 'broadcast':
-        return (
-          <div>
-            <h2>{t('adminPanel.broadcast.title')}</h2>
-
-            <Card style={{ marginBottom: '16px' }}>
-              <Space>
-                <span>{t('adminPanel.broadcast.simulateBlackout')}</span>
-                <Switch
-                  checked={isBlackoutSimulated}
-                  onChange={setIsBlackoutSimulated}
-                  checkedChildren={t('adminPanel.broadcast.blackoutOn')}
-                  unCheckedChildren={t('adminPanel.broadcast.blackoutOff')}
-                />
-              </Space>
-            </Card>
-
-            {isBlackoutSimulated && (
-              <Alert
-                message={t('adminPanel.broadcast.blackoutAlert')}
-                description={t('adminPanel.broadcast.blackoutAlertDesc')}
-                type="warning"
-                showIcon
-                style={{ marginBottom: '16px' }}
-              />
-            )}
-
-            <Card>
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <div>
-                  <strong>{t('adminPanel.broadcast.audienceLabel')}</strong>
-                  <Select
-                    value={broadcastAudience}
-                    aria-label={t('adminPanel.broadcast.audienceLabel')}
-                    onChange={setBroadcastAudience}
-                    style={{ width: isMobile ? '100%' : '220px', marginLeft: isMobile ? 0 : '8px' }}
-                    options={[
-                      { value: 'owners', label: t('adminPanel.broadcast.audiences.owners') },
-                      { value: 'users', label: t('adminPanel.broadcast.audiences.users') },
-                      { value: 'both', label: t('adminPanel.broadcast.audiences.both') },
-                    ]}
-                  />
-                </div>
-
-                <div>
-                  <strong>{t('adminPanel.broadcast.messageLabel')}</strong>
-                  <TextArea
-                    rows={4}
-                    value={broadcastMessage}
-                    onChange={e => setBroadcastMessage(e.target.value)}
-                    placeholder={t('adminPanel.broadcast.messagePlaceholder')}
-                    style={{ marginTop: '8px' }}
-                  />
-                </div>
-
-                <Button
-                  type="primary"
-                  icon={<SendOutlined />}
-                  disabled={isBlackoutSimulated || !broadcastMessage.trim()}
-                  loading={broadcastLoading}
-                  onClick={handleBroadcastSend}
-                  size="large"
-                >
-                  {t('adminPanel.broadcast.sendButton')}
-                </Button>
-              </Space>
-            </Card>
-
-            <InfoBanner label={`${t('adminPanel.broadcast.title')}:`} description={t('adminPanel.broadcast.info')} />
-          </div>
-        );
+        return <BroadcastSection />;
 
       default:
         return <div>{t('adminPanel.defaultContent')}</div>;
