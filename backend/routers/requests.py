@@ -69,17 +69,17 @@ def _slot_is_parseable(start_date: str, start_time: str, end_date: str, end_time
 
 def _has_conflict(
     db: Session,
-    lot_id: str | None,
+    lot_id: str,
     start_date: str,
     start_time: str,
     end_date: str,
     end_time: str,
-    exclude_id: str | None = None,
 ) -> str | None:
-    """Return the ID of the conflicting approved request if one overlaps, else None."""
-    if not lot_id:
-        return None
-    
+    """Return the ID of the conflicting approved request if one overlaps, else None.
+
+    Only approved requests are compared, and callers pass a request that is still pending,
+    so the request being checked can never match itself.
+    """
     new_start = datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
     new_end = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
 
@@ -90,8 +90,6 @@ def _has_conflict(
     ).all()
 
     for r in existing:
-        if exclude_id and r.id == exclude_id:
-            continue
         r_start = datetime.strptime(f"{r.date} {r.start_time}", "%Y-%m-%d %H:%M")
         r_end = datetime.strptime(f"{r.end_date} {r.end_time}", "%Y-%m-%d %H:%M")
         
@@ -104,7 +102,7 @@ def _has_conflict(
 
 def _is_outside_availability(
     db: Session,
-    lot_id: str | None,
+    lot_id: str,
     start_date: str,
     start_time: str,
     end_date: str,
@@ -116,9 +114,6 @@ def _is_outside_availability(
     Checked day-by-day for multi-day requests.
     Specific-date windows take precedence over recurring day_of_week windows.
     """
-    if not lot_id:
-        return False
-
     lot = db.query(models.Lot).filter(models.Lot.id == lot_id).first()
     # Unowned lots have no availability windows — allow any time
     if not lot or not lot.owner_id:
@@ -283,7 +278,7 @@ def approve_request(
         if not _slot_is_parseable(req.date, req.start_time, req.end_date, req.end_time):
             raise HTTPException(status_code=400, detail="Request has an invalid date or time and cannot be approved")
         conflict_id = _has_conflict(
-            db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=request_id
+            db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time
         )
         if conflict_id:
             raise HTTPException(
