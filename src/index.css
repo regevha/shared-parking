@@ -25,6 +25,34 @@ code {
   border: 0;
 }
 
+/* Skip link: hidden until focused via keyboard */
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -48px;
+  z-index: 2000;
+  padding: 8px 16px;
+  background: #1677ff;
+  color: #fff;
+  border-radius: 4px;
+  transition: top 0.15s;
+}
+.skip-link:focus {
+  top: 8px;
+}
+
+/* Swatch used in the "rejected by you" legend (matches greyed-out rejected rows) */
+.rejected-sample {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-inline-end: 8px;
+  vertical-align: middle;
+  border-radius: 3px;
+  background: rgba(140, 140, 140, 0.35);
+  border: 1px solid rgba(140, 140, 140, 0.6);
+}
+
 /* WCAG AA: antd's default light preset tags (green/orange) use -7 text on -1 bg (~3.3:1).
    Use the darker -8 shade (>= 5:1). Dark mode keeps antd's own dark variants. */
 :root:not([data-theme="dark"]) .ant-tag-green { color: #237804; }

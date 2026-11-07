@@ -15,7 +15,10 @@
     "availability": "זמינות",
     "menu": "תפריט",
     "language": "שפה",
-    "settings": "הגדרות"
+    "settings": "הגדרות",
+    "skipToContent": "דלג לתוכן",
+    "toggleTheme": "החלף מצב כהה",
+    "notifications": "התראות"
   },
   "login": {
     "title": "ניהול חניה",

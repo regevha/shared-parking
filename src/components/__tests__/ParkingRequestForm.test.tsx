@@ -97,7 +97,7 @@ describe('ParkingRequestForm — active requests card', () => {
       authValue: { user: alice },
       requestsValue: { userRequests: active },
     });
-    expect(screen.getByText(/Your Pending Requests \(2 \/ 10\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your Active Requests \(2 \/ 10\)/i)).toBeInTheDocument();
   });
 
   it('does not show active requests card with 0 active requests', () => {
@@ -105,7 +105,7 @@ describe('ParkingRequestForm — active requests card', () => {
       authValue: { user: alice },
       requestsValue: { userRequests: [] },
     });
-    expect(screen.queryByText(/Your Pending Requests/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Your Active Requests/i)).not.toBeInTheDocument();
   });
 
   it('shows request time slot details in the active requests card', () => {

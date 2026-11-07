@@ -116,7 +116,18 @@ const NotificationBell: React.FC = () => {
       overlayClassName="notification-overlay"
       overlayStyle={{ maxWidth: 'min(320px, calc(100vw - 16px))' }}
     >
-      <div className="notification-trigger">
+      <div
+        className="notification-trigger"
+        role="button"
+        tabIndex={0}
+        aria-label={t('nav.notifications')}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setVisible(v => !v);
+          }
+        }}
+      >
         <Badge count={unreadCount} overflowCount={9} size="small" offset={[2, 0]}>
           <BellOutlined style={{ fontSize: '20px', cursor: 'pointer' }} />
         </Badge>

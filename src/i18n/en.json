@@ -15,7 +15,10 @@
     "availability": "Availability",
     "menu": "Menu",
     "language": "Language",
-    "settings": "Settings"
+    "settings": "Settings",
+    "skipToContent": "Skip to content",
+    "toggleTheme": "Toggle dark mode",
+    "notifications": "Notifications"
   },
   "login": {
     "title": "Parking Management",
@@ -211,7 +214,7 @@
       "title": "Request Limit Reached",
       "description": "You currently have the maximum number of active parking requests ({{max}}). You cannot submit new requests until one of your existing requests is approved or cancelled."
     },
-    "activeRequestsCard": "Your Pending Requests ({{count}} / {{max}})",
+    "activeRequestsCard": "Your Active Requests ({{count}} / {{max}})",
     "labels": {
       "date": "Date",
       "timeSlot": "Time Slot",
