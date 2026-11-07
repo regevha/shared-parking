@@ -30,7 +30,19 @@ export interface LotUpdatePayload {
   owner_id?: string | null;
 }
 
-function mapLot(l: any): LotData {
+interface ApiLot {
+  id: string;
+  floor: string;
+  floor_label: string;
+  owner?: string | null;
+  owner_id?: string | null;
+  status: LotStatus;
+  blocked_until?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+function mapLot(l: ApiLot): LotData {
   return {
     id: l.id,
     floor: l.floor,
@@ -45,17 +57,17 @@ function mapLot(l: any): LotData {
 }
 
 export const lotsApi = {
-  getAll:     ()                  => api.get<any[]>('/api/lots').then(ls => ls.map(mapLot)),
+  getAll:     ()                  => api.get<ApiLot[]>('/api/lots').then(ls => ls.map(mapLot)),
   /** Returns only the authenticated owner's lots (server-scoped) */
-  getMine:    ()                  => api.get<any[]>('/api/lots/mine').then(ls => ls.map(mapLot)),
-  getByOwner: (ownerName: string) => api.get<any[]>(`/api/lots/owner/${encodeURIComponent(ownerName)}`).then(ls => ls.map(mapLot)),
-  getById:    (lotId: string)     => api.get<any>(`/api/lots/${lotId}`).then(mapLot),
+  getMine:    ()                  => api.get<ApiLot[]>('/api/lots/mine').then(ls => ls.map(mapLot)),
+  getByOwner: (ownerName: string) => api.get<ApiLot[]>(`/api/lots/owner/${encodeURIComponent(ownerName)}`).then(ls => ls.map(mapLot)),
+  getById:    (lotId: string)     => api.get<ApiLot>(`/api/lots/${lotId}`).then(mapLot),
 
   create: (payload: LotCreatePayload) =>
-    api.post<any>('/api/lots', payload).then(mapLot),
+    api.post<ApiLot>('/api/lots', payload).then(mapLot),
 
   update: (lotId: string, payload: LotUpdatePayload) =>
-    api.patch<any>(`/api/lots/${lotId}`, payload).then(mapLot),
+    api.patch<ApiLot>(`/api/lots/${lotId}`, payload).then(mapLot),
 
   delete: (lotId: string) =>
     api.delete<void>(`/api/lots/${lotId}`),

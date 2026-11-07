@@ -9,7 +9,21 @@ export interface SystemConfig {
   bookingWindowEnd: string;
 }
 
-function mapConfig(raw: any): SystemConfig {
+interface ApiConfig {
+  timezone: string;
+  blackout_start: string;
+  blackout_end: string;
+  max_pending_requests_per_user: number;
+  booking_window_start: string;
+  booking_window_end: string;
+}
+
+interface ApiAutoApprovalResult {
+  approved: number;
+  remaining_pending: number;
+}
+
+function mapConfig(raw: ApiConfig): SystemConfig {
   return {
     timezone:                  raw.timezone,
     blackoutStart:             raw.blackout_start,
@@ -26,9 +40,9 @@ export interface AutoApprovalResult {
 }
 
 export const configApi = {
-  get: () => api.get<any>('/api/config').then(mapConfig),
+  get: () => api.get<ApiConfig>('/api/config').then(mapConfig),
   triggerAutoApproval: () =>
-    api.post<any>('/api/config/run-auto-approval', {}).then((raw) => ({
+    api.post<ApiAutoApprovalResult>('/api/config/run-auto-approval', {}).then((raw) => ({
       approved: raw.approved,
       remainingPending: raw.remaining_pending,
     } as AutoApprovalResult)),

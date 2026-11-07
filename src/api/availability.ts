@@ -24,7 +24,18 @@ export interface AvailabilityWindowUpdate {
   is_active?: boolean;
 }
 
-function mapWindow(raw: any): AvailabilityWindowData {
+interface ApiWindow {
+  id: number;
+  lot_id: string;
+  day_of_week?: number | null;
+  specific_date?: string | null;
+  start_time: string;
+  end_time: string;
+  is_active: boolean;
+  created_at?: string | null;
+}
+
+function mapWindow(raw: ApiWindow): AvailabilityWindowData {
   return {
     id: raw.id,
     lotId: raw.lot_id,
@@ -39,13 +50,13 @@ function mapWindow(raw: any): AvailabilityWindowData {
 
 export const availabilityApi = {
   list: (lotId: string) =>
-    api.get<any[]>(`/api/lots/${lotId}/availability`).then(ws => ws.map(mapWindow)),
+    api.get<ApiWindow[]>(`/api/lots/${lotId}/availability`).then(ws => ws.map(mapWindow)),
 
   create: (lotId: string, payload: AvailabilityWindowCreate) =>
-    api.post<any>(`/api/lots/${lotId}/availability`, payload).then(mapWindow),
+    api.post<ApiWindow>(`/api/lots/${lotId}/availability`, payload).then(mapWindow),
 
   update: (lotId: string, windowId: number, payload: AvailabilityWindowUpdate) =>
-    api.patch<any>(`/api/lots/${lotId}/availability/${windowId}`, payload).then(mapWindow),
+    api.patch<ApiWindow>(`/api/lots/${lotId}/availability/${windowId}`, payload).then(mapWindow),
 
   delete: (lotId: string, windowId: number) =>
     api.delete<void>(`/api/lots/${lotId}/availability/${windowId}`),

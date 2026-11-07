@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { requestsApi } from '../api/requests';
+import { requestsApi, AuditEntry } from '../api/requests';
 import './AuditTrailModal.css';
-
-interface AuditLog {
-  id: number;
-  request_id: string;
-  user_name: string;
-  action: string;
-  details?: string;
-  timestamp: string;
-}
 
 interface AuditTrailModalProps {
   requestId: string;
@@ -19,7 +10,7 @@ interface AuditTrailModalProps {
 
 const AuditTrailModal: React.FC<AuditTrailModalProps> = ({ requestId, onClose }) => {
   const { t } = useTranslation();
-  const [logs, setLogs] = useState<AuditLog[]>([]);
+  const [logs, setLogs] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
