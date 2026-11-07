@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Layout, Menu, Table, Button, Tag, Space, Card, Row, Col, Alert,
+  Layout, Menu, Table, Button, Tag, Space, Card, Alert,
   DatePicker, Tabs, Select, notification, Skeleton, Modal, Popconfirm, Drawer,
 } from 'antd';
 import InfoBanner from './InfoBanner';
 import BroadcastSection from './admin/BroadcastSection';
 import ImportSection from './admin/ImportSection';
+import ConfigSection from './admin/ConfigSection';
 import {
   UserOutlined,
   CarOutlined,
@@ -15,7 +16,6 @@ import {
   BarChartOutlined,
   SendOutlined,
   UserAddOutlined,
-  ThunderboltOutlined,
   MenuOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -29,7 +29,6 @@ import type { ParkingRequest } from '../contexts/RequestsContext';
 import { UserRole, RequestStatus, LotStatus } from '../types/enums';
 import { useAuth } from '../contexts/AuthContext';
 import { getRequestStatusColor, getRequestStatusLabel } from '../utils/statusUtils';
-import { configApi, SystemConfig } from '../api/config';
 import './AdminPanel.css';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { notifyError } from '../utils/notify';
@@ -76,19 +75,6 @@ const AdminPanel: React.FC = () => {
   // ── UI-only state (sections with no backend) ────────────────────────────────
   const [lotFilter, setLotFilter] = useState<'All' | 'Available' | 'Blocked' | 'Unowned'>('All');
   const [reportDateRange, setReportDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
-
-  // ── System config ───────────────────────────────────────────────────────────
-  const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null);
-  const [configLoading, setConfigLoading] = useState(false);
-  const [autoApprovalLoading, setAutoApprovalLoading] = useState(false);
-
-  useEffect(() => {
-    setConfigLoading(true);
-    configApi.get()
-      .then(setSystemConfig)
-      .catch(() => {/* non-critical — fallback text shown */ })
-      .finally(() => setConfigLoading(false));
-  }, []);
 
   // ── Initial data load ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -612,62 +598,7 @@ const AdminPanel: React.FC = () => {
         );
 
       case 'config':
-        return (
-          <div>
-            <h2>{t('adminPanel.config.title')}</h2>
-            {configLoading ? <Skeleton active paragraph={{ rows: 4 }} /> : <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12}>
-                  <Card title={t('adminPanel.config.cardTitle')}>
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                      <div><strong>{t('adminPanel.config.timezone')}</strong> {systemConfig?.timezone ?? '—'}</div>
-                      <div>
-                        <strong>{t('adminPanel.config.blackoutPeriod')}</strong>{' '}
-                        {systemConfig ? `${systemConfig.blackoutStart} – ${systemConfig.blackoutEnd}` : '—'}
-                      </div>
-                      <div>
-                        <strong>{t('adminPanel.config.maxRequests')}</strong>{' '}
-                        {systemConfig?.maxPendingRequestsPerUser ?? '—'}
-                      </div>
-                    </Space>
-                  </Card>
-                </Col>
-                <Col xs={24} sm={12}>
-                  <Card title={t('adminPanel.config.schedulerTitle')}>
-                    <Space direction="vertical" style={{ width: '100%' }}>
-                      <div>{t('adminPanel.config.schedulerDesc')}</div>
-                      <Button
-                        type="primary"
-                        icon={<ThunderboltOutlined />}
-                        loading={autoApprovalLoading}
-                        onClick={async () => {
-                          setAutoApprovalLoading(true);
-                          try {
-                            const result = await configApi.triggerAutoApproval();
-                            notification.success({
-                              message: t('adminPanel.config.autoApprovalSuccess'),
-                              description: t('adminPanel.config.autoApprovalSuccessDesc', {
-                                approved: result.approved,
-                                remaining: result.remainingPending,
-                              }),
-                            });
-                          } catch (err: any) {
-                            notifyError(t('adminPanel.config.autoApprovalFailed'), err);
-                          } finally {
-                            setAutoApprovalLoading(false);
-                          }
-                        }}
-                        size="large"
-                        block
-                      >
-                        {t('adminPanel.config.runAutoApproval')}
-                      </Button>
-                    </Space>
-                  </Card>
-                </Col>
-              </Row>}
-            <InfoBanner label={`${t('adminPanel.config.title')}:`} description={t('adminPanel.config.info')} />
-          </div>
-        );
+        return <ConfigSection />;
 
       case 'reports':
         return (
