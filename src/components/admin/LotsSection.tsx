@@ -68,7 +68,7 @@ const LotsSection: React.FC<LotsSectionProps> = ({ lots, users, loading, refresh
     {
       title: t('adminPanel.lots.columns.owner'),
       key: 'owner',
-      render: (_: any, record: LotData) =>
+      render: (_: unknown, record: LotData) =>
         record.owner ?? <em style={{ color: 'var(--label-color)' }}>{t('adminPanel.lots.unowned')}</em>,
     },
     {
@@ -81,7 +81,7 @@ const LotsSection: React.FC<LotsSectionProps> = ({ lots, users, loading, refresh
     {
       title: t('adminPanel.lots.columns.actions'),
       key: 'actions',
-      render: (_: any, record: LotData) => {
+      render: (_: unknown, record: LotData) => {
         if (!record.ownerId) {
           return (
             <Button
@@ -105,7 +105,7 @@ const LotsSection: React.FC<LotsSectionProps> = ({ lots, users, loading, refresh
                 await lotsApi.update(record.id, { owner: null, owner_id: null, status: 'unowned' });
                 notification.success({ message: t('adminPanel.lots.notifications.ownerRemoved'), description: record.id });
                 await refreshLots();
-              } catch (err: any) {
+              } catch (err) {
                 notifyError(t('adminPanel.lots.notifications.ownerRemoveFailed'), err);
               } finally {
                 setActionLoading(prev => ({ ...prev, [record.id]: false }));
@@ -201,7 +201,7 @@ const LotsSection: React.FC<LotsSectionProps> = ({ lots, users, loading, refresh
                         await lotsApi.update(lot.id, { owner: null, owner_id: null, status: 'unowned' });
                         notification.success({ message: t('adminPanel.lots.notifications.ownerRemoved'), description: lot.id });
                         await refreshLots();
-                      } catch (err: any) {
+                      } catch (err) {
                         notifyError(t('adminPanel.lots.notifications.ownerRemoveFailed'), err);
                       } finally {
                         setActionLoading(prev => ({ ...prev, [lot.id]: false }));
@@ -254,7 +254,7 @@ const LotsSection: React.FC<LotsSectionProps> = ({ lots, users, loading, refresh
             setAssignOwnerLotId(null);
             setAssignOwnerValue(null);
             await refreshLots();
-          } catch (err: any) {
+          } catch (err) {
             notifyError(t('adminPanel.lots.notifications.ownerAssignFailed'), err);
           } finally {
             setAssignOwnerLoading(false);

@@ -34,7 +34,7 @@ const UsersSection: React.FC<UsersSectionProps> = ({ users, loading, refreshUser
         description: t('adminPanel.users.notifications.roleUpdatedDesc', { name: record.name, role: translatedRole }),
       });
       await refreshUsers();
-    } catch (err: any) {
+    } catch (err) {
       notifyError(t('adminPanel.users.notifications.roleUpdateFailed'), err);
     } finally {
       setBusy(record.id, false);
@@ -47,7 +47,7 @@ const UsersSection: React.FC<UsersSectionProps> = ({ users, loading, refreshUser
       await usersApi.delete(record.id);
       notification.success({ message: t('adminPanel.users.notifications.userDeleted'), description: record.name });
       await refreshUsers();
-    } catch (err: any) {
+    } catch (err) {
       notifyError(t('adminPanel.users.notifications.deleteFailed'), err);
     } finally {
       setBusy(record.id, false);
@@ -88,7 +88,7 @@ const UsersSection: React.FC<UsersSectionProps> = ({ users, loading, refreshUser
     {
       title: t('adminPanel.users.columns.actions'),
       key: 'actions',
-      render: (_: any, record: UserData) => (
+      render: (_: unknown, record: UserData) => (
         <Popconfirm
           title={t('adminPanel.users.deleteConfirm')}
           description={t('adminPanel.users.deleteWarning')}

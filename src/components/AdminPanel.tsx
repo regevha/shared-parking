@@ -62,7 +62,7 @@ const AdminPanel: React.FC = () => {
         setUsers(fetchedUsers);
         setLots(fetchedLots);
         setRequests(fetchedRequests);
-      } catch (err: any) {
+      } catch (err) {
         notifyError(t('adminPanel.loadFailed'), err, t('adminPanel.loadFailedDesc'));
       } finally {
         setLoading(false);

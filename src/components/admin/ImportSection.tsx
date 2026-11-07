@@ -52,7 +52,7 @@ const ImportSection: React.FC<ImportSectionProps> = ({ onImported }) => {
         }
         setHasImportedData(true);
         onImported(isLots ? 'lots' : 'users'); // let the parent refresh its tables
-      } catch (err: any) {
+      } catch (err) {
         notifyError(t('adminPanel.import.notifications.uploadFailed'), err);
       } finally {
         setImportLoading(false);
