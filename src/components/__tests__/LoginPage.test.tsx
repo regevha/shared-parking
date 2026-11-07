@@ -54,7 +54,7 @@ describe('LoginPage', () => {
   it('demo account tag click fills form with email and password123', async () => {
     renderWithProviders(<LoginPage />);
     // Click the Sarah demo account tag
-    const sarahTag = screen.getByText('Sarah');
+    const sarahTag = screen.getByRole('button', { name: /Sarah/ });
     fireEvent.click(sarahTag);
 
     await waitFor(() => {
@@ -64,6 +64,18 @@ describe('LoginPage', () => {
 
     const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement;
     expect(passwordInput.value).toBe('password123');
+  });
+
+  it('demo account tag is operable with the keyboard and shows its role', async () => {
+    renderWithProviders(<LoginPage />);
+    const sarahTag = screen.getByRole('button', { name: /Sarah/ });
+    expect(sarahTag.textContent).toMatch(/owner/i);
+    fireEvent.keyDown(sarahTag, { key: 'Enter' });
+
+    await waitFor(() => {
+      const emailInput = screen.getByRole('textbox', { name: /email/i }) as HTMLInputElement;
+      expect(emailInput.value).toBe('sarah@parking.dev');
+    });
   });
 
   it('shows loading state on submit button during async login', async () => {

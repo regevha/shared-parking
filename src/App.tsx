@@ -128,11 +128,13 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
     <RequestsProvider>
       <Router>
         <Layout>
+          <a href="#main-content" className="skip-link">{t('nav.skipToContent')}</a>
           <Header style={headerStyle}>
             {isMobile && (
               <Button
                 type="text"
                 icon={<MenuOutlined />}
+                aria-label={t('nav.menu')}
                 onClick={showDrawer}
                 style={{ ...headerBtnStyle, fontSize: 18 }}
               />
@@ -150,6 +152,8 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                 <Button
                   type="text"
                   icon={<GlobalOutlined />}
+                  // The accessible name must contain the visible text (WCAG 2.5.3 label-in-name)
+                  aria-label={isMobile ? t('nav.language') : `${t('nav.language')}: ${currentLangLabel}`}
                   style={{ ...headerBtnStyle, fontWeight: 600, fontSize: 13 }}
                 >
                   {!isMobile && currentLangLabel}
@@ -159,12 +163,13 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
                 type="text"
                 icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
                 onClick={toggleDarkMode}
+                aria-label={t('nav.toggleTheme')}
                 style={headerBtnStyle}
               />
               <NotificationBell />
               {!isMobile && (
                 <Dropdown menu={settingsMenu} trigger={['click']}>
-                  <Button type="text" icon={<SettingOutlined />} style={headerBtnStyle} />
+                  <Button type="text" icon={<SettingOutlined />} aria-label={t('nav.settings')} style={headerBtnStyle} />
                 </Dropdown>
               )}
               <Dropdown
@@ -217,7 +222,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
               </div>
             </Drawer>
           </Header>
-          <Content style={{ padding: isMobile ? '0 8px' : '0 50px' }}>
+          <Content id="main-content" tabIndex={-1} style={{ padding: isMobile ? '0 8px' : '0 50px', outline: 'none' }}>
             <div style={{ padding: isMobile ? 12 : 24, minHeight: 380 }}>
               <Routes>
                 <Route path="/lot-status" element={<LotStatusBoard />} />

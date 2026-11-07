@@ -13,9 +13,9 @@ interface LoginForm {
 }
 
 const DEMO_ACCOUNTS = [
-  { name: 'Sarah', email: 'sarah@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
-  { name: 'Mike',  email: 'mike@parking.dev',  icon: <CrownOutlined />, color: 'gold'   },
-  { name: 'Admin', email: 'admin@parking.dev', icon: <TeamOutlined />,  color: 'purple' },
+  { name: 'Sarah', role: 'owner',   email: 'sarah@parking.dev', icon: <CrownOutlined />, color: 'gold'   },
+  { name: 'Mike',  role: 'owner',   email: 'mike@parking.dev',  icon: <CrownOutlined />, color: 'gold'   },
+  { name: 'Admin', role: 'manager', email: 'admin@parking.dev', icon: <TeamOutlined />,  color: 'purple' },
 ];
 
 const LoginPage: React.FC = () => {
@@ -144,10 +144,18 @@ const LoginPage: React.FC = () => {
               key={acct.email}
               icon={acct.icon}
               color={acct.color}
+              role="button"
+              tabIndex={0}
               style={{ cursor: 'pointer', padding: '4px 10px', fontSize: 13 }}
               onClick={() => fillDemo(acct.email)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  fillDemo(acct.email);
+                }
+              }}
             >
-              {acct.name}
+              {acct.name} · {t(`login.demoRoles.${acct.role}`)}
             </Tag>
           ))}
         </Space>

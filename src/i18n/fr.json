@@ -15,7 +15,10 @@
     "availability": "Disponibilité",
     "menu": "Menu",
     "language": "Langue",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "skipToContent": "Aller au contenu",
+    "toggleTheme": "Basculer le mode sombre",
+    "notifications": "Notifications"
   },
   "login": {
     "title": "Gestion du Parking",
