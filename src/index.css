@@ -24,3 +24,8 @@ code {
   white-space: nowrap;
   border: 0;
 }
+
+/* WCAG AA: antd's default light preset tags (green/orange) use -7 text on -1 bg (~3.3:1).
+   Use the darker -8 shade (>= 5:1). Dark mode keeps antd's own dark variants. */
+:root:not([data-theme="dark"]) .ant-tag-green { color: #237804; }
+:root:not([data-theme="dark"]) .ant-tag-orange { color: #ad4e00; }

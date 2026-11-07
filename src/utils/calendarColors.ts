@@ -10,7 +10,6 @@
 export const EVENT_FILL = {
   approved: '#237804',
   pending: '#ad4e00',
-  pendingBlue: '#0958d9',
   rejected: '#cf1322',
   available: '#006d75',
 } as const;
