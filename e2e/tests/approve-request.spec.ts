@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginAs, waitForNav } from '../fixtures/auth';
 import { Account, api, createAccount, createPendingRequest, deleteAccount, uiDate } from '../fixtures/api';
-import { confirmDialog, rowWith, toast } from '../fixtures/ui';
+import { confirmDialog, openNavGroup, rowWith, toast } from '../fixtures/ui';
 
 /**
  * Owner approve / reject flows.
@@ -68,6 +68,7 @@ test.describe('Approve / Reject requests (Owner)', () => {
     await expect(rowWith(page, requester.name)).toHaveCount(0);
     expect(await statusOf()).toBe('approved');
 
+    await openNavGroup(page, 'Review');
     await page.getByRole('menuitem', { name: 'Approvals' }).click();
     await page.getByPlaceholder(/search/i).fill(requester.name);
     const approved = rowWith(page, requester.name);

@@ -13,6 +13,14 @@ export const tableRows = (page: Page): Locator => page.locator('tr.ant-table-row
 export const rowWith = (page: Page, text: string | RegExp): Locator =>
   page.locator('tr.ant-table-row', { hasText: text });
 
+/**
+ * Open a navigation group (a submenu such as "Review" or "Availability") so the links inside it
+ * become visible. The group title is a `menuitem` like any other nav entry.
+ */
+export async function openNavGroup(page: Page, group: 'Review' | 'Availability'): Promise<void> {
+  await page.getByRole('menuitem', { name: group }).first().click();
+}
+
 /** The confirmation dialog opened by `Modal.confirm(...)`. */
 export const confirmDialog = (page: Page): Locator => page.locator('.ant-modal-confirm');
 

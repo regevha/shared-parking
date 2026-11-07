@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { loginAs, waitForNav } from '../fixtures/auth';
+import { openNavGroup } from '../fixtures/ui';
 
 test.describe('Role-based navigation — User', () => {
   test.beforeEach(async ({ page, request }) => {
@@ -11,6 +12,7 @@ test.describe('Role-based navigation — User', () => {
   test('sees My Requests, Requests View, Parking Status', async ({ page }) => {
     await expect(page.getByRole('menuitem', { name: 'My Requests' })).toBeVisible();
     await expect(page.getByRole('menuitem', { name: 'Requests View' })).toBeVisible();
+    await openNavGroup(page, 'Availability');
     await expect(page.getByRole('menuitem', { name: 'Parking Status' })).toBeVisible();
   });
 
@@ -29,6 +31,7 @@ test.describe('Role-based navigation — Owner', () => {
 
   test('sees My Requests, My Lots, Lot Calendar', async ({ page }) => {
     await expect(page.getByRole('menuitem', { name: 'My Requests' })).toBeVisible();
+    await openNavGroup(page, 'Availability');
     await expect(page.getByRole('menuitem', { name: 'My Lots' })).toBeVisible();
     await expect(page.getByRole('menuitem', { name: 'Lot Calendar' })).toBeVisible();
   });
@@ -47,6 +50,7 @@ test.describe('Role-based navigation — Manager', () => {
 
   test('sees Admin Panel and Lot Calendar', async ({ page }) => {
     await expect(page.getByRole('menuitem', { name: 'Admin Panel' })).toBeVisible();
+    await openNavGroup(page, 'Availability');
     await expect(page.getByRole('menuitem', { name: 'Lot Calendar' })).toBeVisible();
   });
 

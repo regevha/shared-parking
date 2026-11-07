@@ -227,6 +227,8 @@ $env:CI='true'; npm test -- --ci --no-cache
 | `ParkingRequestForm.tsx` | `/submit-request` | (via "+ New Request" button) |
 | `RequestDetail.tsx` | `/request/:id` | (navigated to from request rows) |
 
+**Menu grouping** (`App.tsx` `getMenuItems`): top-level *My Requests* (user/owner), *Requests View*, *Admin Panel* (manager); group **Review** = Pending Requests + Approvals; group **Availability** = Parking Status + Lot Calendar (owner/manager) + My Lots (owner). Routes are unchanged. e2e specs open a group first with `openNavGroup(page, 'Review' | 'Availability')` from `e2e/fixtures/ui.ts`.
+
 ### Reusable Components
 - `src/components/EmptyState.tsx` — empty state with icon, title, description, optional CTA button
 

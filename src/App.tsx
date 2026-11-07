@@ -49,24 +49,37 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
 
-  const getMenuItems = () => {
-    const items: { key: string; label: React.ReactNode }[] = [];
+  type NavItem = { key: string; label: React.ReactNode; children?: { key: string; label: React.ReactNode }[] };
+
+  // Grouped by task: Review (pending + approvals) and Availability (status + lot calendar + my lots)
+  const getMenuItems = (): NavItem[] => {
+    const items: NavItem[] = [];
 
     if (role === UserRole.USER || role === UserRole.OWNER) {
       items.push({ key: 'my-requests', label: <Link to="/my-requests">{t('nav.myRequests')}</Link> });
     }
 
     items.push({ key: 'calendar', label: <Link to="/calendar">{t('nav.requestsView')}</Link> });
-    items.push({ key: 'pending', label: <Link to="/pending">{t('nav.pendingRequests')}</Link> });
-    items.push({ key: 'approvals', label: <Link to="/approvals">{t('nav.approvals')}</Link> });
-    items.push({ key: 'lot-status', label: <Link to="/lot-status">{t('nav.parkingStatus')}</Link> });
 
+    items.push({
+      key: 'review',
+      label: t('nav.review'),
+      children: [
+        { key: 'pending', label: <Link to="/pending">{t('nav.pendingRequests')}</Link> },
+        { key: 'approvals', label: <Link to="/approvals">{t('nav.approvals')}</Link> },
+      ],
+    });
+
+    const availability: { key: string; label: React.ReactNode }[] = [
+      { key: 'lot-status', label: <Link to="/lot-status">{t('nav.parkingStatus')}</Link> },
+    ];
     if (role === UserRole.OWNER || role === UserRole.MANAGER) {
-      items.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">{t('nav.lotCalendar')}</Link> });
+      availability.push({ key: 'lot-calendar', label: <Link to="/lot-calendar">{t('nav.lotCalendar')}</Link> });
     }
     if (role === UserRole.OWNER) {
-      items.push({ key: 'my-lots', label: <Link to="/my-lots">{t('nav.myLots')}</Link> });
+      availability.push({ key: 'my-lots', label: <Link to="/my-lots">{t('nav.myLots')}</Link> });
     }
+    items.push({ key: 'availability-group', label: t('nav.availability'), children: availability });
 
     if (role === UserRole.MANAGER) {
       items.push({ key: 'admin', label: <Link to="/admin">{t('nav.adminPanel')}</Link> });
@@ -183,6 +196,7 @@ const AppShell: React.FC<AppShellProps> = ({ darkMode, toggleDarkMode, language,
             >
               <Menu
                 mode="inline"
+                defaultOpenKeys={['review', 'availability-group']}
                 items={getMenuItems()}
                 onClick={onClose}
                 style={{ borderRight: 'none' }}
