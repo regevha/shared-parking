@@ -141,3 +141,16 @@ def test_import_lots_incomplete_row_is_reported_and_valid_rows_still_import(clie
     body = resp.json()
     assert body["imported"] == 1
     assert len(body["errors"]) == 1
+
+
+def test_import_lots_duplicate_id_inside_one_file_is_reported_not_fatal(client, manager_headers):
+    """The same lot id twice in one CSV: the second row is reported and the first still imports."""
+    csv = "id,floor,floor_label,owner_email\nDUP-1,1,Floor 1,\nDUP-1,1,Floor 1,\nOK-2,2,Floor 2,\n"
+    resp = client.post("/api/admin/import-lots", files=_csv(csv), headers=manager_headers)
+
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["imported"] == 2
+    assert body["errors"] == ["Lot DUP-1 already exists"]
+    lot_ids = sorted(lot["id"] for lot in client.get("/api/lots", headers=manager_headers).json())
+    assert lot_ids == ["DUP-1", "OK-2"]

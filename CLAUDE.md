@@ -143,7 +143,7 @@ $env:CI='true'; npm test -- --ci --no-cache
 - `e2e/tests/*.spec.ts` — 15 specs run serially against live servers (see `e2e/README.md`), including an axe accessibility scan of every screen in light, dark and Hebrew. Run in CI by the "E2E (Playwright + axe)" job.
 
 ### Backend Tests
-- 300 tests (1 skipped: opt-in live-DB check, `CHECK_LIVE_DB=1`), always green. Uses in-memory SQLite (StaticPool) for testing — never touches `parking.db` in production.
+- 301 tests (1 skipped: opt-in live-DB check, `CHECK_LIVE_DB=1`), always green. Uses in-memory SQLite (StaticPool) for testing — never touches `parking.db` in production.
 - `conftest.py` — Fixtures: in-memory DB, TestClient with overrides, headers, and pwd hashing patches.
 - `test_auth.py` — 16 tests: register, login, `/auth/me`.
 - `test_auth_tokens.py` — 13 tests: JWT rejection paths (deleted user, no `sub`, expired, forged, `alg=none`, malformed header).
@@ -156,7 +156,7 @@ $env:CI='true'; npm test -- --ci --no-cache
 - `test_availability.py` — 29 tests: availability windows CRUD, owner scoping, enforcement, multi-day (midnight-spanning) checks.
 - `test_system_endpoints.py` — 11 tests: health route, `GET /api/config`, manual auto-approve RBAC.
 - `test_dst.py` — 6 tests: wall-clock end-time calculation around DST changes.
-- `test_error_paths.py` — 10 tests: missing preference rows, unknown lots, audit-trail access, malformed `CANCELLATION_WINDOW_HOURS`, bad CSV rows.
+- `test_error_paths.py` — 11 tests: missing preference rows, unknown lots, audit-trail access, malformed `CANCELLATION_WINDOW_HOURS`, bad CSV rows (incl. duplicate lot id in one file).
 - `test_schema_validation.py` — 25 tests: 422 rules for requests, preferences and availability windows.
 - `test_corrupt_data.py` — 8 tests: malformed stored dates/times (edit and approve return 400, availability fails closed, auto-approval skips the bad row).
 - `test_startup.py` — 5 tests: `SECRET_KEY` fail-fast and `AUTO_SEED_DEMO` (run in subprocesses).

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 import csv
 import io
@@ -108,8 +109,14 @@ def import_lots(
                 created_at=datetime.now(timezone.utc).isoformat(),
                 updated_at=datetime.now(timezone.utc).isoformat()
             )
-            db.add(new_lot)
+            # Savepoint: a row the database rejects (e.g. the same id twice in one file) is rolled back and
+            # reported on its own, instead of failing the final commit and losing the whole import.
+            with db.begin_nested():
+                db.add(new_lot)
+                db.flush()
             count += 1
+        except IntegrityError:
+            errors.append(f"Lot {lot_id} already exists")
         except Exception as e:
             errors.append(str(e))
             
