@@ -54,7 +54,7 @@ def run_auto_approval(db=None):
             if req.lot_id:
                 lot = next((lot_ for lot_ in all_lots if lot_.id == req.lot_id), None)
                 if lot and lot.status == models.LotStatus.AVAILABLE.value:
-                    if not _has_conflict(db, lot.id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=req.id) and \
+                    if not _has_conflict(db, lot.id, req.date, req.start_time, req.end_date, req.end_time) and \
                        not _is_outside_availability(db, lot.id, req.date, req.start_time, req.end_date, req.end_time):
                         target_lot = lot
             else:
@@ -64,7 +64,7 @@ def run_auto_approval(db=None):
                         continue
                     
                     # Check for conflicts and availability for THIS lot
-                    if not _has_conflict(db, lot.id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=req.id) and \
+                    if not _has_conflict(db, lot.id, req.date, req.start_time, req.end_date, req.end_time) and \
                        not _is_outside_availability(db, lot.id, req.date, req.start_time, req.end_date, req.end_time):
                         target_lot = lot
                         break
