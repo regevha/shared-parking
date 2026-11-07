@@ -272,7 +272,7 @@ Always use `pagination={{ pageSize: 10, hideOnSinglePage: true }}` on all Tables
 ### Table Sorting & Search
 - **Sortable columns** via Ant Design `sorter` prop on key columns (date, requester, submitted, duration, lot owner, status)
 - `AllPendingRequests`: search input filters by requester name; sortable date, submitted, requester columns
-- `AllApprovals`: search input filters by requester or lot owner; "My lot only" toggle; sortable date, requester, lotOwner, approvedAt, duration
+- `AllApprovals`: search input filters by requester or lot owner; "My lot only" toggle; 6 columns (ID, Requester, When = date + time + duration, Lot = lot + floor + owner, Approved, Actions); sortable When (date), requester, lot, approvedAt
 - `MyRequests`: sortable Date, Duration, Submitted columns
 - `MyLots`: sortable Lot ID, Floor, Status columns
 

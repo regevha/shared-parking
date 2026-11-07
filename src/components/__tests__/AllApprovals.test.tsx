@@ -34,6 +34,18 @@ describe('AllApprovals', () => {
     await waitFor(() => expect(screen.getByText('Alice Johnson')).toBeInTheDocument());
   });
 
+  it('shows lot, floor and owner together and keeps six columns', async () => {
+    const req = makeApproved({ requesterName: 'Alice Johnson', lotId: 'LOT-A1', floor: 'Floor 1', lotOwner: 'Sarah', duration: 3 });
+    renderWithProviders(<AllApprovals />, {
+      authValue: { user: makeUser() },
+      requestsValue: { approvedRequests: [req] },
+    });
+    await waitFor(() => expect(screen.getByText('Alice Johnson')).toBeInTheDocument());
+    expect(screen.getAllByRole('columnheader')).toHaveLength(6);
+    expect(screen.getByText('Floor 1 · Sarah')).toBeInTheDocument();
+    expect(screen.getByText(/· 3h/)).toBeInTheDocument();
+  });
+
   it('shows empty state when no approved requests', () => {
     renderWithProviders(<AllApprovals />, {
       authValue: { user: makeUser() },

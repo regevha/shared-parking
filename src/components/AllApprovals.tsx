@@ -49,65 +49,47 @@ const AllApprovals: React.FC = () => {
       title: t('approvals.columns.requester'),
       dataIndex: 'requesterName',
       key: 'requesterName',
-      width: '15%',
+      width: '16%',
       sorter: (a: ParkingRequest, b: ParkingRequest) => a.requesterName.localeCompare(b.requesterName),
     },
     {
-      title: t('approvals.columns.date'),
+      title: t('approvals.columns.when'),
       dataIndex: 'date',
-      key: 'date',
-      width: '12%',
+      key: 'when',
+      width: '24%',
       sorter: (a: ParkingRequest, b: ParkingRequest) => a.date.localeCompare(b.date),
       defaultSortOrder: 'ascend' as const,
-      render: (v: string) => dayjs(v).format('DD/MM/YYYY'),
-    },
-    {
-      title: t('approvals.columns.timeSlot'),
-      key: 'timeSlot',
-      width: '15%',
-      render: (_, record: ParkingRequest) => (
-        <>
-          {record.startTime} - {record.endTime}
-          {record.endDate && record.endDate !== record.date && (
-            <div style={{ fontSize: '11px', color: 'var(--label-color)' }}>
-              ({dayjs(record.endDate).format('DD/MM')})
-            </div>
-          )}
-        </>
+      render: (_: unknown, record: ParkingRequest) => (
+        <div>
+          <div>{dayjs(record.date).format('DD/MM/YYYY')}</div>
+          <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>
+            {record.startTime} - {record.endTime}
+            {record.endDate && record.endDate !== record.date && ` (${dayjs(record.endDate).format('DD/MM')})`}
+            {' · '}{record.duration}h
+          </div>
+        </div>
       ),
-    },
-    {
-      title: t('approvals.columns.duration'),
-      dataIndex: 'duration',
-      key: 'duration',
-      width: '8%',
-      sorter: (a: ParkingRequest, b: ParkingRequest) => a.duration - b.duration,
-      render: (duration: number) => `${duration}h`,
     },
     {
       title: t('approvals.columns.assignedLot'),
       dataIndex: 'lotId',
       key: 'lotId',
-      width: '12%',
+      width: '20%',
+      sorter: (a: ParkingRequest, b: ParkingRequest) => (a.lotId || '').localeCompare(b.lotId || ''),
       render: (lotId: string, record: ParkingRequest) => (
         <div>
           <div><strong>{lotId}</strong></div>
-          <div style={{ fontSize: '12px', color: '#666' }}>{record.floor}</div>
+          <div style={{ fontSize: '12px', color: 'var(--label-color)' }}>
+            {[record.floor, record.lotOwner].filter(Boolean).join(' · ')}
+          </div>
         </div>
       ),
-    },
-    {
-      title: t('approvals.columns.lotOwner'),
-      dataIndex: 'lotOwner',
-      key: 'lotOwner',
-      width: '15%',
-      sorter: (a: ParkingRequest, b: ParkingRequest) => (a.lotOwner || '').localeCompare(b.lotOwner || ''),
     },
     {
       title: t('approvals.columns.approvedAt'),
       dataIndex: 'approvedAt',
       key: 'approvedAt',
-      width: '15%',
+      width: '18%',
       sorter: (a: ParkingRequest, b: ParkingRequest) => (a.approvedAt || '').localeCompare(b.approvedAt || ''),
       render: (_: unknown, record: ParkingRequest) => (
         <div>

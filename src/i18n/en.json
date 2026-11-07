@@ -179,6 +179,7 @@
       "date": "Date",
       "timeSlot": "Time Slot",
       "duration": "Duration",
+      "when": "When",
       "assignedLot": "Assigned Lot",
       "lotOwner": "Lot Owner",
       "approvedAt": "Approved At",
