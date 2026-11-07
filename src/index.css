@@ -29,3 +29,6 @@ code {
    Use the darker -8 shade (>= 5:1). Dark mode keeps antd's own dark variants. */
 :root:not([data-theme="dark"]) .ant-tag-green { color: #237804; }
 :root:not([data-theme="dark"]) .ant-tag-orange { color: #ad4e00; }
+
+/* WCAG AA (dark mode): antd's purple tag text is ~3.4:1 on its dark background; lighten it (~6:1). */
+[data-theme="dark"] .ant-tag-purple { color: #b37feb; }
