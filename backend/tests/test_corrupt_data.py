@@ -90,3 +90,38 @@ def test_availability_check_accepts_a_valid_slot_inside_the_window(client, db_se
     lot_id = _lot_with_open_window(client, owner_headers, owner_lot_id)
 
     assert _is_outside_availability(db_session, lot_id, "2030-01-07", "09:00", "2030-01-07", "10:00") is False
+
+
+# ── Approval paths must not crash on a malformed row ────────────────────────
+
+def test_owner_approval_of_request_with_corrupt_date_returns_400(
+    client, db_session, user_headers, owner_headers, owner_lot_id
+):
+    req_id = _created_pending(client, user_headers)
+    _corrupt(db_session, req_id, date="not-a-date")
+
+    resp = client.patch(f"/api/requests/{req_id}/approve", json={"lot_id": owner_lot_id}, headers=owner_headers)
+
+    assert resp.status_code == 400
+    assert "invalid date or time" in resp.json()["detail"].lower()
+    still_pending = db_session.query(models.ParkingRequest).filter(models.ParkingRequest.id == req_id).one()
+    assert still_pending.status == "pending"
+
+
+def test_auto_approval_skips_a_corrupt_request_and_still_processes_the_rest(
+    client, db_session, user_headers, manager_headers
+):
+    """One bad row must not stop auto-approval for every request submitted after it."""
+    from scheduler import run_auto_approval
+
+    lot = client.post("/api/lots", json={"id": "AUTO-C", "floor": "F1", "floor_label": "Floor 1", "status": "available"}, headers=manager_headers)
+    assert lot.status_code == 201
+    bad_id = _created_pending(client, user_headers)
+    good_id = _created_pending(client, user_headers)
+    _corrupt(db_session, bad_id, date="not-a-date")
+
+    run_auto_approval(db=db_session)
+
+    rows = {r.id: r for r in db_session.query(models.ParkingRequest).all()}
+    assert rows[bad_id].status == "pending"
+    assert rows[good_id].status == "approved"

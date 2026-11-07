@@ -8,11 +8,16 @@ requests. If clear → auto-approves. If conflicted → skips (leaves for manual
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timezone
+import logging
 import os
 
 from database import SessionLocal
 import models
-from routers.requests import _has_conflict, _is_outside_availability, _add_audit_log, _create_notification
+from routers.requests import (
+    _has_conflict, _is_outside_availability, _add_audit_log, _create_notification, _slot_is_parseable,
+)
+
+logger = logging.getLogger("parking-api")
 
 scheduler = BackgroundScheduler()
 
@@ -39,6 +44,11 @@ def run_auto_approval(db=None):
 
         for req in pending:
             target_lot = None
+
+            # A malformed stored date/time can never be placed; skip it so it cannot block the requests behind it
+            if not _slot_is_parseable(req.date, req.start_time, req.end_date, req.end_time):
+                logger.warning("Auto-approval skipped request %s: stored date/time is malformed", req.id)
+                continue
             
             # If request already has a lot specified, check only that one
             if req.lot_id:

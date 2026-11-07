@@ -53,6 +53,20 @@ def _create_notification(db: Session, user_id: str, message: str):
     db.commit()
 
 
+def _slot_is_parseable(start_date: str, start_time: str, end_date: str, end_time: str) -> bool:
+    """True if the stored start and end can be read as real dates and times.
+
+    The API validates input, so a False here means a malformed row already in the database
+    (old import, manual edit). Callers use it to refuse or skip such a row instead of crashing.
+    """
+    try:
+        datetime.strptime(f"{start_date} {start_time}", "%Y-%m-%d %H:%M")
+        datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+    except (ValueError, TypeError):
+        return False
+    return True
+
+
 def _has_conflict(
     db: Session,
     lot_id: str | None,
@@ -266,6 +280,8 @@ def approve_request(
             raise HTTPException(status_code=404, detail="Lot not found")
         if lot.owner != current_user.name and current_user.role != "manager":
             raise HTTPException(status_code=403, detail="You can only assign lots you own")
+        if not _slot_is_parseable(req.date, req.start_time, req.end_date, req.end_time):
+            raise HTTPException(status_code=400, detail="Request has an invalid date or time and cannot be approved")
         conflict_id = _has_conflict(
             db, payload.lot_id, req.date, req.start_time, req.end_date, req.end_time, exclude_id=request_id
         )
