@@ -77,9 +77,9 @@ describe('getLotStatusTagColor', () => {
 describe('getRequestStatusColor', () => {
   it.each([
     [RequestStatus.APPROVED,  'green'],
-    [RequestStatus.PENDING,   'blue'],
+    [RequestStatus.PENDING,   'orange'],
     [RequestStatus.REJECTED,  'red'],
-    ['expired',   'orange'],
+    ['expired',   'default'],
     ['cancelled', 'default'],
   ])('returns %s for %s status', (status, expected) => {
     expect(getRequestStatusColor(status)).toBe(expected);
@@ -89,9 +89,9 @@ describe('getRequestStatusColor', () => {
     expect(getRequestStatusColor('archived')).toBe('default');
   });
 
-  // Guard: pending must be blue, NOT orange — this was a real bug in LotCalendarView
-  it('pending is blue (not orange)', () => {
-    expect(getRequestStatusColor(RequestStatus.PENDING)).toBe('blue');
+  // Guard: pending is amber/orange everywhere (tags + calendars) so colour means one thing
+  it('pending is orange (matches calendar fill)', () => {
+    expect(getRequestStatusColor(RequestStatus.PENDING)).toBe('orange');
   });
 });
 

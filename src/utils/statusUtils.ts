@@ -40,9 +40,9 @@ export const getLotStatusTagColor = (status: LotStatus): string => {
 export const getRequestStatusColor = (status: RequestStatus | string): string => {
   switch (status) {
     case RequestStatus.APPROVED: return 'green';
-    case RequestStatus.PENDING:  return 'blue';
+    case RequestStatus.PENDING:  return 'orange';
     case RequestStatus.REJECTED: return 'red';
-    case 'expired':   return 'orange';
+    case 'expired':   return 'default';
     case 'cancelled': return 'default';
     default:          return 'default';
   }
