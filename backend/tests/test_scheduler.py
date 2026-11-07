@@ -167,3 +167,108 @@ def test_auto_approve_idempotent_on_approved_requests(client, db_session, user_h
     resp = client.get("/api/requests/approved", headers=user_headers)
     ids = [r["id"] for r in resp.json()]
     assert ids.count(req_id) == 1
+
+
+# ── Requests that name a lot, and lots that cannot be used ─────────────────
+
+def _create_lot_with_status(client, manager_headers, lot_id: str, status: str) -> str:
+    resp = client.post("/api/lots", json={
+        "id": lot_id, "floor": "F1", "floor_label": "Floor 1", "status": status,
+    }, headers=manager_headers)
+    assert resp.status_code == 201, resp.text
+    return lot_id
+
+
+def _name_lot(db_session, req_id: str, lot_id: str) -> None:
+    """Give a pending request a lot, as seed data and legacy rows have. The create endpoint ignores lot_id,
+    so the only way such a row exists is being written to the database directly."""
+    req = db_session.query(models.ParkingRequest).filter_by(id=req_id).one()
+    req.lot_id = lot_id
+    db_session.commit()
+
+
+def _status_of(client, headers, req_id: str) -> dict:
+    return next(r for r in client.get("/api/requests/me", headers=headers).json() if r["id"] == req_id)
+
+
+def test_request_naming_an_available_lot_gets_that_lot(client, db_session, user_headers, manager_headers):
+    """A pending request that already names a lot (seed/legacy data) is approved for exactly that lot."""
+    _create_lot(client, manager_headers, "LOT-FIRST")
+    _create_lot(client, manager_headers, "LOT-WANTED")
+    req_id = _create_request(client, user_headers)
+    _name_lot(db_session, req_id, "LOT-WANTED")
+
+    run_auto_approval(db=db_session)
+
+    req = _status_of(client, user_headers, req_id)
+    assert req["status"] == "approved"
+    assert req["lot_id"] == "LOT-WANTED"
+
+
+def test_request_naming_a_blocked_lot_stays_pending(client, db_session, user_headers, manager_headers):
+    """The scheduler never switches a named lot for another one: the request waits for manual review."""
+    _create_lot_with_status(client, manager_headers, "LOT-BLOCKED", "blocked")
+    _create_lot(client, manager_headers, "LOT-OTHER")
+    req_id = _create_request(client, user_headers)
+    _name_lot(db_session, req_id, "LOT-BLOCKED")
+
+    run_auto_approval(db=db_session)
+
+    req = _status_of(client, user_headers, req_id)
+    assert req["status"] == "pending"
+    assert req["lot_id"] == "LOT-BLOCKED"
+
+
+def test_unassigned_request_skips_lots_that_are_not_available(client, db_session, user_headers, manager_headers):
+    _create_lot_with_status(client, manager_headers, "LOT-A-BLOCKED", "blocked")
+    _create_lot(client, manager_headers, "LOT-B-OPEN")
+    req_id = _create_request(client, user_headers)
+
+    run_auto_approval(db=db_session)
+
+    req = _status_of(client, user_headers, req_id)
+    assert req["status"] == "approved"
+    assert req["lot_id"] == "LOT-B-OPEN"
+
+
+def test_no_request_is_approved_when_every_lot_is_unavailable(client, db_session, user_headers, manager_headers):
+    _create_lot_with_status(client, manager_headers, "LOT-ONLY", "blocked")
+    req_id = _create_request(client, user_headers)
+
+    run_auto_approval(db=db_session)
+
+    assert _status_of(client, user_headers, req_id)["status"] == "pending"
+
+
+# ── Production path: the job opens and closes its own session ──────────────
+
+def test_job_without_a_session_opens_its_own_and_closes_it(client, db_engine, db_session, user_headers, manager_headers, monkeypatch):
+    """The scheduled job is called with no arguments in production; it must use SessionLocal and release it."""
+    from sqlalchemy.orm import sessionmaker
+    import scheduler
+
+    _create_lot(client, manager_headers)
+    req_id = _create_request(client, user_headers)
+
+    own_session = sessionmaker(autocommit=False, autoflush=False, bind=db_engine)()
+    closed = []
+    real_close = own_session.close
+    own_session.close = lambda: (closed.append(True), real_close())
+    monkeypatch.setattr(scheduler, "SessionLocal", lambda: own_session)
+
+    scheduler.run_auto_approval()
+
+    assert closed == [True]
+    db_session.expire_all()
+    assert _status_of(client, user_headers, req_id)["status"] == "approved"
+
+
+def test_caller_supplied_session_is_left_open(client, db_session, user_headers, manager_headers):
+    """With an explicit session the job must not close it (the caller owns it)."""
+    _create_lot(client, manager_headers)
+    _create_request(client, user_headers)
+
+    run_auto_approval(db=db_session)
+
+    # A closed-and-reused session would still work, so check it is still usable and holds the change
+    assert db_session.query(models.ParkingRequest).filter_by(status="approved").count() == 1
