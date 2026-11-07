@@ -3,6 +3,7 @@ import { Form, Input, Button, Typography, Card, Alert, Divider, Tag, Space, them
 import { UserOutlined, LockOutlined, CrownOutlined, TeamOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { errorMessage } from '../utils/notify';
 
 const { Title, Text } = Typography;
 
@@ -43,8 +44,8 @@ const LoginPage: React.FC = () => {
     setErrorMsg(null);
     try {
       await login(values.email, values.password);
-    } catch (err: any) {
-      setErrorMsg(err.message || t('login.loginFailed'));
+    } catch (err) {
+      setErrorMsg(errorMessage(err) || t('login.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -142,7 +143,7 @@ const LoginPage: React.FC = () => {
             <Tag
               key={acct.email}
               icon={acct.icon}
-              color={acct.color as any}
+              color={acct.color}
               style={{ cursor: 'pointer', padding: '4px 10px', fontSize: 13 }}
               onClick={() => fillDemo(acct.email)}
             >

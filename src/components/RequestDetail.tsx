@@ -34,7 +34,7 @@ const RequestDetail: React.FC = () => {
     setLoadingMessages(true);
     messagesApi.getForRequest(id)
       .then(setMessages)
-      .catch((err: any) => {
+      .catch((err: unknown) => {
         notifyError(t('requestDetail.messages.loadFailed'), err);
       })
       .finally(() => setLoadingMessages(false));
@@ -61,7 +61,7 @@ const RequestDetail: React.FC = () => {
       const msg = await messagesApi.send(id, text);
       setMessages(prev => [...prev, msg]);
       setNewMessage('');
-    } catch (err: any) {
+    } catch (err) {
       notifyError(t('requestDetail.messages.sendFailed'), err);
     } finally {
       setSending(false);

@@ -66,7 +66,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
             message: t('pendingRequests.notifications.approved'),
             description: t('pendingRequests.notifications.approvedDesc', { name: requesterName }),
           });
-        } catch (err: any) {
+        } catch (err) {
           notifyError(t('pendingRequests.notifications.approvalFailed'), err, t('pendingRequests.notifications.approvalFailedDesc'));
         } finally {
           setApprovalInProgress(null);
@@ -90,7 +90,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
             message: t('pendingRequests.notifications.rejected'),
             description: t('pendingRequests.notifications.rejectedDesc', { name: requesterName }),
           });
-        } catch (err: any) {
+        } catch (err) {
           notifyError(t('pendingRequests.notifications.rejectionFailed'), err, t('pendingRequests.notifications.rejectionFailedDesc'));
         } finally {
           setApprovalInProgress(null);
@@ -219,7 +219,7 @@ const AllPendingRequests: React.FC<AllPendingRequestsProps> = ({ role }) => {
                   { label: t('pendingRequests.filterHideRejected'), value: 'active' },
                 ]}
                 value={filterMode}
-                onChange={(v) => setFilterMode(v as any)}
+                onChange={(v) => setFilterMode(v as 'all' | 'active')}
               />
             </Space>
           </Col>

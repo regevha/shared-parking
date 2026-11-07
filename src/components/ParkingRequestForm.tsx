@@ -107,7 +107,7 @@ const ParkingRequestForm: React.FC = () => {
         duration: 3,
       });
       form.resetFields();
-    } catch (err: any) {
+    } catch (err) {
       notifyError(t('requestForm.notifications.failed'), err, t('requestForm.notifications.failedDesc'));
     } finally {
       setLoading(false);

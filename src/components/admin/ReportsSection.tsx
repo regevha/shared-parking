@@ -76,7 +76,7 @@ const ReportsSection: React.FC<ReportsSectionProps> = ({ requests, loading }) =>
       title: t('adminPanel.reports.columns.timeSlot'),
       key: 'timeSlot',
       width: 130,
-      render: (_: any, r: ParkingRequest) => `${r.startTime} – ${r.endTime}`,
+      render: (_: unknown, r: ParkingRequest) => `${r.startTime} – ${r.endTime}`,
     },
     {
       title: t('adminPanel.reports.columns.status'),

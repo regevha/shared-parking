@@ -129,7 +129,7 @@ const MyRequests: React.FC = () => {
         message: t('myRequests.notifications.updated'),
         description: t('myRequests.notifications.updatedDesc', { id: editingRequest.id }),
       });
-    } catch (err: any) {
+    } catch (err) {
       notifyError(t('myRequests.notifications.updateFailed'), err, t('myRequests.notifications.updateFailedDesc'));
     } finally {
       setLoading(false);
@@ -143,7 +143,7 @@ const MyRequests: React.FC = () => {
         message: t('myRequests.notifications.cancelled'),
         description: t('myRequests.notifications.cancelledDesc', { id: requestId }),
       });
-    } catch (err: any) {
+    } catch (err) {
       notifyError(t('myRequests.notifications.cancelFailed'), err, t('myRequests.notifications.cancelFailedDesc'));
     }
   };
@@ -194,7 +194,7 @@ const MyRequests: React.FC = () => {
       dataIndex: 'status',
       key: 'status',
       width: 90,
-      render: (_: any, record: ParkingRequest) => (
+      render: (_: unknown, record: ParkingRequest) => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <div>
             <Tag color={getRequestStatusColor(record.status)}>

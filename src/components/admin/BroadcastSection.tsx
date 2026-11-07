@@ -40,7 +40,7 @@ const BroadcastSection: React.FC = () => {
         }),
       });
       setBroadcastMessage('');
-    } catch (err: any) {
+    } catch (err) {
       notifyError(t('adminPanel.broadcast.notifications.blocked'), err);
     } finally {
       setBroadcastLoading(false);

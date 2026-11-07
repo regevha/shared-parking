@@ -109,7 +109,7 @@ const AllApprovals: React.FC = () => {
       key: 'approvedAt',
       width: '15%',
       sorter: (a: ParkingRequest, b: ParkingRequest) => (a.approvedAt || '').localeCompare(b.approvedAt || ''),
-      render: (_: any, record: ParkingRequest) => (
+      render: (_: unknown, record: ParkingRequest) => (
         <div>
           <div>{record.approvedAt ? dayjs(record.approvedAt).format('DD/MM/YYYY HH:mm') : '—'}</div>
           {record.approvedBy === 'auto' && (

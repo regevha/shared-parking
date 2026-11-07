@@ -59,7 +59,7 @@ const ConfigSection: React.FC = () => {
                           remaining: result.remainingPending,
                         }),
                       });
-                    } catch (err: any) {
+                    } catch (err) {
                       notifyError(t('adminPanel.config.autoApprovalFailed'), err);
                     } finally {
                       setAutoApprovalLoading(false);

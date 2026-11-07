@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
 import { useRequests } from '../contexts/RequestsContext';
-import { availabilityApi, type AvailabilityWindowData, DAY_LABELS } from '../api/availability';
+import { availabilityApi, type AvailabilityWindowData, type AvailabilityWindowCreate, DAY_LABELS } from '../api/availability';
+import { errorMessage } from '../utils/notify';
 import type { LotData } from '../api/lots';
 import InfoBanner from './InfoBanner';
 import './AvailabilityWindows.css';
@@ -67,7 +68,7 @@ const AvailabilityWindows: React.FC = () => {
     try {
       const values = await form.validateFields();
       setSaving(true);
-      const payload: any = {
+      const payload: AvailabilityWindowCreate = {
         start_time: values.timeRange[0].format('HH:mm'),
         end_time: values.timeRange[1].format('HH:mm'),
       };
@@ -83,9 +84,9 @@ const AvailabilityWindows: React.FC = () => {
       }));
       setAddModalLot(null);
       notification.success({ message: t('availabilityWindows.notifications.added') });
-    } catch (err: any) {
-      if (err?.errorFields) return; // form validation error — stay open
-      notification.error({ message: err?.message ?? t('availabilityWindows.notifications.saveFailed') });
+    } catch (err) {
+      if ((err as { errorFields?: unknown } | null)?.errorFields) return; // form validation error — stay open
+      notification.error({ message: errorMessage(err) ?? t('availabilityWindows.notifications.saveFailed') });
     } finally {
       setSaving(false);
     }

@@ -4,6 +4,7 @@ import { lotsApi, LotData } from '../api/lots';
 import { useAuth } from './AuthContext';
 import { RequestStatus } from '../types/enums';
 import { usePermissions } from '../hooks/usePermissions';
+import { errorMessage } from '../utils/notify';
 
 export interface ParkingRequest {
   id: string;
@@ -101,8 +102,8 @@ export const RequestsProvider: React.FC<RequestsProviderProps> = ({ children }) 
           setAllLots(lots);
           setOwnerLots([]);
         }
-      } catch (err: any) {
-        setError(err.message || 'Failed to load data from API');
+      } catch (err) {
+        setError(errorMessage(err) || 'Failed to load data from API');
       } finally {
         setLoading(false);
       }
