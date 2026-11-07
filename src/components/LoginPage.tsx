@@ -4,6 +4,7 @@ import { UserOutlined, LockOutlined, CrownOutlined, TeamOutlined } from '@ant-de
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { errorMessage } from '../utils/notify';
+import './LoginPage.css';
 
 const { Title, Text } = Typography;
 
@@ -57,17 +58,10 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: colorBgLayout,
-      padding: 24,
-    }}>
-      <Card style={{ width: '100%', maxWidth: 420 }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <Title level={3} style={{ marginBottom: 4 }}>{t('login.title')}</Title>
+    <div className="login-page" style={{ background: colorBgLayout }}>
+      <Card className="login-card">
+        <div className="login-header">
+          <Title level={3} className="login-title">{t('login.title')}</Title>
           <Text type="secondary">{t('login.subtitle')}</Text>
         </div>
 
@@ -115,13 +109,13 @@ const LoginPage: React.FC = () => {
             />
           </Form.Item>
 
-          <div style={{ textAlign: 'right', marginBottom: 24, marginTop: -12 }}>
-            <Button type="link" onClick={showForgotModal} style={{ padding: 0, fontSize: 13, height: 'auto' }}>
+          <div className="login-forgot">
+            <Button type="link" onClick={showForgotModal} className="login-forgot-btn">
               {t('login.forgotPassword')}
             </Button>
           </div>
 
-          <Form.Item style={{ marginBottom: 0 }}>
+          <Form.Item className="login-submit-item">
             <Button
               type="primary"
               htmlType="submit"
@@ -135,10 +129,10 @@ const LoginPage: React.FC = () => {
         </Form>
 
         <Divider plain>
-          <Text type="secondary" style={{ fontSize: 12 }}>{t('login.demoAccounts')}</Text>
+          <Text type="secondary" className="login-demo-label">{t('login.demoAccounts')}</Text>
         </Divider>
 
-        <Space wrap style={{ justifyContent: 'center', width: '100%' }}>
+        <Space wrap className="login-demo-list">
           {DEMO_ACCOUNTS.map(acct => (
             <Tag
               key={acct.email}
@@ -146,7 +140,7 @@ const LoginPage: React.FC = () => {
               color={acct.color}
               role="button"
               tabIndex={0}
-              style={{ cursor: 'pointer', padding: '4px 10px', fontSize: 13 }}
+              className="login-demo-tag"
               onClick={() => fillDemo(acct.email)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

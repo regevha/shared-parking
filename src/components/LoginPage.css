@@ -1,0 +1,25 @@
+/* Login screen layout. Compound selectors keep precedence over antd's own rules,
+   matching the inline styles these replace. The page background is theme-driven
+   and stays inline in LoginPage.tsx. */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-page .ant-card.login-card { width: 100%; max-width: 420px; }
+
+.login-header { text-align: center; margin-bottom: 32px; }
+.login-header .ant-typography.login-title { margin-bottom: 4px; }
+
+.login-forgot { text-align: right; margin-bottom: 24px; margin-top: -12px; }
+.login-page .ant-btn.login-forgot-btn { padding: 0; font-size: 13px; height: auto; }
+
+.login-page .ant-form-item.login-submit-item { margin-bottom: 0; }
+
+.login-page .ant-typography.login-demo-label { font-size: 12px; }
+
+.login-page .ant-space.login-demo-list { justify-content: center; width: 100%; }
+.login-page .ant-tag.login-demo-tag { cursor: pointer; padding: 4px 10px; font-size: 13px; }
