@@ -371,3 +371,42 @@ def test_scheduler_allows_lot_within_window(client, user_headers, owner_headers,
     req = db.query(models.ParkingRequest).filter(models.ParkingRequest.id == request_id).first()
     result = _is_outside_availability(db, owner_lot_id, req.date, req.start_time, req.end_date, req.end_time)
     assert result is False, "Expected lot to be available within window"
+
+
+# ── Requests that span midnight are checked day by day ──────────────────────
+
+def _open_window(client, owner_headers, lot_id, day_of_week, start, end):
+    resp = client.post(
+        f"/api/lots/{lot_id}/availability",
+        json={"day_of_week": day_of_week, "start_time": start, "end_time": end},
+        headers=owner_headers,
+    )
+    assert resp.status_code == 201
+
+
+def test_multi_day_slot_inside_windows_on_both_days_is_available(client, db_session, owner_headers, owner_lot_id):
+    from routers.requests import _is_outside_availability
+
+    _open_window(client, owner_headers, owner_lot_id, 0, "00:00", "23:59")  # Monday
+    _open_window(client, owner_headers, owner_lot_id, 1, "00:00", "23:59")  # Tuesday
+
+    # Monday 2030-01-07 22:00 -> Tuesday 02:00
+    assert _is_outside_availability(db_session, owner_lot_id, "2030-01-07", "22:00", "2030-01-08", "02:00") is False
+
+
+def test_multi_day_slot_is_unavailable_when_the_second_day_is_not_covered(client, db_session, owner_headers, owner_lot_id):
+    from routers.requests import _is_outside_availability
+
+    _open_window(client, owner_headers, owner_lot_id, 0, "00:00", "23:59")  # Monday
+    _open_window(client, owner_headers, owner_lot_id, 1, "08:00", "18:00")  # Tuesday: closed at 02:00
+
+    assert _is_outside_availability(db_session, owner_lot_id, "2030-01-07", "22:00", "2030-01-08", "02:00") is True
+
+
+def test_multi_day_slot_is_unavailable_when_the_first_day_ends_early(client, db_session, owner_headers, owner_lot_id):
+    from routers.requests import _is_outside_availability
+
+    _open_window(client, owner_headers, owner_lot_id, 0, "08:00", "18:00")  # Monday closes before 22:00
+    _open_window(client, owner_headers, owner_lot_id, 1, "00:00", "23:59")
+
+    assert _is_outside_availability(db_session, owner_lot_id, "2030-01-07", "22:00", "2030-01-08", "02:00") is True
