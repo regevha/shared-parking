@@ -127,3 +127,24 @@ describe('ParkingRequestForm — info banner', () => {
     expect(screen.getByText(/Submit Parking Request:/i)).toBeInTheDocument();
   });
 });
+
+
+describe('ParkingRequestForm — guidance text', () => {
+  it('shows an accurate inline helper instead of the old Business Rules card', () => {
+    renderWithProviders(<ParkingRequestForm />, {
+      authValue: { user: alice },
+      requestsValue: { userRequests: [] },
+    });
+    expect(screen.getByText(/1–36 hours/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`up to ${MAX_ACTIVE} active requests`))).toBeInTheDocument();
+    expect(screen.queryByText(/Business Rules/i)).not.toBeInTheDocument();
+  });
+
+  it('does not show the availability warning before a slot is chosen', () => {
+    renderWithProviders(<ParkingRequestForm />, {
+      authValue: { user: alice },
+      requestsValue: { userRequests: [] },
+    });
+    expect(screen.queryByText(/No lot looks free/i)).not.toBeInTheDocument();
+  });
+});

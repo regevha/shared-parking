@@ -360,3 +360,9 @@ class LotAvailabilityWindowOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class AvailabilityCheckOut(BaseModel):
+    """Informational result for the request form: how many lots could take the requested slot."""
+    available_lots: int
+    total_lots: int

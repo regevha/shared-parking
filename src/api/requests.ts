@@ -95,6 +95,19 @@ export const requestsApi = {
   /** Returns only the authenticated user's requests (server-scoped) */
   getMe:      ()              => api.get<ApiRequest[]>('/api/requests/me').then(rs => rs.map(mapRequest)),
 
+  /** Informational: how many lots could take this slot (not blocked, inside windows, no overlap). */
+  checkAvailability: (q: { date: string; startTime: string; endDate: string; endTime: string }) => {
+    const params = new URLSearchParams({
+      date: q.date,
+      start_time: q.startTime,
+      end_date: q.endDate,
+      end_time: q.endTime,
+    });
+    return api
+      .get<{ available_lots: number; total_lots: number }>(`/api/requests/availability-check?${params}`)
+      .then(r => ({ availableLots: r.available_lots, totalLots: r.total_lots }));
+  },
+
   create: (payload: CreateRequestPayload) =>
     api.post<ApiRequest>('/api/requests', payload).then(mapRequest),
 

@@ -221,3 +221,34 @@ describe('auth header', () => {
     expect((options.headers as Record<string, string>)['Authorization']).toBeUndefined();
   });
 });
+
+
+// ── availability check ───────────────────────────────────────────────────────
+
+describe('requestsApi.checkAvailability', () => {
+  it('sends the slot as query params and maps the response to camelCase', async () => {
+    mockOk({ available_lots: 2, total_lots: 5 });
+
+    const result = await requestsApi.checkAvailability({
+      date: '2026-12-01',
+      startTime: '09:00',
+      endDate: '2026-12-01',
+      endTime: '11:00',
+    });
+
+    expect(result).toEqual({ availableLots: 2, totalLots: 5 });
+    const url = mockFetch.mock.calls[0][0] as string;
+    expect(url).toContain('/api/requests/availability-check?');
+    expect(url).toContain('date=2026-12-01');
+    expect(url).toContain('start_time=09%3A00');
+    expect(url).toContain('end_date=2026-12-01');
+    expect(url).toContain('end_time=11%3A00');
+  });
+
+  it('rejects when the server returns a validation error', async () => {
+    mockError(422, 'End must be after start');
+    await expect(
+      requestsApi.checkAvailability({ date: '2026-12-01', startTime: '11:00', endDate: '2026-12-01', endTime: '09:00' }),
+    ).rejects.toThrow();
+  });
+});

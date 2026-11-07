@@ -207,7 +207,7 @@
     "title": "Submit Parking Request",
     "limitAlert": {
       "title": "Request Limit Reached",
-      "description": "You currently have the maximum number of pending parking requests (5). You cannot submit new requests until one of your existing requests is approved or cancelled."
+      "description": "You currently have the maximum number of active parking requests ({{max}}). You cannot submit new requests until one of your existing requests is approved or cancelled."
     },
     "activeRequestsCard": "Your Pending Requests ({{count}} / {{max}})",
     "labels": {
@@ -232,14 +232,10 @@
     "endTimeInvalid": "⚠️ Invalid: End time would exceed 20:00",
     "submitButton": "Submit Request",
     "submitButtonDisabled": "Cannot Submit (Max Requests Reached)",
-    "businessRules": {
-      "title": "Business Rules",
-      "rule1start": "You can have a maximum of ",
-      "rule1bold": "5 concurrent pending requests",
-      "rule2": "Select any date from today onwards",
-      "rule3": "Start time must be on hourly boundaries (08:00 – 19:00)",
-      "rule4": "Duration is 1–6 hours, automatically limited so end time never exceeds 20:00",
-      "rule5": "End time is auto-calculated and cannot exceed 20:00"
+    "helper": "Pick a date, a start time and a duration (1–36 hours). The end time is calculated for you. You can have up to {{max}} active requests; approval depends on a lot being free at that time.",
+    "availabilityWarning": {
+      "title": "No lot looks free for this time",
+      "description": "Every lot is either outside its owner's availability or already booked for this slot, so approval is unlikely. You can still submit, or try another time."
     },
     "info": "Submit a parking request for a specific date and time slot; an owner will review and approve or reject it.",
     "notifications": {

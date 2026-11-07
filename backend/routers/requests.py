@@ -213,6 +213,48 @@ def get_my_requests(
     )
 
 
+@router.get("/availability-check", response_model=schemas.AvailabilityCheckOut)
+def availability_check(
+    date: str,
+    start_time: str,
+    end_date: str,
+    end_time: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """
+    Informational only (used by the request form): count the lots that could take this slot,
+    i.e. not blocked, inside the lot's availability windows, and with no overlapping approved booking.
+    """
+    try:
+        start_dt = datetime.strptime(f"{date} {start_time}", "%Y-%m-%d %H:%M")
+        end_dt = datetime.strptime(f"{end_date} {end_time}", "%Y-%m-%d %H:%M")
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Invalid date or time format")
+    if end_dt <= start_dt:
+        raise HTTPException(status_code=422, detail="End must be after start")
+
+    lots = db.query(models.Lot).all()
+    available = 0
+    for lot in lots:
+        if lot.status in ("blocked", "unowned-blocked"):
+            try:
+                still_blocked = (
+                    lot.blocked_until is None
+                    or datetime.fromisoformat(str(lot.blocked_until).replace("Z", "+00:00")).replace(tzinfo=None) > start_dt
+                )
+            except ValueError:
+                still_blocked = True
+            if still_blocked:
+                continue
+        if _is_outside_availability(db, lot.id, date, start_time, end_date, end_time):
+            continue
+        if _has_conflict(db, lot.id, date, start_time, end_date, end_time):
+            continue
+        available += 1
+    return schemas.AvailabilityCheckOut(available_lots=available, total_lots=len(lots))
+
+
 @router.post("", response_model=schemas.ParkingRequestOut, status_code=201)
 def create_request(
     payload: schemas.ParkingRequestCreate,
