@@ -264,7 +264,7 @@ Always use `pagination={{ pageSize: 10, hideOnSinglePage: true }}` on all Tables
 - Other shared helpers: `usePermissions()` (`src/hooks/`), `notifyError()` and `isFromYesterdayOnward()` / `isBeforeToday()` (`src/utils/`)
 - `MyRequests`, `AllPendingRequests`, `AllApprovals`, `MyLots` use card list on mobile
 - `LotStatusBoard` uses compact grid on mobile (smaller spots, full-width modal)
-- Calendars default to `day` view on mobile, `week` on desktop
+- Calendars default to `week` view on all screen sizes; on mobile, events are text-free colour blocks and tapping one opens a bottom sheet (`Drawer`) with the details
 
 ### Empty States
 - Reusable `<EmptyState />` component (`src/components/EmptyState.tsx`) with icon, title, description, optional CTA button
