@@ -5,5 +5,5 @@ pydantic[email]==2.9.2
 PyJWT>=2.8.0
 bcrypt==5.0.0
 python-multipart==0.0.22
-python-dotenv==1.0.1
+python-dotenv==1.2.2
 apscheduler==3.10.4
