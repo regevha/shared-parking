@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased]
+
+### Added
+- **Phone-first week view** for Requests View and Lot Calendar:
+  - Swipe left/right to move to the next/previous week (or day/month, matching the current view)
+  - Calendar height now fills the phone screen instead of a fixed 500px
+  - Three or more overlapping events in a day collapse into one count block; tapping it lists them in a bottom sheet
+  - Events with a full day column show a short label (first name / lot id)
+
+### Fixed
+- Multi-day bookings in the all-day row no longer cover the date number in the mobile week header
+- Lot Calendar showed bright day-column dividers in dark mode
+- Larger tap targets on the mobile calendar toolbar
+
+---
+
 ## [0.13.0] - 2026-05-05
 
 ### Fixed

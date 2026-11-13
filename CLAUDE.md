@@ -132,7 +132,7 @@ $env:CI='true'; npm test -- --ci --no-cache
 ## Test Coverage Summary
 
 ### Frontend Tests
-- 24 jest suites, 221 tests (`src/**/__tests__/*.test.ts(x)` plus `src/App.test.tsx`): API clients, contexts, components, i18n, status helpers, and jest-axe accessibility checks.
+- 40 jest suites, 323 tests (`src/**/__tests__/*.test.ts(x)` plus `src/App.test.tsx`): API clients, contexts, components, i18n, status helpers, and jest-axe accessibility checks.
 - `src/App.test.tsx` — Basic app rendering, navigation, and provider initialization.
 - `src/components/__tests__/AdminPanel.test.tsx` — Admin functionalities: User/Lot management and defensive UI rendering.
 - `src/components/__tests__/AllPendingRequests.test.tsx` — Real-world simulation of approval/rejection workflows across roles.
@@ -264,7 +264,9 @@ Always use `pagination={{ pageSize: 10, hideOnSinglePage: true }}` on all Tables
 - Other shared helpers: `usePermissions()` (`src/hooks/`), `notifyError()` and `isFromYesterdayOnward()` / `isBeforeToday()` (`src/utils/`)
 - `MyRequests`, `AllPendingRequests`, `AllApprovals`, `MyLots` use card list on mobile
 - `LotStatusBoard` uses compact grid on mobile (smaller spots, full-width modal)
-- Calendars default to `week` view on all screen sizes; on mobile, events are text-free colour blocks and tapping one opens a bottom sheet (`Drawer`) with the details
+- Calendars default to `week` view on all screen sizes. Phone week view (shared code in `src/components/calendar/`):
+  - `mobileWeek.tsx` — `buildMobileWeekEvents()` collapses 3+ simultaneous events in a day into one count block (`ClusterEvent`); tapping it opens `<ClusterSheet />` (bottom sheet listing the members). Events with a full column show a short label (`shortTitle`); tapping any event opens the details bottom sheet (`Drawer`)
+  - `useMobileCalendar()` in `calendarShared.tsx` — swipe left/right to move one day/week/month (`src/hooks/useSwipeNavigation.ts`) and a height that fills the screen (`src/hooks/useViewportFillHeight.ts`)
 
 ### Empty States
 - Reusable `<EmptyState />` component (`src/components/EmptyState.tsx`) with icon, title, description, optional CTA button

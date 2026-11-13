@@ -1,8 +1,10 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { DatePicker } from 'antd';
 import type { View } from 'react-big-calendar';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { useSwipeNavigation, SwipeDirection } from '../../hooks/useSwipeNavigation';
+import { useViewportFillHeight } from '../../hooks/useViewportFillHeight';
 
 /** Day-header cell for the compact mobile week view ("MO" over the day number). */
 export const MobileDayHeader: React.FC<{ date: Date }> = ({ date: headerDate }) => {
@@ -37,6 +39,31 @@ export function useCalendarHours() {
   const minTime = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
   const maxTime = useMemo(() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; }, []);
   return { scrollTo8AM, minTime, maxTime };
+}
+
+/**
+ * Phone behaviour shared by both calendars: swipe left/right to move one day/week/month (matching
+ * the current view), a short slide animation, and a height that fills the screen.
+ * Spread `wrapperProps` on the element that wraps the calendar.
+ */
+export function useMobileCalendar(view: View, date: Date, setDate: (d: Date) => void, isMobile: boolean) {
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [slide, setSlide] = useState<{ dir: SwipeDirection; n: number } | null>(null);
+
+  const onSwipe = useCallback((dir: SwipeDirection) => {
+    const unit = view === 'month' ? 'month' : view === 'week' ? 'week' : 'day';
+    setDate(dayjs(date).add(dir === 'next' ? 1 : -1, unit).toDate());
+    setSlide(prev => ({ dir, n: (prev?.n ?? 0) + 1 }));
+  }, [view, date, setDate]);
+
+  const swipeHandlers = useSwipeNavigation(onSwipe, isMobile);
+  const height = useViewportFillHeight(wrapperRef, { min: view === 'month' ? 520 : 420, enabled: isMobile });
+
+  // Alternating the class name (…-0 / …-1) restarts the CSS animation on consecutive swipes.
+  const slideClass = slide ? ` calendar-slide-${slide.dir}-${slide.n % 2}` : '';
+  const className = `calendar-naked-wrapper${view === 'week' ? ' calendar-week-view' : ''}${slideClass}`;
+
+  return { wrapperProps: { ref: wrapperRef, className, ...swipeHandlers }, height: height ?? 500 };
 }
 
 type CalendarNamespace = 'calendarView' | 'lotCalendarView';

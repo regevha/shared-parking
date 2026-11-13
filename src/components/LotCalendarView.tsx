@@ -19,7 +19,8 @@ import AuditTrailModal from './AuditTrailModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { usePermissions } from '../hooks/usePermissions';
 import { isFromYesterdayOnward } from '../utils/dates';
-import { MobileDayHeader, currentHourSlotPropGetter, useCalendarHours, useCalendarToolbars } from './calendar/calendarShared';
+import { MobileDayHeader, currentHourSlotPropGetter, useCalendarHours, useCalendarToolbars, useMobileCalendar } from './calendar/calendarShared';
+import { buildMobileWeekEvents, isClusterEvent, clusterEventStyle, ClusterEvent, ClusterSheet, MobileWeekEvent } from './calendar/mobileWeek';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -35,6 +36,7 @@ interface LotCalendarEvent {
   availableCount?: number;
   totalLots?: number;
   isMine?: boolean;
+  shortTitle?: string;
 }
 
 // Fills carry white text, so they must meet WCAG AA (see utils/calendarColors.ts)
@@ -64,13 +66,6 @@ const CustomEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => {
   );
 };
 
-
-// Text-free block for the mobile week view: colour + position carry the meaning,
-// the full details open in a bottom sheet on tap.
-const CustomMobileWeekEvent: React.FC<{ event: LotCalendarEvent }> = ({ event }) => (
-  <div className="custom-event-week-mobile" role="img" aria-label={event.title} title={event.title} />
-);
-
 const LotCalendarView: React.FC = () => {
   const { pendingRequests, approvedRequests, approveRequest, rejectRequest, ownerLots, allLots } = useRequests();
   const { user } = useAuth();
@@ -84,6 +79,8 @@ const LotCalendarView: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<LotCalendarEvent | null>(null);
   const [selectedLot, setSelectedLot] = useState<string>('all');
   const [showHistory, setShowHistory] = useState(false);
+  const [openCluster, setOpenCluster] = useState<ClusterEvent<LotCalendarEvent> | null>(null);
+  const { wrapperProps, height: mobileCalendarHeight } = useMobileCalendar(view, date, setDate, isMobile);
 
   const { scrollTo8AM, minTime, maxTime } = useCalendarHours();
 
@@ -110,6 +107,7 @@ const LotCalendarView: React.FC = () => {
       .map(a => ({
         id: a.id,
         title: `${a.requesterName.split(' ')[0]} · ${a.lotId}`,
+        shortTitle: a.requesterName.split(' ')[0],
         start: new Date(`${a.date}T${a.startTime}:00`),
         end: new Date(`${a.endDate || a.date}T${a.endTime}:00`),
         type: 'booked' as EventType,
@@ -126,6 +124,7 @@ const LotCalendarView: React.FC = () => {
       .map(r => ({
         id: `pending-${r.id}`,
         title: `⏳ ${r.requesterName.split(' ')[0]}`,
+        shortTitle: r.requesterName.split(' ')[0],
         start: new Date(`${r.date}T${r.startTime}:00`),
         end: new Date(`${r.endDate || r.date}T${r.endTime}:00`),
         type: 'pending' as EventType,
@@ -144,6 +143,7 @@ const LotCalendarView: React.FC = () => {
         return {
           id: `blocked-${l.id}`,
           title: `🔒 ${l.id}`,
+          shortTitle: l.id,
           start: until.startOf('day').toDate(),
           end: until.toDate(),
           type: 'blocked' as EventType,
@@ -212,6 +212,7 @@ const LotCalendarView: React.FC = () => {
           result.push({
             id: `avail-${day.format('YYYY-MM-DD')}-${h}`,
             title: `✓ ${freeLots.length}/${visibleLots.length}`,
+            shortTitle: `✓${freeLots.length}`,
             start: day.hour(h).minute(0).second(0).toDate(),
             end:   day.hour(h + 1).minute(0).second(0).toDate(),
             type: 'available' as EventType,
@@ -236,7 +237,16 @@ const LotCalendarView: React.FC = () => {
       : [...bookedEvents, ...pendingEvents, ...blockedEvents],
   [bookedEvents, pendingEvents, blockedEvents, availableEvents, selectedLot]);
 
-  const eventStyleGetter = (event: LotCalendarEvent) => {
+  // Phone week view: crowded stacks collapse into a count block (see calendar/mobileWeek.tsx)
+  const mobileWeekEvents = useMemo(() => buildMobileWeekEvents(events), [events]);
+
+  const handleSelectEvent = (event: LotCalendarEvent | ClusterEvent<LotCalendarEvent>) => {
+    if (isClusterEvent(event)) setOpenCluster(event);
+    else setSelectedEvent(event);
+  };
+
+  const eventStyleGetter = (event: LotCalendarEvent | ClusterEvent<LotCalendarEvent>) => {
+    if (isClusterEvent(event)) return clusterEventStyle;
     const color = EVENT_COLORS[event.type];
     return {
       style: {
@@ -292,7 +302,7 @@ const LotCalendarView: React.FC = () => {
 
   const mobileWeekComponents = useMemo(() => ({
     toolbar: CustomMobileToolbar,
-    event: CustomMobileWeekEvent,
+    event: MobileWeekEvent,
     header: MobileDayHeader,
   }), [CustomMobileToolbar]);
 
@@ -306,8 +316,6 @@ const LotCalendarView: React.FC = () => {
     const rangeEnd   = (view === 'week' ? dayjs(date).endOf('week')   : dayjs(date).endOf('day')).toDate();
     return events.some(e => e.start < rangeEnd && e.end > rangeStart);
   }, [events, date, view]);
-
-  const mobileCalendarHeight = view === 'month' ? 620 : 500;
 
   // Modal title + content based on event type
   const modalTitle = useMemo(() => {
@@ -434,10 +442,10 @@ const LotCalendarView: React.FC = () => {
       {/* Calendar — forced LTR: react-big-calendar has no RTL support */}
       <div dir="ltr">
       {isMobile ? (
-        <div className={`calendar-naked-wrapper${view === 'week' ? ' calendar-week-view' : ''}`}>
+        <div {...wrapperProps}>
           <Calendar
             localizer={localizer}
-            events={events}
+            events={(view === 'week' ? mobileWeekEvents : events) as LotCalendarEvent[]}
             view={view}
             onView={setView}
             date={date}
@@ -445,7 +453,7 @@ const LotCalendarView: React.FC = () => {
             views={['day', 'week', 'month']}
             style={{ height: mobileCalendarHeight }}
             eventPropGetter={eventStyleGetter}
-            onSelectEvent={(event: LotCalendarEvent) => setSelectedEvent(event)}
+            onSelectEvent={handleSelectEvent}
             popup
             scrollToTime={scrollTo8AM}
             step={60}
@@ -473,7 +481,7 @@ const LotCalendarView: React.FC = () => {
             views={['day', 'week', 'month']}
             style={{ height: 700 }}
             eventPropGetter={eventStyleGetter}
-            onSelectEvent={(event: LotCalendarEvent) => setSelectedEvent(event)}
+            onSelectEvent={handleSelectEvent}
             popup
             scrollToTime={scrollTo8AM}
             step={60}
@@ -562,6 +570,13 @@ const LotCalendarView: React.FC = () => {
           {renderModalContent()}
         </Modal>
       )}
+
+      <ClusterSheet
+        cluster={openCluster}
+        onClose={() => setOpenCluster(null)}
+        onSelect={(member) => { setOpenCluster(null); setSelectedEvent(member); }}
+        getColor={(member) => EVENT_COLORS[member.type]}
+      />
 
       {showHistory && selectedEvent?.resource?.id && (
         <AuditTrailModal 
