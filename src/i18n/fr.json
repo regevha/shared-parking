@@ -255,6 +255,10 @@
     "durationOption_other": "{{count}} heures"
   },
   "calendarView": {
+    "cluster": {
+      "title": "{{n}} en chevauchement · {{day}}",
+      "label": "{{n}} en chevauchement, {{time}}. Touchez pour les afficher."
+    },
     "toolbar": {
       "today": "Aujourd'hui",
       "weekShort": "Sem"

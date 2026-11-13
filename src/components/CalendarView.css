@@ -329,3 +329,149 @@
     border-color: #1677ff;
   }
 }
+
+/* ── Phone-first week view ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* The grid fills the screen (height set by useViewportFillHeight); empty note floats inside it */
+  .calendar-naked-wrapper {
+    position: relative;
+  }
+
+  /* Vertical scroll stays native; horizontal swipes change the period instead of triggering the
+     browser's back/forward gesture. The time grid is its own scroller, so it needs the rule too. */
+  .calendar-naked-wrapper,
+  .calendar-naked-wrapper .rbc-time-content,
+  .calendar-naked-wrapper .rbc-month-view {
+    touch-action: pan-y;
+    overscroll-behavior-x: contain;
+  }
+
+  .calendar-naked-wrapper .calendar-empty-state {
+    position: absolute;
+    top: 45%;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+  }
+
+  /* Header row must be as tall as its 2-line cells, or they spill over the all-day row */
+  .calendar-week-view .rbc-time-header-cell {
+    min-height: 44px;
+  }
+
+  /* All-day row only takes space when a multi-day booking is in it */
+  .calendar-week-view .rbc-allday-cell,
+  .calendar-week-view .rbc-allday-cell .rbc-row-content {
+    min-height: 6px;
+    height: auto;
+  }
+
+  /* Short label inside an event that has a whole day column to itself */
+  .custom-event-week-mobile {
+    overflow: hidden;
+    padding: 2px 2px 0;
+    box-sizing: border-box;
+  }
+
+  .mobile-week-event-label {
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+  }
+
+  /* Count block standing in for 3+ overlapping events */
+  .mobile-week-cluster {
+    height: 100%;
+    min-height: 12px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 3px;
+    box-sizing: border-box;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0 4px, transparent 4px 8px);
+  }
+
+  /* Comfortable tap targets in the toolbar */
+  .mobile-toolbar-nav button,
+  .mobile-toolbar-views button {
+    min-height: 36px;
+    min-width: 40px;
+  }
+
+  /* Slide-in after a swipe; two names per direction so consecutive swipes restart it */
+  .calendar-slide-next-0 .rbc-time-view, .calendar-slide-next-0 .rbc-month-view { animation: calendar-slide-next-a 180ms ease-out; }
+  .calendar-slide-next-1 .rbc-time-view, .calendar-slide-next-1 .rbc-month-view { animation: calendar-slide-next-b 180ms ease-out; }
+  .calendar-slide-prev-0 .rbc-time-view, .calendar-slide-prev-0 .rbc-month-view { animation: calendar-slide-prev-a 180ms ease-out; }
+  .calendar-slide-prev-1 .rbc-time-view, .calendar-slide-prev-1 .rbc-month-view { animation: calendar-slide-prev-b 180ms ease-out; }
+
+  @keyframes calendar-slide-next-a { from { transform: translateX(24px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+  @keyframes calendar-slide-next-b { from { transform: translateX(24px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+  @keyframes calendar-slide-prev-a { from { transform: translateX(-24px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+  @keyframes calendar-slide-prev-b { from { transform: translateX(-24px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .calendar-naked-wrapper .rbc-time-view,
+    .calendar-naked-wrapper .rbc-month-view { animation: none !important; }
+  }
+}
+
+/* Bottom sheet listing the events behind a cluster block */
+.cluster-sheet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cluster-sheet-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--toolbar-border);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.cluster-sheet-list li:last-child .cluster-sheet-item { border-bottom: 0; }
+
+.cluster-sheet-swatch {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.cluster-sheet-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.cluster-sheet-time {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+@media (max-width: 768px) {
+  /* Give events the whole day column (the desktop 10px gutter is for click-to-create, unused here) */
+  .calendar-week-view .rbc-day-slot .rbc-events-container {
+    margin-right: 2px;
+  }
+}

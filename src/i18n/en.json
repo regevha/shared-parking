@@ -255,6 +255,10 @@
     "durationOption_other": "{{count}} hours"
   },
   "calendarView": {
+    "cluster": {
+      "title": "{{n}} overlapping · {{day}}",
+      "label": "{{n}} overlapping, {{time}}. Tap to list them."
+    },
     "toolbar": {
       "today": "Today",
       "weekShort": "Wk"

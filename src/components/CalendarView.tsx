@@ -17,7 +17,8 @@ import './CalendarView.css';
 import AuditTrailModal from './AuditTrailModal';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { isFromYesterdayOnward } from '../utils/dates';
-import { MobileDayHeader, currentHourSlotPropGetter, useCalendarHours, useCalendarToolbars } from './calendar/calendarShared';
+import { MobileDayHeader, currentHourSlotPropGetter, useCalendarHours, useCalendarToolbars, useMobileCalendar } from './calendar/calendarShared';
+import { buildMobileWeekEvents, isClusterEvent, clusterEventStyle, ClusterEvent, ClusterSheet, MobileWeekEvent } from './calendar/mobileWeek';
 
 const DnDCalendar = withDragAndDrop(Calendar as any) as any;
 
@@ -34,6 +35,8 @@ interface CalendarEvent {
   end: Date;
   resource: ParkingRequest;
   isMine: boolean;
+  shortTitle?: string;
+  a11yLabel?: string;
 }
 
 // Fills carry white text, so they must meet WCAG AA (see utils/calendarColors.ts)
@@ -57,13 +60,6 @@ const CustomEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => {
   );
 };
 
-// Text-free block for the mobile week view: colour + position carry the meaning,
-// the full details open in a bottom sheet on tap.
-const CustomMobileWeekEvent: React.FC<{ event: CalendarEvent }> = ({ event }) => {
-  const label = `${event.resource.requesterName}, ${event.resource.startTime}–${event.resource.endTime}`;
-  return <div className="custom-event-week-mobile" role="img" aria-label={label} title={label} />;
-};
-
 
 const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const { pendingRequests, approvedRequests, userRequests, updateUserRequest } = useRequests();
@@ -75,6 +71,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const [date, setDate] = useState(new Date());
   const [selectedRequest, setSelectedRequest] = useState<ParkingRequest | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [openCluster, setOpenCluster] = useState<ClusterEvent<CalendarEvent> | null>(null);
+  const { wrapperProps, height: mobileCalendarHeight } = useMobileCalendar(view, date, setDate, isMobile);
 
 
   const myRequestIds = useMemo(() => new Set(userRequests.map((r) => r.id)), [userRequests]);
@@ -115,11 +113,22 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       end: new Date(`${req.endDate || req.date}T${req.endTime}:00`),
       resource: req,
       isMine: myRequestIds.has(req.id),
+      shortTitle: req.requesterName.split(' ')[0],
+      a11yLabel: `${req.requesterName}, ${req.startTime}–${req.endTime}`,
     })),
     [allRequests, myRequestIds]
   );
 
-  const eventStyleGetter = (event: CalendarEvent) => {
+  // Phone week view: crowded stacks collapse into a count block (see calendar/mobileWeek.tsx)
+  const mobileWeekEvents = useMemo(() => buildMobileWeekEvents(events), [events]);
+
+  const handleSelectEvent = (event: CalendarEvent | ClusterEvent<CalendarEvent>) => {
+    if (isClusterEvent(event)) setOpenCluster(event);
+    else setSelectedRequest(event.resource);
+  };
+
+  const eventStyleGetter = (event: CalendarEvent | ClusterEvent<CalendarEvent>) => {
+    if (isClusterEvent(event)) return clusterEventStyle;
     const color = getStatusColor(event.resource);
     return {
       style: {
@@ -183,7 +192,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   // Week view on mobile: compact event + short time labels
   const mobileWeekComponents = useMemo(() => ({
     toolbar: CustomMobileToolbar,
-    event: CustomMobileWeekEvent,
+    event: MobileWeekEvent,
     header: MobileDayHeader,
   }), [CustomMobileToolbar]);
 
@@ -204,8 +213,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   const pendingCount = allRequests.filter((r) => r.status === RequestStatus.PENDING && !r.rejectedByOwner).length;
   const approvedCount = allRequests.filter((r) => r.status === RequestStatus.APPROVED).length;
   const rejectedCount = allRequests.filter((r) => r.rejectedByOwner).length;
-
-  const mobileCalendarHeight = view === 'month' ? 620 : 500;
 
   const detailTitle = selectedRequest ? t('calendarView.modal.title', { name: selectedRequest.requesterName }) : '';
   const detailFooter = (
@@ -244,10 +251,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
       {/* Calendar — forced LTR: react-big-calendar has no RTL support */}
       <div dir="ltr">
       {isMobile ? (
-        <div className={`calendar-naked-wrapper${view === 'week' ? ' calendar-week-view' : ''}`}>
+        <div {...wrapperProps}>
           <DnDCalendar
             localizer={localizer}
-            events={events}
+            events={view === 'week' ? mobileWeekEvents : events}
             view={view}
             onView={handleViewChange}
             date={date}
@@ -255,7 +262,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             views={['day', 'week', 'month']}
             style={{ height: mobileCalendarHeight }}
             eventPropGetter={eventStyleGetter}
-            onSelectEvent={(event: CalendarEvent) => setSelectedRequest(event.resource)}
+            onSelectEvent={handleSelectEvent}
             popup
             draggableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
             resizableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
@@ -287,7 +294,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
             views={['day', 'week', 'month']}
             style={{ height: 700 }}
             eventPropGetter={eventStyleGetter}
-            onSelectEvent={(event: CalendarEvent) => setSelectedRequest(event.resource)}
+            onSelectEvent={handleSelectEvent}
             popup
             draggableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
             resizableAccessor={(event: CalendarEvent) => event.isMine && event.resource.status === 'pending'}
@@ -386,6 +393,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
           {detailBody}
         </Modal>
       )}
+
+      <ClusterSheet
+        cluster={openCluster}
+        onClose={() => setOpenCluster(null)}
+        onSelect={(member) => { setOpenCluster(null); setSelectedRequest(member.resource); }}
+        getColor={(member) => getStatusColor(member.resource)}
+      />
 
       {showHistory && selectedRequest && (
         <AuditTrailModal 
