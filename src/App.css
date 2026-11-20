@@ -221,3 +221,8 @@
 [data-theme="dark"] .calendar-week-view .rbc-time-header-gutter {
   background-color: #141414 !important;
 }
+
+/* Day-column divider drawn by react-big-calendar on the events container (light grey by default) */
+[data-theme="dark"] .rbc-time-content > * + * > * {
+  border-left-color: #303030;
+}

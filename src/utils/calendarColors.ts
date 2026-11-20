@@ -12,6 +12,8 @@ export const EVENT_FILL = {
   pending: '#ad4e00',
   rejected: '#cf1322',
   available: '#006d75',
+  /** Neutral block standing in for several overlapping events (phone week view). */
+  cluster: '#4b5563',
 } as const;
 
 export const ACCENT_TEXT = {

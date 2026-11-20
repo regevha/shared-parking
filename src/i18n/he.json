@@ -255,6 +255,11 @@
     "durationOption_other": "{{count}} שעות"
   },
   "calendarView": {
+    "cluster": {
+      "title": "{{n}} חופפים · {{day}}",
+      "label": "{{n}} חופפים, {{time}}. הקישו להצגת הרשימה.",
+      "labelWithBreakdown": "{{n}} חופפים, {{time}}: {{breakdown}}. הקישו להצגת הרשימה."
+    },
     "toolbar": {
       "today": "היום",
       "weekShort": "שבוע"
