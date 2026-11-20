@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Phone-first week view** for Requests View and Lot Calendar:
   - Swipe left/right to move to the next/previous week (or day/month, matching the current view)
   - Calendar height now fills the phone screen instead of a fixed 500px
-  - Three or more overlapping events in a day collapse into one count block; tapping it lists them in a bottom sheet
+  - Three or more overlapping events in a day collapse into one count block, striped by status (each stripe's width matches its share); tapping it lists them in a bottom sheet
   - Events with a full day column show a short label (first name / lot id)
 
 ### Fixed

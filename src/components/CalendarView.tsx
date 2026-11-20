@@ -120,7 +120,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ role = 'User' }) => {
   );
 
   // Phone week view: crowded stacks collapse into a count block (see calendar/mobileWeek.tsx)
-  const mobileWeekEvents = useMemo(() => buildMobileWeekEvents(events), [events]);
+  const mobileWeekEvents = useMemo(
+    () => buildMobileWeekEvents(events, e => ({ color: getStatusColor(e.resource), label: t(getStatusLabel(e.resource)) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the colour/label helpers are pure; `t` changes with the language
+    [events, t]
+  );
 
   const handleSelectEvent = (event: CalendarEvent | ClusterEvent<CalendarEvent>) => {
     if (isClusterEvent(event)) setOpenCluster(event);

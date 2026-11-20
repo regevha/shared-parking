@@ -383,8 +383,9 @@
     text-overflow: clip;
   }
 
-  /* Count block standing in for 3+ overlapping events */
+  /* Count block standing in for 3+ overlapping events: one stripe per status, count on a chip */
   .mobile-week-cluster {
+    position: relative;
     height: 100%;
     min-height: 12px;
     display: flex;
@@ -395,7 +396,30 @@
     font-size: 13px;
     font-weight: 700;
     line-height: 1;
-    background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0 4px, transparent 4px 8px);
+  }
+
+  .mobile-week-cluster-bands {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    gap: 1px;
+    background: rgba(0, 0, 0, 0.35); /* shows through the gaps as stripe dividers */
+  }
+
+  .mobile-week-cluster-band {
+    flex-basis: 0;
+    min-width: 4px;
+  }
+
+  /* Neutral chip keeps the white count readable whatever stripe is behind it */
+  .mobile-week-cluster-count {
+    position: relative;
+    min-width: 18px;
+    padding: 2px 4px;
+    border-radius: 9px;
+    background: #4b5563;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55);
+    text-align: center;
   }
 
   /* Comfortable tap targets in the toolbar */

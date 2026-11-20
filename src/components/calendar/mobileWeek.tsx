@@ -11,6 +11,8 @@ import { EVENT_FILL } from '../../utils/calendarColors';
  * slivers that cannot be read or tapped. `buildMobileWeekEvents` therefore collapses any group of
  * overlapping events that would need more than `maxColumns` columns into one "cluster" block
  * showing a count; tapping it opens `ClusterSheet`, a bottom sheet listing the members.
+ * When the caller says which status each event has (`getBand`), the block is filled with one
+ * vertical stripe per status, each as wide as that status's share of the members.
  */
 
 export interface WeekEventBase {
@@ -24,6 +26,16 @@ export interface WeekEventBase {
   a11yLabel?: string;
 }
 
+/** How one event is counted in a cluster's stripes: its fill colour and a translated status name. */
+export interface BandKey {
+  color: string;
+  label: string;
+}
+
+export interface ClusterBand extends BandKey {
+  count: number;
+}
+
 export interface ClusterEvent<E extends WeekEventBase> {
   id: string;
   title: string;
@@ -31,6 +43,8 @@ export interface ClusterEvent<E extends WeekEventBase> {
   end: Date;
   isCluster: true;
   members: E[];
+  /** One entry per status among the members, largest first. Empty when no `getBand` was given. */
+  bands: ClusterBand[];
 }
 
 export type MobileWeekItem<E extends WeekEventBase> = (E & { fullWidth?: boolean }) | ClusterEvent<E>;
@@ -61,8 +75,24 @@ function maxConcurrency(group: WeekEventBase[]): number {
   return max;
 }
 
+/** Groups members by status (colour + label), largest group first; ties keep first-seen order. */
+export function clusterBands<E>(members: E[], getBand: (member: E) => BandKey): ClusterBand[] {
+  const bands: ClusterBand[] = [];
+  members.forEach(member => {
+    const key = getBand(member);
+    const existing = bands.find(b => b.color === key.color && b.label === key.label);
+    if (existing) existing.count += 1;
+    else bands.push({ ...key, count: 1 });
+  });
+  return bands
+    .map((band, order) => ({ band, order }))
+    .sort((a, b) => b.band.count - a.band.count || a.order - b.order)
+    .map(({ band }) => band);
+}
+
 export function buildMobileWeekEvents<E extends WeekEventBase>(
   events: E[],
+  getBand?: (member: E) => BandKey,
   maxColumns: number = MOBILE_WEEK_MAX_COLUMNS,
 ): MobileWeekItem<E>[] {
   const result: MobileWeekItem<E>[] = [];
@@ -94,6 +124,7 @@ export function buildMobileWeekEvents<E extends WeekEventBase>(
           end: new Date(groupEnd),
           isCluster: true,
           members: group,
+          bands: getBand ? clusterBands(group, getBand) : [],
         });
       }
       group = [];
@@ -110,7 +141,7 @@ export function buildMobileWeekEvents<E extends WeekEventBase>(
   return result;
 }
 
-/** Style for a cluster block (white count on a neutral fill that meets WCAG AA). */
+/** Style for a cluster block: the stripes fill it edge to edge, the count sits on a neutral chip. */
 export const clusterEventStyle = {
   style: {
     backgroundColor: EVENT_FILL.cluster,
@@ -118,6 +149,8 @@ export const clusterEventStyle = {
     color: '#fff',
     borderRadius: '3px',
     fontSize: '12px',
+    padding: 0,
+    overflow: 'hidden',
   },
 };
 
@@ -127,10 +160,26 @@ const timeRange = (start: Date, end: Date) => `${dayjs(start).format('HH:mm')}â€
 export const MobileWeekEvent: React.FC<{ event: MobileWeekItem<WeekEventBase> }> = ({ event }) => {
   const { t } = useTranslation();
   if (isClusterEvent(event)) {
-    const label = t('calendarView.cluster.label', { n: event.members.length, time: timeRange(event.start, event.end) });
+    const n = event.members.length;
+    const time = timeRange(event.start, event.end);
+    const label = event.bands.length > 0
+      ? t('calendarView.cluster.labelWithBreakdown', { n, time, breakdown: event.bands.map(b => `${b.count} ${b.label}`).join(', ') })
+      : t('calendarView.cluster.label', { n, time });
     return (
       <div className="mobile-week-cluster" role="img" aria-label={label} title={label}>
-        <span aria-hidden="true">{event.members.length}</span>
+        {event.bands.length > 0 && (
+          <div className="mobile-week-cluster-bands" aria-hidden="true">
+            {event.bands.map(band => (
+              <span
+                key={`${band.color}-${band.label}`}
+                className="mobile-week-cluster-band"
+                data-testid="cluster-band"
+                style={{ backgroundColor: band.color, flexGrow: band.count }}
+              />
+            ))}
+          </div>
+        )}
+        <span className="mobile-week-cluster-count" aria-hidden="true">{n}</span>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import {
-  buildMobileWeekEvents, isClusterEvent, ClusterEvent, ClusterSheet, MobileWeekEvent, WeekEventBase, clusterEventStyle,
+  buildMobileWeekEvents, clusterBands, isClusterEvent, ClusterEvent, ClusterSheet, MobileWeekEvent, WeekEventBase, clusterEventStyle,
 } from '../mobileWeek';
 import { EVENT_FILL } from '../../../utils/calendarColors';
 
@@ -64,9 +64,51 @@ describe('buildMobileWeekEvents', () => {
   });
 
   it('respects a custom column limit', () => {
-    const out = buildMobileWeekEvents([ev('a', '09:00', '11:00'), ev('b', '10:00', '12:00')], 1);
+    const out = buildMobileWeekEvents([ev('a', '09:00', '11:00'), ev('b', '10:00', '12:00')], undefined, 1);
     expect(out).toHaveLength(1);
     expect(isClusterEvent(out[0])).toBe(true);
+  });
+});
+
+describe('cluster stripes', () => {
+  const STATUS: Record<string, { color: string; label: string }> = {
+    p: { color: '#ad4e00', label: 'Pending' },
+    a: { color: '#237804', label: 'Approved' },
+  };
+  const band = (e: WeekEventBase) => STATUS[e.id[0]];
+
+  it('counts members per status, largest group first, ties in first-seen order', () => {
+    const members = ['a1', 'p1', 'p2', 'p3', 'a2'].map(id => ev(id, '09:00', '11:00'));
+    expect(clusterBands(members, band)).toEqual([
+      { color: '#ad4e00', label: 'Pending', count: 3 },
+      { color: '#237804', label: 'Approved', count: 2 },
+    ]);
+    expect(clusterBands([ev('a1', '09:00', '11:00'), ev('p1', '09:00', '11:00')], band).map(b => b.label)).toEqual(['Approved', 'Pending']);
+  });
+
+  it('stores the stripes on the cluster when a status function is given, and none otherwise', () => {
+    const events = ['p1', 'p2', 'a1'].map(id => ev(id, '09:00', '11:00'));
+    const [withBands] = buildMobileWeekEvents(events, band) as ClusterEvent<WeekEventBase>[];
+    expect(withBands.bands.map(b => [b.label, b.count])).toEqual([['Pending', 2], ['Approved', 1]]);
+    const [plain] = buildMobileWeekEvents(events) as ClusterEvent<WeekEventBase>[];
+    expect(plain.bands).toEqual([]);
+  });
+
+  it('draws one stripe per status, sized by count, and reads the breakdown to screen readers', () => {
+    const [cluster] = buildMobileWeekEvents(['p1', 'p2', 'a1'].map(id => ev(id, '09:00', '11:00')), band);
+    render(<MobileWeekEvent event={cluster} />);
+    const stripes = screen.getAllByTestId('cluster-band');
+    expect(stripes).toHaveLength(2);
+    expect(stripes[0]).toHaveStyle({ backgroundColor: '#ad4e00', flexGrow: '2' });
+    expect(stripes[1]).toHaveStyle({ backgroundColor: '#237804', flexGrow: '1' });
+    expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.getByRole('img').getAttribute('aria-label')).toContain('2 Pending, 1 Approved');
+  });
+
+  it('draws no stripes for a cluster built without statuses', () => {
+    const [cluster] = buildMobileWeekEvents(['p1', 'p2', 'a1'].map(id => ev(id, '09:00', '11:00')));
+    render(<MobileWeekEvent event={cluster} />);
+    expect(screen.queryAllByTestId('cluster-band')).toHaveLength(0);
   });
 });
 

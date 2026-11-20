@@ -257,7 +257,8 @@
   "calendarView": {
     "cluster": {
       "title": "{{n}} en chevauchement · {{day}}",
-      "label": "{{n}} en chevauchement, {{time}}. Touchez pour les afficher."
+      "label": "{{n}} en chevauchement, {{time}}. Touchez pour les afficher.",
+      "labelWithBreakdown": "{{n}} en chevauchement, {{time}} : {{breakdown}}. Touchez pour les afficher."
     },
     "toolbar": {
       "today": "Aujourd'hui",

@@ -238,7 +238,10 @@ const LotCalendarView: React.FC = () => {
   [bookedEvents, pendingEvents, blockedEvents, availableEvents, selectedLot]);
 
   // Phone week view: crowded stacks collapse into a count block (see calendar/mobileWeek.tsx)
-  const mobileWeekEvents = useMemo(() => buildMobileWeekEvents(events), [events]);
+  const mobileWeekEvents = useMemo(
+    () => buildMobileWeekEvents(events, e => ({ color: EVENT_COLORS[e.type], label: t(`lotCalendarView.legend.${e.type}`) })),
+    [events, t]
+  );
 
   const handleSelectEvent = (event: LotCalendarEvent | ClusterEvent<LotCalendarEvent>) => {
     if (isClusterEvent(event)) setOpenCluster(event);

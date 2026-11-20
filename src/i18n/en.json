@@ -257,7 +257,8 @@
   "calendarView": {
     "cluster": {
       "title": "{{n}} overlapping · {{day}}",
-      "label": "{{n}} overlapping, {{time}}. Tap to list them."
+      "label": "{{n}} overlapping, {{time}}. Tap to list them.",
+      "labelWithBreakdown": "{{n}} overlapping, {{time}}: {{breakdown}}. Tap to list them."
     },
     "toolbar": {
       "today": "Today",
